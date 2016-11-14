@@ -1,4 +1,4 @@
-#  Neuromorphic Benchmarks
+#  SNABSuite -- Spiking Neural Architecture Benchmark Suite
 #  Copyright (C) 2016  Christoph Jenzen
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -111,5 +111,5 @@ target_link_libraries(benchmark
 # Unit tests -- only enable if gtest is present
 #
 if(${GTEST_FOUND})
-	#add_subdirectory(test)
+	add_subdirectory(test)
 endif()
