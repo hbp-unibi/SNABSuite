@@ -21,26 +21,46 @@
 #include "util/utilities.hpp"
 
 namespace SNAB {
-cypress::Json read_config(std::string name, std::string backend){
-    cypress::Json config;
+cypress::Json read_config(std::string name, std::string backend)
+{
+	cypress::Json config;
 	{
 		std::ifstream ifs("../config/" + name + ".json");
-		config << ifs;
+		if (ifs.good()) {
+			config << ifs;
+		}
+		else {
+			std::ifstream ifs("../../config/" + name + ".json");
+			if (ifs.good()) {
+				config << ifs;
+			}
+			else {
+				std::ifstream ifs("config/" + name + ".json");
+				if (ifs.good()) {
+					config << ifs;
+				}
+				else {
+					throw std::invalid_argument("Config file not found!");
+				}
+			}
+		}
 	}
 	if (config.find(backend) == config.end()) {
 		std::string simulator =
 		    Utilities::split(Utilities::split(backend, '=')[0], '.').back();
-        if (config.find(simulator) == config.end()) {
-            
-            std::cerr << "Could not find any config for given simulator! Take values for "<< config.begin().key() << " instead!" <<std::endl;
-            return config.begin().value();
-        }
-        else {
-            return config["simulator"];
-        }
+		if (config.find(simulator) == config.end()) {
+
+			std::cerr << "Could not find any config for given simulator! Take "
+			             "values for "
+			          << config.begin().key() << " instead!" << std::endl;
+			return config.begin().value();
+		}
+		else {
+			return config[simulator];
+		}
 	}
-	else { 
-        return config[backend];
-    }
+	else {
+		return config[backend];
+	}
 }
 }
