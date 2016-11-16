@@ -34,9 +34,8 @@
 namespace SNAB {
 OutputFrequencySingleNeuron::OutputFrequencySingleNeuron(
     const std::string backend)
-    : m_backend(backend), m_pop(m_netw, 0)
+    : BenchmarkBase("OutputFrequencySingleNeuron", backend), m_pop(m_netw, 0)
 {
-	m_config_file = read_config("OutputFrequencySingleNeuron", backend);
 }
 
 cypress::Network &OutputFrequencySingleNeuron::build_netw(
@@ -54,13 +53,12 @@ cypress::Network &OutputFrequencySingleNeuron::build_netw(
 	return netw;
 }
 
-void OutputFrequencySingleNeuron::run_netw(std::string backend,
-                                           cypress::Network &netw)
+void OutputFrequencySingleNeuron::run_netw(cypress::Network &netw)
 {
 	netw.logger().min_level(cypress::DEBUG, 0);
 	cypress::PowerManagementBackend pwbackend(
 	    std::make_shared<cypress::NetIO4>(),
-	    cypress::Network::make_backend(backend));
+	    cypress::Network::make_backend(m_backend));
 	netw.run(pwbackend, 100.0);
 }
 

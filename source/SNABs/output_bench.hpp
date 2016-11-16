@@ -28,9 +28,9 @@
 namespace SNAB {
 class OutputFrequencySingleNeuron : public BenchmarkBase {
 private:
-	std::string m_backend;
+	
 	cypress::PopulationBase m_pop;
-	cypress::Json m_config_file;
+	
 	const std::vector<std::string> names_vec = {
 	    "Average frequency", "Standard deviation", "Maximum", "Minimum"};
 	const std::vector<std::string> types_vec = {"quality", "quality", "quality",
@@ -40,12 +40,12 @@ private:
 public:
 	OutputFrequencySingleNeuron(const std::string backend);
 	cypress::Network &build_netw(cypress::Network &netw) override;
-	void run_netw(std::string backend, cypress::Network &netw) override;
+	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;
 	std::string names(size_t i) override { return names_vec[i]; };
 	std::string types(size_t i) override { return types_vec[i]; };
 	std::string measures(size_t i) override { return measures_vec[i]; };
-    std::string snab_name(){return "OutputFrequencySingleNeuron";};
+    std::string snab_name() override {return "OutputFrequencySingleNeuron";};
 };
 }
 #endif /* SNABSUITE_SNABS_OUTPUT_BENCH_HPP */

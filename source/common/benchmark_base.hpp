@@ -24,26 +24,80 @@
 #include <cypress/cypress.hpp>
 #include <string>
 
+#include "util/read_json.hpp"
+
 namespace SNAB {
-/* Virtual Base class for SNABs/Benchmarks.
+/**
+ * Virtual Base class for SNABs/Benchmarks.
  * All Benchmarks should have seperate building of networks, execution and an
  * evaluation tasks
  */
 class BenchmarkBase {
 protected:
+	// Internal spiking network which should be used by the benchmark
 	cypress::Network m_netw;
+	// PLatform specific platform file which is read in with the constructor
+	cypress::Json m_config_file;
+	// String which contains the name of the simulation backend
+	std::string m_backend;
 
 public:
-	virtual ~BenchmarkBase(){};
+	/**
+	 * Constructor reads in platform specific config file
+	 * @param name: name of the benchmark, and therefore of the config file
+	 * @param backend: string containing the simulation backend
+	 */
+	BenchmarkBase(std::string name, std::string backend) : m_backend(backend)
+	{
+		m_config_file = read_config(name, m_backend);
+	};
+
+	/**
+	 * Building the neural network for benchmarking. If you want to use an
+	 * external network, you should use the first version of building (and the
+	 * corresponding run function), for the member network use the second
+	 * function. The implementation is contained in the first one.
+	 * @param network: External network benchmark will be constructed in
+	 */
 	virtual cypress::Network &build_netw(cypress::Network &netw) = 0;
 	cypress::Network &build() { return build_netw(m_netw); };
-	virtual void run_netw(std::string backend, cypress::Network &netw) = 0;
-	void run(std::string backend) { run_netw(backend, m_netw); };
-	virtual std::vector<cypress::Real> evaluate() = 0;
+
+	/**
+	 * Execution of the benchmark on the simulation platform. Similar to the
+	 * buil function, the first function contains the implementation, while the
+	 * second simply uses the first with member networks.
+	 * @param network: External network benchmark will be constructed in
+	 */
+	virtual void run_netw(cypress::Network &netw) = 0;
+	void run() { run_netw(m_netw); };
+
+	/**
+	 * For formatting the output in the correct structure introduce in the SP9
+	 * Guidebook, the evaluation process needs the exact order of the names,
+	 * types
+	 * and measures of the results returned from the fuction @evaluate().
+	 * 'Names' should be unique for the measurment represent the idea of the
+	 * value
+	 * 'types' can be e.g. "quality", "performance", "energy consumption"
+	 * 'measures' should be the "type of the measurment", therfore the unit of
+	 * the value
+	 * @param i: enumerates the names, measures and types. For the same value
+	 * these should be related
+	 */
 	virtual std::string names(size_t i) = 0;
 	virtual std::string types(size_t i) = 0;
 	virtual std::string measures(size_t i) = 0;
-    virtual std::string snab_name() = 0;
+
+	/**
+	 * This should contain the evaluation process and return the result in order
+	 * of those in names(), types() and measures()
+	 */
+	virtual std::vector<cypress::Real> evaluate() = 0;
+
+	/**
+	 * The result of evaluation() is converted into the format used by the HBP
+	 * benchmark repository
+	 */
 	cypress::Json evaluate_json()
 	{
 		std::vector<cypress::Real> results = evaluate();
@@ -56,6 +110,13 @@ public:
 		}
 		return json;
 	}
+	/**
+	 * Returns the name of the Benchmark. Again used for the output to the
+	 * benchmark repository
+	 */
+	virtual std::string snab_name() = 0;
+
+	virtual ~BenchmarkBase(){};
 };
 }
 
