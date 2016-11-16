@@ -33,6 +33,20 @@ target_link_libraries(SNABSuite_test_util
 	benchmark_common
 	${GTEST_LIBRARIES}
 )
-
-
 add_test(SNABSuite_test_util SNABSuite_test_util)
+
+add_executable(SNABSuite_test_common
+	common/test_neuron_parameters.cpp
+)
+
+add_dependencies(SNABSuite_test_common googletest)
+
+target_link_libraries(SNABSuite_test_common
+	benchmark_utils
+	benchmark_common
+	${GTEST_LIBRARIES}
+)
+add_test(SNABSuite_test_common SNABSuite_test_common)
+
+
+
