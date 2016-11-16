@@ -18,8 +18,8 @@
 
 #pragma once
 
-#ifndef SNABSUITE_SOURCE_BENCHMARK_HPP
-#define SNABSUITE_SOURCE_BENCHMARK_HPP
+#ifndef SNABSUITE_COMMON_BENCHMARK_REGISTRY_HPP
+#define SNABSUITE_COMMON_BENCHMARK_REGISTRY_HPP
 
 #include <memory>
 #include <string>
@@ -29,13 +29,18 @@
 #include "common/benchmark_base.hpp"
 
 namespace SNAB {
+/**
+ * A vector containing all benchmarks which should be executed. The shared
+ * pointer ensures that objects live 'long enough'
+ */
 std::vector<std::shared_ptr<BenchmarkBase>> benchmark_registry(
     std::string backend)
 {
 	std::vector<std::shared_ptr<BenchmarkBase>> vec = {
-	    std::make_shared<OutputFrequencySingleNeuron>(OutputFrequencySingleNeuron(backend))};
+	    std::make_shared<OutputFrequencySingleNeuron>(
+	        OutputFrequencySingleNeuron(backend))};
 	return vec;
 }
 }
 
-#endif /* SNABSUITE_COMMON_BENCHMARK_HPP */
+#endif /* SNABSUITE_COMMON_BENCHMARK_REGISTRY_HPP */

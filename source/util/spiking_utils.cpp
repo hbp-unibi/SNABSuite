@@ -48,7 +48,7 @@ PopulationBase SpikingUtils::add_typed_population(
 	    size, Parameters(neuronParams.parameter()), Signals().record_spikes());
 }
 
-PopulationBase SpikingUtils::add_population(std::string &neuron_type_str,
+PopulationBase SpikingUtils::add_population(std::string neuron_type_str,
                                             Network &network,
                                             NeuronParameters &neuronParams,
                                             size_t size)

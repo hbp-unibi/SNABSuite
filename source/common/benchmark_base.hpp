@@ -36,7 +36,7 @@ class BenchmarkBase {
 protected:
 	// Internal spiking network which should be used by the benchmark
 	cypress::Network m_netw;
-	// PLatform specific platform file which is read in with the constructor
+	// Platform specific config file which is read in with the constructor
 	cypress::Json m_config_file;
 	// String which contains the name of the simulation backend
 	std::string m_backend;
@@ -64,7 +64,7 @@ public:
 
 	/**
 	 * Execution of the benchmark on the simulation platform. Similar to the
-	 * buil function, the first function contains the implementation, while the
+	 * build function, the first function contains the implementation, while the
 	 * second simply uses the first with member networks.
 	 * @param network: External network benchmark will be constructed in
 	 */
@@ -72,14 +72,14 @@ public:
 	void run() { run_netw(m_netw); };
 
 	/**
-	 * For formatting the output in the correct structure introduce in the SP9
+	 * For formatting the output in the correct structure introduced in the SP9
 	 * Guidebook, the evaluation process needs the exact order of the names,
 	 * types
-	 * and measures of the results returned from the fuction @evaluate().
-	 * 'Names' should be unique for the measurment represent the idea of the
-	 * value
+	 * and measures of the results returned from the function @evaluate().
+	 * 'Names' should be unique for the measurement and represent the idea of 
+	 * the value
 	 * 'types' can be e.g. "quality", "performance", "energy consumption"
-	 * 'measures' should be the "type of the measurment", therfore the unit of
+	 * 'measures' should be the "type of the measurement", therefore the unit of
 	 * the value
 	 * @param i: enumerates the names, measures and types. For the same value
 	 * these should be related

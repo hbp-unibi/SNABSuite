@@ -43,11 +43,14 @@ cypress::Network &OutputFrequencySingleNeuron::build_netw(
 {
 	std::string neuron_type_str = m_config_file["neuron_type"];
 	SpikingUtils::detect_type(neuron_type_str);
-	m_config_file["neuron_params"];
+    
+    // discard out put
 	std::ofstream out;
+    // Get neuron neuron_parameters
 	NeuronParameters neuron_params =
 	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params"], out);
+    // Set up population
 	m_pop =
 	    SpikingUtils::add_population(neuron_type_str, netw, neuron_params, 1);
 	return netw;
@@ -55,7 +58,10 @@ cypress::Network &OutputFrequencySingleNeuron::build_netw(
 
 void OutputFrequencySingleNeuron::run_netw(cypress::Network &netw)
 {
+    // Debug logger, may be ignored in the future
 	netw.logger().min_level(cypress::DEBUG, 0);
+    
+    // PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
 	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
@@ -64,8 +70,11 @@ void OutputFrequencySingleNeuron::run_netw(cypress::Network &netw)
 
 std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 {
+    // Vector of frequencies
 	std::vector<cypress::Real> frequencies;
+    // Get spikes
 	auto spikes = m_pop.signals().data(0);
+    // Calculate frequencies
 	if (spikes.size() != 0) {
 
 		for (size_t i = 0; i < spikes.size() - 1; i++) {
@@ -76,6 +85,8 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 	else {
 		frequencies.push_back(0.0);
 	}
+	
+	// Calculate statistics
 	cypress::Real max =
 	    *std::max_element(frequencies.begin(), frequencies.end());
 	cypress::Real min =
@@ -88,24 +99,6 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 	    frequencies.begin(), frequencies.end(),
 	    [&](const cypress::Real val) { std_dev += (val - avg) * (val - avg); });
 	std_dev = std::sqrt(std_dev / cypress::Real(frequencies.size() - 1));
-	/*cypress::Json results = {
-	    {{"type", "quality"},
-	     {"name", "Average frequency"},
-	     {"value", avg},
-	     {"measure", "1/ms"}},
-	    {{"type", "quality"},
-	     {"name", "Standard deviation"},
-	     {"value", std_dev},
-	     {"measure", "1/ms"}},
-	    {{"type", "quality"},
-	     {"name", "Maximum"},
-	     {"value", max},
-	     {"measure", "1/ms"}},
-	    {{"type", "quality"},
-	     {"name", "Minimum"},
-	     {"value", min},
-	     {"measure", "1/ms"}},
-	};*/
 	std::vector<cypress::Real> results = {avg, std_dev, max, min};
 	return results;
 }

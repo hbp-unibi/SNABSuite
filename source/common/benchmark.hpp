@@ -27,28 +27,46 @@
 #include "common/benchmark_registry.hpp"
 
 namespace SNAB {
-
+/**
+ * Class for the consecutive execution of all benchmarks registered in the
+ * benchmark_registry.hpp
+ */
 class BenchmarkExec {
 private:
+	// String containing the simulation backend
 	std::string m_backend;
+	// Container for the results
 	cypress::Json results;
-    std::string convert_time(int value){
-        if(value<10){
-            return '0' + std::to_string(value);
-        }
-        return std::to_string(value);
-    }
+
+	/**
+	 * Converting an integer value to a time string
+	 */
+	std::string convert_time(int value)
+	{
+		if (value < 10) {
+			return '0' + std::to_string(value);
+		}
+		return std::to_string(value);
+	}
+
+	/**
+	 * Gives back a timestamp as a string without white spaces
+	 */
 	std::string timestamp()
 	{
 		auto ltime = time(NULL);
 		auto Tm = localtime(&ltime);
-		return std::to_string(1900+Tm->tm_year) + "-" + convert_time(Tm->tm_mon) +
-		       "-" + convert_time(Tm->tm_mday) + "T" +
-		       convert_time(Tm->tm_hour) + ":" + convert_time(Tm->tm_min) +
-		       ":" + convert_time(Tm->tm_sec);
+		return std::to_string(1900 + Tm->tm_year) + "-" +
+		       convert_time(Tm->tm_mon) + "-" + convert_time(Tm->tm_mday) +
+		       "T" + convert_time(Tm->tm_hour) + ":" +
+		       convert_time(Tm->tm_min) + ":" + convert_time(Tm->tm_sec);
 	}
 
 public:
+	/**
+	 * Constructor which executes all registered benchmarks and gives the result
+	 * to std::cout (at the moment)
+	 */
 	BenchmarkExec(std::string backend) : m_backend(backend)
 	{
 		auto snab_vec = benchmark_registry(m_backend);
@@ -59,7 +77,7 @@ public:
 			                   {"timestamp", timestamp()},
 			                   {"results", i->evaluate_json()}});
 		}
-		std::cout <<results.dump(4)<<std::endl;
+		std::cout << results.dump(4) << std::endl;
 	};
 };
 }

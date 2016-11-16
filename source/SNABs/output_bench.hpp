@@ -26,16 +26,20 @@
 #include "common/benchmark_base.hpp"
 
 namespace SNAB {
+/**
+ * This SNAB will test the maximal frequency of a single neuron by simply
+ * setting the neuron membrane reset-potential above threshold.
+ */
 class OutputFrequencySingleNeuron : public BenchmarkBase {
 private:
-	
 	cypress::PopulationBase m_pop;
-	
+
 	const std::vector<std::string> names_vec = {
 	    "Average frequency", "Standard deviation", "Maximum", "Minimum"};
 	const std::vector<std::string> types_vec = {"quality", "quality", "quality",
-	                                        "quality"};
-	const std::vector<std::string> measures_vec = {"1/ms", "1/ms", "1/ms", "1/ms"};
+	                                            "quality"};
+	const std::vector<std::string> measures_vec = {"1/ms", "1/ms", "1/ms",
+	                                               "1/ms"};
 
 public:
 	OutputFrequencySingleNeuron(const std::string backend);
@@ -45,7 +49,7 @@ public:
 	std::string names(size_t i) override { return names_vec[i]; };
 	std::string types(size_t i) override { return types_vec[i]; };
 	std::string measures(size_t i) override { return measures_vec[i]; };
-    std::string snab_name() override {return "OutputFrequencySingleNeuron";};
+	std::string snab_name() override { return "OutputFrequencySingleNeuron"; };
 };
 }
 #endif /* SNABSUITE_SNABS_OUTPUT_BENCH_HPP */

@@ -40,7 +40,7 @@ public:
 	 * instead of a template argument
 	 */
 	static cypress::PopulationBase add_population(
-	    std::string &neuron_type_str, Network &network,
+	    std::string neuron_type_str, Network &network,
 	    NeuronParameters &neuronParams, size_t size);
 
 	static const NeuronType &detect_type(std::string neuron_type_str);
