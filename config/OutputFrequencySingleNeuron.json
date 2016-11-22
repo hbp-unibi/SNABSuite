@@ -11,5 +11,16 @@
 			"tau_m": 10,
 			"cm": 0.2
 		}
+	},
+	"spikey" : {
+		"neuron_type" : "IfFacetsHardware1",
+		"neuron_params": {
+			"g_leak": 0.2,
+			"tau_refrac": 0.0,
+			"v_rest": -55.0,
+			"v_thresh": -68.0,
+			"v_reset": -70.0,
+			"e_rev_I": 0.0
+		}
 	}
 }
