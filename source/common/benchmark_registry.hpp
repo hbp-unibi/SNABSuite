@@ -38,7 +38,9 @@ std::vector<std::shared_ptr<BenchmarkBase>> benchmark_registry(
 {
 	std::vector<std::shared_ptr<BenchmarkBase>> vec = {
 	    std::make_shared<OutputFrequencySingleNeuron>(
-	        OutputFrequencySingleNeuron(backend))};
+	        OutputFrequencySingleNeuron(backend)),
+	    std::make_shared<OutputFrequencyMultipleNeurons>(
+	        OutputFrequencyMultipleNeurons(backend))};
 	return vec;
 }
 }

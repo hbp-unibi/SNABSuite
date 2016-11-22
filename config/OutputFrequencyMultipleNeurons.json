@@ -1,0 +1,28 @@
+{
+	"spinnaker" : {
+		"neuron_type" : "IF_cond_exp",
+		"neuron_params": {
+			"e_rev_E": 0.0,
+			"v_rest": -60.0,
+			"v_reset": -60.0,
+			"v_thresh": -64.7,
+			"tau_syn_E": 2.0,
+			"tau_refrac": 0.0,
+			"tau_m": 10,
+			"cm": 0.2
+		},
+		"#neurons" : 16000
+	},
+	"spikey" : {
+		"neuron_type" : "IfFacetsHardware1",
+		"neuron_params": {
+			"g_leak": 0.2,
+			"tau_refrac": 0.0,
+			"v_rest": -55.0,
+			"v_thresh": -68.0,
+			"v_reset": -70.0,
+			"e_rev_I": 0.0
+		},
+		"#neurons" : 10
+	}
+}

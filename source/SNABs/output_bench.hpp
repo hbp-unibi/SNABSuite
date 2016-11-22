@@ -51,5 +51,39 @@ public:
 	std::string measures(size_t i) override { return measures_vec[i]; };
 	std::string snab_name() override { return "OutputFrequencySingleNeuron"; };
 };
+
+/**
+ * Here we do a similar test as in OutputFrequencySingleNeurons, but now we
+ * increase the number of neurons used. We look at averages over neurons instead
+ * of the average of a single neuron. This will show possible shortcuts in
+ * communication infrastructure of neuron-nhips to the outer world
+ */
+class OutputFrequencyMultipleNeurons : public BenchmarkBase {
+private:
+	cypress::PopulationBase m_pop;
+
+	const std::vector<std::string> names_vec = {
+	    "Average frequency of neurons", "Standard deviation",
+	    "Maximum av frequency", "Minimum av frequency"};
+	const std::vector<std::string> types_vec = {"quality", "quality", "quality",
+	                                            "quality"};
+	const std::vector<std::string> measures_vec = {"1/ms", "1/ms", "1/ms",
+	                                               "1/ms"};
+
+	size_t m_num_neurons = 0;
+
+public:
+	OutputFrequencyMultipleNeurons(const std::string backend);
+	cypress::Network &build_netw(cypress::Network &netw) override;
+	void run_netw(cypress::Network &netw) override;
+	std::vector<cypress::Real> evaluate() override;
+	std::string names(size_t i) override { return names_vec[i]; };
+	std::string types(size_t i) override { return types_vec[i]; };
+	std::string measures(size_t i) override { return measures_vec[i]; };
+	std::string snab_name() override
+	{
+		return "OutputFrequencyMultipleNeurons";
+	};
+};
 }
 #endif /* SNABSUITE_SNABS_OUTPUT_BENCH_HPP */
