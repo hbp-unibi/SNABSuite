@@ -40,29 +40,32 @@ const NeuronType &SpikingUtils::detect_type(std::string neuron_type_str)
 
 template <typename T>
 PopulationBase SpikingUtils::add_typed_population(
-    Network &network, NeuronParameters &neuronParams, size_t size)
+    Network &network, const NeuronParameters &neuronParams, const size_t size,
+    const typename T::Signals &rec_signal)
 {
-	using Signals = typename T::Signals;
 	using Parameters = typename T::Parameters;
 	return network.create_population<T>(
-	    size, Parameters(neuronParams.parameter()), Signals().record_spikes());
+	    size, Parameters(neuronParams.parameter()), rec_signal);
 }
 
-PopulationBase SpikingUtils::add_population(std::string neuron_type_str,
-                                            Network &network,
-                                            NeuronParameters &neuronParams,
-                                            size_t size)
+PopulationBase SpikingUtils::add_population(
+    const std::string neuron_type_str, Network &network,
+    const NeuronParameters &neuronParams, const size_t size,
+    const std::string record_signal)
 {
 	if (neuron_type_str == "IF_cond_exp") {
-		return add_typed_population<IfCondExp>(network, neuronParams, size);
+		return add_typed_population<IfCondExp>(
+		    network, neuronParams, size, IfCondExpSignals({record_signal}));
 	}
 	else if (neuron_type_str == "IfFacetsHardware1") {
-		return add_typed_population<IfFacetsHardware1>(network, neuronParams,
-		                                               size);
+		return add_typed_population<IfFacetsHardware1>(
+		    network, neuronParams, size,
+		    IfFacetsHardware1Signals({record_signal}));
 	}
 	else if (neuron_type_str == "AdExp") {
-		return add_typed_population<EifCondExpIsfaIsta>(network, neuronParams,
-		                                                size);
+		return add_typed_population<EifCondExpIsfaIsta>(
+		    network, neuronParams, size,
+		    EifCondExpIsfaIstaSignals({record_signal}));
 	}
 
 	throw CypressException("Invalid neuron type \"" + neuron_type_str + "\"");

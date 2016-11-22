@@ -33,17 +33,20 @@ public:
 	 */
 	template <typename T>
 	static cypress::PopulationBase add_typed_population(
-	    Network &network, NeuronParameters &neuronParams, size_t size);
+	    Network &network, const NeuronParameters &neuronParams,
+	    const size_t size, const typename T::Signals &rec_signal =
+	                           typename T::Signals().record_spikes());
+
+	static const NeuronType &detect_type(std::string neuron_type_str);
 
 	/**
 	 * Runs add_typed_population, but gets a string containing the neuron type
 	 * instead of a template argument
 	 */
 	static cypress::PopulationBase add_population(
-	    std::string neuron_type_str, Network &network,
-	    NeuronParameters &neuronParams, size_t size);
-
-	static const NeuronType &detect_type(std::string neuron_type_str);
+	    const std::string neuron_type_str, Network &network,
+	    const NeuronParameters &neuronParams, const size_t size,
+	    const std::string record_signal = "spikes");
 };
 }
 

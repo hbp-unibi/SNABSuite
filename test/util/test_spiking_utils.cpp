@@ -41,14 +41,29 @@ TEST(SpikingUtils, add_population)
 	cypress::Json json;
 	NeuronParameters params(IfCondExp::inst(), json);
 	std::string type = "IF_cond_exp";
-	SpikingUtils::add_population(type, netw, params, 1);
+	auto pop1 = SpikingUtils::add_population(type, netw, params, 1);
 	EXPECT_EQ(netw.population_count(), 1);
 	EXPECT_EQ(netw.neuron_count(), 1);
 	EXPECT_EQ(netw.neuron_count(IfCondExp::inst()), 1);
 	EXPECT_EQ(netw.neuron_count(IfFacetsHardware1::inst()), 0);
+	EXPECT_FALSE(pop1.signals().is_recording(
+	    cypress::IfCondExp::inst().signal_index("v").value()));
+	EXPECT_TRUE(pop1.signals().is_recording(
+	    cypress::IfCondExp::inst().signal_index("spikes").value()));
 
-	auto pop = netw.population();
-	EXPECT_EQ(pop.size(), 1);
-	EXPECT_EQ(&pop.type(), &IfCondExp::inst());
+	EXPECT_EQ(pop1.size(), 1);
+	EXPECT_EQ(&pop1.type(), &IfCondExp::inst());
+
+	auto pop2 = SpikingUtils::add_population(type, netw, params, 1, "v");
+	EXPECT_TRUE(pop2.signals().is_recording(
+	    cypress::IfCondExp::inst().signal_index("v").value()));
+	EXPECT_FALSE(pop2.signals().is_recording(
+	    cypress::IfCondExp::inst().signal_index("spikes").value()));
+
+	auto pop3 = SpikingUtils::add_population(type, netw, params, 1, "gsyn_exc");
+	EXPECT_FALSE(pop3.signals().is_recording(
+	    cypress::IfCondExp::inst().signal_index("v").value()));
+	EXPECT_FALSE(pop3.signals().is_recording(
+	    cypress::IfCondExp::inst().signal_index("spikes").value()));
 }
 }
