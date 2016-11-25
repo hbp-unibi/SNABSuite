@@ -56,20 +56,7 @@ std::vector<cypress::Real> read_neuron_parameters_from_json(
 	// special case if tau_m was given instead of g_leak on spikey
 	iter = input.find("tau_m");
 	if (iter != input.end() && &type == &cypress::IfFacetsHardware1::inst()) {
-		auto iter2 = input.find("cm");
-		cypress::Real cm = 0;
-		if (iter2 == input.end()) {
-			for (size_t j = 0; j < type.parameter_names.size(); j++) {
-				if (type.parameter_names[j] == "cm") {
-					cm = type.parameter_defaults[j];
-					break;
-				}
-			}
-		}
-		else {
-			cm = input["cm"];
-		}
-		input["g_leak"] = cm / input["tau_m"];
+		input["g_leak"] = 0.2 / input["tau_m"];
 		input.erase(iter);
 	}
 
