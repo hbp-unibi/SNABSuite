@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "SNABs/output_bench.hpp"
+#include "SNABs/refractory_period.hpp"
 #include "common/benchmark_base.hpp"
 
 namespace SNAB {
@@ -40,7 +41,8 @@ std::vector<std::shared_ptr<BenchmarkBase>> benchmark_registry(
 	    std::make_shared<OutputFrequencySingleNeuron>(
 	        OutputFrequencySingleNeuron(backend)),
 	    std::make_shared<OutputFrequencyMultipleNeurons>(
-	        OutputFrequencyMultipleNeurons(backend))};
+	        OutputFrequencyMultipleNeurons(backend)),
+	    std::make_shared<RefractoryPeriod>(RefractoryPeriod(backend))};
 	return vec;
 }
 }

@@ -87,6 +87,7 @@ target_link_libraries(benchmark_common
 
 add_library(benchmarks 
     source/SNABs/output_bench
+    source/SNABs/refractory_period
 )
 target_link_libraries(benchmarks
 	cypress
