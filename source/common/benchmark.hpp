@@ -71,11 +71,13 @@ public:
 	{
 		auto snab_vec = benchmark_registry(m_backend);
 		for (auto i : snab_vec) {
-			i->build();
-			i->run();
-			results.push_back({{"name", i->snab_name},
-			                   {"timestamp", timestamp()},
-			                   {"results", i->evaluate_json()}});
+			if (i->valid()) {
+				i->build();
+				i->run();
+				results.push_back({{"name", i->snab_name},
+				                   {"timestamp", timestamp()},
+				                   {"results", i->evaluate_json()}});
+			}
 		}
 		std::cout << results.dump(4) << std::endl;
 	};

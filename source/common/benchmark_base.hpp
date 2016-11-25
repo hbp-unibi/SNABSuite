@@ -40,6 +40,9 @@ protected:
 	cypress::Json m_config_file;
 	// String which contains the name of the simulation backend
 	std::string m_backend;
+	// Flag which tracks if the benchmark can be executed on the backend
+	// In the config file define the key "invalid" for the simulator
+	bool m_valid = false;
 
 public:
 	/**
@@ -63,6 +66,9 @@ public:
 	      indicator_measures(indicator_measures)
 	{
 		m_config_file = read_config(name, m_backend);
+		if (m_config_file.find("invalid") == m_config_file.end()) {
+			m_valid = true;
+		}
 	};
 
 	/**
@@ -130,7 +136,12 @@ public:
 		return json;
 	}
 
-	virtual ~BenchmarkBase(){};
+	/**
+	 * Returns the state of the m_valid flag. Simulation should not be executed
+	 * when valid() returns false
+	 */
+	bool valid() const { return m_valid; }
+	virtual ~BenchmarkBase() {}
 };
 }
 
