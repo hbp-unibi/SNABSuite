@@ -73,7 +73,7 @@ public:
 		for (auto i : snab_vec) {
 			i->build();
 			i->run();
-			results.push_back({{"name", i->snab_name()},
+			results.push_back({{"name", i->snab_name},
 			                   {"timestamp", timestamp()},
 			                   {"results", i->evaluate_json()}});
 		}

@@ -43,11 +43,24 @@ protected:
 
 public:
 	/**
-	 * Constructor reads in platform specific config file
+	 * Constructor which reads in platform specific config file
+	 * For description of the indicator_* initializers look into the comment of
+	 * their declaration below
 	 * @param name: name of the benchmark, and therefore of the config file
 	 * @param backend: string containing the simulation backend
+	 * @param indicator_names: names of benchmark indicators
+	 * @param indicator_types: types...
+	 * @param indicator_measures: measures...
 	 */
-	BenchmarkBase(std::string name, std::string backend) : m_backend(backend)
+	BenchmarkBase(std::string name, std::string backend,
+	              std::initializer_list<std::string> indicator_names,
+	              std::initializer_list<std::string> indicator_types,
+	              std::initializer_list<std::string> indicator_measures)
+	    : m_backend(backend),
+	      snab_name(name),
+	      indicator_names(indicator_names),
+	      indicator_types(indicator_types),
+	      indicator_measures(indicator_measures)
 	{
 		m_config_file = read_config(name, m_backend);
 	};
@@ -72,21 +85,27 @@ public:
 	void run() { run_netw(m_netw); };
 
 	/**
+	 * The name of the Benchmark/SNAB
+	 */
+	const std::string snab_name;
+
+	/**
 	 * For formatting the output in the correct structure introduced in the SP9
 	 * Guidebook, the evaluation process needs the exact order of the names,
 	 * types
 	 * and measures of the results returned from the function @evaluate().
-	 * 'Names' should be unique for the measurement and represent the idea of 
-	 * the value
-	 * 'types' can be e.g. "quality", "performance", "energy consumption"
-	 * 'measures' should be the "type of the measurement", therefore the unit of
-	 * the value
+	 * 'indicator_names' should be unique for the measurement and represent the
+	 * idea of the value
+	 * 'indicator_types' can be e.g. "quality", "performance", "energy
+	 * consumption"
+	 * 'indicator_measures' should be the "type of the measurement", therefore
+	 * the unit of the value
 	 * @param i: enumerates the names, measures and types. For the same value
 	 * these should be related
 	 */
-	virtual std::string names(size_t i) = 0;
-	virtual std::string types(size_t i) = 0;
-	virtual std::string measures(size_t i) = 0;
+	const std::vector<std::string> indicator_names;
+	const std::vector<std::string> indicator_types;
+	const std::vector<std::string> indicator_measures;
 
 	/**
 	 * This should contain the evaluation process and return the result in order
@@ -103,18 +122,13 @@ public:
 		std::vector<cypress::Real> results = evaluate();
 		cypress::Json json;
 		for (size_t i = 0; i < results.size(); i++) {
-			json.push_back({{"type", types(i)},
-			                {"name", names(i)},
+			json.push_back({{"type", indicator_types[i]},
+			                {"name", indicator_names[i]},
 			                {"value", results[i]},
-			                {"measures", measures(i)}});
+			                {"measures", indicator_measures[i]}});
 		}
 		return json;
 	}
-	/**
-	 * Returns the name of the Benchmark. Again used for the output to the
-	 * benchmark repository
-	 */
-	virtual std::string snab_name() = 0;
 
 	virtual ~BenchmarkBase(){};
 };

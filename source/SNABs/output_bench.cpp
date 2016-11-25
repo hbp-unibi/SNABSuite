@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <algorithm>  // Minimal and Maximal element
-#include <numeric>  // std::accumulate
+#include <numeric>    // std::accumulate
 #include <string>
 #include <vector>
 
@@ -32,7 +32,12 @@
 namespace SNAB {
 OutputFrequencySingleNeuron::OutputFrequencySingleNeuron(
     const std::string backend)
-    : BenchmarkBase(__func__, backend), m_pop(m_netw, 0)
+    : BenchmarkBase(
+          __func__, backend,
+          {"Average frequency", "Standard deviation", "Maximum", "Minimum"},
+          {"quality", "quality", "quality", "quality"},
+          {"1/ms", "1/ms", "1/ms", "1/ms"}),
+      m_pop(m_netw, 0)
 {
 }
 
@@ -103,7 +108,12 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 
 OutputFrequencyMultipleNeurons::OutputFrequencyMultipleNeurons(
     const std::string backend)
-    : BenchmarkBase(__func__, backend), m_pop(m_netw, 0)
+    : BenchmarkBase(__func__, backend,
+                    {"Average frequency of neurons", "Standard deviation",
+                     "Maximum av frequency", "Minimum av frequency"},
+                    {"quality", "quality", "quality", "quality"},
+                    {"1/ms", "1/ms", "1/ms", "1/ms"}),
+      m_pop(m_netw, 0)
 {
 }
 
@@ -172,21 +182,18 @@ std::vector<cypress::Real> OutputFrequencyMultipleNeurons::evaluate()
 		    std::accumulate(frequencies.begin(), frequencies.end(), 0.0) /
 		    cypress::Real(frequencies.size());
 	}
-	
+
 	// Calculate statistics
-	cypress::Real max =
-	    *std::max_element(averages.begin(), averages.end());
-	cypress::Real min =
-	    *std::min_element(averages.begin(), averages.end());
-	cypress::Real avg =
-	    std::accumulate(averages.begin(), averages.end(), 0.0) /
-	    cypress::Real(averages.size());
+	cypress::Real max = *std::max_element(averages.begin(), averages.end());
+	cypress::Real min = *std::min_element(averages.begin(), averages.end());
+	cypress::Real avg = std::accumulate(averages.begin(), averages.end(), 0.0) /
+	                    cypress::Real(averages.size());
 	cypress::Real std_dev = 0.0;
 	std::for_each(
 	    averages.begin(), averages.end(),
 	    [&](const cypress::Real val) { std_dev += (val - avg) * (val - avg); });
 	std_dev = std::sqrt(std_dev / cypress::Real(averages.size() - 1));
-	
+
 	std::vector<cypress::Real> results = {avg, std_dev, max, min};
 	return results;
 }

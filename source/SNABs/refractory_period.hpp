@@ -39,21 +39,11 @@ private:
 	cypress::Population<cypress::SpikeSourceArray> m_pop_source;
 	NeuronParameters m_neuro_params;
 
-	// TODO
-	const std::vector<std::string> names_vec = {
-	    "Average deviation from refractory period", "Standard deviation"};
-	const std::vector<std::string> types_vec = {"quality", "quality"};
-	const std::vector<std::string> measures_vec = {"ms", "ms"};
-
 public:
 	RefractoryPeriod(const std::string backend);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;
-	std::string names(size_t i) override { return names_vec[i]; };
-	std::string types(size_t i) override { return types_vec[i]; };
-	std::string measures(size_t i) override { return measures_vec[i]; };
-	std::string snab_name() override { return "RefractoryPeriod"; };
 };
 }
 
