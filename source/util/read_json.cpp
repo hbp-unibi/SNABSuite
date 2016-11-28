@@ -23,37 +23,38 @@
 namespace SNAB {
 cypress::Json read_config(std::string name, std::string backend)
 {
+	std::vector<std::string> dir(
+	    {"../config/", "../../config/", "config/", ""});
+	bool valid = false;
 	cypress::Json config;
-	{
-		std::ifstream ifs("../config/" + name + ".json");
+
+	for (auto i : dir) {
+		std::ifstream ifs(i + name + ".json");
 		if (ifs.good()) {
 			config << ifs;
-		}
-		else {
-			std::ifstream ifs("../../config/" + name + ".json");
-			if (ifs.good()) {
-				config << ifs;
-			}
-			else {
-				std::ifstream ifs("config/" + name + ".json");
-				if (ifs.good()) {
-					config << ifs;
-				}
-				else {
-					throw std::invalid_argument("Config file not found!");
-				}
-			}
+			valid = true;
+			break;
 		}
 	}
+	if (!valid) {
+		throw std::invalid_argument("Config file for" + name + " not found!");
+	}
+
 	if (config.find(backend) == config.end()) {
 		std::string simulator =
 		    Utilities::split(Utilities::split(backend, '=')[0], '.').back();
 		if (config.find(simulator) == config.end()) {
-
-			std::cerr << "Could not find any config for given simulator! Take "
-			             "values for "
-			          << config.begin().key() << " instead!" << std::endl;
-			return config.begin().value();
+			std::cerr << "Could not find any config for " + simulator +
+			                 " in the config file of " + name + "! ";
+			if (config.find("default") != config.end()) {
+				std::cerr << "Take default values instead!" << std::endl;
+				return config["default"];
+			}
+			else {
+				std::cerr << "Take values for " << config.begin().key()
+				          << " instead!" << std::endl;
+				return config.begin().value();
+			}
 		}
 		else {
 			return config[simulator];
