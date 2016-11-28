@@ -66,7 +66,8 @@ public:
 	      indicator_measures(indicator_measures)
 	{
 		m_config_file = read_config(name, m_backend);
-		if (m_config_file.find("invalid") == m_config_file.end()) {
+		if (m_config_file.find("invalid") == m_config_file.end() ||
+		        m_config_file["invalid"] == false) {
 			m_valid = true;
 		}
 	};
