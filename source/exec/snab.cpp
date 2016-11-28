@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <glob.h>
+
 #include <cypress/cypress.hpp>
 #include "common/benchmark.hpp"
 
@@ -27,6 +29,21 @@ int main(int argc, const char *argv[])
 		std::cout << "Usage: " << argv[0] << " <SIMULATOR> [NMPI]" << std::endl;
 		return 1;
 	}
-	BenchmarkExec bla(argv[1]);
+
+	if (argc == 3 && std::string(argv[2]) == "NMPI" &&
+	    !cypress::NMPI::check_args(argc, argv)) {
+		glob_t glob_result;
+		glob(std::string("../config/*").c_str(), GLOB_TILDE, NULL,
+		     &glob_result);
+		std::vector<std::string> files;
+
+		for (unsigned int i = 0; i < glob_result.gl_pathc; ++i) {
+			files.push_back(std::string(glob_result.gl_pathv[i]));
+		}
+		globfree(&glob_result);
+		cypress::NMPI(argv[1], argc, argv, files);
+		return 0;
+	}
+	BenchmarkExec bench(argv[1]);
 	return 0;
 }
