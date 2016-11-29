@@ -64,7 +64,7 @@ cypress::Network &RefractoryPeriod::build_netw(cypress::Network &netw)
 	// 10 input neurons with spike times
 	m_pop_source = netw.create_population<SpikeSourceArray>(10);
 	for (auto i : m_pop_source) {
-		i.parameters().spike_times({10, 20, 30, 40, 50, 60});
+		i.parameters().spike_times({10, 30, 50, 70, 90, 110, 130});
 	}
 	netw.add_connection(
 	    m_pop_source, m_pop,
@@ -81,7 +81,7 @@ void RefractoryPeriod::run_netw(cypress::Network &netw)
 	cypress::PowerManagementBackend pwbackend(
 	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
-	netw.run(pwbackend, 100.0);
+	netw.run(pwbackend, 150.0);
 }
 
 std::vector<cypress::Real> RefractoryPeriod::evaluate()
