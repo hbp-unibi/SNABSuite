@@ -7,18 +7,32 @@
 			"v_reset": -65.0,
 			"v_thresh": -55.0,
 			"tau_syn_E": 2.0,
-			"tau_refrac": 2.0,
-			"tau_m": 50,
+			"tau_refrac": 5.0,
+			"tau_m": 1,
 			"cm": 0.2
 		}, 
-		"weight" : 0.1
-	}
-,
+		"weight" : 0.01
+	},
+
+	"nest" : {
+		"neuron_type" : "IF_cond_exp",
+		"neuron_params": {
+			"e_rev_E": 0.0,
+			"v_rest": -60.0,
+			"v_reset": -65.0,
+			"v_thresh": -55.0,
+			"tau_syn_E": 2.0,
+			"tau_refrac": 5.0,
+			"tau_m": 1,
+			"cm": 0.2
+		}, 
+		"weight" : 0.008
+	},
 	"spikey" : {
 		"neuron_type" : "IfFacetsHardware1",
 		"neuron_params": {
-			"tau_m": 20,
-			"tau_refrac": 1.0,
+			"tau_m": 1,
+			"tau_refrac": 5.0,
 			"v_rest": -65.0,
 			"v_thresh": -60.0,
 			"v_reset": -70.0,

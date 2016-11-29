@@ -24,5 +24,19 @@
 			"e_rev_I": 0.0
 		},
 		"#neurons" : 10
-	}
+	},
+	"nest" : {
+		"neuron_type" : "IF_cond_exp",
+		"neuron_params": {
+			"e_rev_E": 0.0,
+			"v_rest": -30.0,
+			"v_reset": -64.8,
+			"v_thresh": -64.7,
+			"tau_syn_E": 2.0,
+			"tau_refrac": 0.0,
+			"tau_m": 1,
+			"cm": 0.2
+		},
+		"#neurons" : 100
+    }
 }
