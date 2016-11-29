@@ -131,13 +131,8 @@ cypress::Network &OutputFrequencyMultipleNeurons::build_netw(
 	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params"], out);
 
-	if (m_config_file.find("#neurons") != m_config_file.end()) {
-		m_num_neurons = m_config_file["#neurons"];
-	}
-	else {
-		throw std::invalid_argument(
-		    "Config file does not contain any neuron number!");
-	}
+	m_num_neurons = m_config_file["#neurons"];
+
 	// Set up population
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, neuron_params,
 	                                     m_num_neurons);

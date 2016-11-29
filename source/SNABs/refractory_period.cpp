@@ -44,11 +44,6 @@ cypress::Network &RefractoryPeriod::build_netw(cypress::Network &netw)
 	std::string neuron_type_str = m_config_file["neuron_type"];
 	auto &neuro_type = SpikingUtils::detect_type(neuron_type_str);
 
-	if (m_config_file.find("weight") == m_config_file.end()) {
-		throw std::invalid_argument(
-		    "Config file does not contain any value for the weight!");
-	}
-
 	// discard out put
 	std::ofstream out;
 	// Get neuron neuron_parameters
