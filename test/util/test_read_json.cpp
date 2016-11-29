@@ -127,4 +127,16 @@ TEST(ReadJSON, read_config)
     EXPECT_NO_THROW(read_config("OutputFrequencySingleNeuron", "spikey"));
     
 }
+
+TEST(ReadJSON, check_json_for_parameters)
+{
+    std::stringstream ss(test_json);
+	cypress::Json json(ss);
+    std::vector<std::string> names({"data", "network"});
+    EXPECT_TRUE(check_json_for_parameters(names, json, "bla"));
+    std::vector<std::string> names2({"n_bits_in","n_bits_out", "n_ones_in","n_ones_out", "n_samples"});
+    EXPECT_TRUE(check_json_for_parameters(names2, json["data"], "bla"));
+    names2.emplace_back("wrong_test");
+    EXPECT_FALSE(check_json_for_parameters(names, json["data"], "bla"));
+}
 }

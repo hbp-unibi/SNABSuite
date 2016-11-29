@@ -54,11 +54,14 @@ public:
 	 * @param indicator_names: names of benchmark indicators
 	 * @param indicator_types: types...
 	 * @param indicator_measures: measures...
+	 * @param required_parameters: list of parameters which are required in the
+	 * JSON file, which should be checked before unnecessary building networks
 	 */
 	BenchmarkBase(std::string name, std::string backend,
 	              std::initializer_list<std::string> indicator_names,
 	              std::initializer_list<std::string> indicator_types,
-	              std::initializer_list<std::string> indicator_measures)
+	              std::initializer_list<std::string> indicator_measures,
+	              std::initializer_list<std::string> required_parameters)
 	    : m_backend(backend),
 	      snab_name(name),
 	      indicator_names(indicator_names),
@@ -66,8 +69,12 @@ public:
 	      indicator_measures(indicator_measures)
 	{
 		m_config_file = read_config(name, m_backend);
-		if (m_config_file.find("invalid") == m_config_file.end() ||
-		        m_config_file["invalid"] == false) {
+		std::vector<std::string> required_parameters_vec(required_parameters);
+		bool required_params = check_json_for_parameters(
+		    required_parameters_vec, m_config_file, name);
+		if ((m_config_file.find("invalid") == m_config_file.end() ||
+		     m_config_file["invalid"] == false) &&
+		    required_params) {
 			m_valid = true;
 		}
 	};

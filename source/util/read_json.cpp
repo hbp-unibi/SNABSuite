@@ -16,6 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cypress/cypress.hpp>
 #include "util/read_json.hpp"
 
 #include "util/utilities.hpp"
@@ -63,5 +64,18 @@ cypress::Json read_config(std::string name, std::string backend)
 	else {
 		return config[backend];
 	}
+}
+
+bool check_json_for_parameters(std::vector<std::string> &parameters,
+                               cypress::Json &json, std::string name)
+{
+	for (auto i : parameters) {
+		if (json.find(i) == json.end()) {
+			std::cerr << "Config file for " << name
+			          << " does not contain any value for " << i << std::endl;
+			return false;
+		}
+	}
+	return true;
 }
 }

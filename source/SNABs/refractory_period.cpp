@@ -15,8 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-//#include <algorithm>  // Minimal and Maximal element
-//#include <numeric>  // std::accumulate
+
 #include <string>
 #include <vector>
 
@@ -34,7 +33,8 @@ RefractoryPeriod::RefractoryPeriod(const std::string backend)
     : BenchmarkBase(
           __func__, backend,
           {"Average deviation from refractory period", "Standard deviation"},
-          {"quality", "quality"}, {"ms", "ms"}),
+          {"quality", "quality"}, {"ms", "ms"},
+          {"neuron_type", "neuron_params", "weight"}),
       m_pop(m_netw, 0),
       m_pop_source(cypress::PopulationBase(m_netw, 0))
 {

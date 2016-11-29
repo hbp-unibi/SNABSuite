@@ -36,7 +36,7 @@ OutputFrequencySingleNeuron::OutputFrequencySingleNeuron(
           __func__, backend,
           {"Average frequency", "Standard deviation", "Maximum", "Minimum"},
           {"quality", "quality", "quality", "quality"},
-          {"1/ms", "1/ms", "1/ms", "1/ms"}),
+          {"1/ms", "1/ms", "1/ms", "1/ms"}, {"neuron_type", "neuron_params"}),
       m_pop(m_netw, 0)
 {
 }
@@ -112,7 +112,8 @@ OutputFrequencyMultipleNeurons::OutputFrequencyMultipleNeurons(
                     {"Average frequency of neurons", "Standard deviation",
                      "Maximum av frequency", "Minimum av frequency"},
                     {"quality", "quality", "quality", "quality"},
-                    {"1/ms", "1/ms", "1/ms", "1/ms"}),
+                    {"1/ms", "1/ms", "1/ms", "1/ms"},
+                    {"neuron_type", "neuron_params", "#neurons"}),
       m_pop(m_netw, 0)
 {
 }

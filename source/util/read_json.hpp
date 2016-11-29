@@ -80,6 +80,9 @@ std::vector<T> read_check(std::map<std::string, T> &input,
 }
 
 cypress::Json read_config(std::string name, std::string backend);
+
+bool check_json_for_parameters(std::vector<std::string> &parameters,
+                               cypress::Json &json, std::string name);
 }
 
 #endif /* SNABSUITE_UTIL_READ_JSON_HPP */
