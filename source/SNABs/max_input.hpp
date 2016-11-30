@@ -23,8 +23,8 @@
 
 #include <cypress/cypress.hpp>
 
-#include "common/neuron_parameters.hpp"
 #include "common/benchmark_base.hpp"
+#include "common/neuron_parameters.hpp"
 
 namespace SNAB {
 /**
@@ -34,13 +34,32 @@ namespace SNAB {
 class MaxInputOneToOne : public BenchmarkBase {
 private:
 	cypress::PopulationBase m_pop;
-    cypress::Population<cypress::SpikeSourceArray> m_pop_source;
+	cypress::Population<cypress::SpikeSourceArray> m_pop_source;
 	size_t m_num_neurons = 0, m_num_spikes = 0;
-    NeuronParameters m_neuro_params;
-    cypress::Real simulation_length = 100;// ms
+	NeuronParameters m_neuro_params;
+	cypress::Real simulation_length = 100;  // ms
 
 public:
 	MaxInputOneToOne(const std::string backend);
+	cypress::Network &build_netw(cypress::Network &netw) override;
+	void run_netw(cypress::Network &netw) override;
+	std::vector<cypress::Real> evaluate() override;
+};
+
+/**
+ * Check the input bandwidth by injecting spikes per all to all connection.
+ * Check if output neurons spike accordingly
+ */
+class MaxInputAllToAll : public BenchmarkBase {
+private:
+	cypress::PopulationBase m_pop;
+	cypress::Population<cypress::SpikeSourceArray> m_pop_source;
+	size_t m_num_neurons = 0, m_num_inp_neurons = 0, m_num_spikes = 0;
+	NeuronParameters m_neuro_params;
+	cypress::Real simulation_length = 100;  // ms
+
+public:
+	MaxInputAllToAll(const std::string backend);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;

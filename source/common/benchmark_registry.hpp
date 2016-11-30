@@ -44,7 +44,8 @@ std::vector<std::shared_ptr<BenchmarkBase>> benchmark_registry(
 	    std::make_shared<OutputFrequencyMultipleNeurons>(
 	        OutputFrequencyMultipleNeurons(backend)),
 	    std::make_shared<RefractoryPeriod>(RefractoryPeriod(backend)),
-	    std::make_shared<MaxInputOneToOne>(MaxInputOneToOne(backend))};
+	    std::make_shared<MaxInputOneToOne>(MaxInputOneToOne(backend)),
+	    std::make_shared<MaxInputAllToAll>(MaxInputAllToAll(backend))};
 	return vec;
 }
 }
