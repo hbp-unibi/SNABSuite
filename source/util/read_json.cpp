@@ -38,7 +38,7 @@ cypress::Json read_config(std::string name, std::string backend)
 		}
 	}
 	if (!valid) {
-		throw std::invalid_argument("Config file for" + name + " not found!");
+		throw std::invalid_argument("Config file for " + name + " not found!");
 	}
 
 	if (config.find(backend) == config.end()) {
