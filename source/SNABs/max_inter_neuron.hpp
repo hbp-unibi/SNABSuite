@@ -39,6 +39,20 @@ public:
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;
 };
+
+class GroupMaxFreqToGroup : public BenchmarkBase {
+private:
+	cypress::PopulationBase m_pop_max, m_pop_retr;
+	size_t m_num_neurons = 0;
+	cypress::Real simulation_length = 150;  // ms
+	NeuronParameters m_retr_params;
+
+public:
+	GroupMaxFreqToGroup(const std::string backend);
+	cypress::Network &build_netw(cypress::Network &netw) override;
+	void run_netw(cypress::Network &netw) override;
+	std::vector<cypress::Real> evaluate() override;
+};
 }
 
 #endif /* SNABSUITE_SNABS_MAX_INTER_NEURON_HPP */

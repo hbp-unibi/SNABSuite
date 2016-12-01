@@ -47,7 +47,8 @@ std::vector<std::shared_ptr<BenchmarkBase>> benchmark_registry(
 	    std::make_shared<RefractoryPeriod>(RefractoryPeriod(backend)),
 	    std::make_shared<MaxInputOneToOne>(MaxInputOneToOne(backend)),
 	    std::make_shared<MaxInputAllToAll>(MaxInputAllToAll(backend)),
-	    std::make_shared<SingleMaxFreqToGroup>(SingleMaxFreqToGroup(backend))};
+	    std::make_shared<SingleMaxFreqToGroup>(SingleMaxFreqToGroup(backend)),
+	    std::make_shared<GroupMaxFreqToGroup>(GroupMaxFreqToGroup(backend))};
 	return vec;
 }
 }
