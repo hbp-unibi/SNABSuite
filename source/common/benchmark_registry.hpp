@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "SNABs/max_input.hpp"
+#include "SNABs/max_inter_neuron.hpp"
 #include "SNABs/output_bench.hpp"
 #include "SNABs/refractory_period.hpp"
 #include "common/benchmark_base.hpp"
@@ -45,7 +46,8 @@ std::vector<std::shared_ptr<BenchmarkBase>> benchmark_registry(
 	        OutputFrequencyMultipleNeurons(backend)),
 	    std::make_shared<RefractoryPeriod>(RefractoryPeriod(backend)),
 	    std::make_shared<MaxInputOneToOne>(MaxInputOneToOne(backend)),
-	    std::make_shared<MaxInputAllToAll>(MaxInputAllToAll(backend))};
+	    std::make_shared<MaxInputAllToAll>(MaxInputAllToAll(backend)),
+	    std::make_shared<SingleMaxFreqToGroup>(SingleMaxFreqToGroup(backend))};
 	return vec;
 }
 }
