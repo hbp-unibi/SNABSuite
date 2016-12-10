@@ -71,6 +71,10 @@ void RefractoryPeriod::run_netw(cypress::Network &netw)
 {
 	// Debug logger, may be ignored in the future
 	netw.logger().min_level(cypress::DEBUG, 0);
+    
+    if(m_backend == "spikey"){
+        m_backend.append("={\"calibIcb\": 1}");
+    }
 
 	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
