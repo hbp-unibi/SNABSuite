@@ -43,8 +43,8 @@
 			"v_reset": -25.0,
 			"e_rev_I": 0.0
 		},
-		"#neurons" : 256,
-		"#input_neurons" : 384,
+		"#neurons" : 384,
+		"#input_neurons" : 256,
 		"weight" : 0.03,
 		"#spikes" : 1
 	}
