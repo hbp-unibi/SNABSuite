@@ -23,14 +23,14 @@
 
 #include <cypress/cypress.hpp>
 
-#include "common/benchmark_base.hpp"
+#include "common/snab_base.hpp"
 
 namespace SNAB {
 /**
  * This SNAB will test the maximal frequency of a single neuron by simply
  * setting the neuron membrane reset-potential above threshold.
  */
-class OutputFrequencySingleNeuron : public BenchmarkBase {
+class OutputFrequencySingleNeuron : public SNABBase {
 private:
 	cypress::PopulationBase m_pop;
 
@@ -47,7 +47,7 @@ public:
  * of the average of a single neuron. This will show possible shortcuts in
  * communication infrastructure of neuron-nhips to the outer world
  */
-class OutputFrequencyMultipleNeurons : public BenchmarkBase {
+class OutputFrequencyMultipleNeurons : public SNABBase {
 private:
 	cypress::PopulationBase m_pop;
 	size_t m_num_neurons = 0;

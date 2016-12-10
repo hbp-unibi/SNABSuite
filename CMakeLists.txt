@@ -75,8 +75,8 @@ target_link_libraries(benchmark_utils
 
 add_library(benchmark_common
     source/common/benchmark
-	source/common/benchmark_base
-	source/common/benchmark_registry
+	source/common/snab_base
+	source/common/snab_registry
 	source/common/neuron_parameters
 )
 target_link_libraries(benchmark_common

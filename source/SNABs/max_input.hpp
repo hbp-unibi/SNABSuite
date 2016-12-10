@@ -23,7 +23,7 @@
 
 #include <cypress/cypress.hpp>
 
-#include "common/benchmark_base.hpp"
+#include "common/snab_base.hpp"
 #include "common/neuron_parameters.hpp"
 
 namespace SNAB {
@@ -31,7 +31,7 @@ namespace SNAB {
  * Check the input bandwidth by injecting spikes per one to one connection.
  * Check if output neurons spike accordingly
  */
-class MaxInputOneToOne : public BenchmarkBase {
+class MaxInputOneToOne : public SNABBase {
 private:
 	cypress::PopulationBase m_pop;
 	cypress::Population<cypress::SpikeSourceArray> m_pop_source;
@@ -50,7 +50,7 @@ public:
  * Check the input bandwidth by injecting spikes per all to all connection.
  * Check if output neurons spike accordingly
  */
-class MaxInputAllToAll : public BenchmarkBase {
+class MaxInputAllToAll : public SNABBase {
 private:
 	cypress::PopulationBase m_pop;
 	cypress::Population<cypress::SpikeSourceArray> m_pop_source;

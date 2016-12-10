@@ -18,8 +18,8 @@
 
 #pragma once
 
-#ifndef SNABSUITE_COMMON_BENCHMARK_BASE_HPP
-#define SNABSUITE_COMMON_BENCHMARK_BASE_HPP
+#ifndef SNABSUITE_COMMON_SNAB_BASE_HPP
+#define SNABSUITE_COMMON_SNAB_BASE_HPP
 
 #include <cypress/cypress.hpp>
 #include <string>
@@ -28,19 +28,19 @@
 
 namespace SNAB {
 /**
- * Virtual Base class for SNABs/Benchmarks.
- * All Benchmarks should have seperate building of networks, execution and an
+ * Virtual Base class for SNABs(Benchmarks).
+ * All SNABs should have seperate building of networks, execution and an
  * evaluation tasks
  */
-class BenchmarkBase {
+class SNABBase {
 protected:
-	// Internal spiking network which should be used by the benchmark
+	// Internal spiking network which should be used by the SNAB
 	cypress::Network m_netw;
 	// Platform specific config file which is read in with the constructor
 	cypress::Json m_config_file;
 	// String which contains the name of the simulation backend
 	std::string m_backend;
-	// Flag which tracks if the benchmark can be executed on the backend
+	// Flag which tracks if the SNAB can be executed on the backend
 	// In the config file define the key "invalid" for the simulator
 	bool m_valid = false;
 
@@ -49,7 +49,7 @@ public:
 	 * Constructor which reads in platform specific config file
 	 * For description of the indicator_* initializers look into the comment of
 	 * their declaration below
-	 * @param name: name of the benchmark, and therefore of the config file
+	 * @param name: name of the SNAB, and therefore of the config file
 	 * @param backend: string containing the simulation backend
 	 * @param indicator_names: names of benchmark indicators
 	 * @param indicator_types: types...
@@ -57,11 +57,11 @@ public:
 	 * @param required_parameters: list of parameters which are required in the
 	 * JSON file, which should be checked before unnecessary building networks
 	 */
-	BenchmarkBase(std::string name, std::string backend,
-	              std::initializer_list<std::string> indicator_names,
-	              std::initializer_list<std::string> indicator_types,
-	              std::initializer_list<std::string> indicator_measures,
-	              std::initializer_list<std::string> required_parameters)
+	SNABBase(std::string name, std::string backend,
+	         std::initializer_list<std::string> indicator_names,
+	         std::initializer_list<std::string> indicator_types,
+	         std::initializer_list<std::string> indicator_measures,
+	         std::initializer_list<std::string> required_parameters)
 	    : m_backend(backend),
 	      snab_name(name),
 	      indicator_names(indicator_names),
@@ -84,7 +84,7 @@ public:
 	 * external network, you should use the first version of building (and the
 	 * corresponding run function), for the member network use the second
 	 * function. The implementation is contained in the first one.
-	 * @param network: External network benchmark will be constructed in
+	 * @param network: External network SNAB/benchmark will be constructed in
 	 */
 	virtual cypress::Network &build_netw(cypress::Network &netw) = 0;
 	cypress::Network &build() { return build_netw(m_netw); };
@@ -93,7 +93,7 @@ public:
 	 * Execution of the benchmark on the simulation platform. Similar to the
 	 * build function, the first function contains the implementation, while the
 	 * second simply uses the first with member networks.
-	 * @param network: External network benchmark will be constructed in
+	 * @param network: External network SNAB/benchmark will be constructed in
 	 */
 	virtual void run_netw(cypress::Network &netw) = 0;
 	void run() { run_netw(m_netw); };
@@ -149,8 +149,8 @@ public:
 	 * when valid() returns false
 	 */
 	bool valid() const { return m_valid; }
-	virtual ~BenchmarkBase() {}
+	virtual ~SNABBase() {}
 };
 }
 
-#endif /* SNABSUITE_COMMON_BENCHMARK_BASE_HPP */
+#endif /* SNABSUITE_COMMON_SNAB_BASE_HPP */

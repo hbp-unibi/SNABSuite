@@ -21,8 +21,8 @@ Here, the <platform> can be substituted by all platforms currently supported by 
 
 ## Overall Architecture/Hints for adding a new SNAB
 
-The benchmark base class can be found in `source/common/benchmark_base.hpp`. New benchmarks have to implement the virtual functions given. The constructor of your SNAB should initialize the base class correctly to make evaluation possible. Details can be found in the documentation. By activating the constructor of the base class, a config file is read in, which should be a JSON file in the config-directory with the same name as the SNAB. This config icontains all platform specific parameters which are set in the individual benchmarks. 
-Finally, all benchmarks are registered in the `source/common/benchmark_registry.hpp` file, to make a consecutive execution of all SNABs possible.
+The benchmark/SNAB base class can be found in `source/common/snab_base.hpp`. New SNABs have to implement the virtual functions given. The constructor of your SNAB should initialize the base class correctly to make evaluation possible. Details can be found in the documentation. By activating the constructor of the base class, a config file is read in, which should be a JSON file in the config-directory with the same name as the SNAB. This config icontains all platform specific parameters which are set in the individual SNABs. 
+Finally, all SNABs are registered in the `source/common/snab_registry.hpp` file, to make a consecutive execution of all SNABs possible.
 To help implementing new SNABs, there is a list of common tools and utilities found in their respective directories. For example there is a NeuronParameters class which helps handling the different neuron implementations of the cypress framework.
 
 ### Config files

@@ -23,10 +23,10 @@
 
 #include <cypress/cypress.hpp>
 
-#include "common/benchmark_base.hpp"
+#include "common/snab_base.hpp"
 
 namespace SNAB {
-class SingleMaxFreqToGroup : public BenchmarkBase {
+class SingleMaxFreqToGroup : public SNABBase {
 private:
 	cypress::PopulationBase m_pop_single, m_pop_group;
 	size_t m_num_neurons = 0;
@@ -40,7 +40,7 @@ public:
 	std::vector<cypress::Real> evaluate() override;
 };
 
-class GroupMaxFreqToGroup : public BenchmarkBase {
+class GroupMaxFreqToGroup : public SNABBase {
 private:
 	cypress::PopulationBase m_pop_max, m_pop_retr;
 	size_t m_num_neurons = 0;

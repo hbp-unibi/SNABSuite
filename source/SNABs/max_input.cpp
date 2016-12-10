@@ -29,7 +29,7 @@
 namespace SNAB {
 
 MaxInputOneToOne::MaxInputOneToOne(const std::string backend)
-    : BenchmarkBase(
+    : SNABBase(
           __func__, backend, {"Average number of sikes", "Standard deviation",
                               "Maximum #spikes", "Minimum #spikes"},
           {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
@@ -102,7 +102,7 @@ std::vector<cypress::Real> MaxInputOneToOne::evaluate()
 }
 
 MaxInputAllToAll::MaxInputAllToAll(const std::string backend)
-    : BenchmarkBase(
+    : SNABBase(
           __func__, backend, {"Average number of sikes", "Standard deviation",
                               "Maximum #spikes", "Minimum #spikes"},
           {"quality", "quality", "quality", "quality"}, {"", "", "", ""},

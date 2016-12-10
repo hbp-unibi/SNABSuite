@@ -31,7 +31,7 @@
 
 namespace SNAB {
 SingleMaxFreqToGroup::SingleMaxFreqToGroup(const std::string backend)
-    : BenchmarkBase(__func__, backend,
+    : SNABBase(__func__, backend,
                     {"Average spike number deviation", "Standard deviation",
                      "Maximum", "Minimum"},
                     {"quality", "quality", "quality", "quality"},
@@ -111,7 +111,7 @@ std::vector<cypress::Real> SingleMaxFreqToGroup::evaluate()
 }
 
 GroupMaxFreqToGroup::GroupMaxFreqToGroup(const std::string backend)
-    : BenchmarkBase(__func__, backend,
+    : SNABBase(__func__, backend,
                     {"Average spike number deviation", "Standard deviation",
                      "Maximum", "Minimum"},
                     {"quality", "quality", "quality", "quality"},

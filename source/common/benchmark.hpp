@@ -24,12 +24,12 @@
 #include <string>
 
 #include <cypress/cypress.hpp>
-#include "common/benchmark_registry.hpp"
+#include "common/snab_registry.hpp"
 
 namespace SNAB {
 /**
- * Class for the consecutive execution of all benchmarks registered in the
- * benchmark_registry.hpp
+ * Class for the consecutive execution of all benchmarks/SNABs registered in the
+ * snab_registry.hpp
  */
 class BenchmarkExec {
 private:
@@ -69,7 +69,7 @@ public:
 	 */
 	BenchmarkExec(std::string backend) : m_backend(backend)
 	{
-		auto snab_vec = benchmark_registry(m_backend);
+		auto snab_vec = snab_registry(m_backend);
 		for (auto i : snab_vec) {
 			if (i->valid()) {
 				i->build();

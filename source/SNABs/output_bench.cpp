@@ -32,7 +32,7 @@
 namespace SNAB {
 OutputFrequencySingleNeuron::OutputFrequencySingleNeuron(
     const std::string backend)
-    : BenchmarkBase(
+    : SNABBase(
           __func__, backend,
           {"Average frequency", "Standard deviation", "Maximum", "Minimum"},
           {"quality", "quality", "quality", "quality"},
@@ -108,7 +108,7 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 
 OutputFrequencyMultipleNeurons::OutputFrequencyMultipleNeurons(
     const std::string backend)
-    : BenchmarkBase(__func__, backend,
+    : SNABBase(__func__, backend,
                     {"Average frequency of neurons", "Standard deviation",
                      "Maximum av frequency", "Minimum av frequency"},
                     {"quality", "quality", "quality", "quality"},

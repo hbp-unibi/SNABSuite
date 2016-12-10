@@ -23,7 +23,7 @@
 
 #include <cypress/cypress.hpp>
 
-#include "common/benchmark_base.hpp"
+#include "common/snab_base.hpp"
 #include "common/neuron_parameters.hpp"
 
 namespace SNAB {
@@ -33,7 +33,7 @@ namespace SNAB {
  * Negative values correspond to too short periods, positive values indicate a
  * period which is too long.
  */
-class RefractoryPeriod : public BenchmarkBase {
+class RefractoryPeriod : public SNABBase {
 private:
 	cypress::PopulationBase m_pop;
 	cypress::Population<cypress::SpikeSourceArray> m_pop_source;

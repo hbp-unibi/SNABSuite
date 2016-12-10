@@ -30,7 +30,7 @@
 
 namespace SNAB {
 RefractoryPeriod::RefractoryPeriod(const std::string backend)
-    : BenchmarkBase(
+    : SNABBase(
           __func__, backend,
           {"Average deviation from refractory period", "Standard deviation"},
           {"quality", "quality"}, {"ms", "ms"},
