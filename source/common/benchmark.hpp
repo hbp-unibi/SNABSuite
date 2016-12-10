@@ -21,6 +21,7 @@
 #ifndef SNABSUITE_COMMON_BENCHMARK_HPP
 #define SNABSUITE_COMMON_BENCHMARK_HPP
 
+#include <fstream>
 #include <string>
 
 #include <cypress/cypress.hpp>
@@ -65,13 +66,14 @@ private:
 public:
 	/**
 	 * Constructor which executes all registered benchmarks and gives the result
-	 * to std::cout (at the moment)
+	 * to std::cout and backend.json
 	 */
 	BenchmarkExec(std::string backend) : m_backend(backend)
 	{
 		auto snab_vec = snab_registry(m_backend);
 		for (auto i : snab_vec) {
 			if (i->valid()) {
+                std::cout << "Executing " << i->snab_name<<std::endl;
 				i->build();
 				i->run();
 				results.push_back({{"name", i->snab_name},
@@ -80,6 +82,12 @@ public:
 			}
 		}
 		std::cout << results.dump(4) << std::endl;
+		{
+			std::fstream file =
+			    std::fstream((backend + ".json").c_str(), std::fstream::out);
+            file << results.dump(4)<<std::endl;
+            file.close();
+		}
 	};
 };
 }
