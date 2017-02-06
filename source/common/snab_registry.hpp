@@ -25,10 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "SNABs/max_input.hpp"
-#include "SNABs/max_inter_neuron.hpp"
-#include "SNABs/output_bench.hpp"
-#include "SNABs/refractory_period.hpp"
 #include "common/snab_base.hpp"
 
 namespace SNAB {
@@ -36,20 +32,7 @@ namespace SNAB {
  * A vector containing all SNABs/benchmarks which should be executed. The shared
  * pointer ensures that objects live 'long enough'
  */
-std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend)
-{
-	std::vector<std::shared_ptr<SNABBase>> vec = {
-	    std::make_shared<OutputFrequencySingleNeuron>(
-	        OutputFrequencySingleNeuron(backend)),
-	    std::make_shared<OutputFrequencyMultipleNeurons>(
-	        OutputFrequencyMultipleNeurons(backend)),
-	    std::make_shared<RefractoryPeriod>(RefractoryPeriod(backend)),
-	    std::make_shared<MaxInputOneToOne>(MaxInputOneToOne(backend)),
-	    std::make_shared<MaxInputAllToAll>(MaxInputAllToAll(backend)),
-	    std::make_shared<SingleMaxFreqToGroup>(SingleMaxFreqToGroup(backend)),
-	};
-	return vec;
-}
+std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend);
 }
 
 #endif /* SNABSUITE_COMMON_SNAB_REGISTRY_HPP */

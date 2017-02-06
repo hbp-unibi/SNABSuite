@@ -103,6 +103,8 @@ add_executable(benchmark
 )
 
 target_link_libraries(benchmark
+    benchmark_utils
+    benchmark_common
     benchmarks
 )
 
