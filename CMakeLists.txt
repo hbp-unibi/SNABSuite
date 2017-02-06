@@ -75,9 +75,11 @@ target_link_libraries(benchmark_utils
 
 add_library(benchmark_common
     source/common/benchmark
+    source/common/neuron_parameters
+    source/common/parameter_sweep
 	source/common/snab_base
 	source/common/snab_registry
-	source/common/neuron_parameters
+	
 )
 target_link_libraries(benchmark_common
 	cypress
