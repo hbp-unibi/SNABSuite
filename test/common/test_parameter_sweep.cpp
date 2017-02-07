@@ -83,6 +83,22 @@ static const std::string sweep_json =
     "}\n"
     "";
 
+static const std::string sweep2_json =
+    "{\n"
+    "\t\"neuron_params\": {\n"
+    "\t\t\"e_rev_E\": [1,5,5],\n"
+    "\t\t\"v_rest\": 9.0,\n"
+    "\t\t\"v_reset\": 10.0\n"
+    "\t},\n"
+    "\t\"neuron_params2\": {\n"
+    "\t\t\"tau_syn_E\": [1,3,3],\n"
+    "\t\t\"tau_refrac\": 12.0,\n"
+    "\t\t\"tau_m\": 13.0,\n"
+    "\t\t\"cm\": 14.0\n"
+    "\t}\n"
+    "}\n"
+    "";
+
 TEST(generate_sweep_vector, overwrite)
 {
 	std::stringstream ss(test_json);
@@ -162,5 +178,48 @@ TEST(generate_sweep_vector, sweep)
 	EXPECT_NEAR(3.0, Real(res[2]["neuron_params"]["e_rev_E"]), 1e-8);
 	EXPECT_NEAR(4.0, Real(res[3]["neuron_params"]["e_rev_E"]), 1e-8);
 	EXPECT_NEAR(5.0, Real(res[4]["neuron_params"]["e_rev_E"]), 1e-8);
+}
+
+TEST(generate_sweep_vector, 2dim_sweep)
+{
+	std::stringstream ss(test_json);
+	cypress::Json json = cypress::Json::parse(ss);
+	std::stringstream ss2(sweep2_json);
+	cypress::Json json2 = cypress::Json::parse(ss2);
+	std::vector<std::string> sweep_name;
+	auto res = ParameterSweep::generate_sweep_vector(json2, json, sweep_name);
+	EXPECT_EQ(15, res.size());
+
+	EXPECT_NEAR(1.0, Real(res[0]["neuron_params"]["e_rev_E"]), 1e-8);
+	EXPECT_NEAR(2.0, Real(res[1]["neuron_params"]["e_rev_E"]), 1e-8);
+	EXPECT_NEAR(3.0, Real(res[2]["neuron_params"]["e_rev_E"]), 1e-8);
+	EXPECT_NEAR(4.0, Real(res[3]["neuron_params"]["e_rev_E"]), 1e-8);
+	EXPECT_NEAR(5.0, Real(res[4]["neuron_params"]["e_rev_E"]), 1e-8);
+	EXPECT_NEAR(1.0, Real(res[5]["neuron_params"]["e_rev_E"]), 1e-8);
+	EXPECT_NEAR(2.0, Real(res[6]["neuron_params"]["e_rev_E"]), 1e-8);
+	EXPECT_NEAR(3.0, Real(res[7]["neuron_params"]["e_rev_E"]), 1e-8);
+	EXPECT_NEAR(4.0, Real(res[8]["neuron_params"]["e_rev_E"]), 1e-8);
+	EXPECT_NEAR(5.0, Real(res[9]["neuron_params"]["e_rev_E"]), 1e-8);
+	EXPECT_NEAR(1.0, Real(res[10]["neuron_params"]["e_rev_E"]), 1e-8);
+	EXPECT_NEAR(2.0, Real(res[11]["neuron_params"]["e_rev_E"]), 1e-8);
+	EXPECT_NEAR(3.0, Real(res[12]["neuron_params"]["e_rev_E"]), 1e-8);
+	EXPECT_NEAR(4.0, Real(res[13]["neuron_params"]["e_rev_E"]), 1e-8);
+	EXPECT_NEAR(5.0, Real(res[14]["neuron_params"]["e_rev_E"]), 1e-8);
+
+	EXPECT_NEAR(1.0, Real(res[0]["neuron_params2"]["tau_syn_E"]), 1e-8);
+	EXPECT_NEAR(1.0, Real(res[1]["neuron_params2"]["tau_syn_E"]), 1e-8);
+	EXPECT_NEAR(1.0, Real(res[2]["neuron_params2"]["tau_syn_E"]), 1e-8);
+	EXPECT_NEAR(1.0, Real(res[3]["neuron_params2"]["tau_syn_E"]), 1e-8);
+	EXPECT_NEAR(1.0, Real(res[4]["neuron_params2"]["tau_syn_E"]), 1e-8);
+	EXPECT_NEAR(2.0, Real(res[5]["neuron_params2"]["tau_syn_E"]), 1e-8);
+	EXPECT_NEAR(2.0, Real(res[6]["neuron_params2"]["tau_syn_E"]), 1e-8);
+	EXPECT_NEAR(2.0, Real(res[7]["neuron_params2"]["tau_syn_E"]), 1e-8);
+	EXPECT_NEAR(2.0, Real(res[8]["neuron_params2"]["tau_syn_E"]), 1e-8);
+	EXPECT_NEAR(2.0, Real(res[9]["neuron_params2"]["tau_syn_E"]), 1e-8);
+	EXPECT_NEAR(3.0, Real(res[10]["neuron_params2"]["tau_syn_E"]), 1e-8);
+	EXPECT_NEAR(3.0, Real(res[11]["neuron_params2"]["tau_syn_E"]), 1e-8);
+	EXPECT_NEAR(3.0, Real(res[12]["neuron_params2"]["tau_syn_E"]), 1e-8);
+	EXPECT_NEAR(3.0, Real(res[13]["neuron_params2"]["tau_syn_E"]), 1e-8);
+	EXPECT_NEAR(3.0, Real(res[14]["neuron_params2"]["tau_syn_E"]), 1e-8);
 }
 }

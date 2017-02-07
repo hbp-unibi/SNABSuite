@@ -35,9 +35,9 @@ std::vector<std::string> &split(const std::string &s, char delim,
 	std::stringstream ss(s);
 	std::string item;
 	while (std::getline(ss, item, delim)) {
-        if(item == ""){
-            continue;
-        }
+		if (item == "") {
+			continue;
+		}
 		elems.push_back(item);
 	}
 	return elems;
@@ -54,12 +54,13 @@ std::vector<std::string> split(const std::string &s, char delim)
 }
 }
 
-
 std::vector<cypress::Json> ParameterSweep::generate_sweep_vector(
     cypress::Json &source, cypress::Json &target,
     std::vector<std::string> &sweep_values)
 {
+	// vector containing the flatten JSON files
 	std::vector<cypress::Json> sweep;
+	// Flatting the input configs
 	auto tar = target.flatten();
 	auto src = source.flatten();
 
@@ -67,6 +68,9 @@ std::vector<cypress::Json> ParameterSweep::generate_sweep_vector(
 	for (auto i = src.begin(); i != src.end(); i++) {
 		auto val = i.value();
 		auto target_iter = tar.find(i.key());
+		// If a value cannot be found in target, there are two possibilities:
+		// Wrong entry or a sweep array was changed in entry/0, entry/1 and
+		// entry/2.
 		if (target_iter == tar.end()) {
 			auto splitted = split(i.key(), '/');
 			if (splitted.back() == "0") {
@@ -82,6 +86,7 @@ std::vector<cypress::Json> ParameterSweep::generate_sweep_vector(
 				std::cerr << "Skipping value for " << i.key() << std::endl;
 			}
 		}
+		// Copy single values
 		else if (val.is_number() || val.is_string()) {
 			if (i.key() == "repetitions") {
 				continue;
@@ -89,26 +94,35 @@ std::vector<cypress::Json> ParameterSweep::generate_sweep_vector(
 			tar[i.key()] = i.value();
 		}
 	}
+
 	sweep.emplace_back(tar);
 	for (auto i : sweep_values) {
+		// Make a copy of the old vector
 		std::vector<cypress::Json> sweep_temp = sweep;
 		sweep = std::vector<cypress::Json>();
+		// Gather relevant entries and calculate step size
 		cypress::Real begin = src[i + "/0"];
 		cypress::Real end = src[i + "/1"];
 		cypress::Real steps = src[i + "/2"];
 		cypress::Real step_size = (end - begin) / (steps - 1.0);
 		for (size_t j = 0; j < steps; j++) {
+			// For every Json in sweep_temp overwrite the respective value with
+			// the current one
 			cypress::Real current_value = begin + j * step_size;
 			for (size_t k = 0; k < sweep_temp.size(); k++) {
 				sweep_temp[k][i] = current_value;
 			}
+			// Insert this subpart (constant current_value) into the result
 			sweep.insert(sweep.end(), sweep_temp.begin(), sweep_temp.end());
 		}
 	}
+
+	// Unflatten the results
 	std::vector<cypress::Json> sweep2;
 	for (size_t i = 0; i < sweep.size(); i++) {
 		sweep2.emplace_back(sweep[i].unflatten());
 	}
+
 	return sweep2;
 }
 
