@@ -66,6 +66,33 @@ cypress::Json read_config(std::string name, std::string backend)
 	}
 }
 
+cypress::Json extract_backend(cypress::Json &config, std::string backend)
+{
+	if (config.find(backend) == config.end()) {
+		std::string simulator =
+		    Utilities::split(Utilities::split(backend, '=')[0], '.').back();
+		if (config.find(simulator) == config.end()) {
+			std::cerr << "Could not find any config for " + simulator +
+			                 " in the provided Json! ";
+			if (config.find("default") != config.end()) {
+				std::cerr << "Take default values instead!" << std::endl;
+				return config["default"];
+			}
+			else {
+				std::cerr << "Take values for " << config.begin().key()
+				          << " instead!" << std::endl;
+				return config.begin().value();
+			}
+		}
+		else {
+			return config[simulator];
+		}
+	}
+	else {
+		return config[backend];
+	}
+}
+
 bool check_json_for_parameters(std::vector<std::string> &parameters,
                                cypress::Json &json, std::string name)
 {

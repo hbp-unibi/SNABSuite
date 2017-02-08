@@ -82,6 +82,7 @@ add_library(benchmark_common
 	
 )
 target_link_libraries(benchmark_common
+    benchmarks
 	cypress
 	benchmark_utils
 	-pthread
@@ -105,6 +106,16 @@ add_executable(benchmark
 )
 
 target_link_libraries(benchmark
+    benchmark_utils
+    benchmark_common
+    benchmarks
+)
+
+add_executable(sweep
+    source/exec/snab_sweep.cpp
+)
+
+target_link_libraries(sweep
     benchmark_utils
     benchmark_common
     benchmarks

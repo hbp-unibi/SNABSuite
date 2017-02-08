@@ -27,40 +27,78 @@
 
 #include <cypress/cypress.hpp>
 #include "common/snab_base.hpp"
-#include "common/snab_registry.hpp"
 
 namespace SNAB {
+    
+/**
+ * class for systematic parameter sweeps of single benchmarks
+ */
 class ParameterSweep {
 private:
 	// String containing the simulation backend
 	std::string m_backend;
-	// Container for the results
-	cypress::Json results;
 	// Sweep Configuration
 	cypress::Json m_sweep_config;
 	// Benchmark class
-	std::shared_ptr<SNABBase> snab;
+	std::shared_ptr<SNABBase> m_snab;
+	// Shuffled indices
+	std::vector<size_t> m_indices;
+	// List of indices with jobs already done
+	std::vector<size_t> m_jobs_done;
+	// Vector containing all configuration files of a sweep
+	std::vector<cypress::Json> m_sweep_vector;
+	// Names and Keys for parameterws swept over
+	std::vector<std::string> m_sweep_names;
+	// Vector containing all resulting json files
+	std::vector<std::vector<cypress::Real>> m_results;
+	// TODO: Number of repetitions for every simulation
+	size_t m_repetitions = 1;
+
+	// Function for shuffling indices, reduces covariance between neighbouring
+	// simulations on analogue hardware
+	void shuffle_sweep_indices(size_t size);
+
+	// TODO
+	void recover_broken_simulation();
+	// TODO
+	void backup_simulation_results();
 
 public:
-	ParameterSweep(std::string backend, cypress::Json &config)
-	    : m_backend(backend), m_sweep_config(config)
-	{
-		std::string snab_name = m_sweep_config["snab_name"];
-		auto snab_vec = snab_registry(m_backend);
-		for (auto i : snab_vec) {
-			if (i->snab_name == snab_name) {
-				snab = i;
-			}
-		}
-	}
+	/**
+	 * Constructor choses the appropriate SNAB. sets the most general structures
+	 * above and generate the vector containing configurations for all sweeps.
+	 * Sweep indices are shuffeld
+	 * @param backend: the cypress backend
+	 * @param config: json structure which looks similar to the json-files in
+	 * config/ thus containing backend specific instructions. This json
+	 * structure should have arrays like [a,b,c] instead of a parameter value
+	 * to sweep from a to b in c steps.
+	 */
+	ParameterSweep(std::string backend, cypress::Json &config);
 
-	void execute() {}
+	/**
+	 * Execution of the sweep simulations. Results are stored in m_results
+	 */
+	void execute();
 
+	/**
+	 * Generates the m_sweep_vector.
+	 * @param target contains the original config from the snab
+	 * @param source should contain single values which will overwrite those
+	 * from @target in all simulations and json values like [a,b,c] which will
+	 * generate vectors of config files, in which the parameter is varied from a
+	 * to b in c steps.
+	 * @param sweep_names will contain the flattened keys for all parameters
+	 * swept over
+	 */
 	static std::vector<cypress::Json> generate_sweep_vector(
-	    cypress::Json &source, cypress::Json &target,
-	    std::vector<std::string> &sweep_values);
-    
-    void prepare_json();
+	    const cypress::Json &source, const cypress::Json &target,
+	    std::vector<std::string> &sweep_names);
+
+    /**
+     * Results are converted to comma seperated values and written to *sweep_parameters*_*backend*_.csv
+     */
+	void write_csv();
 };
 }
 

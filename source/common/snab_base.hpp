@@ -145,6 +145,24 @@ public:
 	}
 
 	/**
+	 * Getter for the config file
+	 */
+	cypress::Json get_config() { return m_config_file; }
+
+	/**
+	 * Setting a new config file. Note that before building the new network you
+	 * probably want to reset the network structure, because the old populations
+	 * and result will not be deleted automatically
+	 */
+	void set_config(cypress::Json json) { m_config_file = json; }
+
+	/**
+	 * Reset the cypress network, therefore deleting all old populations. For
+	 * example in several concurrent runs with different configurations
+	 */
+	void reset_network() { m_netw = cypress::Network(); }
+
+	/**
 	 * Returns the state of the m_valid flag. Simulation should not be executed
 	 * when valid() returns false
 	 */

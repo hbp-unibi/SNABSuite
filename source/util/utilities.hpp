@@ -21,6 +21,7 @@
 #ifndef SNABSUITE_UTIL_UTILITIES_HPP
 #define SNABSUITE_UTIL_UTILITIES_HPP
 
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -54,8 +55,11 @@ public:
 		split(s, delim, elems);
 		return elems;
 	}
-
-	/*static void progress_callback(double p)
+    
+    /**
+     * Funtion for generating a progress bar on terminal
+     */
+	static void progress_callback(double p)
 	{
 		const int w = 50;
 		std::cerr << std::fixed << std::setprecision(2) << std::setw(6)
@@ -65,7 +69,7 @@ public:
 			std::cerr << (i > j ? ' ' : (i == j ? '>' : '='));
 		}
 		std::cerr << "]\r";
-	}*/
+	}
 };
 }
 

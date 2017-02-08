@@ -83,6 +83,12 @@ cypress::Json read_config(std::string name, std::string backend);
 
 bool check_json_for_parameters(std::vector<std::string> &parameters,
                                cypress::Json &json, std::string name);
+
+/**
+ * Extract backend specific part from a configuration file. Checks for dot
+ * seperated backends
+ */
+cypress::Json extract_backend(cypress::Json &config, std::string backend);
 }
 
 #endif /* SNABSUITE_UTIL_READ_JSON_HPP */
