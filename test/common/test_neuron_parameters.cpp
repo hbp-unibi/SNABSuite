@@ -45,7 +45,7 @@ static const std::string test_json =
 TEST(NeuronParameters, NeuronParameters)
 {
 	std::stringstream ss(test_json);
-	cypress::Json json(ss);
+	cypress::Json json = cypress::Json::parse(ss);
 	const cypress::IfCondExp &neurontype = cypress::IfCondExp::inst();
 	std::ofstream out;
 	auto params = NeuronParameters(neurontype, json["neuron_params"], out, false);

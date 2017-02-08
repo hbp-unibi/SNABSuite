@@ -66,7 +66,7 @@ static const std::string test_json =
 TEST(ReadJSON, json_to_map)
 {
 	std::stringstream ss(test_json);
-	cypress::Json json(ss);
+	cypress::Json json = cypress::Json::parse(ss);
 
 	auto map = json_to_map<float>(json["network"]);
 	EXPECT_EQ(map.end(), map.find("neuron_type"));
@@ -85,7 +85,7 @@ TEST(ReadJSON, json_to_map)
 TEST(ReadJSON, read_check)
 {
 	std::stringstream ss(test_json);
-	cypress::Json json(ss);
+	cypress::Json json = cypress::Json::parse(ss);
 
 	auto map = json_to_map<float>(json["network"]["params"]);
 	std::vector<std::string> names = {"e_rev_E",  "v_rest",    "v_reset",
@@ -103,7 +103,7 @@ TEST(ReadJSON, read_check)
 	EXPECT_NEAR(res[5], 0.0, 1e-8);
 	EXPECT_NEAR(res[6], 50.0, 1e-8);
 	EXPECT_NEAR(res[7], 0.2, 1e-8);
-    
+
 	map = json_to_map<float>(json["network"]);
 	EXPECT_ANY_THROW(
 	    read_check<float>(map, std::vector<std::string>({"input_burst_size"}),
@@ -112,31 +112,32 @@ TEST(ReadJSON, read_check)
 
 TEST(ReadJSON, read_config)
 {
-    EXPECT_ANY_THROW(read_config("bla", "blup"));
-    EXPECT_NO_THROW(read_config("OutputFrequencySingleNeuron", "spinnaker"));
-    auto config = read_config("OutputFrequencySingleNeuron", "spinnaker")["neuron_params"];
-    EXPECT_NEAR(config["e_rev_E"], 0.0, 1e-8);
+	EXPECT_ANY_THROW(read_config("bla", "blup"));
+	EXPECT_NO_THROW(read_config("OutputFrequencySingleNeuron", "spinnaker"));
+	auto config = read_config("OutputFrequencySingleNeuron",
+	                          "spinnaker")["neuron_params"];
+	EXPECT_NEAR(config["e_rev_E"], 0.0, 1e-8);
 	EXPECT_NEAR(config["v_rest"], -60.0, 1e-8);
-    EXPECT_NEAR(config["v_reset"], -60.0, 1e-8);
-    EXPECT_NEAR(config["v_thresh"], -64.7, 1e-8);
-    EXPECT_NEAR(config["tau_syn_E"], 2.0, 1e-8);
-    EXPECT_NEAR(config["tau_refrac"], 0.0, 1e-8);
-    EXPECT_NEAR(config["tau_m"], 10.0, 1e-8);
-    EXPECT_NEAR(config["cm"], 0.2, 1e-8);
-    
-    EXPECT_NO_THROW(read_config("OutputFrequencySingleNeuron", "spikey"));
-    
+	EXPECT_NEAR(config["v_reset"], -60.0, 1e-8);
+	EXPECT_NEAR(config["v_thresh"], -64.7, 1e-8);
+	EXPECT_NEAR(config["tau_syn_E"], 2.0, 1e-8);
+	EXPECT_NEAR(config["tau_refrac"], 0.0, 1e-8);
+	EXPECT_NEAR(config["tau_m"], 10.0, 1e-8);
+	EXPECT_NEAR(config["cm"], 0.2, 1e-8);
+
+	EXPECT_NO_THROW(read_config("OutputFrequencySingleNeuron", "spikey"));
 }
 
 TEST(ReadJSON, check_json_for_parameters)
 {
-    std::stringstream ss(test_json);
-	cypress::Json json(ss);
-    std::vector<std::string> names({"data", "network"});
-    EXPECT_TRUE(check_json_for_parameters(names, json, "bla"));
-    std::vector<std::string> names2({"n_bits_in","n_bits_out", "n_ones_in","n_ones_out", "n_samples"});
-    EXPECT_TRUE(check_json_for_parameters(names2, json["data"], "bla"));
-    names2.emplace_back("wrong_test");
-    EXPECT_FALSE(check_json_for_parameters(names, json["data"], "bla"));
+	std::stringstream ss(test_json);
+	cypress::Json json = cypress::Json::parse(ss);
+	std::vector<std::string> names({"data", "network"});
+	EXPECT_TRUE(check_json_for_parameters(names, json, "bla"));
+	std::vector<std::string> names2(
+	    {"n_bits_in", "n_bits_out", "n_ones_in", "n_ones_out", "n_samples"});
+	EXPECT_TRUE(check_json_for_parameters(names2, json["data"], "bla"));
+	names2.emplace_back("wrong_test");
+	EXPECT_FALSE(check_json_for_parameters(names, json["data"], "bla"));
 }
 }
