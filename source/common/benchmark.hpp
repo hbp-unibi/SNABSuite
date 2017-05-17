@@ -68,11 +68,11 @@ public:
 	 * Constructor which executes all registered benchmarks and gives the result
 	 * to std::cout and backend.json
 	 */
-	BenchmarkExec(std::string backend) : m_backend(backend)
+	BenchmarkExec(std::string backend, std::string benchmark = "all") : m_backend(backend)
 	{
 		auto snab_vec = snab_registry(m_backend);
 		for (auto i : snab_vec) {
-			if (i->valid()) {
+			if (i->valid() && (benchmark =="all" || benchmark == i->snab_name )) {
                 std::cout << "Executing " << i->snab_name<<std::endl;
 				i->build();
 				i->run();

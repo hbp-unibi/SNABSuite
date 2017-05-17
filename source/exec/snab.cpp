@@ -25,12 +25,12 @@ using namespace SNAB;
 
 int main(int argc, const char *argv[])
 {
-	if (argc != 3 && argc != 2 && !cypress::NMPI::check_args(argc, argv)) {
-		std::cout << "Usage: " << argv[0] << " <SIMULATOR> [NMPI]" << std::endl;
+	if (argc < 2 && argc > 4 && !cypress::NMPI::check_args(argc, argv)) {
+		std::cout << "Usage: " << argv[0] << " <SIMULATOR> [snab] [NMPI]" << std::endl;
 		return 1;
 	}
 
-	if (argc == 3 && std::string(argv[2]) == "NMPI" &&
+	if (std::string(argv[argc -1]) == "NMPI" &&
 	    !cypress::NMPI::check_args(argc, argv)) {
 		glob_t glob_result;
 		glob(std::string("../config/*").c_str(), GLOB_TILDE, NULL,
@@ -44,6 +44,11 @@ int main(int argc, const char *argv[])
 		cypress::NMPI(argv[1], argc, argv, files);
 		return 0;
 	}
-	BenchmarkExec bench(argv[1]);
+	std::string snab_name = "all";
+	if (argc > 2 && std::string(argv[2]) != "NMPI"){
+        snab_name = std::string(argv[2]);
+    }
+	BenchmarkExec bench(std::string(argv[1]), snab_name);
+
 	return 0;
 }
