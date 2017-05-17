@@ -119,7 +119,8 @@ void ParameterSweep::shuffle_sweep_indices(size_t size)
 
 void ParameterSweep::recover_broken_simulation()
 {
-	//TODO Check if last simulation broke down, recover state if backup is there
+	// TODO Check if last simulation broke down, recover state if backup is
+	// there
 	std::vector<size_t> jobs_done;
 	std::fstream ss(m_backend + "_bak.dat", std::fstream::in);
 	bool resume = ss.good();
@@ -140,7 +141,7 @@ void ParameterSweep::recover_broken_simulation()
 
 void ParameterSweep::backup_simulation_results()
 {
-    // TODO
+	// TODO
 	std::fstream ss(m_backend + "_bak.dat", std::fstream::out);
 	ss.write((char *)m_indices.data(), m_indices.size() * sizeof(size_t));
 	ss.write((char *)m_results.data(),
@@ -157,7 +158,7 @@ ParameterSweep::ParameterSweep(std::string backend, cypress::Json &config)
 {
 	std::string snab_name = config["snab_name"];
 	m_sweep_config = extract_backend(config, m_backend);
-    // Get the correct SNAB
+	// Get the correct SNAB
 	auto snab_vec = snab_registry(m_backend);
 	for (auto i : snab_vec) {
 		if (i->snab_name == snab_name) {
@@ -168,11 +169,11 @@ ParameterSweep::ParameterSweep(std::string backend, cypress::Json &config)
 		// TODO Feature still missing
 		// m_repetitions = m_sweep_config["repetitions"];
 	}
-	
+
 	m_sweep_vector = generate_sweep_vector(m_sweep_config, m_snab->get_config(),
 	                                       m_sweep_names);
 	shuffle_sweep_indices(m_sweep_vector.size());
-    m_results = std::vector<std::vector<cypress::Real>>(
+	m_results = std::vector<std::vector<cypress::Real>>(
 	    m_indices.size(),
 	    std::vector<cypress::Real>(m_snab->indicator_names.size(), 0));
 	// recover_broken_simulation();
@@ -180,18 +181,13 @@ ParameterSweep::ParameterSweep(std::string backend, cypress::Json &config)
 
 void ParameterSweep::execute()
 {
-	
+
 	size_t backup_count;
-    // Get rid of all nasty output in every iteration, everything is kept in cerr.txt
-	std::ofstream dump_cerr("cerr.txt", std::ios::out);
-    // Backup of the normal cerr output
-	std::streambuf *std_cerr = std::cerr.rdbuf();
-    
+
 	for (size_t i = 0; i < m_indices.size(); i++) {
-        // Report the percentage of jobs done
+		// Report the percentage of jobs done
 		Utilities::progress_callback(double(i) / double(m_indices.size()));
-        // Dump all cerr output
-		std::cerr.rdbuf(dump_cerr.rdbuf());
+
 		// Get the new index
 		size_t current_index = m_indices[i];
 		// Check if simulation has be done in previous (broken) simulation
@@ -205,22 +201,19 @@ void ParameterSweep::execute()
 		m_snab->build();
 		m_snab->run();
 		m_results[i] = m_snab->evaluate();
-        // Add the current job to the list of finished indices
+		// Add the current job to the list of finished indices
 		m_jobs_done.emplace_back(current_index);
 		backup_count++;
 		if (backup_count >= 50) {
 			// backup_simulation_results();
 			backup_count = 0;
 		}
-		
-		// Reset cerr
-		std::cerr.rdbuf(std_cerr);
 	}
 	// Finalize output in terminal
 	Utilities::progress_callback(1.0);
 	std::cerr << std::endl;
-    
-    // Remove backup file
+
+	// Remove backup file
 	std::remove((m_backend + "_bak.dat").c_str());
 }
 
@@ -239,21 +232,21 @@ cypress::Real get_value_with_flattened_key(const cypress::Json &json,
 
 void ParameterSweep::write_csv()
 {
-    // Get the direct parameter names without json key
+	// Get the direct parameter names without json key
 	std::vector<std::string> shortened_sweep_names;
 	for (auto i : m_sweep_names) {
 		shortened_sweep_names.push_back(Utilities::split(i, '/').back());
 	}
-    
-    // Put the sweep parameters into the results structure
+
+	// Put the sweep parameters into the results structure
 	for (size_t i = 0; i < m_results.size(); i++) {
 		for (size_t j = 0; j < m_sweep_names.size(); j++) {
 			m_results[i].emplace_back(get_value_with_flattened_key(
 			    m_sweep_vector[m_indices[i]], m_sweep_names[j]));
 		}
 	}
-    
-    // Sort the structure for the last entries (sweep parameters)
+
+	// Sort the structure for the last entries (sweep parameters)
 	size_t sweep_size = m_sweep_names.size();
 	std::sort(m_results.begin(), m_results.end(),
 	          [&sweep_size](const std::vector<cypress::Real> a,

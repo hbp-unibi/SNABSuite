@@ -25,7 +25,8 @@ using namespace SNAB;
 int main(int argc, const char *argv[])
 {
 	if (argc != 4 && argc != 3 && !cypress::NMPI::check_args(argc, argv)) {
-		std::cout << "Usage: " << argv[0] << " <SIMULATOR> <SWEEP_CONFIG> [NMPI]" << std::endl;
+		std::cout << "Usage: " << argv[0]
+		          << " <SIMULATOR> <SWEEP_CONFIG> [NMPI]" << std::endl;
 		return 1;
 	}
 
@@ -43,20 +44,20 @@ int main(int argc, const char *argv[])
 		for (auto i : files) {
 			std::cout << i << std::endl;
 		}
-		//cypress::NMPI(argv[1], argc, argv, files);
+		// cypress::NMPI(argv[1], argc, argv, files);
 		return 0;
 	}
-	
+
 	std::ifstream ifs(argv[2]);
-    if(!ifs.good()){
-        std::cout << "Could not open sweep configuration file!"<<std::endl;
-        return 1;
-    }
-    auto json = cypress::Json::parse(ifs);
-	
+	if (!ifs.good()) {
+		std::cout << "Could not open sweep configuration file!" << std::endl;
+		return 1;
+	}
+	auto json = cypress::Json::parse(ifs);
+	cypress::global_logger().min_level(cypress::LogSeverity::ERROR, 1);
 	ParameterSweep sweep(argv[1], json);
-    sweep.execute();
-    sweep.write_csv();
+	sweep.execute();
+	sweep.write_csv();
 
 	return 0;
 }

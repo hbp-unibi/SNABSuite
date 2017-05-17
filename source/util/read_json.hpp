@@ -31,6 +31,7 @@
 //#include "util/utilities.hpp"
 
 namespace SNAB {
+using cypress::global_logger;
 /**
 * Store input form json in a map to check everything!
 */
@@ -55,7 +56,7 @@ std::map<std::string, T> json_to_map(const cypress::Json &obj)
 template <typename T>
 std::vector<T> read_check(std::map<std::string, T> &input,
                           std::vector<std::string> names,
-                          std::vector<T> defaults, bool warn = true)
+                          std::vector<T> defaults)
 {
 	std::vector<T> res(names.size());
 	for (size_t i = 0; i < res.size(); i++) {
@@ -66,10 +67,9 @@ std::vector<T> read_check(std::map<std::string, T> &input,
 		}
 		else {
 			res[i] = defaults.at(i);
-			if (warn) {
-				std::cerr << "For " << names[i] << " the default value "
-				          << defaults[i] << " is used" << std::endl;
-			}
+			global_logger().debug("SNABSuite",
+			                      "For " + names[i] + " the default value " +
+			                          std::to_string(defaults[i]) + " is used");
 		}
 	}
 	for (auto elem : input) {

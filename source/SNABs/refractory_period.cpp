@@ -30,11 +30,10 @@
 
 namespace SNAB {
 RefractoryPeriod::RefractoryPeriod(const std::string backend)
-    : SNABBase(
-          __func__, backend,
-          {"Average deviation from refractory period", "Standard deviation"},
-          {"quality", "quality"}, {"ms", "ms"},
-          {"neuron_type", "neuron_params", "weight"}),
+    : SNABBase(__func__, backend, {"Average deviation from refractory period",
+                                   "Standard deviation"},
+               {"quality", "quality"}, {"ms", "ms"},
+               {"neuron_type", "neuron_params", "weight"}),
       m_pop(m_netw, 0),
       m_pop_source(cypress::PopulationBase(m_netw, 0))
 {
@@ -44,12 +43,10 @@ cypress::Network &RefractoryPeriod::build_netw(cypress::Network &netw)
 	std::string neuron_type_str = m_config_file["neuron_type"];
 	auto &neuro_type = SpikingUtils::detect_type(neuron_type_str);
 
-	// discard out put
-	std::ofstream out;
 	// Get neuron neuron_parameters
 	m_neuro_params =
 	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params"], out);
+	                     m_config_file["neuron_params"]);
 	// Set up population, record voltage
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, m_neuro_params,
 	                                     1, "v");
@@ -71,10 +68,10 @@ void RefractoryPeriod::run_netw(cypress::Network &netw)
 {
 	// Debug logger, may be ignored in the future
 	netw.logger().min_level(cypress::DEBUG, 0);
-    
-    if(m_backend == "spikey"){
-        m_backend.append("={\"calibIcb\": 1}");
-    }
+
+	if (m_backend == "spikey") {
+		m_backend.append("={\"calibIcb\": 1}");
+	}
 
 	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(

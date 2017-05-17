@@ -23,8 +23,8 @@
 
 #include <cypress/cypress.hpp>
 
-#include "common/snab_base.hpp"
 #include "common/neuron_parameters.hpp"
+#include "common/snab_base.hpp"
 
 namespace SNAB {
 /**

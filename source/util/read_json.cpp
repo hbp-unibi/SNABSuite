@@ -22,6 +22,7 @@
 #include "util/utilities.hpp"
 
 namespace SNAB {
+using cypress::global_logger;
 cypress::Json read_config(std::string name, std::string backend)
 {
 	std::vector<std::string> dir(
@@ -38,22 +39,26 @@ cypress::Json read_config(std::string name, std::string backend)
 		}
 	}
 	if (!valid) {
-		throw std::invalid_argument("Config file for " + name + " not found!");
+		global_logger().warn("SNABSuite", "Config file for " + name + " not found!");
+		config["valid"] = false;
+        return config;
 	}
 
 	if (config.find(backend) == config.end()) {
 		std::string simulator =
 		    Utilities::split(Utilities::split(backend, '=')[0], '.').back();
 		if (config.find(simulator) == config.end()) {
-			std::cerr << "Could not find any config for " + simulator +
-			                 " in the config file of " + name + "! ";
+			global_logger().warn("SNABSuite", "Could not find any config for " +
+			                             simulator + " in the config file of " +
+			                             name + "! ");
 			if (config.find("default") != config.end()) {
-				std::cerr << "Take default values instead!" << std::endl;
+				global_logger().warn("SNABSuite", "Take default values instead!");
 				return config["default"];
 			}
 			else {
-				std::cerr << "Take values for " << config.begin().key()
-				          << " instead!" << std::endl;
+				global_logger().warn(
+				    "SNABSuite",
+				    "Take values for " + config.begin().key() + " instead!");
 				return config.begin().value();
 			}
 		}
@@ -72,15 +77,16 @@ cypress::Json extract_backend(cypress::Json &config, std::string backend)
 		std::string simulator =
 		    Utilities::split(Utilities::split(backend, '=')[0], '.').back();
 		if (config.find(simulator) == config.end()) {
-			std::cerr << "Could not find any config for " + simulator +
-			                 " in the provided Json! ";
+			cypress::global_logger().warn("SNABSuite", "Could not find any config for " +
+			                             simulator + " in the provided Json!");
 			if (config.find("default") != config.end()) {
-				std::cerr << "Take default values instead!" << std::endl;
+				global_logger().warn("SNABSuite", "Take default values instead!");
 				return config["default"];
 			}
 			else {
-				std::cerr << "Take values for " << config.begin().key()
-				          << " instead!" << std::endl;
+				global_logger().warn(
+				    "SNABSuite",
+				    "Take values for " + config.begin().key() + " instead!");
 				return config.begin().value();
 			}
 		}
@@ -98,8 +104,8 @@ bool check_json_for_parameters(std::vector<std::string> &parameters,
 {
 	for (auto i : parameters) {
 		if (json.find(i) == json.end()) {
-			std::cerr << "Config file for " << name
-			          << " does not contain any value for " << i << std::endl;
+			global_logger().warn("SNABSuite", "Config file for " + name +
+			                            " does not contain any value for " + i);
 			return false;
 		}
 	}

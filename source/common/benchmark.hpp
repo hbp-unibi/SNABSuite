@@ -28,6 +28,8 @@
 #include "common/snab_registry.hpp"
 
 namespace SNAB {
+
+using cypress::global_logger;
 /**
  * Class for the consecutive execution of all benchmarks/SNABs registered in the
  * snab_registry.hpp
@@ -68,12 +70,14 @@ public:
 	 * Constructor which executes all registered benchmarks and gives the result
 	 * to std::cout and backend.json
 	 */
-	BenchmarkExec(std::string backend, std::string benchmark = "all") : m_backend(backend)
+	BenchmarkExec(std::string backend, std::string benchmark = "all")
+	    : m_backend(backend)
 	{
 		auto snab_vec = snab_registry(m_backend);
 		for (auto i : snab_vec) {
-			if (i->valid() && (benchmark =="all" || benchmark == i->snab_name )) {
-                std::cout << "Executing " << i->snab_name<<std::endl;
+			if (i->valid() &&
+			    (benchmark == "all" || benchmark == i->snab_name)) {
+				global_logger().info("SNABSuite", "Executing " + i->snab_name);
 				i->build();
 				i->run();
 				results.push_back({{"name", i->snab_name},
@@ -85,8 +89,8 @@ public:
 		{
 			std::fstream file =
 			    std::fstream((backend + ".json").c_str(), std::fstream::out);
-            file << results.dump(4)<<std::endl;
-            file.close();
+			file << results.dump(4) << std::endl;
+			file.close();
 		}
 	};
 };

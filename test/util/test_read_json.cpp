@@ -94,7 +94,7 @@ TEST(ReadJSON, read_check)
 
 	std::vector<float> def = {1, 1, 1, 1, 1, 1, 1, 1};
 
-	auto res = read_check<float>(map, names, def, false);
+	auto res = read_check<float>(map, names, def);
 	EXPECT_NEAR(res[0], 0.0, 1e-8);
 	EXPECT_NEAR(res[1], -70.0, 1e-8);
 	EXPECT_NEAR(res[2], -80.0, 1e-8);
@@ -112,7 +112,7 @@ TEST(ReadJSON, read_check)
 
 TEST(ReadJSON, read_config)
 {
-	EXPECT_ANY_THROW(read_config("bla", "blup"));
+	EXPECT_FALSE(read_config("bla", "blup")["valid"]);
 	EXPECT_NO_THROW(read_config("OutputFrequencySingleNeuron", "spinnaker"));
 	auto config = read_config("OutputFrequencySingleNeuron",
 	                          "spinnaker")["neuron_params"];

@@ -47,8 +47,7 @@ TEST(NeuronParameters, NeuronParameters)
 	std::stringstream ss(test_json);
 	cypress::Json json = cypress::Json::parse(ss);
 	const cypress::IfCondExp &neurontype = cypress::IfCondExp::inst();
-	std::ofstream out;
-	auto params = NeuronParameters(neurontype, json["neuron_params"], out, false);
+	auto params = NeuronParameters(neurontype, json["neuron_params"]);
 	std::vector<cypress::Real> parameter = params.parameter();
 	EXPECT_NEAR(Real(0.2), parameter[0], 1e-8);
 	EXPECT_NEAR(Real(50), parameter[1], 1e-8);
@@ -60,46 +59,45 @@ TEST(NeuronParameters, NeuronParameters)
 	EXPECT_NEAR(Real(-80), parameter[7], 1e-8);
 	EXPECT_NEAR(Real(0), parameter[8], 1e-8);
 	EXPECT_NEAR(Real(-70), parameter[9], 1e-8);  // Cypress standard
-	EXPECT_NEAR(Real(0), parameter[10], 1e-8); // Cypress standard
+	EXPECT_NEAR(Real(0), parameter[10], 1e-8);   // Cypress standard
 }
 
 TEST(NeuronParameters, set)
 {
-    cypress::Json json;
+	cypress::Json json;
 	const cypress::IfCondExp &neurontype = cypress::IfCondExp::inst();
 	std::ofstream out;
-	auto params = NeuronParameters(neurontype, json, out, false);
-    EXPECT_NEAR(Real(0.53), params.set("cm", 0.53).parameter()[0], 1e-8);
-    EXPECT_NEAR(Real(0.43), params.set("tau_m", 0.43).parameter()[1], 1e-8);
-    EXPECT_NEAR(Real(0.33), params.set("tau_syn_E", 0.33).parameter()[2], 1e-8);
-    EXPECT_NEAR(Real(0.23), params.set("tau_syn_I", 0.23).parameter()[3], 1e-8);
-    EXPECT_NEAR(Real(0.13), params.set("tau_refrac", 0.13).parameter()[4], 1e-8);
-    EXPECT_NEAR(Real(0.03), params.set("v_rest", 0.03).parameter()[5], 1e-8);
-    EXPECT_NEAR(Real(0.63), params.set("v_thresh", 0.63).parameter()[6], 1e-8);
-    EXPECT_NEAR(Real(0.73), params.set("v_reset", 0.73).parameter()[7], 1e-8);
-    EXPECT_NEAR(Real(0.83), params.set("e_rev_E", 0.83).parameter()[8], 1e-8);
-    EXPECT_NEAR(Real(0.93), params.set("e_rev_I", 0.93).parameter()[9], 1e-8);
-    EXPECT_NEAR(Real(1.03), params.set("i_offset", 1.03).parameter()[10], 1e-8);
-    
+	auto params = NeuronParameters(neurontype, json);
+	EXPECT_NEAR(Real(0.53), params.set("cm", 0.53).parameter()[0], 1e-8);
+	EXPECT_NEAR(Real(0.43), params.set("tau_m", 0.43).parameter()[1], 1e-8);
+	EXPECT_NEAR(Real(0.33), params.set("tau_syn_E", 0.33).parameter()[2], 1e-8);
+	EXPECT_NEAR(Real(0.23), params.set("tau_syn_I", 0.23).parameter()[3], 1e-8);
+	EXPECT_NEAR(Real(0.13), params.set("tau_refrac", 0.13).parameter()[4],
+	            1e-8);
+	EXPECT_NEAR(Real(0.03), params.set("v_rest", 0.03).parameter()[5], 1e-8);
+	EXPECT_NEAR(Real(0.63), params.set("v_thresh", 0.63).parameter()[6], 1e-8);
+	EXPECT_NEAR(Real(0.73), params.set("v_reset", 0.73).parameter()[7], 1e-8);
+	EXPECT_NEAR(Real(0.83), params.set("e_rev_E", 0.83).parameter()[8], 1e-8);
+	EXPECT_NEAR(Real(0.93), params.set("e_rev_I", 0.93).parameter()[9], 1e-8);
+	EXPECT_NEAR(Real(1.03), params.set("i_offset", 1.03).parameter()[10], 1e-8);
 }
 
 TEST(NeuronParameters, get)
 {
-    cypress::Json json;
+	cypress::Json json;
 	const cypress::IfCondExp &neurontype = cypress::IfCondExp::inst();
 	std::ofstream out;
-	auto params = NeuronParameters(neurontype, json, out, false);
-    EXPECT_NEAR(Real(1.0), params.get("cm"), 1e-8);
-    EXPECT_NEAR(Real(20.0), params.get("tau_m"), 1e-8);
-    EXPECT_NEAR(Real(5.0), params.get("tau_syn_E"), 1e-8);
-    EXPECT_NEAR(Real(5.0), params.get("tau_syn_I"), 1e-8);
-    EXPECT_NEAR(Real(0.1), params.get("tau_refrac"), 1e-8);
-    EXPECT_NEAR(Real(-65.0), params.get("v_rest"), 1e-8);
-    EXPECT_NEAR(Real(-50.0), params.get("v_thresh"), 1e-8);
-    EXPECT_NEAR(Real(-65.0), params.get("v_reset"), 1e-8);
-    EXPECT_NEAR(Real(0.0), params.get("e_rev_E"), 1e-8);
-    EXPECT_NEAR(Real(-70.0), params.get("e_rev_I"), 1e-8);
-    EXPECT_NEAR(Real(0.0), params.get("i_offset"), 1e-8);
-    
+	auto params = NeuronParameters(neurontype, json);
+	EXPECT_NEAR(Real(1.0), params.get("cm"), 1e-8);
+	EXPECT_NEAR(Real(20.0), params.get("tau_m"), 1e-8);
+	EXPECT_NEAR(Real(5.0), params.get("tau_syn_E"), 1e-8);
+	EXPECT_NEAR(Real(5.0), params.get("tau_syn_I"), 1e-8);
+	EXPECT_NEAR(Real(0.1), params.get("tau_refrac"), 1e-8);
+	EXPECT_NEAR(Real(-65.0), params.get("v_rest"), 1e-8);
+	EXPECT_NEAR(Real(-50.0), params.get("v_thresh"), 1e-8);
+	EXPECT_NEAR(Real(-65.0), params.get("v_reset"), 1e-8);
+	EXPECT_NEAR(Real(0.0), params.get("e_rev_E"), 1e-8);
+	EXPECT_NEAR(Real(-70.0), params.get("e_rev_I"), 1e-8);
+	EXPECT_NEAR(Real(0.0), params.get("i_offset"), 1e-8);
 }
 }

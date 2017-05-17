@@ -46,12 +46,10 @@ cypress::Network &MaxInputOneToOne::build_netw(cypress::Network &netw)
 	m_num_neurons = m_config_file["#neurons"];
 	m_num_spikes = m_config_file["#spikes"];
 
-	// discard out put
-	std::ofstream out;
 	// Get neuron neuron_parameters
 	m_neuro_params =
 	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params"], out);
+	                     m_config_file["neuron_params"]);
 	// Set up population, record voltage
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, m_neuro_params,
 	                                     m_num_neurons, "spikes");
@@ -121,12 +119,10 @@ cypress::Network &MaxInputAllToAll::build_netw(cypress::Network &netw)
 	m_num_spikes = m_config_file["#spikes"];
 	m_num_inp_neurons = m_config_file["#input_neurons"];
 
-	// discard out put
-	std::ofstream out;
 	// Get neuron neuron_parameters
 	m_neuro_params =
 	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params"], out);
+	                     m_config_file["neuron_params"]);
 	// Set up population, record voltage
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, m_neuro_params,
 	                                     m_num_neurons, "spikes");
@@ -196,12 +192,10 @@ cypress::Network &MaxInputFixedOutConnector::build_netw(cypress::Network &netw)
 	m_num_spikes = m_config_file["#spikes"];
 	m_num_inp_neurons = m_config_file["#input_neurons"];
 
-	// discard out put
-	std::ofstream out;
 	// Get neuron neuron_parameters
 	m_neuro_params =
 	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params"], out);
+	                     m_config_file["neuron_params"]);
 	// Set up population, record voltage
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, m_neuro_params,
 	                                     m_num_neurons, "spikes");
@@ -212,12 +206,11 @@ cypress::Network &MaxInputFixedOutConnector::build_netw(cypress::Network &netw)
 	}
 	m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
 	    m_num_inp_neurons, SpikeSourceArrayParameters(spike_times));
-    std::cout<< m_config_file["#ConnectionsPerInput"] <<std::endl;
+	std::cout << m_config_file["#ConnectionsPerInput"] << std::endl;
 	netw.add_connection(
 	    m_pop_source, m_pop,
-	    Connector::fixed_fan_out(
-	        size_t(m_config_file["#ConnectionsPerInput"]),
-	        cypress::Real(m_config_file["weight"])));
+	    Connector::fixed_fan_out(size_t(m_config_file["#ConnectionsPerInput"]),
+	                             cypress::Real(m_config_file["weight"])));
 	return netw;
 }
 void MaxInputFixedOutConnector::run_netw(cypress::Network &netw)

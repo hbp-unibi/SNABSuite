@@ -47,12 +47,10 @@ cypress::Network &OutputFrequencySingleNeuron::build_netw(
 	std::string neuron_type_str = m_config_file["neuron_type"];
 	SpikingUtils::detect_type(neuron_type_str);
 
-	// discard out put
-	std::ofstream out;
 	// Get neuron neuron_parameters
 	NeuronParameters neuron_params =
 	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params"], out);
+	                     m_config_file["neuron_params"]);
 	// Set up population
 	m_pop =
 	    SpikingUtils::add_population(neuron_type_str, netw, neuron_params, 1);
@@ -63,6 +61,10 @@ void OutputFrequencySingleNeuron::run_netw(cypress::Network &netw)
 {
 	// Debug logger, may be ignored in the future
 	netw.logger().min_level(cypress::DEBUG, 0);
+
+	if (m_backend == "spikey") {
+		m_backend.append("={\"calibIcb\": 1}");
+	}
 
 	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
@@ -109,11 +111,11 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 OutputFrequencyMultipleNeurons::OutputFrequencyMultipleNeurons(
     const std::string backend)
     : SNABBase(__func__, backend,
-                    {"Average frequency of neurons", "Standard deviation",
-                     "Maximum av frequency", "Minimum av frequency"},
-                    {"quality", "quality", "quality", "quality"},
-                    {"1/ms", "1/ms", "1/ms", "1/ms"},
-                    {"neuron_type", "neuron_params", "#neurons"}),
+               {"Average frequency of neurons", "Standard deviation",
+                "Maximum av frequency", "Minimum av frequency"},
+               {"quality", "quality", "quality", "quality"},
+               {"1/ms", "1/ms", "1/ms", "1/ms"},
+               {"neuron_type", "neuron_params", "#neurons"}),
       m_pop(m_netw, 0)
 {
 }
@@ -124,12 +126,10 @@ cypress::Network &OutputFrequencyMultipleNeurons::build_netw(
 	std::string neuron_type_str = m_config_file["neuron_type"];
 	SpikingUtils::detect_type(neuron_type_str);
 
-	// discard out put
-	std::ofstream out;
 	// Get neuron neuron_parameters
 	NeuronParameters neuron_params =
 	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params"], out);
+	                     m_config_file["neuron_params"]);
 
 	m_num_neurons = m_config_file["#neurons"];
 
@@ -143,6 +143,10 @@ void OutputFrequencyMultipleNeurons::run_netw(cypress::Network &netw)
 {
 	// Debug logger, may be ignored in the future
 	netw.logger().min_level(cypress::DEBUG, 0);
+
+	if (m_backend == "spikey") {
+		m_backend.append("={\"calibIcb\": 1}");
+	}
 
 	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(

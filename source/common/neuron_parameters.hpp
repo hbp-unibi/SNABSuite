@@ -47,10 +47,10 @@ private:
 
 public:
 	/**
-	 * Construct from Json, give out parameters to @param out
+	 * Construct from Json, logging values to DEBUG
 	 */
-	NeuronParameters(const cypress::NeuronType &type, const cypress::Json &json,
-	                 std::ostream &out = std::cout, bool warn = true);
+	NeuronParameters(const cypress::NeuronType &type,
+	                 const cypress::Json &json);
 
 	NeuronParameters(){};
 

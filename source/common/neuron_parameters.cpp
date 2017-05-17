@@ -25,10 +25,11 @@
 #include "util/read_json.hpp"
 
 namespace SNAB {
+using cypress::global_logger;
 namespace {
 
 std::vector<cypress::Real> read_neuron_parameters_from_json(
-    const cypress::NeuronType &type, const cypress::Json &obj, bool warn = true)
+    const cypress::NeuronType &type, const cypress::Json &obj)
 {
 	std::map<std::string, cypress::Real> input =
 	    json_to_map<cypress::Real>(obj);
@@ -61,20 +62,21 @@ std::vector<cypress::Real> read_neuron_parameters_from_json(
 	}
 
 	return read_check<cypress::Real>(input, type.parameter_names,
-	                                 type.parameter_defaults, warn);
+	                                 type.parameter_defaults);
 }
 }
 
 NeuronParameters::NeuronParameters(const cypress::NeuronType &type,
-                                   const cypress::Json &json, std::ostream &out,
-                                   bool warn)
+                                   const cypress::Json &json)
     : m_parameter_names(type.parameter_names)
 {
-	m_params = read_neuron_parameters_from_json(type, json, warn);
-	out << "# Neuron Parameters: " << std::endl;
+	m_params = read_neuron_parameters_from_json(type, json);
+	std::stringstream msg;
+	msg << " Neuron Parameters:\n";
 	for (size_t i = 0; i < m_params.size(); i++) {
-		out << type.parameter_names[i] << ": " << m_params[i] << std::endl;
+		msg << std::setw(15) << type.parameter_names[i] << ":\t "
+		    << std::setw(10) << std::to_string(m_params[i]) << "\n";
 	}
-	out << std::endl;
+	global_logger().debug("SNABSuite", msg.str());
 }
 }

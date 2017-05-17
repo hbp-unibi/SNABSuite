@@ -31,13 +31,12 @@
 
 namespace SNAB {
 SingleMaxFreqToGroup::SingleMaxFreqToGroup(const std::string backend)
-    : SNABBase(__func__, backend,
-                    {"Average spike number deviation", "Standard deviation",
-                     "Maximum", "Minimum"},
-                    {"quality", "quality", "quality", "quality"},
-                    {"1/ms", "1/ms", "1/ms", "1/ms"},
-                    {"neuron_type", "neuron_params_max", "neuron_params_group",
-                     "weight", "#neurons"}),
+    : SNABBase(__func__, backend, {"Average spike number deviation",
+                                   "Standard deviation", "Maximum", "Minimum"},
+               {"quality", "quality", "quality", "quality"},
+               {"1/ms", "1/ms", "1/ms", "1/ms"},
+               {"neuron_type", "neuron_params_max", "neuron_params_group",
+                "weight", "#neurons"}),
       m_pop_single(m_netw, 0),
       m_pop_group(m_netw, 0)
 {
@@ -45,14 +44,13 @@ SingleMaxFreqToGroup::SingleMaxFreqToGroup(const std::string backend)
 cypress::Network &SingleMaxFreqToGroup::build_netw(cypress::Network &netw)
 {
 	std::string neuron_type_str = m_config_file["neuron_type"];
-	// discard out put
-	std::ofstream out;
+
 	// Get neuron neuron_parameters
 	NeuronParameters params(SpikingUtils::detect_type(neuron_type_str),
-	                        m_config_file["neuron_params_max"], out);
+	                        m_config_file["neuron_params_max"]);
 	m_group_params =
 	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params_group"], out);
+	                     m_config_file["neuron_params_group"]);
 
 	// Create the single, alway spiking population
 	m_pop_single = SpikingUtils::add_population(neuron_type_str, netw, params,
@@ -111,13 +109,12 @@ std::vector<cypress::Real> SingleMaxFreqToGroup::evaluate()
 }
 
 GroupMaxFreqToGroup::GroupMaxFreqToGroup(const std::string backend)
-    : SNABBase(__func__, backend,
-                    {"Average spike number deviation", "Standard deviation",
-                     "Maximum", "Minimum"},
-                    {"quality", "quality", "quality", "quality"},
-                    {"1/ms", "1/ms", "1/ms", "1/ms"},
-                    {"neuron_type", "neuron_params_max", "neuron_params_group",
-                     "weight", "#neurons"}),
+    : SNABBase(__func__, backend, {"Average spike number deviation",
+                                   "Standard deviation", "Maximum", "Minimum"},
+               {"quality", "quality", "quality", "quality"},
+               {"1/ms", "1/ms", "1/ms", "1/ms"},
+               {"neuron_type", "neuron_params_max", "neuron_params_group",
+                "weight", "#neurons"}),
       m_pop_max(m_netw, 0),
       m_pop_retr(m_netw, 0)
 {
@@ -125,13 +122,12 @@ GroupMaxFreqToGroup::GroupMaxFreqToGroup(const std::string backend)
 cypress::Network &GroupMaxFreqToGroup::build_netw(cypress::Network &netw)
 {
 	std::string neuron_type_str = m_config_file["neuron_type"];
-	// discard out put
-	std::ofstream out;
+
 	// Get neuron neuron_parameters
 	NeuronParameters params(SpikingUtils::detect_type(neuron_type_str),
-	                        m_config_file["neuron_params_max"], out);
+	                        m_config_file["neuron_params_max"]);
 	m_retr_params = NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
-	                                 m_config_file["neuron_params_group"], out);
+	                                 m_config_file["neuron_params_group"]);
 
 	// Create the single, alway spiking population
 	m_pop_max = SpikingUtils::add_population(

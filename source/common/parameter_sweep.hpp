@@ -29,7 +29,7 @@
 #include "common/snab_base.hpp"
 
 namespace SNAB {
-    
+
 /**
  * class for systematic parameter sweeps of single benchmarks
  */
@@ -95,9 +95,10 @@ public:
 	    const cypress::Json &source, const cypress::Json &target,
 	    std::vector<std::string> &sweep_names);
 
-    /**
-     * Results are converted to comma seperated values and written to *sweep_parameters*_*backend*_.csv
-     */
+	/**
+	 * Results are converted to comma seperated values and written to
+	 * *sweep_parameters*_*backend*_.csv
+	 */
 	void write_csv();
 };
 }
