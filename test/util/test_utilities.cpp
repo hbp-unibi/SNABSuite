@@ -16,17 +16,45 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cmath>
 #include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include "util/utilities.hpp"
 namespace SNAB {
-TEST(Utilities, split){
-    std::string st = "test.tested.and.testified";
-    EXPECT_EQ(Utilities::split(st, ',')[0], st);
-    EXPECT_EQ(Utilities::split(st, '.')[0], "test");
-    EXPECT_EQ(Utilities::split(st, '.')[1], "tested");
-    EXPECT_EQ(Utilities::split(st, '.')[2], "and");
-    EXPECT_EQ(Utilities::split(st, '.')[3], "testified");
+TEST(Utilities, split)
+{
+	std::string st = "test.tested.and.testified";
+	EXPECT_EQ(Utilities::split(st, ',')[0], st);
+	EXPECT_EQ(Utilities::split(st, '.')[0], "test");
+	EXPECT_EQ(Utilities::split(st, '.')[1], "tested");
+	EXPECT_EQ(Utilities::split(st, '.')[2], "and");
+	EXPECT_EQ(Utilities::split(st, '.')[3], "testified");
+}
+
+TEST(Utilities, calculate_statistics) {
+    std::vector<double> empty;
+    double min, max, avg, std_dev;
+    Utilities::calculate_statistics(empty, min, max, avg, std_dev);
+    EXPECT_EQ(min, 1);
+    EXPECT_EQ(max, -1);
+    EXPECT_EQ(avg, -1.0);
+    EXPECT_EQ(std_dev, -1.0);
+    
+    std::vector<double> first = {2.0, 2.0, 3.0, 3.0};
+    Utilities::calculate_statistics(first, min, max, avg, std_dev);
+    EXPECT_NEAR(min, 2.0, 1e-6);
+    EXPECT_NEAR(max, 3.0, 1e-6);
+    EXPECT_NEAR(avg, 2.5, 1e-6);
+    EXPECT_NEAR(std_dev, std::sqrt(1.0/3.0), 1e-6);
+    
+    
+    first = {0.0, 2.0, 1.0, 3.0};
+    Utilities::calculate_statistics(first, min, max, avg, std_dev);
+    EXPECT_NEAR(min, 0.0, 1e-6);
+    EXPECT_NEAR(max, 3.0, 1e-6);
+    EXPECT_NEAR(avg, 1.5, 1e-6);
+    EXPECT_NEAR(std_dev, std::sqrt(5.0/3.0), 1e-6);
 }
 }

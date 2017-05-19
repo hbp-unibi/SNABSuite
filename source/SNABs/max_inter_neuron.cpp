@@ -94,18 +94,9 @@ std::vector<cypress::Real> SingleMaxFreqToGroup::evaluate()
 		spikes.push_back(m_pop_group[i].signals().data(0).size());
 	}
 	// Calculate statistics
-	cypress::Real max = *std::max_element(spikes.begin(), spikes.end());
-	cypress::Real min = *std::min_element(spikes.begin(), spikes.end());
-	cypress::Real avg = std::accumulate(spikes.begin(), spikes.end(), 0.0) /
-	                    cypress::Real(spikes.size());
-	cypress::Real std_dev = 0.0;
-	std::for_each(spikes.begin(), spikes.end(), [&](const cypress::Real val) {
-		std_dev += (val - avg) * (val - avg);
-	});
-	std_dev = std::sqrt(std_dev / cypress::Real(spikes.size() - 1));
-
-	std::vector<cypress::Real> results = {avg - spike_ref, std_dev, max, min};
-	return results;
+	cypress::Real max, min, avg, std_dev;
+	Utilities::calculate_statistics(spikes, min, max, avg, std_dev);
+	return std::vector<cypress::Real>({avg - spike_ref, max, min});
 }
 
 GroupMaxFreqToGroup::GroupMaxFreqToGroup(const std::string backend)
@@ -137,7 +128,7 @@ cypress::Network &GroupMaxFreqToGroup::build_netw(cypress::Network &netw)
 	    SpikingUtils::add_population(neuron_type_str, netw, m_retr_params,
 	                                 m_config_file["#neurons"], "spikes");
 
-	// Connnect the spiking neuron to the group
+	// Connnect the spiking neurons to the group
 	netw.add_connection(
 	    m_pop_max, m_pop_retr,
 	    Connector::one_to_one(cypress::Real(m_config_file["weight"])));
@@ -173,20 +164,20 @@ std::vector<cypress::Real> GroupMaxFreqToGroup::evaluate()
 		spikes.push_back(m_pop_retr[i].signals().data(0).size());
 	}
 	// Calculate statistics
-	cypress::Real max = *std::max_element(spikes.begin(), spikes.end());
-	cypress::Real min = *std::min_element(spikes.begin(), spikes.end());
-	cypress::Real avg = std::accumulate(spikes.begin(), spikes.end(), 0.0) /
-	                    cypress::Real(spikes.size());
+	cypress::Real max, min, avg, std_dev;
+	Utilities::calculate_statistics(spikes, min, max, avg, std_dev);
 	cypress::Real avg_ref =
 	    std::accumulate(spikes_ref.begin(), spikes_ref.end(), 0.0) /
 	    cypress::Real(spikes_ref.size());
-	cypress::Real std_dev = 0.0;
-	std::for_each(spikes.begin(), spikes.end(), [&](const cypress::Real val) {
-		std_dev += (val - avg) * (val - avg);
-	});
-	std_dev = std::sqrt(std_dev / cypress::Real(spikes.size() - 1));
 
-	std::vector<cypress::Real> results = {avg - avg_ref, std_dev, max, min};
-	return results;
+	return std::vector<cypress::Real>({avg - avg_ref, std_dev, max, min});
+	// Calculate statistics
+	cypress::Real max, min, avg, std_dev;
+	Utilities::calculate_statistics(spikes, min, max, avg, std_dev);
+	cypress::Real avg_ref =
+	    std::accumulate(spikes_ref.begin(), spikes_ref.end(), 0.0) /
+	    cypress::Real(spikes_ref.size());
+
+	return std::vector<cypress::Real>({avg - avg_ref, std_dev, max, min});
 }
 }

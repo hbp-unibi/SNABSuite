@@ -92,20 +92,9 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 	}
 
 	// Calculate statistics
-	cypress::Real max =
-	    *std::max_element(frequencies.begin(), frequencies.end());
-	cypress::Real min =
-	    *std::min_element(frequencies.begin(), frequencies.end());
-	cypress::Real avg =
-	    std::accumulate(frequencies.begin(), frequencies.end(), 0.0) /
-	    cypress::Real(frequencies.size());
-	cypress::Real std_dev = 0.0;
-	std::for_each(
-	    frequencies.begin(), frequencies.end(),
-	    [&](const cypress::Real val) { std_dev += (val - avg) * (val - avg); });
-	std_dev = std::sqrt(std_dev / cypress::Real(frequencies.size() - 1));
-	std::vector<cypress::Real> results = {avg, std_dev, max, min};
-	return results;
+	cypress::Real max, min, avg, std_dev;
+	Utilities::calculate_statistics(frequencies, min, max, avg, std_dev);
+	return std::vector<cypress::Real>({avg, std_dev, max, min});
 }
 
 OutputFrequencyMultipleNeurons::OutputFrequencyMultipleNeurons(
@@ -124,7 +113,6 @@ cypress::Network &OutputFrequencyMultipleNeurons::build_netw(
     cypress::Network &netw)
 {
 	std::string neuron_type_str = m_config_file["neuron_type"];
-	SpikingUtils::detect_type(neuron_type_str);
 
 	// Get neuron neuron_parameters
 	NeuronParameters neuron_params =
@@ -184,17 +172,8 @@ std::vector<cypress::Real> OutputFrequencyMultipleNeurons::evaluate()
 	}
 
 	// Calculate statistics
-	cypress::Real max = *std::max_element(averages.begin(), averages.end());
-	cypress::Real min = *std::min_element(averages.begin(), averages.end());
-	cypress::Real avg = std::accumulate(averages.begin(), averages.end(), 0.0) /
-	                    cypress::Real(averages.size());
-	cypress::Real std_dev = 0.0;
-	std::for_each(
-	    averages.begin(), averages.end(),
-	    [&](const cypress::Real val) { std_dev += (val - avg) * (val - avg); });
-	std_dev = std::sqrt(std_dev / cypress::Real(averages.size() - 1));
-
-	std::vector<cypress::Real> results = {avg, std_dev, max, min};
-	return results;
+	cypress::Real max, min, avg, std_dev;
+	Utilities::calculate_statistics(averages, min, max, avg, std_dev);
+	return std::vector<cypress::Real>({avg, std_dev, max, min});
 }
 }

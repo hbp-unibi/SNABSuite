@@ -27,6 +27,7 @@
 #include "common/neuron_parameters.hpp"
 #include "max_input.hpp"
 #include "util/spiking_utils.hpp"
+#include "util/utilities.hpp"
 
 namespace SNAB {
 
@@ -87,18 +88,9 @@ std::vector<cypress::Real> MaxInputOneToOne::evaluate()
 	}
 
 	// Calculate statistics
-	cypress::Real max = *std::max_element(spikes.begin(), spikes.end());
-	cypress::Real min = *std::min_element(spikes.begin(), spikes.end());
-	cypress::Real avg = std::accumulate(spikes.begin(), spikes.end(), 0.0) /
-	                    cypress::Real(spikes.size());
-	cypress::Real std_dev = 0.0;
-	std::for_each(spikes.begin(), spikes.end(), [&](const cypress::Real val) {
-		std_dev += (val - avg) * (val - avg);
-	});
-	std_dev = std::sqrt(std_dev / cypress::Real(spikes.size() - 1));
-
-	std::vector<cypress::Real> results = {avg, std_dev, max, min};
-	return results;
+	cypress::Real max, min, avg, std_dev;
+	Utilities::calculate_statistics(spikes, min, max, avg, std_dev);
+	return std::vector<cypress::Real>({avg, std_dev, max, min});
 }
 
 MaxInputAllToAll::MaxInputAllToAll(const std::string backend)
@@ -160,18 +152,9 @@ std::vector<cypress::Real> MaxInputAllToAll::evaluate()
 	}
 
 	// Calculate statistics
-	cypress::Real max = *std::max_element(spikes.begin(), spikes.end());
-	cypress::Real min = *std::min_element(spikes.begin(), spikes.end());
-	cypress::Real avg = std::accumulate(spikes.begin(), spikes.end(), 0.0) /
-	                    cypress::Real(spikes.size());
-	cypress::Real std_dev = 0.0;
-	std::for_each(spikes.begin(), spikes.end(), [&](const cypress::Real val) {
-		std_dev += (val - avg) * (val - avg);
-	});
-	std_dev = std::sqrt(std_dev / cypress::Real(spikes.size() - 1));
-
-	std::vector<cypress::Real> results = {avg, std_dev, max, min};
-	return results;
+	cypress::Real max, min, avg, std_dev;
+	Utilities::calculate_statistics(spikes, min, max, avg, std_dev);
+	return std::vector<cypress::Real>({avg, std_dev, max, min});
 }
 
 MaxInputFixedOutConnector::MaxInputFixedOutConnector(const std::string backend)
@@ -227,7 +210,7 @@ void MaxInputFixedOutConnector::run_netw(cypress::Network &netw)
 
 std::vector<cypress::Real> MaxInputFixedOutConnector::evaluate()
 {
-	// Gather the average #spikes of every neuron
+	// Gather the average #spikes of every neuron, init with -1
 	std::vector<cypress::Real> spikes(m_num_neurons, -1);
 	for (size_t i = 0; i < m_num_neurons; i++) {
 		// Get #spikes
@@ -235,17 +218,8 @@ std::vector<cypress::Real> MaxInputFixedOutConnector::evaluate()
 	}
 
 	// Calculate statistics
-	cypress::Real max = *std::max_element(spikes.begin(), spikes.end());
-	cypress::Real min = *std::min_element(spikes.begin(), spikes.end());
-	cypress::Real avg = std::accumulate(spikes.begin(), spikes.end(), 0.0) /
-	                    cypress::Real(spikes.size());
-	cypress::Real std_dev = 0.0;
-	std::for_each(spikes.begin(), spikes.end(), [&](const cypress::Real val) {
-		std_dev += (val - avg) * (val - avg);
-	});
-	std_dev = std::sqrt(std_dev / cypress::Real(spikes.size() - 1));
-
-	std::vector<cypress::Real> results = {avg, std_dev, max, min};
-	return results;
+	cypress::Real max, min, avg, std_dev;
+	Utilities::calculate_statistics(spikes, min, max, avg, std_dev);
+	return std::vector<cypress::Real>({avg, std_dev, max, min});
 }
 }

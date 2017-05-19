@@ -88,7 +88,7 @@ std::vector<cypress::Real> RefractoryPeriod::evaluate()
 	std::vector<cypress::Real> ends;
 	cypress::Real v_reset = m_neuro_params.get("v_reset");
 	cypress::Real ref_per = m_neuro_params.get("tau_refrac");
-	cypress::Real tolerance = 1;  // in mV
+	cypress::Real tolerance = 1.0;  // in mV
 	bool started = false;
 
 	// Check if backend spiked at all
@@ -120,13 +120,8 @@ std::vector<cypress::Real> RefractoryPeriod::evaluate()
 	}
 
 	// Calculate statistics
-	cypress::Real avg = std::accumulate(diffs.begin(), diffs.end(), 0.0) /
-	                    cypress::Real(diffs.size());
-	cypress::Real std_dev = 0.0;
-	std::for_each(diffs.begin(), diffs.end(), [&](const cypress::Real val) {
-		std_dev += (val - avg) * (val - avg);
-	});
-	std_dev = std::sqrt(std_dev / cypress::Real(diffs.size() - 1));
+	cypress::Real max, min, avg, std_dev;
+	Utilities::calculate_statistics(diffs, min, max, avg, std_dev);
 	return std::vector<cypress::Real>({avg, std_dev});
 }
 }
