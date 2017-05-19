@@ -30,6 +30,7 @@
 #include "util/utilities.hpp"
 
 namespace SNAB {
+using cypress::global_logger;
 OutputFrequencySingleNeuron::OutputFrequencySingleNeuron(
     const std::string backend)
     : SNABBase(
@@ -170,6 +171,17 @@ std::vector<cypress::Real> OutputFrequencyMultipleNeurons::evaluate()
 		    std::accumulate(frequencies.begin(), frequencies.end(), 0.0) /
 		    cypress::Real(frequencies.size());
 	}
+
+#if SNAB_DEBUG
+	std::vector<std::vector<cypress::Real>> spikes2;
+	for (size_t i = 0; i < m_num_neurons; i++) {
+		spikes2.push_back(m_pop[i].signals().data(0));
+	}
+	Utilities::write_vector2_to_csv(
+	    spikes2, "OutputFrequencyMultipleNeurons_spikes.csv");
+	Utilities::write_vector_to_csv(
+	    averages, "OutputFrequencyMultipleNeurons_averages.csv");
+#endif
 
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;

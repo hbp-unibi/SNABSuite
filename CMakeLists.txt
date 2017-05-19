@@ -55,6 +55,11 @@ if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif()
 
+set(SNAB_DEBUG FALSE CACHE BOOL "Enable debug output of SNABs")
+if(SNAB_DEBUG)
+    add_definitions(-DSNAB_DEBUG)
+endif()
+
 enable_testing()
 
 include_directories(source/)

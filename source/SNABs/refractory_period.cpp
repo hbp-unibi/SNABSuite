@@ -119,6 +119,19 @@ std::vector<cypress::Real> RefractoryPeriod::evaluate()
 		diffs.emplace_back(ends[i] - starts[i] - ref_per);
 	}
 
+#if SNAB_DEBUG
+	std::vector<std::vector<cypress::Real>> time_voltage;
+	for (size_t i = 0; i < voltage.rows(); i++) {
+		time_voltage.push_back(
+		    std::vector<cypress::Real>{voltage(i, 0), voltage(i, 1)});
+	}
+	Utilities::write_vector2_to_csv(time_voltage,
+	                                "RefractoryPeriod_voltage.csv");
+	Utilities::write_vector_to_csv(spike_time,
+	                               "RefractoryPeriod_spike_time.csv");
+	Utilities::write_vector_to_csv(diffs, "RefractoryPeriod_periods.csv");
+#endif
+
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;
 	Utilities::calculate_statistics(diffs, min, max, avg, std_dev);

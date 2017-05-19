@@ -86,6 +86,14 @@ std::vector<cypress::Real> MaxInputOneToOne::evaluate()
 		// Get #spikes
 		spikes[i] = m_pop[i].signals().data(0).size();
 	}
+#if SNAB_DEBUG
+	std::vector<std::vector<cypress::Real>> spikes2;
+	for (size_t i = 0; i < m_pop.size(); i++) {
+		spikes2.push_back(m_pop[i].signals().data(0));
+	}
+	Utilities::write_vector2_to_csv(spikes2, "MaxInputOneToOne_spikes.csv");
+	Utilities::write_vector_to_csv(spikes, "MaxInputOneToOne_num_spikes.csv");
+#endif
 
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;
@@ -150,6 +158,15 @@ std::vector<cypress::Real> MaxInputAllToAll::evaluate()
 		// Get #spikes
 		spikes[i] = m_pop[i].signals().data(0).size();
 	}
+
+#if SNAB_DEBUG
+	std::vector<std::vector<cypress::Real>> spikes2;
+	for (size_t i = 0; i < m_pop.size(); i++) {
+		spikes2.push_back(m_pop[i].signals().data(0));
+	}
+	Utilities::write_vector2_to_csv(spikes2, "MaxInputAllToAll_spikes.csv");
+	Utilities::write_vector_to_csv(spikes, "MaxInputAllToAll_num_spikes.csv");
+#endif
 
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;
@@ -216,6 +233,17 @@ std::vector<cypress::Real> MaxInputFixedOutConnector::evaluate()
 		// Get #spikes
 		spikes[i] = m_pop[i].signals().data(0).size();
 	}
+
+#if SNAB_DEBUG
+	std::vector<std::vector<cypress::Real>> spikes2;
+	for (size_t i = 0; i < m_pop.size(); i++) {
+		spikes2.push_back(m_pop[i].signals().data(0));
+	}
+	Utilities::write_vector2_to_csv(spikes2,
+	                                "MaxInputFixedOutConnector_spikes.csv");
+	Utilities::write_vector_to_csv(spikes,
+	                               "MaxInputFixedOutConnector_num_spikes.csv");
+#endif
 
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;

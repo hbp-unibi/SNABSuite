@@ -23,6 +23,7 @@
 
 #include <algorithm>  // Minimal and Maximal element
 #include <cmath>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <numeric>  // std::accumulate
@@ -104,6 +105,40 @@ public:
 			max = -1;
 			avg = -1.0;
 			std_dev = -1.0;
+		}
+	}
+
+	template <typename T>
+	static void write_vector_to_csv(T &data, std::string file_name)
+	{
+		auto file = std::ofstream(file_name, std::ofstream::out);
+		if (file.good()) {
+			for (auto i : data) {
+				file << i << std::endl;
+			}
+			// file << std::endl;
+		}
+		else {
+			std::cerr << "Could not open file " << file_name
+			          << "for writing csv!" << std::endl;
+		}
+	}
+
+	template <typename T>
+	static void write_vector2_to_csv(T &data, std::string file_name)
+	{
+		auto file = std::ofstream(file_name, std::ofstream::out);
+		if (file.good()) {
+			for (auto i : data) {
+				for (auto j : i) {
+					file << j << ", ";
+				}
+				file << std::endl;
+			}
+		}
+		else {
+			std::cerr << "Could not open file " << file_name
+			          << "for writing csv!" << std::endl;
 		}
 	}
 };

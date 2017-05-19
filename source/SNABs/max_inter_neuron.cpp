@@ -93,6 +93,19 @@ std::vector<cypress::Real> SingleMaxFreqToGroup::evaluate()
 	for (size_t i = 0; i < size_t(m_config_file["#neurons"]); i++) {
 		spikes.push_back(m_pop_group[i].signals().data(0).size());
 	}
+
+#if SNAB_DEBUG
+	std::vector<std::vector<cypress::Real>> spikes2;
+	for (size_t i = 0; i < m_pop_group.size(); i++) {
+		spikes2.push_back(m_pop_group[i].signals().data(0));
+	}
+	Utilities::write_vector2_to_csv(spikes2, "SingleMaxFreqToGroup_spikes.csv");
+	Utilities::write_vector_to_csv(spikes,
+	                               "SingleMaxFreqToGroup_num_spikes.csv");
+	Utilities::write_vector_to_csv(m_pop_single[0].signals().data(0),
+	                               "SingleMaxFreqToGroup_ref_spikes.csv");
+#endif
+
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;
 	Utilities::calculate_statistics(spikes, min, max, avg, std_dev);
@@ -163,6 +176,26 @@ std::vector<cypress::Real> GroupMaxFreqToGroup::evaluate()
 		spikes_ref.push_back(m_pop_max[i].signals().data(0).size());
 		spikes.push_back(m_pop_retr[i].signals().data(0).size());
 	}
+
+#if SNAB_DEBUG
+	std::vector<std::vector<cypress::Real>> spikes2, spikes3;
+	for (size_t i = 0; i < m_pop_max.size(); i++) {
+		spikes2.push_back(m_pop_max[i].signals().data(0));
+	}
+	for (size_t i = 0; i < m_pop_retr.size(); i++) {
+		spikes3.push_back(m_pop_retr[i].signals().data(0));
+	}
+	Utilities::write_vector2_to_csv(spikes2,
+	                                "GroupMaxFreqToGroup_spikes_max.csv");
+	Utilities::write_vector2_to_csv(spikes3,
+	                                "GroupMaxFreqToGroup_spikes_retr.csv");
+
+	Utilities::write_vector_to_csv(spikes,
+	                               "GroupMaxFreqToGroup_num_spikes.csv");
+	Utilities::write_vector_to_csv(spikes_ref,
+	                               "GroupMaxFreqToGroup_num_ref_spikes.csv");
+#endif
+
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;
 	Utilities::calculate_statistics(spikes, min, max, avg, std_dev);
