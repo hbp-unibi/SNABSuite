@@ -87,7 +87,7 @@ public:
 	static void calculate_statistics(const std::vector<T> &data, T &min, T &max,
 	                                 double &avg, double &std_dev)
 	{
-		if (data.size() != 0) {
+		if (data.size() > 1) {
 			// Calculate statistics
 			max = *std::max_element(data.begin(), data.end());
 			min = *std::min_element(data.begin(), data.end());
@@ -99,12 +99,17 @@ public:
 			});
 			std_dev = std::sqrt(double(std_dev) / double(data.size() - 1));
 		}
+		else if (data.size() == 1) {
+			min = data[0];
+			max = data[0];
+			avg = data[0];
+			std_dev = 0;
+		}
 		else {
-			// Refelect that there is something wrong
-			min = 1;
-			max = -1;
-			avg = -1.0;
-			std_dev = -1.0;
+			min = 0;
+			max = 0;
+			avg = 0;
+			std_dev = 0;
 		}
 	}
 
