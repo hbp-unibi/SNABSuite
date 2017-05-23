@@ -17,13 +17,13 @@
  */
 
 #include <algorithm>  // std::find
+#include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <random>
 #include <sstream>
 #include <string>
 #include <vector>
-
-#include <cstdio>
 
 #include <cypress/cypress.hpp>
 #include "common/snab_base.hpp"
@@ -260,7 +260,14 @@ void ParameterSweep::write_csv()
 		          return a.back() < b.back();
 		      });
 
-	std::string filename;
+	std::string filename = m_snab->snab_name + "/";
+    
+	int dir_err =
+	    system((std::string("mkdir -p ") + m_snab->snab_name).c_str());
+	if (dir_err == -1) {
+		std::cout << "Error creating directory!" << std::endl;
+		filename = "";
+	}
 	for (auto i : shortened_sweep_names) {
 		filename += i + "_";
 	}
