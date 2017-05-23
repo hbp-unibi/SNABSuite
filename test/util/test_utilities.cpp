@@ -37,10 +37,10 @@ TEST(Utilities, calculate_statistics) {
     std::vector<double> empty;
     double min, max, avg, std_dev;
     Utilities::calculate_statistics(empty, min, max, avg, std_dev);
-    EXPECT_EQ(min, 1);
-    EXPECT_EQ(max, -1);
-    EXPECT_EQ(avg, -1.0);
-    EXPECT_EQ(std_dev, -1.0);
+    EXPECT_EQ(min, 0);
+    EXPECT_EQ(max, 0);
+    EXPECT_EQ(avg, 0);
+    EXPECT_EQ(std_dev, 0);
     
     std::vector<double> first = {2.0, 2.0, 3.0, 3.0};
     Utilities::calculate_statistics(first, min, max, avg, std_dev);
@@ -56,5 +56,12 @@ TEST(Utilities, calculate_statistics) {
     EXPECT_NEAR(max, 3.0, 1e-6);
     EXPECT_NEAR(avg, 1.5, 1e-6);
     EXPECT_NEAR(std_dev, std::sqrt(5.0/3.0), 1e-6);
+    
+    first = {3.0};
+    Utilities::calculate_statistics(first, min, max, avg, std_dev);
+    EXPECT_NEAR(min, 3.0, 1e-6);
+    EXPECT_NEAR(max, 3.0, 1e-6);
+    EXPECT_NEAR(avg, 3.0, 1e-6);
+    EXPECT_NEAR(std_dev, 0, 1e-6);
 }
 }
