@@ -204,13 +204,5 @@ std::vector<cypress::Real> GroupMaxFreqToGroup::evaluate()
 	    cypress::Real(spikes_ref.size());
 
 	return std::vector<cypress::Real>({avg - avg_ref, std_dev, max, min});
-	// Calculate statistics
-	cypress::Real max, min, avg, std_dev;
-	Utilities::calculate_statistics(spikes, min, max, avg, std_dev);
-	cypress::Real avg_ref =
-	    std::accumulate(spikes_ref.begin(), spikes_ref.end(), 0.0) /
-	    cypress::Real(spikes_ref.size());
-
-	return std::vector<cypress::Real>({avg - avg_ref, std_dev, max, min});
 }
 }
