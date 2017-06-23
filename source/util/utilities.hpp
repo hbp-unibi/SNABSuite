@@ -31,7 +31,12 @@
 #include <string>
 #include <vector>
 
+#include <cypress/cypress.hpp>
+
 namespace SNAB {
+
+using cypress::Json;
+
 class Utilities {
 public:
 	/**
@@ -145,6 +150,51 @@ public:
 			std::cerr << "Could not open file " << file_name
 			          << "for writing csv!" << std::endl;
 		}
+	}
+
+	/**
+	 * Merge two json objects. Note: Values already included in @param a will be
+	 * overwritten!
+	 * See https://github.com/nlohmann/json/issues/252 for source.
+	 * @return combined json object
+	 */
+	static Json merge_json(const Json &a, const Json &b)
+	{
+		Json result = a.flatten();
+		Json tmp = b.flatten();
+
+		for (Json::iterator it = tmp.begin(); it != tmp.end(); ++it) {
+			result[it.key()] = it.value();
+		}
+
+		return result.unflatten();
+	}
+
+	/**
+	 * Merge the backend strings with a provided json object.
+	 * Note: options already included in backend will not be overwritten!
+	 * @param backend: string containig "[backend]" (+ "{setup options}"), will
+	 * contain combined setup after execution
+	 * @param json: Object containig additional options for backend
+	 * @return: Combined json object
+	 */
+	static Json manipulate_backend_string(std::string &backend, Json &json)
+	{
+		Json res;
+        
+        // Check wether there are options given in the backend string
+		if (split(backend, '=').size() > 1) {
+			Json old = Json::parse(split(backend, '=')[1]);
+			res = merge_json(json, old);
+		}
+		else {
+			res = json;
+		}
+		// Construct the new backend
+		backend = split(backend, '=')[0] + "=" + res.dump(-1);
+
+        // Return the merged json
+		return res;
 	}
 };
 }
