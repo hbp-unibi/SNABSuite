@@ -60,9 +60,6 @@ cypress::Network &OutputFrequencySingleNeuron::build_netw(
 
 void OutputFrequencySingleNeuron::run_netw(cypress::Network &netw)
 {
-	// Debug logger, may be ignored in the future
-	netw.logger().min_level(cypress::DEBUG, 0);
-
 	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
 	    std::make_shared<cypress::NetIO4>(),
