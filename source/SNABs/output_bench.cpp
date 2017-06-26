@@ -64,7 +64,14 @@ void OutputFrequencySingleNeuron::run_netw(cypress::Network &netw)
 	cypress::PowerManagementBackend pwbackend(
 	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
-	netw.run(pwbackend, 100.0);
+	try {
+		netw.run(pwbackend, 150.0);
+	}
+	catch (...) {
+		global_logger().fatal_error(
+		    "SNABSuite",
+		    "Wrong parameter setting or backend error! Simulation broke down");
+	}
 }
 
 std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
