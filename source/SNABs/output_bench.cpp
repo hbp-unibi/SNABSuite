@@ -79,13 +79,20 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 	// Vector of frequencies
 	std::vector<cypress::Real> frequencies;
 	// Get spikes
-	auto spikes = m_pop.signals().data(0);
-	// Calculate frequencies
-	if (spikes.size() != 0) {
+	auto spikes = m_pop[0].signals().data(0);
 
+#if SNAB_DEBUG
+	Utilities::write_vector_to_csv(spikes,
+	                               "OutputFrequencySingleNeuron_spikes.csv");
+#endif
+
+	// Calculate frequencies
+	if (spikes.size() > 1) {
 		for (size_t i = 0; i < spikes.size() - 1; i++) {
-			frequencies.push_back(cypress::Real(1.0) /
-			                      (spikes[i + 1] - spikes[i]));
+			if (spikes[i] > 50) {
+				frequencies.push_back(cypress::Real(1.0) /
+				                      (spikes[i + 1] - spikes[i]));
+			}
 		}
 	}
 	else {
