@@ -176,7 +176,7 @@ std::vector<cypress::Real> MaxInputAllToAll::evaluate()
 
 MaxInputFixedOutConnector::MaxInputFixedOutConnector(const std::string backend)
     : SNABBase(__func__, backend,
-               {"Average number of sikes", "Standard deviation",
+               {"Average number of spikes", "Standard deviation",
                 "Maximum #spikes", "Minimum #spikes"},
                {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
                {"neuron_type", "neuron_params", "weight", "#neurons", "#spikes",
