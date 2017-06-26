@@ -151,7 +151,7 @@ std::vector<cypress::Real> OutputFrequencyMultipleNeurons::evaluate()
 		// Get spikes
 		auto spikes = m_pop[i].signals().data(0);
 		// Calculate frequencies
-		if (spikes.size() != 0) {
+		if (spikes.size() > 1) {
 
 			for (size_t i = 0; i < spikes.size() - 1; i++) {
 				frequencies.push_back(cypress::Real(1.0) /
