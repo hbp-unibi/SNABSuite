@@ -271,8 +271,11 @@ void ParameterSweep::write_csv()
 	for (auto i : shortened_sweep_names) {
 		filename += i + "_";
 	}
-	filename += m_backend + ".csv";
+	filename += Utilities::split( m_backend, '=')[0] + ".csv";
 	std::ofstream ofs(filename, std::ofstream::out);
+    if(!ofs.good()){
+        std::cout<< "Error creating CSV"<<std::endl;
+    }
 	// first line of csv
 	ofs << "#";
 	for (size_t i = 1; i <= sweep_size; i++) {
