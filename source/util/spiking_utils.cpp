@@ -48,11 +48,33 @@ PopulationBase SpikingUtils::add_typed_population(
 	    size, Parameters(neuronParams.parameter()), rec_signal);
 }
 
+template <typename T>
+PopulationBase SpikingUtils::add_typed_population_no_record(
+    Network &network, const NeuronParameters &neuronParams, const size_t size)
+{
+	using Parameters = typename T::Parameters;
+	return network.create_population<T>(size,
+	                                    Parameters(neuronParams.parameter()));
+}
+
 PopulationBase SpikingUtils::add_population(
     const std::string neuron_type_str, Network &network,
     const NeuronParameters &neuronParams, const size_t size,
     const std::string record_signal)
 {
+	if (record_signal == "") {
+		if (neuron_type_str == "IF_cond_exp") {
+			return add_typed_population_no_record<IfCondExp>(network, neuronParams, size);
+		}
+		else if (neuron_type_str == "IfFacetsHardware1") {
+			return add_typed_population_no_record<IfFacetsHardware1>(network,
+			                                               neuronParams, size);
+		}
+		else if (neuron_type_str == "AdExp") {
+			return add_typed_population_no_record<EifCondExpIsfaIsta>(network,
+			                                                neuronParams, size);
+		}
+	}
 	if (neuron_type_str == "IF_cond_exp") {
 		return add_typed_population<IfCondExp>(
 		    network, neuronParams, size, IfCondExpSignals({record_signal}));

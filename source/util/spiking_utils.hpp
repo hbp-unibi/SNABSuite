@@ -37,6 +37,15 @@ public:
 	    const size_t size, const typename T::Signals &rec_signal =
 	                           typename T::Signals().record_spikes());
 
+	/**
+	 * Creates a population of type @param T and adds them to m_net without
+	 * recording
+	 */
+	template <typename T>
+	static cypress::PopulationBase add_typed_population_no_record(
+	    Network &network, const NeuronParameters &neuronParams,
+	    const size_t size);
+
 	static const NeuronType &detect_type(std::string neuron_type_str);
 
 	/**
@@ -51,3 +60,4 @@ public:
 }
 
 #endif /* SNAB_UTIL_SPIKING_UTILS_HPP */
+
