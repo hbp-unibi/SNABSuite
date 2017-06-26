@@ -25,6 +25,7 @@
 #include <string>
 
 #include "util/read_json.hpp"
+#include "util/utilities.hpp"
 
 namespace SNAB {
 /**
@@ -72,10 +73,19 @@ public:
 		std::vector<std::string> required_parameters_vec(required_parameters);
 		bool required_params = check_json_for_parameters(
 		    required_parameters_vec, m_config_file, name);
+
+		// Check wether benchmark is labeled as invalid
 		if ((m_config_file.find("invalid") == m_config_file.end() ||
 		     m_config_file["invalid"] == false) &&
 		    required_params) {
 			m_valid = true;
+		}
+
+		// Check for backend related setup config
+		if (m_config_file.find("setup") != m_config_file.end()) {
+			Utilities::manipulate_backend_string(m_backend,
+			                                     m_config_file["setup"]);
+			m_config_file.erase("setup");
 		}
 	};
 
