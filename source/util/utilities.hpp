@@ -121,7 +121,8 @@ public:
 	template <typename T>
 	static void write_vector_to_csv(T &data, std::string file_name)
 	{
-		auto file = std::ofstream(file_name, std::ofstream::out);
+		std::ofstream file;
+		file.open(file_name, std::ofstream::out);
 		if (file.good()) {
 			for (auto i : data) {
 				file << i << std::endl;
@@ -137,7 +138,8 @@ public:
 	template <typename T>
 	static void write_vector2_to_csv(T &data, std::string file_name)
 	{
-		auto file = std::ofstream(file_name, std::ofstream::out);
+		std::ofstream file;
+		file.open(file_name, std::ofstream::out);
 		if (file.good()) {
 			for (auto i : data) {
 				for (auto j : i) {
@@ -181,8 +183,8 @@ public:
 	static Json manipulate_backend_string(std::string &backend, Json &json)
 	{
 		Json res;
-        
-        // Check wether there are options given in the backend string
+
+		// Check wether there are options given in the backend string
 		if (split(backend, '=').size() > 1) {
 			Json old = Json::parse(split(backend, '=')[1]);
 			res = merge_json(json, old);
@@ -193,7 +195,7 @@ public:
 		// Construct the new backend
 		backend = split(backend, '=')[0] + "=" + res.dump(-1);
 
-        // Return the merged json
+		// Return the merged json
 		return res;
 	}
 };

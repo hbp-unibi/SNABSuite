@@ -87,8 +87,8 @@ public:
 		}
 		std::cout << results.dump(4) << std::endl;
 		{
-			std::fstream file =
-			    std::fstream((backend + ".json").c_str(), std::fstream::out);
+			std::fstream file;
+            file.open((backend + ".json").c_str(), std::fstream::out);
 			file << results.dump(4) << std::endl;
 			file.close();
 		}
