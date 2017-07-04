@@ -20,17 +20,17 @@
 #include <string>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include "util/utilities.hpp"
 namespace SNAB {
 TEST(Utilities, split)
 {
 	std::string st = "test.tested.and.testified";
-	EXPECT_EQ(Utilities::split(st, ',')[0], st);
-	EXPECT_EQ(Utilities::split(st, '.')[0], "test");
-	EXPECT_EQ(Utilities::split(st, '.')[1], "tested");
-	EXPECT_EQ(Utilities::split(st, '.')[2], "and");
-	EXPECT_EQ(Utilities::split(st, '.')[3], "testified");
+	EXPECT_STREQ(st.c_str(), Utilities::split(st, ',')[0].c_str());
+	EXPECT_STREQ("test", Utilities::split(st, '.')[0].c_str());
+	EXPECT_STREQ("tested", Utilities::split(st, '.')[1].c_str());
+	EXPECT_STREQ("and", Utilities::split(st, '.')[2].c_str());
+	EXPECT_STREQ("testified", Utilities::split(st, '.')[3].c_str());
 }
 
 TEST(Utilities, calculate_statistics)
@@ -38,31 +38,31 @@ TEST(Utilities, calculate_statistics)
 	std::vector<double> empty;
 	double min, max, avg, std_dev;
 	Utilities::calculate_statistics(empty, min, max, avg, std_dev);
-	EXPECT_EQ(min, 0);
-	EXPECT_EQ(max, 0);
-	EXPECT_EQ(avg, 0);
-	EXPECT_EQ(std_dev, 0);
+	EXPECT_EQ(0, min);
+	EXPECT_EQ(0, max);
+	EXPECT_EQ(0, avg);
+	EXPECT_EQ(0, std_dev);
 
 	std::vector<double> first = {2.0, 2.0, 3.0, 3.0};
 	Utilities::calculate_statistics(first, min, max, avg, std_dev);
-	EXPECT_NEAR(min, 2.0, 1e-6);
-	EXPECT_NEAR(max, 3.0, 1e-6);
-	EXPECT_NEAR(avg, 2.5, 1e-6);
-	EXPECT_NEAR(std_dev, std::sqrt(1.0 / 3.0), 1e-6);
+	EXPECT_NEAR(2.0, min, 1e-6);
+	EXPECT_NEAR(3.0, max, 1e-6);
+	EXPECT_NEAR(2.5, avg, 1e-6);
+	EXPECT_NEAR(std::sqrt(1.0 / 3.0), std_dev, 1e-6);
 
 	first = {0.0, 2.0, 1.0, 3.0};
 	Utilities::calculate_statistics(first, min, max, avg, std_dev);
-	EXPECT_NEAR(min, 0.0, 1e-6);
-	EXPECT_NEAR(max, 3.0, 1e-6);
-	EXPECT_NEAR(avg, 1.5, 1e-6);
-	EXPECT_NEAR(std_dev, std::sqrt(5.0 / 3.0), 1e-6);
+	EXPECT_NEAR(0.0, min, 1e-6);
+	EXPECT_NEAR(3.0, max, 1e-6);
+	EXPECT_NEAR(1.5, avg, 1e-6);
+	EXPECT_NEAR(std::sqrt(5.0 / 3.0), std_dev, 1e-6);
 
 	first = {3.0};
 	Utilities::calculate_statistics(first, min, max, avg, std_dev);
-	EXPECT_NEAR(min, 3.0, 1e-6);
-	EXPECT_NEAR(max, 3.0, 1e-6);
-	EXPECT_NEAR(avg, 3.0, 1e-6);
-	EXPECT_NEAR(std_dev, 0, 1e-6);
+	EXPECT_NEAR(3.0, min, 1e-6);
+	EXPECT_NEAR(3.0, max, 1e-6);
+	EXPECT_NEAR(3.0, avg, 1e-6);
+	EXPECT_NEAR(0, std_dev, 1e-6);
 }
 
 static const std::string test_json1 =
@@ -140,23 +140,23 @@ TEST(Utilities, merge_json)
 
 	// Test for overwriting values
 	Json test1 = Utilities::merge_json(json1, json2);
-	EXPECT_EQ(test1["data"]["n_bits_in"], 200);
-	EXPECT_EQ(test1["data"]["n_bits_out"], 20);
-	EXPECT_EQ(test1["data"]["n_ones_in"], 1);
-	EXPECT_EQ(test1["data"]["n_ones_out"], 2);
-	EXPECT_EQ(test1["data"]["n_samples"], 5);
+	EXPECT_EQ(200, int(test1["data"]["n_bits_in"]));
+	EXPECT_EQ(20, int(test1["data"]["n_bits_out"]));
+	EXPECT_EQ(1, int(test1["data"]["n_ones_in"]));
+	EXPECT_EQ(2, int(test1["data"]["n_ones_out"]));
+	EXPECT_EQ(5, int(test1["data"]["n_samples"]));
 
 	// Test for appending values
 	Json test2 = Utilities::merge_json(json1, json3);
-	EXPECT_EQ(test2["misc"]["n_bits_in"], 200);
-	EXPECT_EQ(test2["misc"]["n_bits_out"], 20);
-	EXPECT_EQ(test2["misc"]["n_ones_in"], 1);
-	EXPECT_EQ(test2["misc"]["n_ones_out"], 2);
-	EXPECT_EQ(test2["misc"]["n_samples"], 5);
+	EXPECT_EQ(200, int(test2["misc"]["n_bits_in"]));
+	EXPECT_EQ(20, int(test2["misc"]["n_bits_out"]));
+	EXPECT_EQ(1, int(test2["misc"]["n_ones_in"]));
+	EXPECT_EQ(2, int(test2["misc"]["n_ones_out"]));
+	EXPECT_EQ(5, int(test2["misc"]["n_samples"]));
 
 	// Test for append in a sub structure
 	Json test3 = Utilities::merge_json(json1, json4);
-	EXPECT_EQ(test3["data"]["misc"], 21);
+	EXPECT_EQ(21, int(test3["data"]["misc"]));
 }
 
 TEST(Utilities, manipulate_backend)
@@ -170,37 +170,37 @@ TEST(Utilities, manipulate_backend)
 
 	Utilities::manipulate_backend_string(backend1, json2);
 	Json test2 = Json::parse(Utilities::split(backend1, '=')[1]);
-	EXPECT_EQ("back", Utilities::split(backend1, '=')[0]);
-	EXPECT_EQ(200, test2["data"]["n_bits_in"]);
-	EXPECT_EQ(20, test2["data"]["n_bits_out"]);
-	EXPECT_EQ(1, test2["data"]["n_ones_in"]);
-	EXPECT_EQ(2, test2["data"]["n_ones_out"]);
-	EXPECT_EQ(5, test2["data"]["n_samples"]);
+	EXPECT_STREQ("back", Utilities::split(backend1, '=')[0].c_str());
+	EXPECT_EQ(200, int(test2["data"]["n_bits_in"]));
+	EXPECT_EQ(20, int(test2["data"]["n_bits_out"]));
+	EXPECT_EQ(1, int(test2["data"]["n_ones_in"]));
+	EXPECT_EQ(2, int(test2["data"]["n_ones_out"]));
+	EXPECT_EQ(5, int(test2["data"]["n_samples"]));
 
 	Utilities::manipulate_backend_string(backend2, json2);
 	test2 = Json::parse(Utilities::split(backend2, '=')[1]);
-	EXPECT_EQ("back", Utilities::split(backend2, '=')[0]);
-	EXPECT_EQ(200, test2["data"]["n_bits_in"]);
-	EXPECT_EQ(20, test2["data"]["n_bits_out"]);
-	EXPECT_EQ(1, test2["data"]["n_ones_in"]);
-	EXPECT_EQ(2, test2["data"]["n_ones_out"]);
-	EXPECT_EQ(5, test2["data"]["n_samples"]);
-	EXPECT_EQ(3, test2["bla"]);
+	EXPECT_STREQ("back", Utilities::split(backend2, '=')[0].c_str());
+	EXPECT_EQ(200, int(test2["data"]["n_bits_in"]));
+	EXPECT_EQ(20, int(test2["data"]["n_bits_out"]));
+	EXPECT_EQ(1, int(test2["data"]["n_ones_in"]));
+	EXPECT_EQ(2, int(test2["data"]["n_ones_out"]));
+	EXPECT_EQ(5, int(test2["data"]["n_samples"]));
+	EXPECT_EQ(3, int(test2["bla"]));
 
 	Utilities::manipulate_backend_string(backend3, json2);
 	test2 = Json::parse(Utilities::split(backend3, '=')[1]);
-	EXPECT_EQ("back", Utilities::split(backend3, '=')[0]);
-	EXPECT_EQ(200, test2["data"]["n_bits_in"]);
-	EXPECT_EQ(20, test2["data"]["n_bits_out"]);
-	EXPECT_EQ(1, test2["data"]["n_ones_in"]);
-	EXPECT_EQ(2, test2["data"]["n_ones_out"]);
-	EXPECT_EQ(5, test2["data"]["n_samples"]);
-	EXPECT_EQ(18, test2["data"]["misc"]);
+	EXPECT_STREQ("back", Utilities::split(backend3, '=')[0].c_str());
+	EXPECT_EQ(200, int(test2["data"]["n_bits_in"]));
+	EXPECT_EQ(20, int(test2["data"]["n_bits_out"]));
+	EXPECT_EQ(1, int(test2["data"]["n_ones_in"]));
+	EXPECT_EQ(2, int(test2["data"]["n_ones_out"]));
+	EXPECT_EQ(5, int(test2["data"]["n_samples"]));
+	EXPECT_EQ(18, int(test2["data"]["misc"]));
 
 	backend3 = "back={\"data\" : {\"misc\": 18 }}";
 	Utilities::manipulate_backend_string(backend3, json4);
 	test2 = Json::parse(Utilities::split(backend3, '=')[1]);
-	EXPECT_EQ("back", Utilities::split(backend3, '=')[0]);
-	EXPECT_EQ(18, test2["data"]["misc"]);
+	EXPECT_STREQ("back", Utilities::split(backend3, '=')[0].c_str());
+	EXPECT_EQ(18, int(test2["data"]["misc"]));
 }
 }

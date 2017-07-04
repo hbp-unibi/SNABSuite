@@ -20,7 +20,7 @@
 
 #include <cypress/cypress.hpp>
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "common/neuron_parameters.hpp"
 #include "util/spiking_utils.hpp"
@@ -42,16 +42,16 @@ TEST(SpikingUtils, add_population)
 	NeuronParameters params(IfCondExp::inst(), json);
 	std::string type = "IF_cond_exp";
 	auto pop1 = SpikingUtils::add_population(type, netw, params, 1);
-	EXPECT_EQ(netw.population_count(), 1);
-	EXPECT_EQ(netw.neuron_count(), 1);
-	EXPECT_EQ(netw.neuron_count(IfCondExp::inst()), 1);
-	EXPECT_EQ(netw.neuron_count(IfFacetsHardware1::inst()), 0);
+	EXPECT_EQ(netw.population_count(), size_t(1));
+	EXPECT_EQ(netw.neuron_count(), size_t(1));
+	EXPECT_EQ(netw.neuron_count(IfCondExp::inst()), size_t(1));
+	EXPECT_EQ(netw.neuron_count(IfFacetsHardware1::inst()), size_t(0));
 	EXPECT_FALSE(pop1.signals().is_recording(
 	    cypress::IfCondExp::inst().signal_index("v").value()));
 	EXPECT_TRUE(pop1.signals().is_recording(
 	    cypress::IfCondExp::inst().signal_index("spikes").value()));
 
-	EXPECT_EQ(pop1.size(), 1);
+	EXPECT_EQ(pop1.size(), size_t(1));
 	EXPECT_EQ(&pop1.type(), &IfCondExp::inst());
 
 	auto pop2 = SpikingUtils::add_population(type, netw, params, 1, "v");

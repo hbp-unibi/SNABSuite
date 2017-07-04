@@ -107,8 +107,8 @@ TEST(generate_sweep_vector, overwrite)
 	cypress::Json json2 = cypress::Json::parse(ss2);
 	std::vector<std::string> sweep_name;
 	auto res = ParameterSweep::generate_sweep_vector(json2, json, sweep_name);
-	EXPECT_EQ(1, res.size());
-	EXPECT_EQ(0, sweep_name.size());
+	EXPECT_EQ(size_t(1), res.size());
+	EXPECT_EQ(size_t(0), sweep_name.size());
 	EXPECT_NEAR(8.0, Real(res[0]["neuron_params"]["e_rev_E"]), 1e-8);
 	EXPECT_NEAR(9.0, Real(res[0]["neuron_params"]["v_rest"]), 1e-8);
 	EXPECT_NEAR(10.0, Real(res[0]["neuron_params"]["v_reset"]), 1e-8);
@@ -136,8 +136,8 @@ TEST(generate_sweep_vector, sweep)
 	cypress::Json json2 = cypress::Json::parse(ss2);
 	std::vector<std::string> sweep_name;
 	auto res = ParameterSweep::generate_sweep_vector(json2, json, sweep_name);
-	EXPECT_EQ(5, res.size());
-	EXPECT_EQ(1, sweep_name.size());
+	EXPECT_EQ(size_t(5), res.size());
+	EXPECT_EQ(size_t(1), sweep_name.size());
 
 	EXPECT_NEAR(1.0, Real(res[0]["neuron_params"]["e_rev_E"]), 1e-8);
 	EXPECT_NEAR(9.0, Real(res[0]["neuron_params"]["v_rest"]), 1e-8);
@@ -188,7 +188,7 @@ TEST(generate_sweep_vector, 2dim_sweep)
 	cypress::Json json2 = cypress::Json::parse(ss2);
 	std::vector<std::string> sweep_name;
 	auto res = ParameterSweep::generate_sweep_vector(json2, json, sweep_name);
-	EXPECT_EQ(15, res.size());
+	EXPECT_EQ(size_t(15), res.size());
 
 	EXPECT_NEAR(1.0, Real(res[0]["neuron_params"]["e_rev_E"]), 1e-8);
 	EXPECT_NEAR(2.0, Real(res[1]["neuron_params"]["e_rev_E"]), 1e-8);

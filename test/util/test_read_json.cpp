@@ -20,7 +20,7 @@
 
 #include <cypress/cypress.hpp>
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "common/neuron_parameters.hpp"
 #include "util/read_json.hpp"
@@ -117,7 +117,7 @@ TEST(ReadJSON, read_config)
 	auto config = read_config("OutputFrequencySingleNeuron",
 	                          "spinnaker")["neuron_params"];
 	EXPECT_NEAR(config["e_rev_E"], 0.0, 1e-8);
-	EXPECT_NEAR(config["v_rest"], -60.0, 1e-8);
+	EXPECT_NEAR(config["v_rest"], -30.0, 1e-8);
 	EXPECT_NEAR(config["v_reset"], -60.0, 1e-8);
 	EXPECT_NEAR(config["v_thresh"], -64.7, 1e-8);
 	EXPECT_NEAR(config["tau_syn_E"], 2.0, 1e-8);
