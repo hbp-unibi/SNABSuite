@@ -26,7 +26,6 @@ add_executable(SNABSuite_test_util
 	util/test_utilities.cpp
 )
 
-add_dependencies(SNABSuite_test_util googletest)
 
 target_link_libraries(SNABSuite_test_util
 	benchmark_utils
@@ -40,7 +39,6 @@ add_executable(SNABSuite_test_common
 	common/test_parameter_sweep.cpp
 )
 
-add_dependencies(SNABSuite_test_common googletest)
 
 target_link_libraries(SNABSuite_test_common
 	benchmark_utils
