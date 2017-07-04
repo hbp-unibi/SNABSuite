@@ -76,7 +76,7 @@ public:
 
 		// Check wether benchmark is labeled as invalid
 		if ((m_config_file.find("invalid") == m_config_file.end() ||
-		     m_config_file["invalid"] == false) &&
+		     bool(m_config_file["invalid"]) == false) &&
 		    required_params) {
 			m_valid = true;
 		}
