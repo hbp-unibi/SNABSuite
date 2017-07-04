@@ -89,5 +89,5 @@ script:
   - cmake .. -DCMAKE_INSTALL_PREFIX:PATH=../install -DSTATIC_LINKING=FALSE
   - make && make install
   - cd ../../
-  - cmake .. -DCypress_DIR=cypress/install/share/cmake/Cypress -DCYPRESS_LIBRARY=cypress/install/lib/libcypress.a -DCYPRESS_INCLUDE_DIR=cypress/install/include/ -DSTATIC_LINKING=FALSE -DSNAB_DEBUG=TRUE
+  - cmake .. -DCypress_DIR=build/cypress/install/share/cmake/Cypress -DCYPRESS_LIBRARY=cypress/install/lib/libcypress.a -DCYPRESS_INCLUDE_DIR=cypress/install/include/ -DSTATIC_LINKING=FALSE -DSNAB_DEBUG=TRUE
   - make && make test ARGS=-V
