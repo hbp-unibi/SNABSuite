@@ -27,7 +27,7 @@ ExternalProject_Add(
 	PATCH_COMMAND cat "${CMAKE_CURRENT_SOURCE_DIR}/cmake/gtest-port.h.patch" >> include/gtest/internal/gtest-port.h
 )
 ExternalProject_Get_Property(googletest SOURCE_DIR BINARY_DIR)
-set(GTEST_INCLUDE_DIRS ${SOURCE_DIR}/include)
+set(GTEST_INCLUDE_DIR ${SOURCE_DIR}/include)
 set(GTEST_LIBRARIES
 	${BINARY_DIR}/libgtest.a
 	${BINARY_DIR}/libgtest_main.a

@@ -16,26 +16,39 @@
 
 # CMake version and project metadata
 cmake_minimum_required (VERSION 3.2)
-project(cppnam)
+project(SNABSuite)
+
+# Enable C++14 support
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
+
+# Add configuration option for static linking 
+set(STATIC_LINKING TRUE CACHE BOOL "True for static linking")
 
 # Link statically
-set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-set(BUILD_SHARED_LIBRARIES OFF)
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
-set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s")
+if(STATIC_LINKING)
+	SET(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+	SET(BUILD_SHARED_LIBRARIES OFF)
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -Wl,--no-export-dynamic")
+        SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s -Wl,--no-export-dynamic")
+    else()
+        SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+        SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s")
+    endif()
+endif()
+
 
 # Add the local "cmake" directory to the search path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
-
-# Automatically download and compile Google-Test and the JSON library
-include(gtest_external)
 
 # Include the Cypress library
 find_package(Cypress REQUIRED)
 include_directories(${CYPRESS_INCLUDE_DIR})
 
-# Enable C++14 support
-set(CMAKE_CXX_STANDARD 14)
+# Automatically download and compile Google-Test
+include(gtest_external)
+
+
 
 # Enable all warnings on MSVC and GCC/Clang/Intel
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -125,10 +138,6 @@ target_link_libraries(sweep
     benchmark_common
     benchmarks
 )
-
-
-
-
 
 #
 # Unit tests -- only enable if gtest is present
