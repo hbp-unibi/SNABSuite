@@ -13,13 +13,14 @@
 		}
 	},
 	"spikey" : {
+        "setup" : {"calibIcb" : 1},
 		"neuron_type" : "IfFacetsHardware1",
 		"neuron_params": {
-			"tau_m": 10,
-			"tau_refrac": 0.01,
+			"tau_m": 1.0,
+			"tau_refrac": 0.00000000001,
 			"v_rest": -55.0,
-			"v_thresh": -59,
-			"v_reset": -61.0,
+			"v_thresh": -78,
+			"v_reset": -80.0,
 			"e_rev_I": -80.0
 		}
 	},

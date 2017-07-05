@@ -1,5 +1,6 @@
 {
 	"spinnaker" : {
+		"invalid" : true,
 		"neuron_type" : "IF_cond_exp",
 		"neuron_params": {
 			"e_rev_E": 0.0,
@@ -11,19 +12,20 @@
 			"tau_m": 10,
 			"cm": 0.2
 		},
-		"#neurons" : 256
+		"#neurons" : 1600
 	},
 	"spikey" : {
+        "setup" : {"calibIcb" : 1},
 		"neuron_type" : "IfFacetsHardware1",
 		"neuron_params": {
-			"tau_m": 10,
-			"tau_refrac": 0.01,
+			"tau_m": 1.0,
+			"tau_refrac": 0.00000000001,
 			"v_rest": -55.0,
-			"v_thresh": -59.0,
-			"v_reset": -61.0,
+			"v_thresh": -78,
+			"v_reset": -80.0,
 			"e_rev_I": -80.0
 		},
-		"#neurons" : 256
+		"#neurons" : 384
 	},
 	"nest" : {
 		"neuron_type" : "IF_cond_exp",
@@ -37,6 +39,6 @@
 			"tau_m": 1,
 			"cm": 0.2
 		},
-		"#neurons" : 256
+		"#neurons" : 1600
 	}
 }
