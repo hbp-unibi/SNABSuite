@@ -3,7 +3,7 @@
 
 This project provides a set of basic benchmarks (SNABs) for neuromorphic simulators like NEST, the Spikey chip or the SpiNNaker system. Benchmark networks are described in the platform-agnostic Cypress framework providing a black-box approach to comparing different simulation backends. To account for hardware differences, every SNAB relies on a config file. Results are presented in a JSON-like structure.
 
-[![Build Status](https://travis-ci.org/hbp-unibi/SNABSuite.svg?branch=master)](https://travis-ci.org/hbp-unibi/SNABSuite)
+[![Build Status](https://travis-ci.org/hbp-unibi/SNABSuite.svg?branch=master)](https://travis-ci.org/hbp-unibi/SNABSuite) [![Documentation](https://img.shields.io/badge/docs-doxygen-blue.svg)](https://hbp-unibi.github.io/SNABSuite/index.html)
 
 ## Installation and Usage
 
