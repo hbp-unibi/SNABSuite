@@ -1,0 +1,9 @@
+{
+	"snab_name" : "OutputFrequencySingleNeuron2",
+	"spikey" : {
+		"#neurons" : [1,384,60]
+	},
+	"nest" : {
+		"#neurons" : [1,1000,60]
+    }
+}
