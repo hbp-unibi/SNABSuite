@@ -67,7 +67,8 @@ void OutputFrequencySingleNeuron::run_netw(cypress::Network &netw)
 	try {
 		netw.run(pwbackend, 150.0);
 	}
-	catch (...) {
+	catch (const std::exception &exc) {
+		std::cerr << exc.what();
 		global_logger().fatal_error(
 		    "SNABSuite",
 		    "Wrong parameter setting or backend error! Simulation broke down");
@@ -95,13 +96,101 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 			}
 		}
 	}
-	else {
+	if (frequencies.size() == 0) {
 		frequencies.push_back(0.0);
 	}
 
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;
 	Utilities::calculate_statistics(frequencies, min, max, avg, std_dev);
+	return std::vector<cypress::Real>({avg, std_dev, max, min});
+}
+
+OutputFrequencySingleNeuron2::OutputFrequencySingleNeuron2(
+    const std::string backend)
+    : SNABBase(__func__, backend, {"Average frequency", "Standard deviation",
+                                   "Maximum", "Minimum"},
+               {"quality", "quality", "quality", "quality"},
+               {"1/ms", "1/ms", "1/ms", "1/ms"},
+               {"neuron_type", "neuron_params", "#neurons"}),
+      m_pop(m_netw, 0)
+{
+}
+
+cypress::Network &OutputFrequencySingleNeuron2::build_netw(
+    cypress::Network &netw)
+{
+	std::string neuron_type_str = m_config_file["neuron_type"];
+
+	// Get neuron neuron_parameters
+	NeuronParameters neuron_params =
+	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
+	                     m_config_file["neuron_params"]);
+	// Set up population
+	m_pop = SpikingUtils::add_population(neuron_type_str, netw, neuron_params,
+	                                     m_config_file["#neurons"], "");
+	return netw;
+}
+
+void OutputFrequencySingleNeuron2::run_netw(cypress::Network &netw)
+{
+	// Reset the results
+	m_spikes = std::vector<std::vector<cypress::Real>>();
+
+	// Debug logger, may be ignored in the future
+	netw.logger().min_level(cypress::DEBUG, 0);
+
+	// PowerManagementBackend to use netio4
+	cypress::PowerManagementBackend pwbackend(
+	    std::make_shared<cypress::NetIO4>(),
+	    cypress::Network::make_backend(m_backend));
+
+	// Record Spikes only for ~10% of the neurons
+	size_t step_size = size_t(float(m_pop.size() - 1) / 10.0);
+
+	for (size_t i = 0; i < m_pop.size(); i += step_size) {
+		for (size_t j = 0; j < m_pop.size(); j++) {
+			m_pop[j].signals().record(0, i == j);
+		}
+		netw.run(pwbackend, 150.0);
+		m_spikes.push_back(m_pop[i].signals().data(0));
+	}
+}
+
+std::vector<cypress::Real> OutputFrequencySingleNeuron2::evaluate()
+{
+	if (m_spikes.size() == 0) {
+
+		return std::vector<cypress::Real>({0, 0, 0, 0});
+	}
+	std::vector<cypress::Real> mean_freq;
+	for (size_t i = 0; i < m_spikes.size(); i++) {
+		std::vector<cypress::Real> frequencies;
+		for (int j = 0; j < int(m_spikes[i].size()) - 1; j++) {
+			if (m_spikes[i][j] > 50) {
+				frequencies.push_back(cypress::Real(1.0) /
+				                      (m_spikes[i][j + 1] - m_spikes[i][j]));
+			}
+		}
+		if (frequencies.size() == 0) {
+			mean_freq.push_back(0.0);
+			continue;
+		}
+		cypress::Real avg =
+		    std::accumulate(frequencies.begin(), frequencies.end(), 0.0) /
+		    cypress::Real(frequencies.size());
+		mean_freq.push_back(avg);
+	}
+#if SNAB_DEBUG
+	Utilities::write_vector2_to_csv(m_spikes,
+	                                "OutputFrequencySingleNeuron2_spikes.csv");
+	Utilities::write_vector_to_csv(
+	    mean_freq, "OutputFrequencySingleNeuron2_mean_freq.csv");
+#endif
+
+	// Calculate statistics
+	cypress::Real max, min, avg, std_dev;
+	Utilities::calculate_statistics(mean_freq, min, max, avg, std_dev);
 	return std::vector<cypress::Real>({avg, std_dev, max, min});
 }
 
@@ -140,11 +229,11 @@ void OutputFrequencyMultipleNeurons::run_netw(cypress::Network &netw)
 	// Debug logger, may be ignored in the future
 	netw.logger().min_level(cypress::DEBUG, 0);
 
-    // PowerManagementBackend to use netio4
+	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
 	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
-	netw.run(pwbackend, 100.0);
+	netw.run(pwbackend, 150.0);
 }
 
 std::vector<cypress::Real> OutputFrequencyMultipleNeurons::evaluate()
@@ -161,11 +250,13 @@ std::vector<cypress::Real> OutputFrequencyMultipleNeurons::evaluate()
 		if (spikes.size() > 1) {
 
 			for (size_t i = 0; i < spikes.size() - 1; i++) {
-				frequencies.push_back(cypress::Real(1.0) /
-				                      (spikes[i + 1] - spikes[i]));
+				if (spikes[i] > 50) {
+					frequencies.push_back(cypress::Real(1.0) /
+					                      (spikes[i + 1] - spikes[i]));
+				}
 			}
 		}
-		else {
+		if (frequencies.size() == 0) {
 			frequencies.push_back(0.0);
 		}
 
