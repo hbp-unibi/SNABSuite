@@ -145,8 +145,11 @@ void OutputFrequencySingleNeuron2::run_netw(cypress::Network &netw)
 	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
 
-	// Record Spikes only for ~10% of the neurons
-	size_t step_size = size_t(float(m_pop.size() - 1) / 10.0);
+	// Record Spikes only for ~16 neurons
+	size_t step_size = size_t(float(m_pop.size() - 1) / 15.0);
+	if (step_size == 0) {
+		step_size = 1;
+	}
 
 	for (size_t i = 0; i < m_pop.size(); i += step_size) {
 		for (size_t j = 0; j < m_pop.size(); j++) {
