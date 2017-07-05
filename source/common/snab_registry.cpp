@@ -35,6 +35,8 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(
 	std::vector<std::shared_ptr<SNABBase>> vec = {
 	    std::make_shared<OutputFrequencySingleNeuron>(
 	        OutputFrequencySingleNeuron(backend)),
+        std::make_shared<OutputFrequencySingleNeuron2>(
+	        OutputFrequencySingleNeuron2(backend)),
 	    std::make_shared<OutputFrequencyMultipleNeurons>(
 	        OutputFrequencyMultipleNeurons(backend)),
 	    std::make_shared<RefractoryPeriod>(RefractoryPeriod(backend))/*,
