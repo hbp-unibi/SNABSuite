@@ -47,21 +47,26 @@ private:
 	std::vector<size_t> m_jobs_done;
 	// Vector containing all configuration files of a sweep
 	std::vector<cypress::Json> m_sweep_vector;
-	// Names and Keys for parameterws swept over
+	// Names and Keys for parameters swept over
 	std::vector<std::string> m_sweep_names;
 	// Vector containing all resulting json files
 	std::vector<std::vector<cypress::Real>> m_results;
 	// TODO: Number of repetitions for every simulation
 	size_t m_repetitions = 1;
 
-	// Function for shuffling indices, reduces covariance between neighbouring
-	// simulations on analogue hardware
+	/**
+	 * Function for shuffling indices, reduces covariance between neighbouring
+	 * simulations on analogue hardware
+	 */
 	void shuffle_sweep_indices(size_t size);
 
-	// TODO
+	/**
+	 * Private function for recovering an old sweep. Gets called at the end of
+	 * the constructor, checks for consistency.
+	 * Note: Make sure the same sweep config is used. This is currently not
+	 * checked against! TODO!
+	 */
 	void recover_broken_simulation();
-	// TODO
-	void backup_simulation_results();
 
 public:
 	/**
@@ -100,6 +105,18 @@ public:
 	 * *sweep_parameters*_*backend*_.csv
 	 */
 	void write_csv();
+	/**
+	 * Function for backing up an old simulation.
+	 * Note: Make sure the same sweep config is used. This is currently not
+	 * checked against! TODO!
+	 */
+	void backup_simulation_results();
+
+	/**
+	 * When the sweep is exited normally (not by signal failure) make sure to
+	 * delete the backup
+	 */
+	~ParameterSweep();
 };
 }
 

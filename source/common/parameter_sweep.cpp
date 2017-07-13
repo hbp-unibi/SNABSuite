@@ -117,39 +117,61 @@ void ParameterSweep::shuffle_sweep_indices(size_t size)
 	m_indices = indices;
 }
 
+using cypress::Json;
 void ParameterSweep::recover_broken_simulation()
 {
-	// TODO Check if last simulation broke down, recover state if backup is
-	// there
-	std::vector<size_t> jobs_done;
-	std::fstream ss(m_backend + "_bak.dat", std::fstream::in);
-	bool resume = ss.good();
-	if (resume) {
-		ss.read((char *)m_indices.data(), m_indices.size() * sizeof(size_t));
-		ss.read(
-		    (char *)m_results.data(),
-		    m_results.size() *
-		        sizeof(std::vector<std::vector<cypress::Real>>::value_type));
-		size_t length = 0;
-		ss.read((char *)&length, sizeof(length));
-		jobs_done.resize(length);
-		ss.read((char *)jobs_done.data(), length * sizeof(size_t));
-		ss.close();
+	// Open a the backup file, check if it exists
+	std::fstream ss(m_backend + "_bak.json", std::fstream::in);
+	if (!ss.good()) {
+		return;
 	}
-	m_jobs_done = jobs_done;
+	Json backup = Json::parse(ss);
+
+	// Check wether the backup is for the correct SNAB
+	if (backup["snab"] != m_snab->snab_name) {
+		global_logger().info("SNABSuite",
+		                     "Backup file exists, but not for this SNAB! "
+		                     "Skipping recovery and overwriting old file");
+		return;
+	}
+
+	// Check wether sweep indices have the same size
+	if (m_indices.size() != backup["indices"].size()) {
+		global_logger().info("SNABSuite",
+		                     "Sweep size of backup is incorrect! Skipping "
+		                     "recovery and overwriting old file");
+		return;
+	}
+
+	// Check results dimension
+	if (m_results.size() != backup["results"].size() ||
+	    m_results[0].size() != backup["results"][0].size()) {
+		global_logger().info("SNABSuite",
+		                     "Results size of backup is incorrect! Skipping "
+		                     "recovery and overwriting old file");
+		return;
+	}
+
+	// Recover data
+	m_indices = json_array_to_vector<size_t>(backup["indices"]);
+	m_results = json_2Darray_to_vector<cypress::Real>(backup["results"]);
+	m_jobs_done = json_array_to_vector<size_t>(backup["jobs_done"]);
+
+	std::cout << "Succesfully recovered old parameter sweep!" << std::endl;
 }
 
 void ParameterSweep::backup_simulation_results()
 {
-	// TODO
-	std::fstream ss(m_backend + "_bak.dat", std::fstream::out);
-	ss.write((char *)m_indices.data(), m_indices.size() * sizeof(size_t));
-	ss.write((char *)m_results.data(),
-	         m_results.size() *
-	             sizeof(std::vector<std::vector<cypress::Real>>::value_type));
-	size_t length = m_jobs_done.size();
-	ss.write((char *)&length, sizeof(length));
-	ss.write((char *)m_jobs_done.data(), length * sizeof(size_t));
+	// Put together the backup of all important data
+	Json backup;
+	backup["snab"] = m_snab->snab_name;
+	backup["indices"] = m_indices;
+	backup["results"] = m_results;
+	backup["jobs_done"] = m_jobs_done;
+
+	// Write to file
+	std::fstream ss(m_backend + "_bak.json", std::fstream::out);
+	ss << backup.dump(0) << std::endl;
 	ss.close();
 }
 
@@ -176,13 +198,13 @@ ParameterSweep::ParameterSweep(std::string backend, cypress::Json &config)
 	m_results = std::vector<std::vector<cypress::Real>>(
 	    m_indices.size(),
 	    std::vector<cypress::Real>(m_snab->indicator_names.size(), 0));
-	// recover_broken_simulation();
+	recover_broken_simulation();
 }
 
 void ParameterSweep::execute()
 {
 
-	size_t backup_count;
+	size_t backup_count = 0;
 
 	for (size_t i = 0; i < m_indices.size(); i++) {
 		// Report the percentage of jobs done
@@ -205,16 +227,13 @@ void ParameterSweep::execute()
 		m_jobs_done.emplace_back(current_index);
 		backup_count++;
 		if (backup_count >= 50) {
-			// backup_simulation_results();
+			backup_simulation_results();
 			backup_count = 0;
 		}
 	}
 	// Finalize output in terminal
 	Utilities::progress_callback(1.0);
 	std::cerr << std::endl;
-
-	// Remove backup file
-	std::remove((m_backend + "_bak.dat").c_str());
 }
 
 // Accessing a unflattend JSON with flattend key
@@ -261,7 +280,7 @@ void ParameterSweep::write_csv()
 		      });
 
 	std::string filename = m_snab->snab_name + "/";
-    
+
 	int dir_err =
 	    system((std::string("mkdir -p ") + m_snab->snab_name).c_str());
 	if (dir_err == -1) {
@@ -271,11 +290,11 @@ void ParameterSweep::write_csv()
 	for (auto i : shortened_sweep_names) {
 		filename += i + "_";
 	}
-	filename += Utilities::split( m_backend, '=')[0] + ".csv";
+	filename += Utilities::split(m_backend, '=')[0] + ".csv";
 	std::ofstream ofs(filename, std::ofstream::out);
-    if(!ofs.good()){
-        std::cout<< "Error creating CSV"<<std::endl;
-    }
+	if (!ofs.good()) {
+		std::cout << "Error creating CSV" << std::endl;
+	}
 	// first line of csv
 	ofs << "#";
 	for (size_t i = 1; i <= sweep_size; i++) {
@@ -293,5 +312,11 @@ void ParameterSweep::write_csv()
 		ofs << "\n";
 	}
 	ofs.close();
+}
+
+ParameterSweep::~ParameterSweep()
+{
+	// Remove backup file
+	std::remove((m_backend + "_bak.json").c_str());
 }
 }
