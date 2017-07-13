@@ -17,10 +17,27 @@
  */
 #include <glob.h>
 
+#include <csignal>
+
 #include <cypress/cypress.hpp>
 #include "common/parameter_sweep.hpp"
 
 using namespace SNAB;
+
+// Global Pointer to a sweep instance, used to access member in sig handler
+ParameterSweep *sweep_pointer;
+
+/**
+ * Using the global pointer this wrapper executes the backup function when the
+ * program gets a signal @param i
+ */
+void backup_wrapper_sig_handler(int i)
+{
+	std::cout << "Caught signal " << i << std::endl;
+	sweep_pointer->backup_simulation_results();
+	std::cout << "Backup complete!" << std::endl;
+	exit(i);
+}
 
 int main(int argc, const char *argv[])
 {
@@ -58,7 +75,12 @@ int main(int argc, const char *argv[])
 
 	// Suppress all logging
 	cypress::global_logger().min_level(cypress::LogSeverity::ERROR, 1);
+
 	ParameterSweep sweep(argv[1], json);
+
+	// Use customized signal handler to backup sweep
+	sweep_pointer = &sweep;
+	std::signal(SIGINT, backup_wrapper_sig_handler);
 
 	// Execute and evaluate
 	sweep.execute();
