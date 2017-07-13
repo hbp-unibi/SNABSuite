@@ -32,30 +32,35 @@ int main(int argc, const char *argv[])
 
 	if (argc == 4 && std::string(argv[3]) == "NMPI" &&
 	    !cypress::NMPI::check_args(argc, argv)) {
+
+		// Gather all config file to upload them to the server
 		glob_t glob_result;
 		glob(std::string("../config/*").c_str(), GLOB_TILDE, NULL,
 		     &glob_result);
 		std::vector<std::string> files;
-
 		for (unsigned int i = 0; i < glob_result.gl_pathc; ++i) {
 			files.push_back(std::string(glob_result.gl_pathv[i]));
 		}
 		globfree(&glob_result);
-		for (auto i : files) {
-			std::cout << i << std::endl;
-		}
-		// cypress::NMPI(argv[1], argc, argv, files);
+
+		// Execute NMPI
+		cypress::NMPI(argv[1], argc, argv, files);
 		return 0;
 	}
 
+	// Open sweep config
 	std::ifstream ifs(argv[2]);
 	if (!ifs.good()) {
 		std::cout << "Could not open sweep configuration file!" << std::endl;
 		return 1;
 	}
 	auto json = cypress::Json::parse(ifs);
+
+	// Suppress all logging
 	cypress::global_logger().min_level(cypress::LogSeverity::ERROR, 1);
 	ParameterSweep sweep(argv[1], json);
+
+	// Execute and evaluate
 	sweep.execute();
 	sweep.write_csv();
 
