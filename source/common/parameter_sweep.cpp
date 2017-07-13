@@ -109,12 +109,11 @@ void ParameterSweep::shuffle_sweep_indices(size_t size)
 	// Shuffle sweep indices for stochastic independence in simulations on
 	// spikey
 	std::default_random_engine generator(1010);
-	std::vector<size_t> indices(size);
+	m_indices = std::vector<size_t>(size);
 	for (size_t j = 0; j < size; j++) {
-		indices[j] = j;
+		m_indices[j] = j;
 	}
-	std::shuffle(indices.begin(), indices.end(), generator);
-	m_indices = indices;
+	std::shuffle(m_indices.begin(), m_indices.end(), generator);
 }
 
 using cypress::Json;
