@@ -140,4 +140,84 @@ TEST(ReadJSON, check_json_for_parameters)
 	names2.emplace_back("wrong_test");
 	EXPECT_FALSE(check_json_for_parameters(names, json["data"], "bla"));
 }
+
+static const cypress::Json json_array = {0, 5, 8, 9, 4, 2, 9, 1, 0, 5, 33, 27};
+static const cypress::Json json_array2 = {0.3, 5.2, 8.8,  9.1, 4.4,  2.8,
+                                          9.9, 1.4, 0.22, 5.3, 33.0, 27.5555};
+static const cypress::Json json_2Darray = {
+    {0, 5, 8}, {9, 4, 2}, {9, 1, 0}, {5, 33, 27}};
+static const cypress::Json json_2Darray2 = {
+    {0.3, 5.2, 8.8}, {9.1, 4.4, 2.8}, {9.9, 1.4, 0.22}, {5.3, 33.0, 27.5555}};
+TEST(ReadJSON, json_array_to_vector)
+{
+	std::vector<int> vec = json_array_to_vector<int>(json_array);
+	EXPECT_EQ(0, vec[0]);
+	EXPECT_EQ(5, vec[1]);
+	EXPECT_EQ(8, vec[2]);
+	EXPECT_EQ(9, vec[3]);
+	EXPECT_EQ(4, vec[4]);
+	EXPECT_EQ(2, vec[5]);
+	EXPECT_EQ(9, vec[6]);
+	EXPECT_EQ(1, vec[7]);
+	EXPECT_EQ(0, vec[8]);
+	EXPECT_EQ(5, vec[9]);
+	EXPECT_EQ(33, vec[10]);
+	EXPECT_EQ(27, vec[11]);
+
+	std::vector<double> vec2 = json_array_to_vector<double>(json_array2);
+	EXPECT_NEAR(0.3, vec2[0], 1e-8);
+	EXPECT_NEAR(5.2, vec2[1], 1e-8);
+	EXPECT_NEAR(8.8, vec2[2], 1e-8);
+	EXPECT_NEAR(9.1, vec2[3], 1e-8);
+	EXPECT_NEAR(4.4, vec2[4], 1e-8);
+	EXPECT_NEAR(2.8, vec2[5], 1e-8);
+	EXPECT_NEAR(9.9, vec2[6], 1e-8);
+	EXPECT_NEAR(1.4, vec2[7], 1e-8);
+	EXPECT_NEAR(0.22, vec2[8], 1e-8);
+	EXPECT_NEAR(5.3, vec2[9], 1e-8);
+	EXPECT_NEAR(33.0, vec2[10], 1e-8);
+	EXPECT_NEAR(27.5555, vec2[11], 1e-8);
+
+	ASSERT_ANY_THROW(json_array_to_vector<double>(cypress::Json({{"foo", 3}})));
+    ASSERT_ANY_THROW(json_array_to_vector<double>(json_2Darray));
+    ASSERT_ANY_THROW(json_array_to_vector<double>(json_2Darray2));
+}
+
+TEST(ReadJSON, json_2Darray_to_vector)
+{
+	std::vector<std::vector<int>> vec =
+	    json_2Darray_to_vector<int>(json_2Darray);
+	EXPECT_EQ(0, vec[0][0]);
+	EXPECT_EQ(5, vec[0][1]);
+	EXPECT_EQ(8, vec[0][2]);
+	EXPECT_EQ(9, vec[1][0]);
+	EXPECT_EQ(4, vec[1][1]);
+	EXPECT_EQ(2, vec[1][2]);
+	EXPECT_EQ(9, vec[2][0]);
+	EXPECT_EQ(1, vec[2][1]);
+	EXPECT_EQ(0, vec[2][2]);
+	EXPECT_EQ(5, vec[3][0]);
+	EXPECT_EQ(33, vec[3][1]);
+	EXPECT_EQ(27, vec[3][2]);
+
+	std::vector<std::vector<double>> vec2 =
+	    json_2Darray_to_vector<double>(json_2Darray2);
+	EXPECT_NEAR(0.3, vec2[0][0], 1e-8);
+	EXPECT_NEAR(5.2, vec2[0][1], 1e-8);
+	EXPECT_NEAR(8.8, vec2[0][2], 1e-8);
+	EXPECT_NEAR(9.1, vec2[1][0], 1e-8);
+	EXPECT_NEAR(4.4, vec2[1][1], 1e-8);
+	EXPECT_NEAR(2.8, vec2[1][2], 1e-8);
+	EXPECT_NEAR(9.9, vec2[2][0], 1e-8);
+	EXPECT_NEAR(1.4, vec2[2][1], 1e-8);
+	EXPECT_NEAR(0.22, vec2[2][2], 1e-8);
+	EXPECT_NEAR(5.3, vec2[3][0], 1e-8);
+	EXPECT_NEAR(33.0, vec2[3][1], 1e-8);
+	EXPECT_NEAR(27.5555, vec2[3][2], 1e-8);
+    
+    ASSERT_ANY_THROW(json_2Darray_to_vector<double>(cypress::Json({{"foo", 3}})));
+    ASSERT_ANY_THROW(json_2Darray_to_vector<double>(json_array));
+    ASSERT_ANY_THROW(json_2Darray_to_vector<double>(json_array2));
+    
+}
 }

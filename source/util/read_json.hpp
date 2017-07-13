@@ -89,6 +89,43 @@ bool check_json_for_parameters(std::vector<std::string> &parameters,
  * seperated backends
  */
 cypress::Json extract_backend(cypress::Json &config, std::string backend);
+
+/**
+ * Function to convert a JSON array to a vector. This is used for one
+ * dimensional arrays only!
+ * @param json array to be converted. This shouold not be an object!
+ * @return Vector of type T containing values of the array
+ */
+template <typename T>
+std::vector<T> json_array_to_vector(const cypress::Json &json)
+{
+	if (!json.is_array() || json[0].is_array()) {
+		throw std::invalid_argument("Error in conversion from Json to array!");
+	}
+	std::vector<T> res;
+	for (auto i : json) {
+		res.push_back(T(i));
+	}
+	return res;
+}
+
+/**
+ * Function to convert a two dimensional array to a vector.
+ * @param json 2D array to be converted. This shouold not be an object!
+ * @return Vector of vectors of type T containing values of the 2D array
+ */
+template <typename T>
+std::vector<std::vector<T>> json_2Darray_to_vector(const cypress::Json &json)
+{
+	if (!json.is_array() || !json[0].is_array()) {
+		throw std::invalid_argument("Error in conversion from Json to array!");
+	}
+	std::vector<std::vector<T>> res;
+	for (auto i : json) {
+		res.push_back(json_array_to_vector<T>(i));
+	}
+	return res;
+}
 }
 
 #endif /* SNABSUITE_UTIL_READ_JSON_HPP */

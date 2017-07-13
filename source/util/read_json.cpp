@@ -39,20 +39,22 @@ cypress::Json read_config(std::string name, std::string backend)
 		}
 	}
 	if (!valid) {
-		global_logger().warn("SNABSuite", "Config file for " + name + " not found!");
+		global_logger().warn("SNABSuite",
+		                     "Config file for " + name + " not found!");
 		config["valid"] = false;
-        return config;
+		return config;
 	}
 
 	if (config.find(backend) == config.end()) {
 		std::string simulator =
 		    Utilities::split(Utilities::split(backend, '=')[0], '.').back();
 		if (config.find(simulator) == config.end()) {
-			global_logger().warn("SNABSuite", "Could not find any config for " +
-			                             simulator + " in the config file of " +
-			                             name + "! ");
+			global_logger().warn("SNABSuite",
+			                     "Could not find any config for " + simulator +
+			                         " in the config file of " + name + "! ");
 			if (config.find("default") != config.end()) {
-				global_logger().warn("SNABSuite", "Take default values instead!");
+				global_logger().warn("SNABSuite",
+				                     "Take default values instead!");
 				return config["default"];
 			}
 			else {
@@ -77,10 +79,12 @@ cypress::Json extract_backend(cypress::Json &config, std::string backend)
 		std::string simulator =
 		    Utilities::split(Utilities::split(backend, '=')[0], '.').back();
 		if (config.find(simulator) == config.end()) {
-			cypress::global_logger().warn("SNABSuite", "Could not find any config for " +
-			                             simulator + " in the provided Json!");
+			cypress::global_logger().warn(
+			    "SNABSuite", "Could not find any config for " + simulator +
+			                     " in the provided Json!");
 			if (config.find("default") != config.end()) {
-				global_logger().warn("SNABSuite", "Take default values instead!");
+				global_logger().warn("SNABSuite",
+				                     "Take default values instead!");
 				return config["default"];
 			}
 			else {
@@ -104,8 +108,9 @@ bool check_json_for_parameters(std::vector<std::string> &parameters,
 {
 	for (auto i : parameters) {
 		if (json.find(i) == json.end()) {
-			global_logger().warn("SNABSuite", "Config file for " + name +
-			                            " does not contain any value for " + i);
+			global_logger().warn("SNABSuite",
+			                     "Config file for " + name +
+			                         " does not contain any value for " + i);
 			return false;
 		}
 	}
