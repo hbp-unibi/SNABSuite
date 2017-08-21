@@ -124,7 +124,17 @@ void ParameterSweep::recover_broken_simulation()
 	if (!ss.good()) {
 		return;
 	}
-	Json backup = Json::parse(ss);
+	
+	Json backup;
+	try {
+		backup = Json::parse(ss);
+	}
+	catch (...) {
+		global_logger().info("SNABSuite",
+		                     "Backup file exists, but is corrupt! "
+		                     "Skipping recovery and overwriting old file");
+        return;
+	}
 
 	// Check wether the backup is for the correct SNAB
 	if (backup["snab"] != m_snab->snab_name) {
