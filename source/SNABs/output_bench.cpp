@@ -91,6 +91,10 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 	if (spikes.size() > 1) {
 		for (size_t i = 0; i < spikes.size() - 1; i++) {
 			if (spikes[i] > 50) {
+				// Workaround for a Bug in BrainScaleS
+				if (spikes[i] == spikes[i + 1]) {
+					continue;
+				}
 				frequencies.push_back(cypress::Real(1.0) /
 				                      (spikes[i + 1] - spikes[i]));
 			}
@@ -171,6 +175,10 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron2::evaluate()
 		std::vector<cypress::Real> frequencies;
 		for (int j = 0; j < int(m_spikes[i].size()) - 1; j++) {
 			if (m_spikes[i][j] > 50) {
+				// Workaround for a Bug in BrainScaleS
+				if (m_spikes[i][j + 1] == m_spikes[i][j]) {
+					continue;
+				}
 				frequencies.push_back(cypress::Real(1.0) /
 				                      (m_spikes[i][j + 1] - m_spikes[i][j]));
 			}
@@ -254,6 +262,10 @@ std::vector<cypress::Real> OutputFrequencyMultipleNeurons::evaluate()
 
 			for (size_t i = 0; i < spikes.size() - 1; i++) {
 				if (spikes[i] > 50) {
+					// Workaround for a Bug in BrainScaleS
+					if (spikes[i] == spikes[i + 1]) {
+						continue;
+					}
 					frequencies.push_back(cypress::Real(1.0) /
 					                      (spikes[i + 1] - spikes[i]));
 				}
