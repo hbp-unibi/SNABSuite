@@ -107,7 +107,7 @@ install:
 script: 
   - mkdir build && cd build
   - git clone https://github.com/hbp-unibi/cypress
-  - cd cypress && mkdir build && mkdir install && cd build && git checkout smaller_changes
+  - cd cypress && mkdir build && mkdir install && cd build
   - cmake .. -DCMAKE_INSTALL_PREFIX:PATH=../install -DSTATIC_LINKING=FALSE
   - make && make install
   - cd ../../
