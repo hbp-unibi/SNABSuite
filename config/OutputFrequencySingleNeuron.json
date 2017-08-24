@@ -13,7 +13,7 @@
 		}
 	},
 	"spikey" : {
-        "setup" : {"calibIcb" : 1},
+		"setup" : {"calibIcb" : 1},
 		"neuron_type" : "IfFacetsHardware1",
 		"neuron_params": {
 			"tau_m": 1.0,
@@ -36,5 +36,23 @@
 			"tau_m": 1,
 			"cm": 0.2
 		}
-    }
+	},
+	"nmpm1" : {
+		"neuron_type" : "IF_cond_exp",
+		"setup": {
+			"calib_path": "/wang/data/calibration/guidebook/",
+			"neuron_size" : 2
+		},
+		"neuron_params": {
+			"e_rev_E": 0.0,
+			"v_rest": 50.0,
+			"v_reset": -60.0,
+			"v_thresh": -100.0,
+			"tau_syn_E": 2.0,
+			"tau_refrac": 0.1,
+			"tau_m": 0.1,
+			"cm": 0.2
+		}
+	}
+
 }
