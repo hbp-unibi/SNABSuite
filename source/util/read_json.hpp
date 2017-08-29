@@ -128,6 +128,8 @@ std::vector<std::vector<T>> json_2Darray_to_vector(const cypress::Json& json)
 	}
 	return res;
 }
+
+void replace_arrays_by_value(cypress::Json& json, const size_t& index = 0);
 }
 
 #endif /* SNABSUITE_UTIL_READ_JSON_HPP */

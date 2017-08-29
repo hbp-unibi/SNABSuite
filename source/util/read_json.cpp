@@ -118,4 +118,16 @@ bool check_json_for_parameters(const std::vector<std::string> &parameters,
 	}
 	return true;
 }
+
+void replace_arrays_by_value(cypress::Json &json, const size_t &index)
+{
+	for (Json::iterator i = json.begin(); i != json.end(); ++i) {
+		if (i.value().is_object()) {
+			replace_arrays_by_value(i.value(), index);
+		}
+		else if (i.value().is_array()) {
+			i.value() = i.value()[index];
+		}
+	}
+}
 }
