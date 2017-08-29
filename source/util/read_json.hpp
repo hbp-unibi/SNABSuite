@@ -55,8 +55,8 @@ std::map<std::string, T> json_to_map(const cypress::Json &obj)
  */
 template <typename T>
 std::vector<T> read_check(std::map<std::string, T> &input,
-                          std::vector<std::string> names,
-                          std::vector<T> defaults)
+                          const std::vector<std::string> &names,
+                          const std::vector<T> &defaults)
 {
 	std::vector<T> res(names.size());
 	for (size_t i = 0; i < res.size(); i++) {
@@ -79,16 +79,18 @@ std::vector<T> read_check(std::map<std::string, T> &input,
 	return res;
 }
 
-cypress::Json read_config(std::string name, std::string backend);
+cypress::Json read_config(const std::string &name, const std::string &backend);
 
-bool check_json_for_parameters(std::vector<std::string> &parameters,
-                               cypress::Json &json, std::string name);
+bool check_json_for_parameters(const std::vector<std::string> &parameters,
+                               const cypress::Json &json,
+                               const std::string name);
 
 /**
  * Extract backend specific part from a configuration file. Checks for dot
  * seperated backends
  */
-cypress::Json extract_backend(cypress::Json &config, std::string backend);
+cypress::Json extract_backend(const cypress::Json &config,
+                              const std::string &backend);
 
 /**
  * Function to convert a JSON array to a vector. This is used for one
@@ -115,7 +117,7 @@ std::vector<T> json_array_to_vector(const cypress::Json &json)
  * @return Vector of vectors of type T containing values of the 2D array
  */
 template <typename T>
-std::vector<std::vector<T>> json_2Darray_to_vector(const cypress::Json &json)
+std::vector<std::vector<T>> json_2Darray_to_vector(const cypress::Json& json)
 {
 	if (!json.is_array() || !json[0].is_array()) {
 		throw std::invalid_argument("Error in conversion from Json to array!");

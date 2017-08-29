@@ -23,7 +23,7 @@
 
 namespace SNAB {
 using cypress::global_logger;
-cypress::Json read_config(std::string name, std::string backend)
+cypress::Json read_config(const std::string &name, const std::string &backend)
 {
 	std::vector<std::string> dir(
 	    {"../config/", "../../config/", "config/", ""});
@@ -73,7 +73,8 @@ cypress::Json read_config(std::string name, std::string backend)
 	}
 }
 
-cypress::Json extract_backend(cypress::Json &config, std::string backend)
+cypress::Json extract_backend(const cypress::Json &config,
+                              const std::string &backend)
 {
 	if (config.find(backend) == config.end()) {
 		std::string simulator =
@@ -103,8 +104,9 @@ cypress::Json extract_backend(cypress::Json &config, std::string backend)
 	}
 }
 
-bool check_json_for_parameters(std::vector<std::string> &parameters,
-                               cypress::Json &json, std::string name)
+bool check_json_for_parameters(const std::vector<std::string> &parameters,
+                               const cypress::Json &json,
+                               const std::string name)
 {
 	for (auto i : parameters) {
 		if (json.find(i) == json.end()) {
