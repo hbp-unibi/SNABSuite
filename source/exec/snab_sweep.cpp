@@ -36,7 +36,7 @@ void backup_wrapper_sig_handler(int i)
 	std::cout << "Caught signal " << i << std::endl;
 	sweep_pointer->backup_simulation_results();
 	std::cout << "Backup complete!" << std::endl;
-	exit(i);
+    std::abort();
 }
 
 int main(int argc, const char *argv[])
@@ -83,7 +83,16 @@ int main(int argc, const char *argv[])
 	std::signal(SIGINT, backup_wrapper_sig_handler);
 
 	// Execute and evaluate
-	sweep.execute();
+    try
+    {
+        sweep.execute();
+    }
+    catch (std::exception e) 
+    {
+        sweep_pointer->backup_simulation_results();
+        std::cout << "Backup complete!" << std::endl;
+        throw e;
+    }
 	sweep.write_csv();
 
 	return 0;
