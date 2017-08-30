@@ -126,6 +126,12 @@ void replace_arrays_by_value(cypress::Json &json, const size_t &index)
 			replace_arrays_by_value(i.value(), index);
 		}
 		else if (i.value().is_array()) {
+			if (i.value().size() <= index) {
+				throw std::length_error(
+				    "The array of size " + std::to_string(i.value().size()) +
+				    " is too small for requested index of " +
+				    std::to_string(index));
+			}
 			i.value() = i.value()[index];
 		}
 	}
