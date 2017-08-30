@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include <unistd.h> // unlink file
+
 #include <cypress/cypress.hpp>
 #include "common/snab_base.hpp"
 #include "common/snab_registry.hpp"
@@ -221,7 +223,7 @@ void ParameterSweep::execute()
 
 		// Get the new index
 		size_t current_index = m_indices[i];
-		// Check if simulation has be done in previous (broken) simulation
+		// Check if simulation has been done in previous (broken) simulation
 		if (std::find(m_jobs_done.begin(), m_jobs_done.end(), current_index) !=
 		    m_jobs_done.end()) {
 			continue;
@@ -321,11 +323,10 @@ void ParameterSweep::write_csv()
 		ofs << "\n";
 	}
 	ofs.close();
+    
+    // Remove backup file
+	unlink((m_backend + "_bak.json").c_str());
 }
 
-ParameterSweep::~ParameterSweep()
-{
-	// Remove backup file
-	std::remove((m_backend + "_bak.json").c_str());
-}
+ParameterSweep::~ParameterSweep() = default;
 }
