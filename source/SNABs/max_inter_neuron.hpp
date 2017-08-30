@@ -34,7 +34,7 @@ private:
 	NeuronParameters m_group_params;
 
 public:
-	SingleMaxFreqToGroup(const std::string backend);
+	SingleMaxFreqToGroup(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;
@@ -48,7 +48,7 @@ private:
 	NeuronParameters m_retr_params;
 
 public:
-	GroupMaxFreqToGroup(const std::string backend);
+	GroupMaxFreqToGroup(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;

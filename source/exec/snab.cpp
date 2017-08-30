@@ -25,9 +25,9 @@ using namespace SNAB;
 
 int main(int argc, const char *argv[])
 {
-	if (argc < 2 && argc > 4 && !cypress::NMPI::check_args(argc, argv)) {
-		std::cout << "Usage: " << argv[0] << " <SIMULATOR> [snab] [NMPI]"
-		          << std::endl;
+	if ((argc < 2 || argc > 5) && !cypress::NMPI::check_args(argc, argv)) {
+		std::cout << "Usage: " << argv[0]
+		          << " <SIMULATOR> [snab] [bench_index] [NMPI]" << std::endl;
 		return 1;
 	}
 
@@ -42,15 +42,22 @@ int main(int argc, const char *argv[])
 			files.push_back(std::string(glob_result.gl_pathv[i]));
 		}
 		globfree(&glob_result);
-		cypress::NMPI(argv[1], argc, argv, files);
+		cypress::NMPI(argv[1], argc, argv, files, true);
 		return 0;
 	}
-	cypress::global_logger().min_level(cypress::LogSeverity::INFO, 1);
+
+	size_t bench_index = 0;
+	if (isdigit(*argv[argc - 1])) {
+		bench_index = std::stoi(argv[argc - 1]);
+	}
+
+	cypress::global_logger().min_level(cypress::LogSeverity::DEBUG, 1);
+
 	std::string snab_name = "all";
 	if (argc > 2 && std::string(argv[2]) != "NMPI") {
 		snab_name = std::string(argv[2]);
 	}
-	BenchmarkExec bench(std::string(argv[1]), snab_name);
+	BenchmarkExec bench(std::string(argv[1]), snab_name, bench_index);
 
 	return 0;
 }

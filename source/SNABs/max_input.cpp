@@ -31,12 +31,14 @@
 
 namespace SNAB {
 
-MaxInputOneToOne::MaxInputOneToOne(const std::string backend)
+MaxInputOneToOne::MaxInputOneToOne(const std::string backend,
+                                   size_t bench_index)
     : SNABBase(
           __func__, backend, {"Average number of sikes", "Standard deviation",
                               "Maximum #spikes", "Minimum #spikes"},
           {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
-          {"neuron_type", "neuron_params", "weight", "#neurons", "#spikes"}),
+          {"neuron_type", "neuron_params", "weight", "#neurons", "#spikes"},
+          bench_index),
       m_pop(m_netw, 0),
       m_pop_source(cypress::PopulationBase(m_netw, 0))
 {
@@ -101,13 +103,15 @@ std::vector<cypress::Real> MaxInputOneToOne::evaluate()
 	return std::vector<cypress::Real>({avg, std_dev, max, min});
 }
 
-MaxInputAllToAll::MaxInputAllToAll(const std::string backend)
+MaxInputAllToAll::MaxInputAllToAll(const std::string backend,
+                                   size_t bench_index)
     : SNABBase(__func__, backend,
                {"Average number of sikes", "Standard deviation",
                 "Maximum #spikes", "Minimum #spikes"},
                {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
                {"neuron_type", "neuron_params", "weight", "#neurons", "#spikes",
-                "#input_neurons"}),
+                "#input_neurons"},
+               bench_index),
       m_pop(m_netw, 0),
       m_pop_source(cypress::PopulationBase(m_netw, 0))
 {
@@ -174,13 +178,15 @@ std::vector<cypress::Real> MaxInputAllToAll::evaluate()
 	return std::vector<cypress::Real>({avg, std_dev, max, min});
 }
 
-MaxInputFixedOutConnector::MaxInputFixedOutConnector(const std::string backend)
+MaxInputFixedOutConnector::MaxInputFixedOutConnector(const std::string backend,
+                                                     size_t bench_index)
     : SNABBase(__func__, backend,
                {"Average number of spikes", "Standard deviation",
                 "Maximum #spikes", "Minimum #spikes"},
                {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
                {"neuron_type", "neuron_params", "weight", "#neurons", "#spikes",
-                "#input_neurons", "#ConnectionsPerInput"}),
+                "#input_neurons", "#ConnectionsPerInput"},
+               bench_index),
       m_pop(m_netw, 0),
       m_pop_source(cypress::PopulationBase(m_netw, 0))
 {

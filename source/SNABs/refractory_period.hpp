@@ -40,7 +40,7 @@ private:
 	NeuronParameters m_neuro_params;
 
 public:
-	RefractoryPeriod(const std::string backend);
+	RefractoryPeriod(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;

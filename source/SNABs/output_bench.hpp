@@ -35,7 +35,7 @@ private:
 	cypress::PopulationBase m_pop;
 
 public:
-	OutputFrequencySingleNeuron(const std::string backend);
+	OutputFrequencySingleNeuron(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;
@@ -52,7 +52,7 @@ private:
 	std::vector<std::vector<cypress::Real>> m_spikes;
 
 public:
-	OutputFrequencySingleNeuron2(const std::string backend);
+	OutputFrequencySingleNeuron2(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;
@@ -70,7 +70,8 @@ private:
 	size_t m_num_neurons = 0;
 
 public:
-	OutputFrequencyMultipleNeurons(const std::string backend);
+	OutputFrequencyMultipleNeurons(const std::string backend,
+	                               size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;

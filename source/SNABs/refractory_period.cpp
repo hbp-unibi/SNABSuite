@@ -29,11 +29,12 @@
 #include "util/utilities.hpp"
 
 namespace SNAB {
-RefractoryPeriod::RefractoryPeriod(const std::string backend)
+RefractoryPeriod::RefractoryPeriod(const std::string backend,
+                                   size_t bench_index)
     : SNABBase(__func__, backend, {"Average deviation from refractory period",
                                    "Standard deviation"},
                {"quality", "quality"}, {"ms", "ms"},
-               {"neuron_type", "neuron_params", "weight"}),
+               {"neuron_type", "neuron_params", "weight"}, bench_index),
       m_pop(m_netw, 0),
       m_pop_source(cypress::PopulationBase(m_netw, 0))
 {

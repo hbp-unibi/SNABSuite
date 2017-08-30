@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include <unistd.h> // unlink file
+#include <unistd.h>  // unlink file
 
 #include <cypress/cypress.hpp>
 #include "common/snab_base.hpp"
@@ -126,7 +126,7 @@ void ParameterSweep::recover_broken_simulation()
 	if (!ss.good()) {
 		return;
 	}
-	
+
 	Json backup;
 	try {
 		backup = Json::parse(ss);
@@ -135,7 +135,7 @@ void ParameterSweep::recover_broken_simulation()
 		global_logger().info("SNABSuite",
 		                     "Backup file exists, but is corrupt! "
 		                     "Skipping recovery and overwriting old file");
-        return;
+		return;
 	}
 
 	// Check wether the backup is for the correct SNAB
@@ -186,13 +186,14 @@ void ParameterSweep::backup_simulation_results()
 	ss.close();
 }
 
-ParameterSweep::ParameterSweep(std::string backend, cypress::Json &config)
+ParameterSweep::ParameterSweep(std::string backend, cypress::Json &config,
+                               size_t bench_index)
     : m_backend(backend)
 {
 	std::string snab_name = config["snab_name"];
 	m_sweep_config = extract_backend(config, m_backend);
 	// Get the correct SNAB
-	auto snab_vec = snab_registry(m_backend);
+	auto snab_vec = snab_registry(m_backend, bench_index);
 	for (auto i : snab_vec) {
 		if (i->snab_name == snab_name) {
 			m_snab = i;
@@ -323,8 +324,8 @@ void ParameterSweep::write_csv()
 		ofs << "\n";
 	}
 	ofs.close();
-    
-    // Remove backup file
+
+	// Remove backup file
 	unlink((m_backend + "_bak.json").c_str());
 }
 

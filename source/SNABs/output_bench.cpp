@@ -32,12 +32,12 @@
 namespace SNAB {
 using cypress::global_logger;
 OutputFrequencySingleNeuron::OutputFrequencySingleNeuron(
-    const std::string backend)
-    : SNABBase(
-          __func__, backend,
-          {"Average frequency", "Standard deviation", "Maximum", "Minimum"},
-          {"quality", "quality", "quality", "quality"},
-          {"1/ms", "1/ms", "1/ms", "1/ms"}, {"neuron_type", "neuron_params"}),
+    const std::string backend, size_t bench_index)
+    : SNABBase(__func__, backend, {"Average frequency", "Standard deviation",
+                                   "Maximum", "Minimum"},
+               {"quality", "quality", "quality", "quality"},
+               {"1/ms", "1/ms", "1/ms", "1/ms"},
+               {"neuron_type", "neuron_params"}, bench_index),
       m_pop(m_netw, 0)
 {
 }
@@ -111,12 +111,12 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 }
 
 OutputFrequencySingleNeuron2::OutputFrequencySingleNeuron2(
-    const std::string backend)
+    const std::string backend, size_t bench_index)
     : SNABBase(__func__, backend, {"Average frequency", "Standard deviation",
                                    "Maximum", "Minimum"},
                {"quality", "quality", "quality", "quality"},
                {"1/ms", "1/ms", "1/ms", "1/ms"},
-               {"neuron_type", "neuron_params", "#neurons"}),
+               {"neuron_type", "neuron_params", "#neurons"}, bench_index),
       m_pop(m_netw, 0)
 {
 }
@@ -206,13 +206,13 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron2::evaluate()
 }
 
 OutputFrequencyMultipleNeurons::OutputFrequencyMultipleNeurons(
-    const std::string backend)
+    const std::string backend, size_t bench_index)
     : SNABBase(__func__, backend,
                {"Average frequency of neurons", "Standard deviation",
                 "Maximum av frequency", "Minimum av frequency"},
                {"quality", "quality", "quality", "quality"},
                {"1/ms", "1/ms", "1/ms", "1/ms"},
-               {"neuron_type", "neuron_params", "#neurons"}),
+               {"neuron_type", "neuron_params", "#neurons"}, bench_index),
       m_pop(m_netw, 0)
 {
 }

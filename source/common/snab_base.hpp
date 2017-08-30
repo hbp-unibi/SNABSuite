@@ -50,19 +50,23 @@ public:
 	 * Constructor which reads in platform specific config file
 	 * For description of the indicator_* initializers look into the comment of
 	 * their declaration below
-	 * @param name: name of the SNAB, and therefore of the config file
-	 * @param backend: string containing the simulation backend
-	 * @param indicator_names: names of benchmark indicators
-	 * @param indicator_types: types...
-	 * @param indicator_measures: measures...
-	 * @param required_parameters: list of parameters which are required in the
+	 * @param name name of the SNAB, and therefore of the config file
+	 * @param backend string containing the simulation backend
+	 * @param indicator_names names of benchmark indicators
+	 * @param indicator_types types...
+	 * @param indicator_measures measures...
+	 * @param required_parameters list of parameters which are required in the
 	 * JSON file, which should be checked before unnecessary building networks
+	 * @param bench_index in case of parameters to choose from (e.g. network
+	 * sizes for chip, board, wafer, ...) this is the corresponding index for
+	 * all arrays in config file
 	 */
 	SNABBase(std::string name, std::string backend,
 	         std::initializer_list<std::string> indicator_names,
 	         std::initializer_list<std::string> indicator_types,
 	         std::initializer_list<std::string> indicator_measures,
-	         std::initializer_list<std::string> required_parameters)
+	         std::initializer_list<std::string> required_parameters,
+	         size_t bench_index)
 	    : m_backend(backend),
 	      snab_name(name),
 	      indicator_names(indicator_names),
@@ -80,12 +84,23 @@ public:
 		    required_params) {
 			m_valid = true;
 		}
+		else {
+			return;
+		}
 
 		// Check for backend related setup config
 		if (m_config_file.find("setup") != m_config_file.end()) {
 			Utilities::manipulate_backend_string(m_backend,
 			                                     m_config_file["setup"]);
 			m_config_file.erase("setup");
+		}
+
+		bool changed = replace_arrays_by_value(m_config_file, bench_index);
+		if (!changed && bench_index != 0) {
+			cypress::global_logger().warn(
+			    "SNABSuite", name +
+			                     ": Benchmark index is not zero, but no "
+			                     "array was found in config file!");
 		}
 	};
 

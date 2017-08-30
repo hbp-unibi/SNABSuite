@@ -23,8 +23,8 @@
 
 #include <cypress/cypress.hpp>
 
-#include "common/snab_base.hpp"
 #include "common/neuron_parameters.hpp"
+#include "common/snab_base.hpp"
 
 namespace SNAB {
 /**
@@ -40,7 +40,7 @@ private:
 	cypress::Real simulation_length = 100;  // ms
 
 public:
-	MaxInputOneToOne(const std::string backend);
+	MaxInputOneToOne(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;
@@ -59,7 +59,7 @@ private:
 	cypress::Real simulation_length = 100;  // ms
 
 public:
-	MaxInputAllToAll(const std::string backend);
+	MaxInputAllToAll(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;
@@ -77,7 +77,7 @@ private:
 	cypress::Real simulation_length = 100;  // ms
 
 public:
-	MaxInputFixedOutConnector(const std::string backend);
+	MaxInputFixedOutConnector(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;

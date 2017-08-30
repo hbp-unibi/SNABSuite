@@ -36,14 +36,15 @@ void backup_wrapper_sig_handler(int i)
 	std::cout << "Caught signal " << i << std::endl;
 	sweep_pointer->backup_simulation_results();
 	std::cout << "Backup complete!" << std::endl;
-    std::abort();
+	std::abort();
 }
 
 int main(int argc, const char *argv[])
 {
-	if (argc != 4 && argc != 3 && !cypress::NMPI::check_args(argc, argv)) {
+	if ((argc < 3 || argc > 5) && !cypress::NMPI::check_args(argc, argv)) {
 		std::cout << "Usage: " << argv[0]
-		          << " <SIMULATOR> <SWEEP_CONFIG> [NMPI]" << std::endl;
+		          << " <SIMULATOR> <SWEEP_CONFIG> [bench_index] [NMPI]"
+		          << std::endl;
 		return 1;
 	}
 
@@ -65,6 +66,11 @@ int main(int argc, const char *argv[])
 		return 0;
 	}
 
+	size_t bench_index = 0;
+	if (isdigit(*argv[argc - 1])) {
+		bench_index = std::stoi(argv[argc - 1]);
+	}
+
 	// Open sweep config
 	std::ifstream ifs(argv[2]);
 	if (!ifs.good()) {
@@ -76,23 +82,21 @@ int main(int argc, const char *argv[])
 	// Suppress all logging
 	cypress::global_logger().min_level(cypress::LogSeverity::ERROR, 1);
 
-	ParameterSweep sweep(argv[1], json);
+	ParameterSweep sweep(argv[1], json, bench_index);
 
 	// Use customized signal handler to backup sweep
 	sweep_pointer = &sweep;
 	std::signal(SIGINT, backup_wrapper_sig_handler);
 
 	// Execute and evaluate
-    try
-    {
-        sweep.execute();
-    }
-    catch (std::exception e) 
-    {
-        sweep_pointer->backup_simulation_results();
-        std::cout << "Backup complete!" << std::endl;
-        throw e;
-    }
+	try {
+		sweep.execute();
+	}
+	catch (std::exception e) {
+		sweep_pointer->backup_simulation_results();
+		std::cout << "Backup complete!" << std::endl;
+		throw e;
+	}
 	sweep.write_csv();
 
 	return 0;

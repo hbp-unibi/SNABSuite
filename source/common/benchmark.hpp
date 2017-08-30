@@ -70,10 +70,11 @@ public:
 	 * Constructor which executes all registered benchmarks and gives the result
 	 * to std::cout and backend.json
 	 */
-	BenchmarkExec(std::string backend, std::string benchmark = "all")
+	BenchmarkExec(std::string backend, std::string benchmark = "all",
+	              size_t bench_index = 0)
 	    : m_backend(backend)
 	{
-		auto snab_vec = snab_registry(m_backend);
+		auto snab_vec = snab_registry(m_backend, bench_index);
 		for (auto i : snab_vec) {
 			if (i->valid() &&
 			    (benchmark == "all" || benchmark == i->snab_name)) {
@@ -88,7 +89,7 @@ public:
 		std::cout << results.dump(4) << std::endl;
 		{
 			std::fstream file;
-            file.open((backend + ".json").c_str(), std::fstream::out);
+			file.open((backend + ".json").c_str(), std::fstream::out);
 			file << results.dump(4) << std::endl;
 			file.close();
 		}

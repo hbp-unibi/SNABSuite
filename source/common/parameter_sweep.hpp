@@ -78,8 +78,11 @@ public:
 	 * config/ thus containing backend specific instructions. This json
 	 * structure should have arrays like [a,b,c] instead of a parameter value
 	 * to sweep from a to b in c steps.
+	 * @param bench_index: if the benchmark config contains several values like
+	 * different network sizes, this the entry id to choose
 	 */
-	ParameterSweep(std::string backend, cypress::Json &config);
+	ParameterSweep(std::string backend, cypress::Json &config,
+	               size_t bench_index = 0);
 
 	/**
 	 * Execution of the sweep simulations. Results are stored in m_results

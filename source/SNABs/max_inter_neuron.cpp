@@ -30,13 +30,15 @@
 #include "util/utilities.hpp"
 
 namespace SNAB {
-SingleMaxFreqToGroup::SingleMaxFreqToGroup(const std::string backend)
+SingleMaxFreqToGroup::SingleMaxFreqToGroup(const std::string backend,
+                                           size_t bench_index)
     : SNABBase(__func__, backend, {"Average spike number deviation",
                                    "Standard deviation", "Maximum", "Minimum"},
                {"quality", "quality", "quality", "quality"},
                {"1/ms", "1/ms", "1/ms", "1/ms"},
                {"neuron_type", "neuron_params_max", "neuron_params_group",
-                "weight", "#neurons"}),
+                "weight", "#neurons"},
+               bench_index),
       m_pop_single(m_netw, 0),
       m_pop_group(m_netw, 0)
 {
@@ -112,13 +114,15 @@ std::vector<cypress::Real> SingleMaxFreqToGroup::evaluate()
 	return std::vector<cypress::Real>({avg - spike_ref, max, min});
 }
 
-GroupMaxFreqToGroup::GroupMaxFreqToGroup(const std::string backend)
+GroupMaxFreqToGroup::GroupMaxFreqToGroup(const std::string backend,
+                                         size_t bench_index)
     : SNABBase(__func__, backend, {"Average spike number deviation",
                                    "Standard deviation", "Maximum", "Minimum"},
                {"quality", "quality", "quality", "quality"},
                {"1/ms", "1/ms", "1/ms", "1/ms"},
                {"neuron_type", "neuron_params_max", "neuron_params_group",
-                "weight", "#neurons"}),
+                "weight", "#neurons"},
+               bench_index),
       m_pop_max(m_netw, 0),
       m_pop_retr(m_netw, 0)
 {

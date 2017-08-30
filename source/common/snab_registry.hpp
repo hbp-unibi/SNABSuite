@@ -32,7 +32,8 @@ namespace SNAB {
  * A vector containing all SNABs/benchmarks which should be executed. The shared
  * pointer ensures that objects live 'long enough'
  */
-std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend);
+std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
+                                                     size_t bench_index);
 }
 
 #endif /* SNABSUITE_COMMON_SNAB_REGISTRY_HPP */
