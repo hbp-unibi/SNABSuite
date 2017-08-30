@@ -119,11 +119,15 @@ bool check_json_for_parameters(const std::vector<std::string> &parameters,
 	return true;
 }
 
-void replace_arrays_by_value(cypress::Json &json, const size_t &index)
+bool replace_arrays_by_value(cypress::Json &json, const size_t &index)
 {
+	bool anything_changed = false;
 	for (Json::iterator i = json.begin(); i != json.end(); ++i) {
 		if (i.value().is_object()) {
-			replace_arrays_by_value(i.value(), index);
+			bool temp = replace_arrays_by_value(i.value(), index);
+			if (!anything_changed && temp) {
+				anything_changed = true;
+			}
 		}
 		else if (i.value().is_array()) {
 			if (i.value().size() <= index) {
@@ -133,7 +137,9 @@ void replace_arrays_by_value(cypress::Json &json, const size_t &index)
 				    std::to_string(index));
 			}
 			i.value() = i.value()[index];
+			anything_changed = true;
 		}
 	}
+	return anything_changed;
 }
 }

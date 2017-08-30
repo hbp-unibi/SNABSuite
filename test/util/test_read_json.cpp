@@ -226,38 +226,48 @@ TEST(ReadJSON, replace_arrays_by_value)
 	std::stringstream ss(test_json);
 	cypress::Json json = cypress::Json::parse(ss);
 	cypress::Json json2 = json;
+    bool changed = false;
 
 	// Check that nothing is changed if there is no array
-	replace_arrays_by_value(json2);
+	changed = replace_arrays_by_value(json2);
+    EXPECT_FALSE(changed);
 	EXPECT_EQ(json, json2);
-	replace_arrays_by_value(json2, 2);
+	changed = replace_arrays_by_value(json2, 2);
+    EXPECT_FALSE(changed);
 	EXPECT_EQ(json, json2);
-	replace_arrays_by_value(json2, 3);
+	changed = replace_arrays_by_value(json2, 3);
+    EXPECT_FALSE(changed);
 	EXPECT_EQ(json, json2);
 
 	json2["data"]["n_bits_out"] = {100, 200, 300, 400};
-	replace_arrays_by_value(json2);
+	changed = replace_arrays_by_value(json2);
+    EXPECT_TRUE(changed);
 	EXPECT_EQ(json, json2);
 	json2["data"]["n_bits_out"] = {100, 200, 300, 400};
-	replace_arrays_by_value(json2, 1);
+	changed = replace_arrays_by_value(json2, 1);
+    EXPECT_TRUE(changed);
 	EXPECT_NE(json, json2);
 	EXPECT_EQ(200, json2["data"]["n_bits_out"]);
 
 	json2["data"]["n_bits_out"] = {100, 200, 300, 400};
-	replace_arrays_by_value(json2, 2);
+	changed = replace_arrays_by_value(json2, 2);
+    EXPECT_TRUE(changed);
 	EXPECT_EQ(300, json2["data"]["n_bits_out"]);
 
 	json2["new_key"] = {1, 3, 5, 28};
 	EXPECT_EQ(cypress::Json({1, 3, 5, 28}), json2["new_key"]);
-	replace_arrays_by_value(json2);
+	changed = replace_arrays_by_value(json2);
+    EXPECT_TRUE(changed);
 	EXPECT_EQ(1, json2["new_key"]);
 
 	json2["new_key"] = {1, 3, 5, 28};
-	replace_arrays_by_value(json2, 1);
+	changed = replace_arrays_by_value(json2, 1);
+    EXPECT_TRUE(changed);
 	EXPECT_EQ(3, json2["new_key"]);
 
 	json2["new_key"] = {1, 3, 5, 28};
-	replace_arrays_by_value(json2, 3);
+	changed = replace_arrays_by_value(json2, 3);
+    EXPECT_TRUE(changed);
 	EXPECT_EQ(28, json2["new_key"]);
     
     json2["new_key"] = {1, 3, 5, 28};

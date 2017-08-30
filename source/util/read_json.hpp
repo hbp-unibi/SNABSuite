@@ -133,8 +133,9 @@ std::vector<std::vector<T>> json_2Darray_to_vector(const cypress::Json &json)
  * Replaces all arrays in a json object with one entry of the same array
  * @param json object to be manipulated
  * @param index index of value used
+ * @return true if json was changed
  */
-void replace_arrays_by_value(cypress::Json &json, const size_t &index = 0);
+bool replace_arrays_by_value(cypress::Json &json, const size_t &index = 0);
 }
 
 #endif /* SNABSUITE_UTIL_READ_JSON_HPP */
