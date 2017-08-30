@@ -179,8 +179,8 @@ TEST(ReadJSON, json_array_to_vector)
 	EXPECT_NEAR(27.5555, vec2[11], 1e-8);
 
 	ASSERT_ANY_THROW(json_array_to_vector<double>(cypress::Json({{"foo", 3}})));
-    ASSERT_ANY_THROW(json_array_to_vector<double>(json_2Darray));
-    ASSERT_ANY_THROW(json_array_to_vector<double>(json_2Darray2));
+	ASSERT_ANY_THROW(json_array_to_vector<double>(json_2Darray));
+	ASSERT_ANY_THROW(json_array_to_vector<double>(json_2Darray2));
 }
 
 TEST(ReadJSON, json_2Darray_to_vector)
@@ -214,10 +214,50 @@ TEST(ReadJSON, json_2Darray_to_vector)
 	EXPECT_NEAR(5.3, vec2[3][0], 1e-8);
 	EXPECT_NEAR(33.0, vec2[3][1], 1e-8);
 	EXPECT_NEAR(27.5555, vec2[3][2], 1e-8);
-    
-    ASSERT_ANY_THROW(json_2Darray_to_vector<double>(cypress::Json({{"foo", 3}})));
-    ASSERT_ANY_THROW(json_2Darray_to_vector<double>(json_array));
-    ASSERT_ANY_THROW(json_2Darray_to_vector<double>(json_array2));
-    
+
+	ASSERT_ANY_THROW(
+	    json_2Darray_to_vector<double>(cypress::Json({{"foo", 3}})));
+	ASSERT_ANY_THROW(json_2Darray_to_vector<double>(json_array));
+	ASSERT_ANY_THROW(json_2Darray_to_vector<double>(json_array2));
+}
+
+TEST(ReadJSON, replace_arrays_by_value)
+{
+	std::stringstream ss(test_json);
+	cypress::Json json = cypress::Json::parse(ss);
+	cypress::Json json2 = json;
+
+	// Check that nothing is changed if there is no array
+	replace_arrays_by_value(json2);
+	EXPECT_EQ(json, json2);
+	replace_arrays_by_value(json2, 2);
+	EXPECT_EQ(json, json2);
+	replace_arrays_by_value(json2, 3);
+	EXPECT_EQ(json, json2);
+
+	json2["data"]["n_bits_out"] = {100, 200, 300, 400};
+	replace_arrays_by_value(json2);
+	EXPECT_EQ(json, json2);
+	json2["data"]["n_bits_out"] = {100, 200, 300, 400};
+	replace_arrays_by_value(json2, 1);
+	EXPECT_NE(json, json2);
+	EXPECT_EQ(200, json2["data"]["n_bits_out"]);
+
+	json2["data"]["n_bits_out"] = {100, 200, 300, 400};
+	replace_arrays_by_value(json2, 2);
+	EXPECT_EQ(300, json2["data"]["n_bits_out"]);
+
+	json2["new_key"] = {1, 3, 5, 28};
+	EXPECT_EQ(cypress::Json({1, 3, 5, 28}), json2["new_key"]);
+	replace_arrays_by_value(json2);
+	EXPECT_EQ(1, json2["new_key"]);
+
+	json2["new_key"] = {1, 3, 5, 28};
+	replace_arrays_by_value(json2, 1);
+	EXPECT_EQ(3, json2["new_key"]);
+
+	json2["new_key"] = {1, 3, 5, 28};
+	replace_arrays_by_value(json2, 3);
+	EXPECT_EQ(28, json2["new_key"]);
 }
 }
