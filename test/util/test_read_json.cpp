@@ -247,30 +247,30 @@ TEST(ReadJSON, replace_arrays_by_value)
 	changed = replace_arrays_by_value(json2, 1);
     EXPECT_TRUE(changed);
 	EXPECT_NE(json, json2);
-	EXPECT_EQ(200, json2["data"]["n_bits_out"]);
+	EXPECT_EQ(200, int(json2["data"]["n_bits_out"]));
 
 	json2["data"]["n_bits_out"] = {100, 200, 300, 400};
 	changed = replace_arrays_by_value(json2, 2);
     EXPECT_TRUE(changed);
-	EXPECT_EQ(300, json2["data"]["n_bits_out"]);
+	EXPECT_EQ(300, int(json2["data"]["n_bits_out"]));
 
 	json2["new_key"] = {1, 3, 5, 28};
 	EXPECT_EQ(cypress::Json({1, 3, 5, 28}), json2["new_key"]);
 	changed = replace_arrays_by_value(json2);
     EXPECT_TRUE(changed);
-	EXPECT_EQ(1, json2["new_key"]);
+	EXPECT_EQ(1, int(json2["new_key"]));
 
 	json2["new_key"] = {1, 3, 5, 28};
 	changed = replace_arrays_by_value(json2, 1);
     EXPECT_TRUE(changed);
-	EXPECT_EQ(3, json2["new_key"]);
+	EXPECT_EQ(3, int(json2["new_key"]));
 
 	json2["new_key"] = {1, 3, 5, 28};
 	changed = replace_arrays_by_value(json2, 3);
     EXPECT_TRUE(changed);
-	EXPECT_EQ(28, json2["new_key"]);
+	EXPECT_EQ(28, int(json2["new_key"]));
     
     json2["new_key"] = {1, 3, 5, 28};
-    EXPECT_ANY_THROW(replace_arrays_by_value(json2, 4));
+    ASSERT_ANY_THROW(replace_arrays_by_value(json2, 4));
 }
 }
