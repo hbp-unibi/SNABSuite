@@ -16,6 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -57,7 +58,8 @@ cypress::Network &RefractoryPeriod::build_netw(cypress::Network &netw)
 	// 10 input neurons with spike times
 	m_pop_source = netw.create_population<SpikeSourceArray>(10);
 	for (auto i : m_pop_source) {
-		i.parameters().spike_times({10, 30, 50, 70, 90, 110, 130});
+		i.parameters().spike_times(
+		    {10, 30, 50, 70, 90, 110, 130, 150, 170, 190});
 	}
 	netw.add_connection(
 	    m_pop_source, m_pop,
@@ -67,18 +69,11 @@ cypress::Network &RefractoryPeriod::build_netw(cypress::Network &netw)
 
 void RefractoryPeriod::run_netw(cypress::Network &netw)
 {
-	// Debug logger, may be ignored in the future
-	netw.logger().min_level(cypress::DEBUG, 0);
-
-	if (m_backend == "spikey") {
-		m_backend.append("={\"calibIcb\": 1}");
-	}
-
 	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
 	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
-	netw.run(pwbackend, 150.0);
+	netw.run(pwbackend, 250.0);
 }
 
 std::vector<cypress::Real> RefractoryPeriod::evaluate()
@@ -89,7 +84,7 @@ std::vector<cypress::Real> RefractoryPeriod::evaluate()
 	std::vector<cypress::Real> ends;
 	cypress::Real v_reset = m_neuro_params.get("v_reset");
 	cypress::Real ref_per = m_neuro_params.get("tau_refrac");
-	cypress::Real tolerance = 1.0;  // in mV
+	cypress::Real tolerance = 0.5;  // in mV
 	bool started = false;
 
 	// Check if backend spiked at all
@@ -97,7 +92,9 @@ std::vector<cypress::Real> RefractoryPeriod::evaluate()
 		std::cerr
 		    << "Refractory period could not be measured! Adjust parameters."
 		    << std::endl;
-		return std::vector<cypress::Real>();
+		return std::vector<cypress::Real>({
+		    std::numeric_limits<cypress::Real>::quiet_NaN(),
+		    std::numeric_limits<cypress::Real>::quiet_NaN()});
 	}
 
 	// Gather start and end points of the refractory periods by running through
