@@ -89,7 +89,9 @@ public:
 		std::cout << results.dump(4) << std::endl;
 		{
 			std::fstream file;
-			file.open((backend + ".json").c_str(), std::fstream::out);
+			file.open(
+			    (backend + "_" + std::to_string(bench_index) + ".json").c_str(),
+			    std::fstream::out);
 			file << results.dump(4) << std::endl;
 			file.close();
 		}
