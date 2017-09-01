@@ -54,7 +54,7 @@ int main(int argc, const char *argv[])
 	cypress::global_logger().min_level(cypress::LogSeverity::DEBUG, 1);
 
 	std::string snab_name = "all";
-	if (argc > 2 && std::string(argv[2]) != "NMPI") {
+	if (argc > 2 && std::string(argv[2]) != "NMPI" && !isdigit(*argv[2])) {
 		snab_name = std::string(argv[2]);
 	}
 	BenchmarkExec bench(std::string(argv[1]), snab_name, bench_index);
