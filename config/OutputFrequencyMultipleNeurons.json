@@ -11,7 +11,7 @@
 			"tau_m": 10,
 			"cm": 0.2
 		},
-		"#neurons" : 1600
+		"#neurons" : [255,4080,16320]
 	},
 	"spikey" : {
 		"setup" : {"calibIcb" : 1},
@@ -24,7 +24,7 @@
 			"v_reset": -80.0,
 			"e_rev_I": -80.0
 		},
-		"#neurons" : 384
+		"#neurons" : [192,384]
 	},
 	"nest" : {
 		"neuron_type" : "IF_cond_exp",
@@ -38,7 +38,7 @@
 			"tau_m": 1,
 			"cm": 0.2
 		},
-		"#neurons" : 1600
+		"#neurons" : [100, 1000, 10000]
 	},
 	"nmpm1" : {
 		"neuron_type" : "IF_cond_exp",
@@ -56,6 +56,6 @@
 			"tau_m": 0.1,
 			"cm": 0.2
 		},
-		"#neurons" : 85
+		"#neurons" : [85, 160]
 	}
 }

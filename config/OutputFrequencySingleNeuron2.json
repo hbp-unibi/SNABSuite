@@ -12,7 +12,7 @@
 			"tau_m": 10,
 			"cm": 0.2
 		},
-		"#neurons" : 1600
+		"#neurons" : [255,4080,16320]
 	},
 	"spikey" : {
         "setup" : {"calibIcb" : 1},
@@ -39,7 +39,7 @@
 			"tau_m": 1,
 			"cm": 0.2
 		},
-		"#neurons" : 1600
+		"#neurons" : [100,1000,10000]
 	},
 	"nmpm1" : {
 		"neuron_type" : "IF_cond_exp",
