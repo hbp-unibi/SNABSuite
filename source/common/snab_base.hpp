@@ -101,6 +101,7 @@ public:
 			    "SNABSuite", name +
 			                     ": Benchmark index is not zero, but no "
 			                     "array was found in config file!");
+			m_valid = false;
 		}
 	};
 
