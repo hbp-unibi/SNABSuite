@@ -23,15 +23,18 @@ Plots data from one dimensional sweeps
 import argparse
 
 parser = argparse.ArgumentParser(description='Plot one-dimensional graphs')
+
+# Optional arguments
 parser.add_argument("-nx", help="normalize x-values",  action="store_true")
 parser.add_argument("-ny", help="normalize y-values", action="store_true")
-parser.add_argument("--ymin", help="minimal y-value")
-parser.add_argument("--ymax", help="maximal y-value")
-parser.add_argument("-y", type=int, required=True, help="Column of y-values")
-parser.add_argument("-x", type=int, help="Column of x-values", default=0)
-
+parser.add_argument("--ymin", type=float, help="minimal y-value")
+parser.add_argument("--ymax", type=float, help="maximal y-value")
 parser.add_argument(
     "-ys", type=int, help="Column of std-deviation of y-values")
+parser.add_argument("-x", type=int, help="Column of x-values", default=0)
+
+# Required Parameters
+parser.add_argument("-y", type=int, required=True, help="Column of y-values")
 parser.add_argument("files", metavar="files", nargs='+', help="files to plot")
 
 args = parser.parse_args()
