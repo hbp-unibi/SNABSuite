@@ -69,6 +69,7 @@ SIMULATOR_LABELS = {
     "spikey": "Spikey",
     "nest": "NEST",
     "pynn": "NEST",
+    "pynn.nest": "NEST",
 }
 
 # Colors for all simulators
@@ -81,4 +82,5 @@ SIMULATOR_COLORS = {
     "spikey": "#cc0000",
     "nest": "#3465a4",
     "pynn": "#3465a4",
+    "pynn.nest": "#3465a4",
 }
