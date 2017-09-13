@@ -11,7 +11,8 @@
 			"tau_m": 1,
 			"cm": 0.2
 		}, 
-		"weight" : 0.01
+		"weight" : 0.01,
+		"tolerance" : 0.5
 	},
 
 	"nest" : {
@@ -26,7 +27,8 @@
 			"tau_m": 1,
 			"cm": 0.2
 		}, 
-		"weight" : 0.008
+		"weight" : 0.008,
+		"tolerance" : 0.5
 	},
 	"spikey" : {
 		"neuron_type" : "IfFacetsHardware1",
@@ -38,6 +40,26 @@
 			"v_reset": -80.0,
 			"e_rev_I": 0.0
 		}, 
-		"weight" : 0.002
-	}
+		"weight" : 0.002,
+		"tolerance" : 1.0
+	},
+	"nmpm1" : {
+		"setup": {
+			"neuron_size" : 2
+		},
+		"neuron_type" : "IF_cond_exp",
+			"neuron_params": {
+				"e_rev_E": 0.0,
+				"e_rev_I": -100.0,
+				"v_rest": -65.0,
+				"v_reset": -80.0,
+				"v_thresh": -60.0,
+				"tau_syn_E": 2.0,
+				"tau_refrac": 5.0,
+				"tau_m": 1.0,
+				"cm": 0.2
+			},
+		"weight" : 0.028,
+		"tolerance" : 1.0
+		}
 }

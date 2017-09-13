@@ -32,10 +32,11 @@
 namespace SNAB {
 RefractoryPeriod::RefractoryPeriod(const std::string backend,
                                    size_t bench_index)
-    : SNABBase(__func__, backend, {"Average deviation from refractory period",
-                                   "Standard deviation"},
-               {"quality", "quality"}, {"ms", "ms"},
-               {"neuron_type", "neuron_params", "weight"}, bench_index),
+    : SNABBase(
+          __func__, backend,
+          {"Average deviation from refractory period", "Standard deviation"},
+          {"quality", "quality"}, {"ms", "ms"},
+          {"neuron_type", "neuron_params", "weight", "tolerance"}, bench_index),
       m_pop(m_netw, 0),
       m_pop_source(cypress::PopulationBase(m_netw, 0))
 {
@@ -44,6 +45,7 @@ cypress::Network &RefractoryPeriod::build_netw(cypress::Network &netw)
 {
 	std::string neuron_type_str = m_config_file["neuron_type"];
 	auto &neuro_type = SpikingUtils::detect_type(neuron_type_str);
+    m_tolerance = m_config_file["tolerance"];
 
 	// Get neuron neuron_parameters
 	m_neuro_params =
@@ -84,7 +86,6 @@ std::vector<cypress::Real> RefractoryPeriod::evaluate()
 	std::vector<cypress::Real> ends;
 	cypress::Real v_reset = m_neuro_params.get("v_reset");
 	cypress::Real ref_per = m_neuro_params.get("tau_refrac");
-	cypress::Real tolerance = 0.5;  // in mV
 	bool started = false;
 
 	std::vector<cypress::Real> diffs;
@@ -95,11 +96,11 @@ std::vector<cypress::Real> RefractoryPeriod::evaluate()
 		// through
 		// the voltage trace
 		for (size_t i = 0; i < voltage.rows(); i++) {
-			if (!started && voltage(i, 1) < v_reset + tolerance) {
+			if (!started && voltage(i, 1) < v_reset + m_tolerance) {
 				started = true;
 				starts.emplace_back(voltage(i, 0));
 			}
-			else if (started && voltage(i, 1) > v_reset + tolerance) {
+			else if (started && voltage(i, 1) > v_reset + m_tolerance) {
 				ends.emplace_back(voltage(i - 1, 0));
 				started = false;
 				i += 10;

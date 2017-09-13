@@ -36,6 +36,7 @@ namespace SNAB {
 class RefractoryPeriod : public SNABBase {
 private:
 	cypress::PopulationBase m_pop;
+    cypress::Real m_tolerance = 1.0;
 	cypress::Population<cypress::SpikeSourceArray> m_pop_source;
 	NeuronParameters m_neuro_params;
 
