@@ -87,32 +87,27 @@ std::vector<cypress::Real> RefractoryPeriod::evaluate()
 	cypress::Real tolerance = 0.5;  // in mV
 	bool started = false;
 
-	// Check if backend spiked at all
-	if (spike_time.size() == 0) {
-		std::cerr
-		    << "Refractory period could not be measured! Adjust parameters."
-		    << std::endl;
-		return std::vector<cypress::Real>({
-		    std::numeric_limits<cypress::Real>::quiet_NaN(),
-		    std::numeric_limits<cypress::Real>::quiet_NaN()});
-	}
+	std::vector<cypress::Real> diffs;
 
-	// Gather start and end points of the refractory periods by running through
-	// the voltage trace
-	for (size_t i = 0; i < voltage.rows(); i++) {
-		if (!started && voltage(i, 1) < v_reset + tolerance) {
-			started = true;
-			starts.emplace_back(voltage(i, 0));
-		}
-		else if (started && voltage(i, 1) > v_reset + tolerance) {
-			ends.emplace_back(voltage(i - 1, 0));
-			started = false;
-			i += 10;
+	// Check if backend spiked at all
+	if (spike_time.size() != 0) {
+		// Gather start and end points of the refractory periods by running
+		// through
+		// the voltage trace
+		for (size_t i = 0; i < voltage.rows(); i++) {
+			if (!started && voltage(i, 1) < v_reset + tolerance) {
+				started = true;
+				starts.emplace_back(voltage(i, 0));
+			}
+			else if (started && voltage(i, 1) > v_reset + tolerance) {
+				ends.emplace_back(voltage(i - 1, 0));
+				started = false;
+				i += 10;
+			}
 		}
 	}
 
 	// Calculate periods
-	std::vector<cypress::Real> diffs;
 	for (size_t i = 0; i < ends.size(); i++) {
 		diffs.emplace_back(ends[i] - starts[i] - ref_per);
 	}
@@ -129,6 +124,15 @@ std::vector<cypress::Real> RefractoryPeriod::evaluate()
 	                               "RefractoryPeriod_spike_time.csv");
 	Utilities::write_vector_to_csv(diffs, "RefractoryPeriod_periods.csv");
 #endif
+
+	if (spike_time.size() == 0) {
+		std::cerr
+		    << "Refractory period could not be measured! Adjust parameters."
+		    << std::endl;
+		return std::vector<cypress::Real>(
+		    {std::numeric_limits<cypress::Real>::quiet_NaN(),
+		     std::numeric_limits<cypress::Real>::quiet_NaN()});
+	}
 
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;
