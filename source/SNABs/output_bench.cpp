@@ -16,7 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <algorithm>  // Minimal and Maximal element
-#include <numeric>    // std::accumulate
+#include <limits>
+#include <numeric>  // std::accumulate
 #include <string>
 #include <vector>
 
@@ -31,13 +32,16 @@
 
 namespace SNAB {
 using cypress::global_logger;
+auto NaN = std::numeric_limits<cypress::Real>::quiet_NaN;
+
 OutputFrequencySingleNeuron::OutputFrequencySingleNeuron(
     const std::string backend, size_t bench_index)
-    : SNABBase(__func__, backend, {"Average frequency", "Standard deviation",
-                                   "Maximum", "Minimum"},
-               {"quality", "quality", "quality", "quality"},
-               {"1/ms", "1/ms", "1/ms", "1/ms"},
-               {"neuron_type", "neuron_params"}, bench_index),
+    : SNABBase(
+          __func__, backend,
+          {"Average frequency", "Standard deviation", "Maximum", "Minimum"},
+          {"quality", "quality", "quality", "quality"},
+          {"1/ms", "1/ms", "1/ms", "1/ms"}, {"neuron_type", "neuron_params"},
+          bench_index),
       m_pop(m_netw, 0)
 {
 }
@@ -101,7 +105,7 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 		}
 	}
 	if (frequencies.size() == 0) {
-		frequencies.push_back(0.0);
+		return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
 	}
 
 	// Calculate statistics
@@ -112,11 +116,12 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 
 OutputFrequencySingleNeuron2::OutputFrequencySingleNeuron2(
     const std::string backend, size_t bench_index)
-    : SNABBase(__func__, backend, {"Average frequency", "Standard deviation",
-                                   "Maximum", "Minimum"},
-               {"quality", "quality", "quality", "quality"},
-               {"1/ms", "1/ms", "1/ms", "1/ms"},
-               {"neuron_type", "neuron_params", "#neurons"}, bench_index),
+    : SNABBase(
+          __func__, backend,
+          {"Average frequency", "Standard deviation", "Maximum", "Minimum"},
+          {"quality", "quality", "quality", "quality"},
+          {"1/ms", "1/ms", "1/ms", "1/ms"},
+          {"neuron_type", "neuron_params", "#neurons"}, bench_index),
       m_pop(m_netw, 0)
 {
 }
@@ -167,13 +172,14 @@ void OutputFrequencySingleNeuron2::run_netw(cypress::Network &netw)
 std::vector<cypress::Real> OutputFrequencySingleNeuron2::evaluate()
 {
 	if (m_spikes.size() == 0) {
-
 		return std::vector<cypress::Real>({0, 0, 0, 0});
 	}
+	bool did_spike = false;
 	std::vector<cypress::Real> mean_freq;
 	for (size_t i = 0; i < m_spikes.size(); i++) {
 		std::vector<cypress::Real> frequencies;
 		for (int j = 0; j < int(m_spikes[i].size()) - 1; j++) {
+            did_spike = true;
 			if (m_spikes[i][j] > 50) {
 				// Workaround for a Bug in BrainScaleS
 				if (m_spikes[i][j + 1] == m_spikes[i][j]) {
@@ -198,7 +204,9 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron2::evaluate()
 	Utilities::write_vector_to_csv(
 	    mean_freq, "OutputFrequencySingleNeuron2_mean_freq.csv");
 #endif
-
+    if(!did_spike){
+        return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
+    }
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;
 	Utilities::calculate_statistics(mean_freq, min, max, avg, std_dev);
@@ -251,6 +259,7 @@ std::vector<cypress::Real> OutputFrequencyMultipleNeurons::evaluate()
 {
 	// Gather the average frequency of every neuron
 	std::vector<cypress::Real> averages(m_num_neurons, -1);
+    bool did_spike = false;
 	for (size_t i = 0; i < m_num_neurons; i++) {
 		// Vector of frequencies
 		std::vector<cypress::Real> frequencies;
@@ -259,6 +268,7 @@ std::vector<cypress::Real> OutputFrequencyMultipleNeurons::evaluate()
 		auto spikes = m_pop[i].signals().data(0);
 		// Calculate frequencies
 		if (spikes.size() > 1) {
+            did_spike = true;
 
 			for (size_t i = 0; i < spikes.size() - 1; i++) {
 				if (spikes[i] > 50) {
@@ -291,6 +301,9 @@ std::vector<cypress::Real> OutputFrequencyMultipleNeurons::evaluate()
 	Utilities::write_vector_to_csv(
 	    averages, "OutputFrequencyMultipleNeurons_averages.csv");
 #endif
+    if(!did_spike){
+        return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
+    }
 
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;
