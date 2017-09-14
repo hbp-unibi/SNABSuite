@@ -22,6 +22,7 @@
 #define SNABSUITE_UTIL_READ_JSON_HPP
 
 #include <fstream>
+#include <limits>
 #include <map>
 #include <string>
 #include <vector>
@@ -106,7 +107,12 @@ std::vector<T> json_array_to_vector(const cypress::Json &json)
 	}
 	std::vector<T> res;
 	for (auto i : json) {
-		res.push_back(T(i));
+		if (i.is_null()) {
+			res.push_back(std::numeric_limits<T>::quiet_NaN());
+		}
+		else {
+			res.push_back(T(i));
+		}
 	}
 	return res;
 }
