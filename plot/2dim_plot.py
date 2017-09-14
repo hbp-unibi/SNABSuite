@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #   SNABSuite -- Spiking Neural Architecture Benchmark Suite
-#   Copyright (C) 2015 Andreas Stöckel, Christoph Jenzen
+#   Copyright (C) 2017 Andreas Stöckel, Christoph Jenzen
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -43,7 +43,8 @@ args = parser.parse_args()
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colorbar
-import sys, os
+import sys
+import os
 from dim_labels import *
 
 
@@ -88,6 +89,8 @@ def plot_measure2d(xs, ys, zs, xlabel, ylabel, zlabel="", zmin=None,
         zmin = np.min(zs[idcs])
         if 0 < zmin < 1:
             zmin = 0
+        else:
+            zmin = int(zmin)
     if zmax is None:
         zmax = round_to_divisable(np.max(zs[idcs]), args.nl - 1) + zmin
         if 0 < zmax < 1:
@@ -132,11 +135,14 @@ for target_file in args.files:
     for i in xrange(0, len(results)):
         data[i] = np.array(list(results[i]))
 
-    fig = plot_measure2d(data[:, 0], data[:, 1], data[:, args.z], xlabel=get_label(
-        keys[0]), ylabel=get_label(keys[1]), zlabel=get_label(keys[args.z]), zmin=args.zmin, zmax=args.zmax, qualitative=args.q, contour=args.c)
+    fig = plot_measure2d(data[:, 0], data[:, 1], data[:, args.z],
+                         xlabel=get_label(keys[0]), ylabel=get_label(keys[1]),
+                         zlabel=get_label(keys[args.z]), zmin=args.zmin,
+                         zmax=args.zmax, qualitative=args.q, contour=args.c)
 
     if target_file.split('/')[-2]:
-        fig.savefig("images/" + target_file.split('/')[-2] + "_" + target_file.split('/')[-1] + ".pdf", format='pdf',
+        fig.savefig("images/" + target_file.split('/')[-2] + "_" +
+                    target_file.split('/')[-1] + ".pdf", format='pdf',
                     bbox_inches='tight')
     else:
         fig.savefig("images/" + target_file.split('/')[-1] + ".pdf", format='pdf',
