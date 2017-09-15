@@ -102,7 +102,7 @@ cypress::Json extract_backend(const cypress::Json &config,
 template <typename T>
 std::vector<T> json_array_to_vector(const cypress::Json &json)
 {
-	if (!json.is_array() || json[0].is_array()) {
+	if (!json.is_array() || json.size() == 0 || json[0].is_array()) {
 		throw std::invalid_argument("Error in conversion from Json to array!");
 	}
 	std::vector<T> res;

@@ -137,7 +137,6 @@ void ParameterSweep::recover_broken_simulation()
 		                     "Skipping recovery and overwriting old file");
 		return;
 	}
-
 	// Check wether the backup is for the correct SNAB
 	if (backup["snab"] != m_snab->snab_name) {
 		global_logger().info("SNABSuite",
@@ -163,6 +162,13 @@ void ParameterSweep::recover_broken_simulation()
 		return;
 	}
 
+	if (backup["jobs_done"].size() == 0) {
+		global_logger().info("SNABSuite",
+		                     "Empty backup file! Skipping "
+		                     "recovery and overwriting old file");
+		return;
+	}
+
 	// Recover data
 	m_indices = json_array_to_vector<size_t>(backup["indices"]);
 	m_results = json_2Darray_to_vector<cypress::Real>(backup["results"]);
@@ -173,6 +179,12 @@ void ParameterSweep::recover_broken_simulation()
 
 void ParameterSweep::backup_simulation_results()
 {
+	if (m_jobs_done.size() == 0) {
+		global_logger().info("SNABSuite",
+		                     "No simulation finished! Skipping backup.");
+		return;
+	}
+
 	// Put together the backup of all important data
 	Json backup;
 	backup["snab"] = m_snab->snab_name;
