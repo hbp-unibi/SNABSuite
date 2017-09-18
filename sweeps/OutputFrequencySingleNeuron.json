@@ -24,8 +24,8 @@
 	"nmpm1" : {
 		"neuron_type" : "IF_cond_exp",
 		"neuron_params": {
-			"v_reset": [-100,-55,20],
-			"v_thresh": [-100,-55,20]
+			"v_reset": [-100,-55,40],
+			"v_thresh": [-100,-55,40]
 		}
 	}
 }

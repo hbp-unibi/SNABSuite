@@ -1,0 +1,15 @@
+{
+    "snab_name" : "RefractoryPeriod",
+    "spikey" : {
+        "weight" : [0.001, 0.015,40]
+    },
+    "spinnaker" : {
+        "weight" : [0.001, 0.015,40]
+    },
+    "nest" : {
+        "weight" : [0.001, 0.015,40]
+    },
+    "nmpm1" : {
+        "weight" : [0.003, 0.03,30]
+    }
+}
