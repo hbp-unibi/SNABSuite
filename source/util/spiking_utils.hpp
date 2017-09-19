@@ -34,8 +34,9 @@ public:
 	template <typename T>
 	static cypress::PopulationBase add_typed_population(
 	    Network &network, const NeuronParameters &neuronParams,
-	    const size_t size, const typename T::Signals &rec_signal =
-	                           typename T::Signals().record_spikes());
+	    const size_t size,
+	    const typename T::Signals &rec_signal =
+	        typename T::Signals().record_spikes());
 
 	/**
 	 * Creates a population of type @param T and adds them to m_net without
@@ -56,8 +57,19 @@ public:
 	    const std::string neuron_type_str, Network &network,
 	    const NeuronParameters &neuronParams, const size_t size,
 	    const std::string record_signal = "spikes");
+
+	/**
+	 * Tries to run the simulation on given backend several times if backend
+	 * produces an unexpected error (needed for e.g. BrainScaleS).
+	 * @param network network object to simulate
+	 * @param backend target of the simulation
+	 * @param time simulation time
+	 * @param n_trials number of trials before giving up
+	 * @return true if simulation was succesful
+	 */
+	static bool rerun_fixed_number_trials(Network &network, Backend &backend,
+	                                      Real time, size_t n_trials = 3);
 };
 }
 
 #endif /* SNAB_UTIL_SPIKING_UTILS_HPP */
-

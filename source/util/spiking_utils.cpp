@@ -64,15 +64,16 @@ PopulationBase SpikingUtils::add_population(
 {
 	if (record_signal == "") {
 		if (neuron_type_str == "IF_cond_exp") {
-			return add_typed_population_no_record<IfCondExp>(network, neuronParams, size);
+			return add_typed_population_no_record<IfCondExp>(
+			    network, neuronParams, size);
 		}
 		else if (neuron_type_str == "IfFacetsHardware1") {
-			return add_typed_population_no_record<IfFacetsHardware1>(network,
-			                                               neuronParams, size);
+			return add_typed_population_no_record<IfFacetsHardware1>(
+			    network, neuronParams, size);
 		}
 		else if (neuron_type_str == "AdExp") {
-			return add_typed_population_no_record<EifCondExpIsfaIsta>(network,
-			                                                neuronParams, size);
+			return add_typed_population_no_record<EifCondExpIsfaIsta>(
+			    network, neuronParams, size);
 		}
 	}
 	if (neuron_type_str == "IF_cond_exp") {
@@ -91,5 +92,23 @@ PopulationBase SpikingUtils::add_population(
 	}
 
 	throw CypressException("Invalid neuron type \"" + neuron_type_str + "\"");
+}
+
+bool SpikingUtils::rerun_fixed_number_trials(Network &network, Backend &backend,
+                                             Real time, size_t n_trials)
+{
+	for (size_t i = 0; i < n_trials; i++) {
+		try {
+			network.run(backend, time);
+			return true;
+		}
+		catch (const std::exception &exc) {
+			std::cerr << exc.what();
+			global_logger().fatal_error("SNABSuite",
+			                            "Wrong parameter setting or backend "
+			                            "error! Simulation broke down");
+		}
+	}
+	return false;
 }
 }

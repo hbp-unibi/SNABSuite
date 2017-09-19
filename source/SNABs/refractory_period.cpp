@@ -30,6 +30,7 @@
 #include "util/utilities.hpp"
 
 namespace SNAB {
+using cypress::global_logger;
 RefractoryPeriod::RefractoryPeriod(const std::string backend,
                                    size_t bench_index)
     : SNABBase(
@@ -45,7 +46,7 @@ cypress::Network &RefractoryPeriod::build_netw(cypress::Network &netw)
 {
 	std::string neuron_type_str = m_config_file["neuron_type"];
 	auto &neuro_type = SpikingUtils::detect_type(neuron_type_str);
-    m_tolerance = m_config_file["tolerance"];
+	m_tolerance = m_config_file["tolerance"];
 
 	// Get neuron neuron_parameters
 	m_neuro_params =
@@ -75,7 +76,7 @@ void RefractoryPeriod::run_netw(cypress::Network &netw)
 	cypress::PowerManagementBackend pwbackend(
 	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
-	netw.run(pwbackend, 250.0);
+	SpikingUtils::rerun_fixed_number_trials(netw, pwbackend, 250, 3);
 }
 
 std::vector<cypress::Real> RefractoryPeriod::evaluate()
@@ -127,9 +128,9 @@ std::vector<cypress::Real> RefractoryPeriod::evaluate()
 #endif
 
 	if (spike_time.size() == 0) {
-		std::cerr
-		    << "Refractory period could not be measured! Adjust parameters."
-		    << std::endl;
+		global_logger().warn(
+		    "SNABSuite",
+		    "Refractory period could not be measured! Adjust parameters.");
 		return std::vector<cypress::Real>(
 		    {std::numeric_limits<cypress::Real>::quiet_NaN(),
 		     std::numeric_limits<cypress::Real>::quiet_NaN()});
