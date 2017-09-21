@@ -110,18 +110,18 @@ public:
 	 * external network, you should use the first version of building (and the
 	 * corresponding run function), for the member network use the second
 	 * function. The implementation is contained in the first one.
-	 * @param network: External network SNAB/benchmark will be constructed in
+	 * @param network External network SNAB/benchmark will be constructed in
 	 */
-	virtual cypress::Network &build_netw(cypress::Network &netw) = 0;
+	virtual cypress::Network &build_netw(cypress::Network &network) = 0;
 	cypress::Network &build() { return build_netw(m_netw); };
 
 	/**
 	 * Execution of the benchmark on the simulation platform. Similar to the
 	 * build function, the first function contains the implementation, while the
 	 * second simply uses the first with member networks.
-	 * @param network: External network SNAB/benchmark will be constructed in
+	 * @param network External network SNAB/benchmark will be constructed in
 	 */
-	virtual void run_netw(cypress::Network &netw) = 0;
+	virtual void run_netw(cypress::Network &network) = 0;
 	void run() { run_netw(m_netw); };
 
 	/**
@@ -132,19 +132,23 @@ public:
 	/**
 	 * For formatting the output in the correct structure introduced in the SP9
 	 * Guidebook, the evaluation process needs the exact order of the names,
-	 * types
-	 * and measures of the results returned from the function @evaluate().
-	 * 'indicator_names' should be unique for the measurement and represent the
-	 * idea of the value
-	 * 'indicator_types' can be e.g. "quality", "performance", "energy
-	 * consumption"
-	 * 'indicator_measures' should be the "type of the measurement", therefore
-	 * the unit of the value
-	 * @param i: enumerates the names, measures and types. For the same value
-	 * these should be related
+	 * types and measures of the results returned from the function
+	 * SNABBase::evaluate().
+	 * indicator_names should be unique for the measurement and represent
+	 * the idea of the value
 	 */
 	const std::vector<std::string> indicator_names;
+    
+    /**
+     * indicator_types can be e.g. "quality", "performance", "energy
+	 * consumption". See also SNABBase::indicator_names.
+     */
 	const std::vector<std::string> indicator_types;
+    
+    /**
+     * indicator_measures should be the "type of the measurement",
+	 * therefore the unit of the value. See also SNABBase::indicator_names.
+     */
 	const std::vector<std::string> indicator_measures;
 
 	/**

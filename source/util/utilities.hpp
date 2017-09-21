@@ -40,9 +40,13 @@ using cypress::Json;
 class Utilities {
 public:
 	/**
-	 * Splits a string @param s into parts devided by @param delim and stores
-	 * the
-	 * result in @param elems and returns it
+	 * Splits a string s into parts devided by delim and stores
+	 * the result in elems and returns it
+	 *
+	 * @param s string to be splitted
+	 * @param delim char which seperated the strings
+	 * @param elems container in which result is appended at the end
+	 * @return the new elems
 	 */
 	static std::vector<std::string> &split(const std::string &s, char delim,
 	                                       std::vector<std::string> &elems)
@@ -56,7 +60,10 @@ public:
 	}
 
 	/**
-	 * The same as above, but only returning the vector.
+	 * The same as Utilities::split, but only returning the vector.
+	 *
+	 * @param s string to be splitted
+	 * @param delim char which seperated the strings
 	 */
 	static std::vector<std::string> split(const std::string &s, char delim)
 	{
@@ -84,9 +91,10 @@ public:
 	 * Calculating statistics of a vector, using an estimator for std_dev
 	 * (sample covariance)
 	 * @param data contains sample data
-	 * @param min, @param max provide minimal, maximal values
-	 * @param avg sample average
-	 * @param std_dev smaple covariance
+	 * @param min object for minimal value
+	 * @param max object for maximal value
+	 * @param avg object for sample average
+	 * @param std_dev object for smaple covariance
 	 */
 	template <typename T>
 	static void calculate_statistics(const std::vector<T> &data, T &min, T &max,
@@ -155,9 +163,12 @@ public:
 	}
 
 	/**
-	 * Merge two json objects. Note: Values already included in @param a will be
+	 * Merge two json objects. Note: Values already included in a will be
 	 * overwritten!
-	 * See https://github.com/nlohmann/json/issues/252 for source.
+	 * See [github](https://github.com/nlohmann/json/issues/252) for source.
+	 *
+	 * @param a target json, keys will b overwritten
+	 * @param b source json, will be copied into a
 	 * @return combined json object
 	 */
 	static Json merge_json(const Json &a, const Json &b)
@@ -175,7 +186,7 @@ public:
 	/**
 	 * Merge the backend strings with a provided json object.
 	 * Note: options already included in backend will not be overwritten!
-	 * @param backend: string containig "[backend]" (+ "{setup options}"), will
+	 * @param backend: string containig "[backend]" (+ "={setup options}"), will
 	 * contain combined setup after execution
 	 * @param json: Object containig additional options for backend
 	 * @return: Combined json object

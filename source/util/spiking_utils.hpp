@@ -29,7 +29,13 @@ using namespace cypress;
 class SpikingUtils {
 public:
 	/**
-	 * Creates a population of type @param T and adds them to m_net
+	 * Creates a population of type T and adds them to m_net
+	 *
+	 * @param network instace in wich the population is placed
+	 * @param neuronParams Neuron parameters of the cell in the population
+	 * @param size Number of neurons in the population
+	 * @param rec_signal signal to be recorded by the backend
+	 * @return Network containing the add Population (same as network)
 	 */
 	template <typename T>
 	static cypress::PopulationBase add_typed_population(
@@ -39,19 +45,36 @@ public:
 	        typename T::Signals().record_spikes());
 
 	/**
-	 * Creates a population of type @param T and adds them to m_net without
+	 * Creates a population of type T and adds them to m_net without
 	 * recording
+	 *
+	 * @param network instace in wich the population is placed
+	 * @param neuronParams Neuron parameters of the cell in the population
+	 * @param size Number of neurons in the population
+	 * @return Network containing the add Population (same as network)
 	 */
 	template <typename T>
 	static cypress::PopulationBase add_typed_population_no_record(
 	    Network &network, const NeuronParameters &neuronParams,
 	    const size_t size);
 
+	/**
+	 * Generates a NeuronType object from a string
+	 *
+	 * @param neuron_type_str string naming the neuron type
+	 * @return the corresponding NeuronType object
+	 */
 	static const NeuronType &detect_type(std::string neuron_type_str);
 
 	/**
-	 * Runs add_typed_population, but gets a string containing the neuron type
-	 * instead of a template argument
+	 * Runs SpikingUtils::add_typed_population, but gets a string containing the
+	 * neuron type instead of a template argument
+     * 
+     * @param neuron_type_str string naming the neuron type
+	 * @param network instace in wich the population is placed
+	 * @param neuronParams Neuron parameters of the cell in the population
+	 * @param size Number of neurons in the population
+	 * @param record_signal string of the signal to be recorded by the backend
 	 */
 	static cypress::PopulationBase add_population(
 	    const std::string neuron_type_str, Network &network,
