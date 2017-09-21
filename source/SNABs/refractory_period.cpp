@@ -85,7 +85,8 @@ std::vector<cypress::Real> RefractoryPeriod::evaluate()
 	auto spike_time = m_pop[0].signals().data(0);
 	std::vector<cypress::Real> starts;
 	std::vector<cypress::Real> ends;
-	cypress::Real v_reset = m_neuro_params.get("v_reset");
+	// Calculations are done with tolerance
+	cypress::Real v_reset = m_neuro_params.get("v_reset") + m_tolerance;
 	cypress::Real ref_per = m_neuro_params.get("tau_refrac");
 	bool started = false;
 
@@ -94,17 +95,23 @@ std::vector<cypress::Real> RefractoryPeriod::evaluate()
 	// Check if backend spiked at all
 	if (spike_time.size() != 0) {
 		// Gather start and end points of the refractory periods by running
-		// through
-		// the voltage trace
+		// through the voltage trace
 		for (size_t i = 0; i < voltage.rows(); i++) {
-			if (!started && voltage(i, 1) < v_reset + m_tolerance) {
+			if (!started && voltage(i, 1) < v_reset) {
 				started = true;
 				starts.emplace_back(voltage(i, 0));
 			}
-			else if (started && voltage(i, 1) > v_reset + m_tolerance) {
+			else if (started && voltage(i, 1) > v_reset) {
+				// Compatibility workaround for analog hardware:
+				// When outside of refractory domain, check wheter this is
+				// caused by fluctuations > m_tolerance
+				if (i < voltage.rows() - 2 && (voltage(i + 1, 1) < v_reset ||
+				                               voltage(i + 2, 1) < v_reset)) {
+					continue;
+				}
+
 				ends.emplace_back(voltage(i - 1, 0));
 				started = false;
-				i += 10;
 			}
 		}
 	}
