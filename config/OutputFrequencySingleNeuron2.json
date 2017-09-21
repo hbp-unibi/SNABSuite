@@ -25,7 +25,7 @@
 			"v_reset": -80.0,
 			"e_rev_I": -80.0
 		},
-		"#neurons" : 384
+		"#neurons" : [192,384]
 	},
 	"nest" : {
 		"neuron_type" : "IF_cond_exp",
