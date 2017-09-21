@@ -114,7 +114,7 @@ for target_file in args.files:
         if args.ys:
             normalize(ys_dev, np.abs(get_max(ys)))
 
-    simulator = target_file.split('_')[-1].split('.')[0]
+    simulator = target_file.split('_')[-1].split('.csv')[0].split('.')[-1]
     plot_measure(ax, xs, ys, ys_dev, color=SIMULATOR_COLORS[simulator],
                  simulator=SIMULATOR_LABELS[simulator], xlabel=DIM_LABELS[keys[args.x]],
                  ylabel=DIM_LABELS[keys[args.y]], ymin=args.ymin, ymax=args.ymax)
