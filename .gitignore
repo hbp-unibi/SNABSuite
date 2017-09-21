@@ -1,2 +1,6 @@
 build*/
 *.kdev4
+plot/images*/
+plot/tables*/
+*.pyc
+*.csv
