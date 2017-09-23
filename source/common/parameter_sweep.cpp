@@ -174,6 +174,24 @@ void ParameterSweep::recover_broken_simulation()
 	m_results = json_2Darray_to_vector<cypress::Real>(backup["results"]);
 	m_jobs_done = json_array_to_vector<size_t>(backup["jobs_done"]);
 
+	// Check for invalid results (NaN) and repeat these experiments
+	for (size_t i = 0; i < m_indices.size(); i++) {
+		bool is_nan = false;
+		for (auto j : m_results[i]) {
+			if (std::isnan(j)) {
+				is_nan = true;
+				break;
+			}
+		}
+		if (is_nan) {
+			auto iter =
+			    std::find(m_jobs_done.begin(), m_jobs_done.end(), m_indices[i]);
+			if (iter != m_jobs_done.end()) {
+				m_jobs_done.erase(iter);
+			}
+		}
+	}
+	
 	std::cout << "Succesfully recovered old parameter sweep!" << std::endl;
 }
 
