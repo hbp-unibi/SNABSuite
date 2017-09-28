@@ -18,6 +18,78 @@
 
 #include "snab_base.hpp"
 
+#include <sys/stat.h>
+#include <cypress/cypress.hpp>
+#include <string>
+
+#include "util/read_json.hpp"
+#include "util/utilities.hpp"
+
 namespace SNAB {
-// Do nothing here, just make sure the header compiles.
+SNABBase::SNABBase(std::string name, std::string backend,
+                   std::initializer_list<std::string> indicator_names,
+                   std::initializer_list<std::string> indicator_types,
+                   std::initializer_list<std::string> indicator_measures,
+                   std::initializer_list<std::string> required_parameters,
+                   size_t bench_index)
+    : m_backend(backend),
+      m_snab_name(name),
+      m_indicator_names(indicator_names),
+      m_indicator_types(indicator_types),
+      m_indicator_measures(indicator_measures)
+{
+	m_config_file = read_config(name, m_backend);
+	std::vector<std::string> required_parameters_vec(required_parameters);
+	bool required_params =
+	    check_json_for_parameters(required_parameters_vec, m_config_file, name);
+
+	// Check wether benchmark is labeled as invalid
+	if ((m_config_file.find("invalid") == m_config_file.end() ||
+	     bool(m_config_file["invalid"]) == false) &&
+	    required_params) {
+		m_valid = true;
+	}
+	else {
+		return;
+	}
+
+	// Check for backend related setup config
+	if (m_config_file.find("setup") != m_config_file.end()) {
+		Utilities::manipulate_backend_string(m_backend, m_config_file["setup"]);
+		m_config_file.erase("setup");
+	}
+
+	bool changed = replace_arrays_by_value(m_config_file, bench_index);
+	if (!changed && bench_index != 0) {
+		cypress::global_logger().warn(
+		    "SNABSuite",
+		    name +
+		        ": Benchmark index is not zero, but no "
+		        "array was found in config file!");
+		m_valid = false;
+	}
+}
+
+cypress::Json SNABBase::evaluate_json()
+{
+	std::vector<cypress::Real> results = evaluate();
+	cypress::Json json;
+	for (size_t i = 0; i < results.size(); i++) {
+		json.push_back({{"type", m_indicator_types[i]},
+		                {"name", m_indicator_names[i]},
+		                {"value", results[i]},
+		                {"measures", m_indicator_measures[i]}});
+	}
+	return json;
+}
+
+std::string SNABBase::_debug_filename(const std::string append) const
+{
+	std::string shortened_backend =
+	    Utilities::split(Utilities::split(m_backend, '=')[0], '.').back();
+	mkdir("debug/", S_IRWXU | S_IRWXG);
+	mkdir(("debug/" + shortened_backend + "/").c_str(), S_IRWXU | S_IRWXG);
+	return std::string("debug/" + shortened_backend + "/" + m_snab_name + "_" +
+	                   append);
+}
 }

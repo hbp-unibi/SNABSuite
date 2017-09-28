@@ -138,7 +138,7 @@ void ParameterSweep::recover_broken_simulation()
 		return;
 	}
 	// Check wether the backup is for the correct SNAB
-	if (backup["snab"] != m_snab->snab_name) {
+	if (backup["snab"] != m_snab->snab_name()) {
 		global_logger().info("SNABSuite",
 		                     "Backup file exists, but not for this SNAB! "
 		                     "Skipping recovery and overwriting old file");
@@ -205,7 +205,7 @@ void ParameterSweep::backup_simulation_results()
 
 	// Put together the backup of all important data
 	Json backup;
-	backup["snab"] = m_snab->snab_name;
+	backup["snab"] = m_snab->snab_name();
 	backup["indices"] = m_indices;
 	backup["results"] = m_results;
 	backup["jobs_done"] = m_jobs_done;
@@ -225,7 +225,7 @@ ParameterSweep::ParameterSweep(std::string backend, cypress::Json &config,
 	// Get the correct SNAB
 	auto snab_vec = snab_registry(m_backend, bench_index);
 	for (auto i : snab_vec) {
-		if (i->snab_name == snab_name) {
+		if (i->snab_name() == snab_name) {
 			m_snab = i;
 		}
 	};
@@ -239,7 +239,7 @@ ParameterSweep::ParameterSweep(std::string backend, cypress::Json &config,
 	shuffle_sweep_indices(m_sweep_vector.size());
 	m_results = std::vector<std::vector<cypress::Real>>(
 	    m_indices.size(),
-	    std::vector<cypress::Real>(m_snab->indicator_names.size(), 0));
+	    std::vector<cypress::Real>(m_snab->indicator_names().size(), 0));
 	recover_broken_simulation();
 }
 
@@ -321,10 +321,10 @@ void ParameterSweep::write_csv()
 		          return a.back() < b.back();
 		      });
 
-	std::string filename = m_snab->snab_name + "/";
+	std::string filename = m_snab->snab_name() + "/";
 
 	int dir_err =
-	    system((std::string("mkdir -p ") + m_snab->snab_name).c_str());
+	    system((std::string("mkdir -p ") + m_snab->snab_name()).c_str());
 	if (dir_err == -1) {
 		std::cout << "Error creating directory!" << std::endl;
 		filename = "";
@@ -342,7 +342,7 @@ void ParameterSweep::write_csv()
 	for (size_t i = 1; i <= sweep_size; i++) {
 		ofs << shortened_sweep_names[sweep_size - i] << ",";
 	}
-	auto indicator_names = m_snab->indicator_names;
+	auto indicator_names = m_snab->indicator_names();
 	for (size_t i = 1; i <= indicator_names.size(); i++) {
 		ofs << indicator_names[indicator_names.size() - i] << ",";
 	}

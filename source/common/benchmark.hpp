@@ -77,11 +77,11 @@ public:
 		auto snab_vec = snab_registry(m_backend, bench_index);
 		for (auto i : snab_vec) {
 			if (i->valid() &&
-			    (benchmark == "all" || benchmark == i->snab_name)) {
-				global_logger().info("SNABSuite", "Executing " + i->snab_name);
+			    (benchmark == "all" || benchmark == i->snab_name())) {
+				global_logger().info("SNABSuite", "Executing " + i->snab_name());
 				i->build();
 				i->run();
-				results.push_back({{"name", i->snab_name},
+				results.push_back({{"name", i->snab_name()},
 				                   {"timestamp", timestamp()},
 				                   {"results", i->evaluate_json()}});
 			}

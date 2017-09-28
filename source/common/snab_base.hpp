@@ -24,32 +24,20 @@
 #include <cypress/cypress.hpp>
 #include <string>
 
-#include "util/read_json.hpp"
-#include "util/utilities.hpp"
-
 namespace SNAB {
+
 /**
- * Virtual Base class for SNABs(Benchmarks).
+ * @brief Virtual Base class for SNABs(Benchmarks).
  * All SNABs should have seperate building of networks, execution and an
  * evaluation tasks
  */
 class SNABBase {
-protected:
-	// Internal spiking network which should be used by the SNAB
-	cypress::Network m_netw;
-	// Platform specific config file which is read in with the constructor
-	cypress::Json m_config_file;
-	// String which contains the name of the simulation backend
-	std::string m_backend;
-	// Flag which tracks if the SNAB can be executed on the backend
-	// In the config file define the key "invalid" for the simulator
-	bool m_valid = false;
-
 public:
 	/**
-	 * Constructor which reads in platform specific config file
+	 * @brief Constructor which reads in platform specific config file
 	 * For description of the indicator_* initializers look into the comment of
 	 * their declaration below
+	 *
 	 * @param name name of the SNAB, and therefore of the config file
 	 * @param backend string containing the simulation backend
 	 * @param indicator_names names of benchmark indicators
@@ -66,53 +54,25 @@ public:
 	         std::initializer_list<std::string> indicator_types,
 	         std::initializer_list<std::string> indicator_measures,
 	         std::initializer_list<std::string> required_parameters,
-	         size_t bench_index)
-	    : m_backend(backend),
-	      snab_name(name),
-	      indicator_names(indicator_names),
-	      indicator_types(indicator_types),
-	      indicator_measures(indicator_measures)
-	{
-		m_config_file = read_config(name, m_backend);
-		std::vector<std::string> required_parameters_vec(required_parameters);
-		bool required_params = check_json_for_parameters(
-		    required_parameters_vec, m_config_file, name);
-
-		// Check wether benchmark is labeled as invalid
-		if ((m_config_file.find("invalid") == m_config_file.end() ||
-		     bool(m_config_file["invalid"]) == false) &&
-		    required_params) {
-			m_valid = true;
-		}
-		else {
-			return;
-		}
-
-		// Check for backend related setup config
-		if (m_config_file.find("setup") != m_config_file.end()) {
-			Utilities::manipulate_backend_string(m_backend,
-			                                     m_config_file["setup"]);
-			m_config_file.erase("setup");
-		}
-
-		bool changed = replace_arrays_by_value(m_config_file, bench_index);
-		if (!changed && bench_index != 0) {
-			cypress::global_logger().warn(
-			    "SNABSuite", name +
-			                     ": Benchmark index is not zero, but no "
-			                     "array was found in config file!");
-			m_valid = false;
-		}
-	};
+	         size_t bench_index);
 
 	/**
-	 * Building the neural network for benchmarking. If you want to use an
+	 * @brief Building the neural network for benchmarking. If you want to use
+	 * an
 	 * external network, you should use the first version of building (and the
 	 * corresponding run function), for the member network use the second
 	 * function. The implementation is contained in the first one.
+	 *
 	 * @param network External network SNAB/benchmark will be constructed in
+	 * @return cypress::Network& Pointer to the constructed network
 	 */
 	virtual cypress::Network &build_netw(cypress::Network &network) = 0;
+
+	/**
+	 * @brief Calls SNABBase::build_netw with the internal network.
+	 *
+	 * @return cypress::Network& Pointer to the constructed network
+	 */
 	cypress::Network &build() { return build_netw(m_netw); };
 
 	/**
@@ -122,82 +82,166 @@ public:
 	 * @param network External network SNAB/benchmark will be constructed in
 	 */
 	virtual void run_netw(cypress::Network &network) = 0;
+
+	/**
+	 * @brief Calls SNABBase::run_netw on the internal network
+	 *
+	 */
 	void run() { run_netw(m_netw); };
 
 	/**
-	 * The name of the Benchmark/SNAB
+	 * @brief Returns the name of the current benchmark
+	 *
+	 * @return const std::__cxx11::string Name of the current benchmark
 	 */
-	const std::string snab_name;
+	const std::string snab_name() const { return m_snab_name; }
 
 	/**
-	 * For formatting the output in the correct structure introduced in the SP9
-	 * Guidebook, the evaluation process needs the exact order of the names,
-	 * types and measures of the results returned from the function
-	 * SNABBase::evaluate().
-	 * indicator_names should be unique for the measurement and represent
-	 * the idea of the value
+	 * @brief Getter for SNABSSuite::m_indicator_names
+	 *
+	 * @return const std::vector< std::__cxx11::string >& list of benchmark
+	 * indicator names
 	 */
-	const std::vector<std::string> indicator_names;
-    
-    /**
-     * indicator_types can be e.g. "quality", "performance", "energy
-	 * consumption". See also SNABBase::indicator_names.
-     */
-	const std::vector<std::string> indicator_types;
-    
-    /**
-     * indicator_measures should be the "type of the measurement",
-	 * therefore the unit of the value. See also SNABBase::indicator_names.
-     */
-	const std::vector<std::string> indicator_measures;
+	const std::vector<std::string> &indicator_names() const
+	{
+		return m_indicator_names;
+	}
 
 	/**
-	 * This should contain the evaluation process and return the result in order
+	 * @brief Getter for SNABSSuite::m_indicator_types
+	 *
+	 * @return const std::vector< std::__cxx11::string >& list of benchmark
+	 * indicator types
+	 */
+	const std::vector<std::string> &indicator_types() const
+	{
+		return m_indicator_types;
+	}
+
+	/**
+	 * @brief Getter for SNABSSuite::m_indicator_measures
+	 *
+	 * @return const std::vector< std::__cxx11::string >& list of benchmark
+	 * indicator measures (their unit)
+	 */
+	const std::vector<std::string> &indicator_measures() const
+	{
+		return m_indicator_measures;
+	}
+
+	/**
+	 * @brief This should contain the evaluation process and return the result
+	 * in order
 	 * of those in names(), types() and measures()
 	 */
 	virtual std::vector<cypress::Real> evaluate() = 0;
 
 	/**
-	 * The result of evaluation() is converted into the format used by the HBP
-	 * benchmark repository
+	 * @brief The result of evaluation() is converted into the format used by
+	 * the HBP benchmark repository
+	 *
+	 * @return cypress::Json Benchmark results
 	 */
-	cypress::Json evaluate_json()
-	{
-		std::vector<cypress::Real> results = evaluate();
-		cypress::Json json;
-		for (size_t i = 0; i < results.size(); i++) {
-			json.push_back({{"type", indicator_types[i]},
-			                {"name", indicator_names[i]},
-			                {"value", results[i]},
-			                {"measures", indicator_measures[i]}});
-		}
-		return json;
-	}
+	cypress::Json evaluate_json();
 
 	/**
-	 * Getter for the config file
+	 * @brief Getter for the config file
+	 *
+	 * @return cypress::Json config file
 	 */
-	cypress::Json get_config() { return m_config_file; }
+	cypress::Json get_config() const { return m_config_file; }
 
 	/**
-	 * Setting a new config file. Note that before building the new network you
-	 * probably want to reset the network structure, because the old populations
-	 * and result will not be deleted automatically
+	 * @brief Setting a new config file. Note that before building the new
+	 * network you probably want to reset the network structure, because the old
+	 * populations and results will not be deleted automatically
+	 *
+	 * @param json new config
 	 */
 	void set_config(cypress::Json json) { m_config_file = json; }
 
 	/**
-	 * Reset the cypress network, therefore deleting all old populations. For
-	 * example in several concurrent runs with different configurations
+	 * @brief Reset the internal cypress network, therefore deleting all old
+	 * populations. For example in several concurrent runs with different
+	 * configurations
 	 */
 	void reset_network() { m_netw = cypress::Network(); }
 
 	/**
-	 * Returns the state of the m_valid flag. Simulation should not be executed
+	 * @brief Returns the state of the m_valid flag. Simulation should not be
+	 * executed
 	 * when valid() returns false
+	 *
+	 * @return bool True when benchmark is valid for execution
 	 */
 	bool valid() const { return m_valid; }
+
+	/**
+	 * @brief Default destructor
+	 *
+	 */
 	virtual ~SNABBase() {}
+
+protected:
+	/**
+	 * @brief Internal spiking network which should be used by the SNAB
+	 *
+	 */
+	cypress::Network m_netw;
+
+	/**
+	 * @brief Platform specific config file which is read in with the
+	 * constructor
+	 *
+	 */
+	cypress::Json m_config_file;
+
+	/**
+	 * @brief String which contains the name of the simulation backend
+	 *
+	 */
+	std::string m_backend;
+
+	/**
+	 * @brief Flag which tracks whether the SNAB can be executed on the backend
+	 * This can be set in config file by setting the key "invalid" for the
+	 * simulator
+	 */
+	bool m_valid = false;
+
+	/**
+	 * @brief The name of the Benchmark/SNAB
+	 */
+	const std::string m_snab_name;
+
+	/**
+	 * @brief For formatting the output in the correct structure introduced in
+	 * the SP9 Guidebook, the evaluation process needs the exact order of the
+	 * names, types and measures of the results returned from the function
+	 * SNABBase::evaluate(). indicator_names should be unique for the
+	 * measurement and represent the idea behind the value
+	 */
+	const std::vector<std::string> m_indicator_names;
+
+	/**
+	 * @brief indicator_types can be e.g. "quality", "performance", "energy
+	 * consumption". See also SNABBase::indicator_names.
+	 */
+	const std::vector<std::string> m_indicator_types;
+
+	/**
+	 * @brief indicator_measures should be the "type of the measurement",
+	 * therefore the unit of the value. See also SNABBase::indicator_names.
+	 */
+	const std::vector<std::string> m_indicator_measures;
+
+	/**
+	 * @brief Beginning of the filename of all debug data (including
+	 * directories)
+	 *
+	 * @return std::__cxx11::string "debug/[backend]/[snabname]_"
+	 */
+	std::string _debug_filename(const std::string append = std::string()) const;
 };
 }
 
