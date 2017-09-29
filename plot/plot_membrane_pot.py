@@ -30,10 +30,11 @@ parser.add_argument("--ymin", type=float, help="minimal y-value")
 parser.add_argument("--ymax", type=float, help="maximal y-value")
 parser.add_argument("--xmin", type=float, help="minimal x-value")
 parser.add_argument("--xmax", type=float, help="maximal x-value")
-parser.add_argument("-t", type=int, help="Column of time-values", default=0)
-parser.add_argument("-s", type=str, help="file containing spikes")
+parser.add_argument("-s", type=str, help="Name of the simulator", default="")
+parser.add_argument("-tc", type=int, help="Column of time-values", default=0)
+parser.add_argument("-sp", type=str, help="file containing spikes")
 parser.add_argument(
-    "-sc", type=int, help="Number of the Column containing spikes", default=0)
+    "-spc", type=int, help="Number of the Column containing spikes", default=0)
 
 
 # Required Parameters
@@ -67,7 +68,7 @@ def get_min(data):
     return np.min(data[np.isfinite(data)])
 
 
-def plot_membrane(ax, xs, ys, color, ymin=None, ymax=None, xmin=None, xmax=None):
+def plot_membrane(ax, xs, ys, color, ymin=None, ymax=None, xmin=None, xmax=None, label=""):
     """
     Plots membrane potential and spikes
 
@@ -81,7 +82,7 @@ def plot_membrane(ax, xs, ys, color, ymin=None, ymax=None, xmin=None, xmax=None)
     xmin -- Maximal x value for limits of the plot
     """
 
-    ax.plot(xs, ys, color=color, lw=0.3, zorder=1, label="Membrane Voltage")
+    ax.plot(xs, ys, color=color, lw=0.3, zorder=1, label=label)
 
     ax.set_xlabel("Time in ms")
     ax.set_ylabel("Voltage in mV")
@@ -116,15 +117,20 @@ data = np.zeros((results.shape[0], len(results[0])))
 for i in xrange(0, len(results)):
     data[i] = np.array(list(results[i]))
 
-xs = np.array(data[:, args.t])
+xs = np.array(data[:, args.tc])
 ys = np.array(data[:, args.y])
 
+label = "Membrane Voltage"
+if args.s is not None:
+    label = label + " of " + SIMULATOR_LABELS[args.s]
+
 plot_membrane(ax, xs, ys, color="#000000", ymin=args.ymin,
-              ymax=args.ymax, xmin=args.xmin, xmax=args.xmax)
+              ymax=args.ymax, xmin=args.xmin, xmax=args.xmax, label=label)
+
 
 # Plot spike times
-if args.s is not None:
-    results2 = np.genfromtxt(args.s, delimiter=',', names=None)
+if args.sp is not None:
+    results2 = np.genfromtxt(args.sp, delimiter=',', names=None)
     # One dimensional data
     if not isinstance(results2[0], list):
         first = True
@@ -144,7 +150,7 @@ if args.s is not None:
 
         # Plot
         first = True
-        for i in spikes[:, args.sc]:
+        for i in spikes[:, args.spc]:
             if first:
                 ax.axvline(x=i, linestyle=':', color='r',
                            lw=0.3, label="Spike Times")
@@ -153,10 +159,8 @@ if args.s is not None:
                 ax.axvline(x=i, linestyle=':', color='r',
                            lw=0.3)
 
-# Write data to images folder
-if not os.path.exists("images"):
-    os.mkdir("images")
+
 ax.legend(loc='lower center', bbox_to_anchor=(0.5, 1.05),
           ncol=4)
-fig.savefig("images/" + args.file.split('/')[-1].split('.csv')
-            [0] + ".pdf", format='pdf', bbox_inches='tight')
+fig.savefig(args.file.split('.csv')[0] +
+            ".pdf", format='pdf', bbox_inches='tight')
