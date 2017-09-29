@@ -17,5 +17,140 @@
  */
 #include "utilities.hpp"
 
+#include <cmath>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+
+#include <cypress/cypress.hpp>
+
 namespace SNAB {
+using cypress::Json;
+std::vector<std::string> &Utilities::split(const std::string &s, char delim,
+                                           std::vector<std::string> &elems)
+{
+	std::stringstream ss(s);
+	std::string item;
+	while (std::getline(ss, item, delim)) {
+		elems.push_back(item);
+	}
+	return elems;
+}
+
+std::vector<std::string> Utilities::split(const std::string &s, char delim)
+{
+	std::vector<std::string> elems;
+	split(s, delim, elems);
+	return elems;
+}
+
+void Utilities::progress_callback(double p)
+{
+	const int w = 50;
+	std::cerr << std::fixed << std::setprecision(2) << std::setw(6) << p * 100.0
+	          << "% [";
+	const int j = p * float(w);
+	for (int i = 0; i < w; i++) {
+		std::cerr << (i > j ? ' ' : (i == j ? '>' : '='));
+	}
+	std::cerr << "]\r";
+}
+
+Json Utilities::merge_json(const Json &a, const Json &b)
+{
+	Json result = a.flatten();
+	Json tmp = b.flatten();
+
+	for (Json::iterator it = tmp.begin(); it != tmp.end(); ++it) {
+		result[it.key()] = it.value();
+	}
+
+	return result.unflatten();
+}
+
+Json Utilities::manipulate_backend_string(std::string &backend, Json &json)
+{
+	Json res;
+
+	// Check wether there are options given in the backend string
+	if (split(backend, '=').size() > 1) {
+		Json old = Json::parse(split(backend, '=')[1]);
+		res = merge_json(json, old);
+	}
+	else {
+		res = json;
+	}
+	// Construct the new backend
+	backend = split(backend, '=')[0] + "=" + res.dump(-1);
+
+	// Return the merged json
+	return res;
+}
+
+void Utilities::plot_spikes(std::string filename, std::string simulator)
+{
+	std::string short_sim = split(split(simulator, '=')[0], '.').back();
+	try {
+		system(("../plot/spike_plot.py " + filename + " -s " + short_sim + "&")
+		           .c_str());
+	}
+	catch (...) {
+		std::cerr << "Calling spike_plot.py caused an error!" << std::endl;
+	}
+}
+
+void Utilities::plot_histogram(std::string filename, std::string simulator,
+                               bool normalized, int n_bins, std::string title)
+{
+	std::string short_sim = split(split(simulator, '=')[0], '.').back();
+	try {
+		if (n_bins < 0 && normalized) {
+			system(("../plot/histogram.py " + filename + " -s " + short_sim +
+			        " -t " + title + " -n " + "&")
+			           .c_str());
+		}
+		else if (n_bins < 0 && !normalized) {
+			system(("../plot/histogram.py " + filename + " -s " + short_sim +
+			        " -t " + title + "&")
+			           .c_str());
+		}
+		else if (n_bins > 0 && normalized) {
+			system(("../plot/histogram.py " + filename + " -s " + short_sim +
+			        " -t " + title + " -b " + std::to_string(n_bins) + " -n " +
+			        "&")
+			           .c_str());
+		}
+		else if (n_bins > 0 && !normalized) {
+			system(("../plot/histogram.py " + filename + " -s " + short_sim +
+			        " -t " + title + " -b " + std::to_string(n_bins) + "&")
+			           .c_str());
+		}
+	}
+	catch (...) {
+		std::cerr << "Calling spike_plot.py caused an error!" << std::endl;
+	}
+}
+
+void Utilities::plot_voltages_spikes(std::string filename,
+                                     std::string simulator, size_t mem_col,
+                                     size_t t_col, std::string spikes_file,
+                                     size_t spikes_col)
+{
+	std::string short_sim = split(split(simulator, '=')[0], '.').back();
+	std::string exec = "../plot/plot_membrane_pot.py " + filename + " -s " +
+	                   short_sim + " -tc " + std::to_string(t_col) + " -y" +
+	                   std::to_string(mem_col);
+	if (spikes_file != "") {
+		exec = exec + " -sp " + spikes_file + " -spc " +
+		       std::to_string(spikes_col);
+	}
+	try {
+		system((exec + " &").c_str());
+	}
+	catch (...) {
+		std::cerr << "Calling spike_plot.py caused an error!" << std::endl;
+	}
+}
 }

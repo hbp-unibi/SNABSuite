@@ -24,10 +24,8 @@
 #include <algorithm>  // Minimal and Maximal element
 #include <cmath>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <numeric>  // std::accumulate
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -37,10 +35,15 @@ namespace SNAB {
 
 using cypress::Json;
 
+/**
+ * @brief Collection of usefull Utilities not directly related to spiking
+ * networks
+ *
+ */
 class Utilities {
 public:
 	/**
-	 * Splits a string s into parts devided by delim and stores
+	 * @brief Splits a string s into parts devided by delim and stores
 	 * the result in elems and returns it
 	 *
 	 * @param s string to be splitted
@@ -49,47 +52,26 @@ public:
 	 * @return the new elems
 	 */
 	static std::vector<std::string> &split(const std::string &s, char delim,
-	                                       std::vector<std::string> &elems)
-	{
-		std::stringstream ss(s);
-		std::string item;
-		while (std::getline(ss, item, delim)) {
-			elems.push_back(item);
-		}
-		return elems;
-	}
-
+	                                       std::vector<std::string> &elems);
 	/**
-	 * The same as Utilities::split, but only returning the vector.
+	 * @brief The same as Utilities::split, but only returning the vector.
 	 *
 	 * @param s string to be splitted
 	 * @param delim char which seperated the strings
 	 */
-	static std::vector<std::string> split(const std::string &s, char delim)
-	{
-		std::vector<std::string> elems;
-		split(s, delim, elems);
-		return elems;
-	}
+	static std::vector<std::string> split(const std::string &s, char delim);
 
 	/**
-	 * Funtion for generating a progress bar on terminal
+	 * @brief Funtion for generating a progress bar on terminal
+	 *
+	 * @param p value between 0 and 1 representing current progress
 	 */
-	static void progress_callback(double p)
-	{
-		const int w = 50;
-		std::cerr << std::fixed << std::setprecision(2) << std::setw(6)
-		          << p * 100.0 << "% [";
-		const int j = p * float(w);
-		for (int i = 0; i < w; i++) {
-			std::cerr << (i > j ? ' ' : (i == j ? '>' : '='));
-		}
-		std::cerr << "]\r";
-	}
+	static void progress_callback(double p);
 
 	/**
-	 * Calculating statistics of a vector, using an estimator for std_dev
+	 * @brief Calculating statistics of a vector, using an estimator for std_dev
 	 * (sample covariance)
+	 *
 	 * @param data contains sample data
 	 * @param min object for minimal value
 	 * @param max object for maximal value
@@ -127,6 +109,15 @@ public:
 	}
 
 	template <typename T>
+	/**
+	 * @brief Writes a vector to a csv
+	 *
+	 * @param T Type of data e.g. vector of ints, iterator musst support '<<'
+	 * for output
+	 * @param data Reference to the data
+	 * @param file_name string containing filename, make sure folders already
+	 * exists
+	 */
 	static void write_vector_to_csv(T &data, std::string file_name)
 	{
 		std::ofstream file;
@@ -144,7 +135,17 @@ public:
 	}
 
 	template <typename T>
-	static void write_vector2_to_csv(T &data, std::string file_name)
+	/**
+	 * @brief Writes a 2D vector to a csv
+	 *
+	 * @param T Type of data e.g. vector of a vector of ints, iterator musst
+	 * support '<<' for output
+	 * @param data Reference to the data
+	 * @param file_name string containing filename, make sure folders already
+	 * exists
+	 */
+	static void
+	write_vector2_to_csv(T &data, std::string file_name)
 	{
 		std::ofstream file;
 		file.open(file_name, std::ofstream::out);
@@ -163,7 +164,7 @@ public:
 	}
 
 	/**
-	 * Merge two json objects. Note: Values already included in a will be
+	 * @brief Merge two json objects. Note: Values already included in a will be
 	 * overwritten!
 	 * See [github](https://github.com/nlohmann/json/issues/252) for source.
 	 *
@@ -171,44 +172,57 @@ public:
 	 * @param b source json, will be copied into a
 	 * @return combined json object
 	 */
-	static Json merge_json(const Json &a, const Json &b)
-	{
-		Json result = a.flatten();
-		Json tmp = b.flatten();
-
-		for (Json::iterator it = tmp.begin(); it != tmp.end(); ++it) {
-			result[it.key()] = it.value();
-		}
-
-		return result.unflatten();
-	}
+	static Json merge_json(const Json &a, const Json &b);
 
 	/**
-	 * Merge the backend strings with a provided json object.
+	 * @brief Merge the backend strings with a provided json object.
 	 * Note: options already included in backend will not be overwritten!
-	 * @param backend: string containig "[backend]" (+ "={setup options}"), will
+	 *
+	 * @param backend string containig "[backend]" (+ "={setup options}"), will
 	 * contain combined setup after execution
-	 * @param json: Object containig additional options for backend
+	 * @param json Object containig additional options for backend
 	 * @return: Combined json object
 	 */
-	static Json manipulate_backend_string(std::string &backend, Json &json)
-	{
-		Json res;
+	static Json manipulate_backend_string(std::string &backend, Json &json);
 
-		// Check wether there are options given in the backend string
-		if (split(backend, '=').size() > 1) {
-			Json old = Json::parse(split(backend, '=')[1]);
-			res = merge_json(json, old);
-		}
-		else {
-			res = json;
-		}
-		// Construct the new backend
-		backend = split(backend, '=')[0] + "=" + res.dump(-1);
+	/**
+	 * @brief Given a filename of a csv with list of spikes this will produce a
+	 * raster plot
+	 *
+	 * @param filename name and path to a csv
+	 * @param simulator simulator string, simulator options will be stripped
+	 * inside
+	 */
+	static void plot_spikes(std::string filename, std::string simulator);
+	/**
+	 * @brief Plotting a histogram a one dimensional data in a csv
+	 *
+	 * @param filename File and path to the cssv
+	 * @param simulator simulator string, options will be stripped insider
+	 * @param normalized flag whether histogram should be normalized
+	 * @param n_bins  number of bins for the histogram, negative values use
+	 * 'auto' in pyplot
+	 * @param title title to be plotted on top of histogram
+	 */
+	static void plot_histogram(std::string filename, std::string simulator,
+	                           bool normalized, int n_bins, std::string title);
 
-		// Return the merged json
-		return res;
-	}
+	/**
+	 * @brief Plotting membrane voltage and (optional) plotting vertical lines
+	 * for spikes on top
+	 *
+	 * @param filename name of the file containing membrane voltage, csv style
+	 * @param simulator the (unshortened) backend/simulator string
+	 * @param mem_col column containing the membrane potential (default = 1)
+	 * @param t_col column containing the time values (default = 0)
+	 * @param spikes_file (optional) file containing spikes of the same neuron
+	 * @param spikes_col column of spike data in spikes_file
+	 */
+	static void plot_voltages_spikes(std::string filename,
+	                                 std::string simulator, size_t mem_col = 1,
+	                                 size_t t_col = 0,
+	                                 std::string spikes_file = "",
+	                                 size_t spikes_col = 0);
 };
 }
 
