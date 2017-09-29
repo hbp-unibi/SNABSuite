@@ -91,26 +91,35 @@ std::vector<cypress::Real> SingleMaxFreqToGroup::evaluate()
 		return std::vector<cypress::Real>();
 	}
 
-	std::vector<cypress::Real> spikes;
+	std::vector<cypress::Real> num_spikes;
 	for (size_t i = 0; i < size_t(m_config_file["#neurons"]); i++) {
-		spikes.push_back(m_pop_group[i].signals().data(0).size());
+		num_spikes.push_back(m_pop_group[i].signals().data(0).size());
 	}
 
 #if SNAB_DEBUG
-	std::vector<std::vector<cypress::Real>> spikes2;
+	// Write data to files
+	std::vector<std::vector<cypress::Real>> spikes;
 	for (size_t i = 0; i < m_pop_group.size(); i++) {
-		spikes2.push_back(m_pop_group[i].signals().data(0));
+		spikes.push_back(m_pop_group[i].signals().data(0));
 	}
-	Utilities::write_vector2_to_csv(spikes2, "SingleMaxFreqToGroup_spikes.csv");
-	Utilities::write_vector_to_csv(spikes,
-	                               "SingleMaxFreqToGroup_num_spikes.csv");
-	Utilities::write_vector_to_csv(m_pop_single[0].signals().data(0),
-	                               "SingleMaxFreqToGroup_ref_spikes.csv");
+	std::vector<std::vector<cypress::Real>> ref_spikes(
+	    {m_pop_single[0].signals().data(0)});
+	Utilities::write_vector2_to_csv(spikes, _debug_filename("spikes.csv"));
+	Utilities::write_vector_to_csv(num_spikes,
+	                               _debug_filename("num_spikes.csv"));
+	Utilities::write_vector2_to_csv(ref_spikes,
+	                                _debug_filename("ref_spikes.csv"));
+
+	// Trigger plots
+	Utilities::plot_spikes(_debug_filename("spikes.csv"), m_backend);
+	Utilities::plot_spikes(_debug_filename("ref_spikes.csv"), m_backend);
+	Utilities::plot_histogram(_debug_filename("num_spikes.csv"), m_backend,
+	                          false, -10, "'Number of Spikes'");
 #endif
 
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;
-	Utilities::calculate_statistics(spikes, min, max, avg, std_dev);
+	Utilities::calculate_statistics(num_spikes, min, max, avg, std_dev);
 	return std::vector<cypress::Real>({avg - spike_ref, max, min});
 }
 
@@ -182,6 +191,7 @@ std::vector<cypress::Real> GroupMaxFreqToGroup::evaluate()
 	}
 
 #if SNAB_DEBUG
+	// Write data to files
 	std::vector<std::vector<cypress::Real>> spikes2, spikes3;
 	for (size_t i = 0; i < m_pop_max.size(); i++) {
 		spikes2.push_back(m_pop_max[i].signals().data(0));
@@ -190,14 +200,22 @@ std::vector<cypress::Real> GroupMaxFreqToGroup::evaluate()
 		spikes3.push_back(m_pop_retr[i].signals().data(0));
 	}
 	Utilities::write_vector2_to_csv(spikes2,
-	                                "GroupMaxFreqToGroup_spikes_max.csv");
+	                                _debug_filename("spikes_max.csv"));
 	Utilities::write_vector2_to_csv(spikes3,
-	                                "GroupMaxFreqToGroup_spikes_retr.csv");
+	                                _debug_filename("spikes_retr.csv"));
 
 	Utilities::write_vector_to_csv(spikes,
-	                               "GroupMaxFreqToGroup_num_spikes.csv");
+	                               _debug_filename("num_spikes_retr.csv"));
 	Utilities::write_vector_to_csv(spikes_ref,
-	                               "GroupMaxFreqToGroup_num_ref_spikes.csv");
+	                               _debug_filename("num_spikes_max.csv"));
+    
+	// Trigger plots
+	Utilities::plot_spikes(_debug_filename("spikes_max.csv"), m_backend);
+	Utilities::plot_spikes(_debug_filename("spikes_retr.csv"), m_backend);
+	Utilities::plot_histogram(_debug_filename("num_spikes_retr.csv"), m_backend,
+	                          false, -10, "'Number of Spikes (Target)'");
+	Utilities::plot_histogram(_debug_filename("num_spikes_max.csv"), m_backend,
+	                          false, -10, "'Number of Spikes (Source)'");
 #endif
 
 	// Calculate statistics

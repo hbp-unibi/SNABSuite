@@ -122,16 +122,25 @@ std::vector<cypress::Real> RefractoryPeriod::evaluate()
 	}
 
 #if SNAB_DEBUG
+	// Write data to files
 	std::vector<std::vector<cypress::Real>> time_voltage;
 	for (size_t i = 0; i < voltage.rows(); i++) {
 		time_voltage.push_back(
 		    std::vector<cypress::Real>{voltage(i, 0), voltage(i, 1)});
 	}
 	Utilities::write_vector2_to_csv(time_voltage,
-	                                "RefractoryPeriod_voltage.csv");
-	Utilities::write_vector_to_csv(spike_time,
-	                               "RefractoryPeriod_spike_time.csv");
-	Utilities::write_vector_to_csv(diffs, "RefractoryPeriod_periods.csv");
+	                                _debug_filename("voltage.csv"));
+
+	std::vector<std::vector<cypress::Real>> temp({spike_time});
+	Utilities::write_vector2_to_csv(temp, _debug_filename("spikes.csv"));
+	Utilities::write_vector_to_csv(diffs, _debug_filename("periods.csv"));
+
+	// Trigger plots
+	Utilities::plot_spikes(_debug_filename("spikes.csv"), m_backend);
+	Utilities::plot_histogram(_debug_filename("periods.csv"), m_backend, false,
+	                          -10, "'Lenght of Ref. Per.'");
+	Utilities::plot_voltages_spikes(_debug_filename("voltage.csv"), m_backend,
+	                                1, 0, _debug_filename("spikes.csv"), 0);
 #endif
 
 	if (spike_time.size() == 0) {

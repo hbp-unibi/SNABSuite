@@ -86,11 +86,6 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 	// Get spikes
 	auto spikes = m_pop[0].signals().data(0);
 
-#if SNAB_DEBUG
-	Utilities::write_vector_to_csv(spikes,
-	                               "OutputFrequencySingleNeuron_spikes.csv");
-#endif
-
 	// Calculate frequencies
 	if (spikes.size() > 1) {
 		for (size_t i = 0; i < spikes.size() - 1; i++) {
@@ -104,6 +99,19 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 			}
 		}
 	}
+
+#if SNAB_DEBUG
+	// Write data to files
+	std::vector<std::vector<cypress::Real>> temp({spikes});
+	Utilities::write_vector2_to_csv(temp, _debug_filename("spikes.csv"));
+	Utilities::write_vector_to_csv(frequencies, _debug_filename("freq.csv"));
+
+	// Trigger plots
+	Utilities::plot_spikes(_debug_filename("spikes.csv"), m_backend);
+	Utilities::plot_histogram(_debug_filename("freq.csv"), m_backend, false,
+	                          -10, "Frequencies");
+#endif
+
 	if (frequencies.size() == 0) {
 		return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
 	}
@@ -199,14 +207,18 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron2::evaluate()
 		mean_freq.push_back(avg);
 	}
 #if SNAB_DEBUG
-	Utilities::write_vector2_to_csv(m_spikes,
-	                                "OutputFrequencySingleNeuron2_spikes.csv");
-	Utilities::write_vector_to_csv(
-	    mean_freq, "OutputFrequencySingleNeuron2_mean_freq.csv");
+	// Write data to files
+	Utilities::write_vector2_to_csv(m_spikes, _debug_filename("spikes.csv"));
+	Utilities::write_vector_to_csv(mean_freq, _debug_filename("mean_freq.csv"));
+
+	// Trigger plots
+	Utilities::plot_spikes(_debug_filename("spikes.csv"), m_backend);
+	Utilities::plot_histogram(_debug_filename("mean_freq.csv"), m_backend,
+	                          false, -10, "Average Frequency");
 #endif
-    if(!did_spike){
-        return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
-    }
+	if (!did_spike) {
+		return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
+	}
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;
 	Utilities::calculate_statistics(mean_freq, min, max, avg, std_dev);
@@ -292,18 +304,22 @@ std::vector<cypress::Real> OutputFrequencyMultipleNeurons::evaluate()
 	}
 
 #if SNAB_DEBUG
+	// Write data to files
 	std::vector<std::vector<cypress::Real>> spikes2;
 	for (size_t i = 0; i < m_num_neurons; i++) {
 		spikes2.push_back(m_pop[i].signals().data(0));
 	}
-	Utilities::write_vector2_to_csv(
-	    spikes2, "OutputFrequencyMultipleNeurons_spikes.csv");
-	Utilities::write_vector_to_csv(
-	    averages, "OutputFrequencyMultipleNeurons_averages.csv");
+	Utilities::write_vector2_to_csv(spikes2, _debug_filename("spikes.csv"));
+	Utilities::write_vector_to_csv(averages, _debug_filename("averages.csv"));
+
+	// Trigger plots
+	Utilities::plot_spikes(_debug_filename("spikes.csv"), m_backend);
+	Utilities::plot_histogram(_debug_filename("averages.csv"), m_backend, false,
+	                          -10, "Averages");
 #endif
-    if(!did_spike){
-        return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
-    }
+	if (!did_spike) {
+		return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
+	}
 
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;

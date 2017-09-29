@@ -89,12 +89,18 @@ std::vector<cypress::Real> MaxInputOneToOne::evaluate()
 		spikes[i] = m_pop[i].signals().data(0).size();
 	}
 #if SNAB_DEBUG
+	// Write data to files
 	std::vector<std::vector<cypress::Real>> spikes2;
 	for (size_t i = 0; i < m_pop.size(); i++) {
 		spikes2.push_back(m_pop[i].signals().data(0));
 	}
-	Utilities::write_vector2_to_csv(spikes2, "MaxInputOneToOne_spikes.csv");
-	Utilities::write_vector_to_csv(spikes, "MaxInputOneToOne_num_spikes.csv");
+	Utilities::write_vector2_to_csv(spikes2, _debug_filename("spikes.csv"));
+	Utilities::write_vector_to_csv(spikes, _debug_filename("num_spikes.csv"));
+
+	// Trigger plots
+	Utilities::plot_spikes(_debug_filename("spikes.csv"), m_backend);
+	Utilities::plot_histogram(_debug_filename("num_spikes.csv"), m_backend,
+	                          false, -10, "'Number of Spikes per Neuron'");
 #endif
 
 	// Calculate statistics
@@ -164,12 +170,18 @@ std::vector<cypress::Real> MaxInputAllToAll::evaluate()
 	}
 
 #if SNAB_DEBUG
+	// Write data to files
 	std::vector<std::vector<cypress::Real>> spikes2;
 	for (size_t i = 0; i < m_pop.size(); i++) {
 		spikes2.push_back(m_pop[i].signals().data(0));
 	}
-	Utilities::write_vector2_to_csv(spikes2, "MaxInputAllToAll_spikes.csv");
-	Utilities::write_vector_to_csv(spikes, "MaxInputAllToAll_num_spikes.csv");
+	Utilities::write_vector2_to_csv(spikes2, _debug_filename("spikes.csv"));
+	Utilities::write_vector_to_csv(spikes, _debug_filename("num_spikes.csv"));
+
+	// Trigger plots
+	Utilities::plot_spikes(_debug_filename("spikes.csv"), m_backend);
+	Utilities::plot_histogram(_debug_filename("num_spikes.csv"), m_backend,
+	                          false, -10, "'Number of Spikes per Neuron'");
 #endif
 
 	// Calculate statistics
@@ -241,14 +253,18 @@ std::vector<cypress::Real> MaxInputFixedOutConnector::evaluate()
 	}
 
 #if SNAB_DEBUG
+	// Write data to files
 	std::vector<std::vector<cypress::Real>> spikes2;
 	for (size_t i = 0; i < m_pop.size(); i++) {
 		spikes2.push_back(m_pop[i].signals().data(0));
 	}
-	Utilities::write_vector2_to_csv(spikes2,
-	                                "MaxInputFixedOutConnector_spikes.csv");
-	Utilities::write_vector_to_csv(spikes,
-	                               "MaxInputFixedOutConnector_num_spikes.csv");
+	Utilities::write_vector2_to_csv(spikes2, _debug_filename("spikes.csv"));
+	Utilities::write_vector_to_csv(spikes, _debug_filename("num_spikes.csv"));
+
+	// Trigger plots
+	Utilities::plot_spikes(_debug_filename("spikes.csv"), m_backend);
+	Utilities::plot_histogram(_debug_filename("num_spikes.csv"), m_backend,
+	                          false, -10, "'Number of Spikes per Neuron'");
 #endif
 
 	// Calculate statistics
