@@ -140,6 +140,13 @@ target_link_libraries(sweep
 )
 
 #
+# Copy Matplotlibrc to build directory
+# 
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/plot/matplotlibrc ${CMAKE_CURRENT_BINARY_DIR}/matplotlibrc COPYONLY)
+
+
+#
 # Unit tests -- only enable if gtest is present
 #
 if(${GTEST_FOUND})
