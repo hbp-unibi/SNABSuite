@@ -1,7 +1,7 @@
 {
-    "snab_name" : "RefractoryPeriod",
+    "snab_name" : "MaxInputOneToOne",
     "spikey" : {
-        "#neurons" : [1, 384,100]
+        "#neurons" : [1, 256,100]
     },
     "spinnaker" : {
         "#neurons" : [1, 4000,100]

@@ -11,7 +11,7 @@
 			"tau_m": 0.2,
 			"cm": 0.2
 		},
-		"#neurons" : 100,
+		"#neurons" : [100, 1000, 10000],
 		"weight" : 0.03,
 		"#spikes" : 100
     },
@@ -27,22 +27,42 @@
 			"tau_m": 0.2,
 			"cm": 0.2
 		},
-		"#neurons" : 100,
+		"#neurons" : [255,4080,16320],
 		"weight" : 0.03,
 		"#spikes" : 300
     },
 	"spikey" : {
 		"neuron_type" : "IfFacetsHardware1",
 		"neuron_params": {
-			"g_leak": 2.0,
+			"tau_m": 10.0,
 			"tau_refrac": 0.0,
-			"v_rest": -55.0,
-			"v_thresh": -55.0,
-			"v_reset": -25.0,
+			"v_rest": -60.0,
+			"v_thresh": -57.0,
+			"v_reset": -65.0,
 			"e_rev_I": 0.0
 		},
-		"#neurons" : 256,
-		"weight" : 0.03,
-		"#spikes" : 1
+		"#neurons" : [128,256],
+		"weight" : 0.015,
+	},
+	"nmpm1" : {
+		"neuron_type" : "IF_cond_exp",
+		"setup": {
+			"calib_path": "/wang/data/calibration/guidebook/",
+			"neuron_size" : 2
+		},
+		"neuron_params": {
+			"e_rev_E": 0.0,
+			"e_rev_I": -100.0,
+			"v_rest": -65.0,
+			"v_reset": -80.0,
+			"v_thresh": -60.0,
+			"tau_syn_E": 2.0,
+			"tau_refrac": 2.0,
+			"tau_m": 1.0,
+			"cm": 0.2
+        },
+		"#neurons" : [60, 120],
+		"weight" : 0.029,
+		"#spikes" : 100
 	}
 }
