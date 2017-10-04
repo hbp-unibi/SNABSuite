@@ -1,3 +1,4 @@
+backend: Agg
 font.family: serif
 font.serif: Palatino
 font.size: 9.0
