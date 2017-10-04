@@ -34,8 +34,9 @@ namespace SNAB {
 MaxInputOneToOne::MaxInputOneToOne(const std::string backend,
                                    size_t bench_index)
     : SNABBase(
-          __func__, backend, {"Average number of sikes", "Standard deviation",
-                              "Maximum #spikes", "Minimum #spikes"},
+          __func__, backend,
+          {"Average number of spikes", "Standard deviation", "Maximum #spikes",
+           "Minimum #spikes"},
           {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
           {"neuron_type", "neuron_params", "weight", "#neurons", "#spikes"},
           bench_index),
@@ -112,7 +113,7 @@ std::vector<cypress::Real> MaxInputOneToOne::evaluate()
 MaxInputAllToAll::MaxInputAllToAll(const std::string backend,
                                    size_t bench_index)
     : SNABBase(__func__, backend,
-               {"Average number of sikes", "Standard deviation",
+               {"Average number of spikes", "Standard deviation",
                 "Maximum #spikes", "Minimum #spikes"},
                {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
                {"neuron_type", "neuron_params", "weight", "#neurons", "#spikes",
