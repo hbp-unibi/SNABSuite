@@ -1,0 +1,15 @@
+{
+    "snab_name" : "MaxInputOneToOne",
+    "spikey" : {
+        "#spikes" : [1, 100, 50]
+    },
+    "spinnaker" : {
+        "#weight" : [1, 100, 50]
+    },
+    "nest" : {
+        "#weight" : [1, 100, 50]
+    },
+    "nmpm1" : {
+        "#weight" : [1, 100, 50]
+    }
+}

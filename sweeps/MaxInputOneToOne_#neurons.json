@@ -1,0 +1,15 @@
+{
+    "snab_name" : "RefractoryPeriod",
+    "spikey" : {
+        "#neurons" : [1, 384,100]
+    },
+    "spinnaker" : {
+        "#neurons" : [1, 4000,100]
+    },
+    "nest" : {
+        "#neurons" : [1, 4000, 100]
+    },
+    "nmpm1" : {
+        "#neurons" : [1, 70 ,70]
+    }
+}
