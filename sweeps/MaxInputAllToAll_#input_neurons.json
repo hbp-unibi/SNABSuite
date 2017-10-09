@@ -1,0 +1,15 @@
+{
+    "snab_name" : "MaxInputAllToAll",
+    "spikey" : {
+        "#input_neurons" : [1, 256, 100]
+    },
+    "spinnaker" : {
+        "#input_neurons" : [1, 10000, 100]
+    },
+    "nest" : {
+        "#input_neurons" : [1, 10000, 100]
+    },
+    "nmpm1" : {
+        "#input_neurons" : [1, 100 ,100]
+    }
+}
