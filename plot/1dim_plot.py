@@ -106,18 +106,22 @@ for target_file in args.files:
     if args.ys:
         ys_dev = np.array(data[:, args.ys])
 
+    xlabel = DIM_LABELS[keys[args.x]]
+    ylabel = DIM_LABELS[keys[args.y]]
     if args.nx:
         normalize(xs, np.abs(get_max(xs)))
+        xlabel = xlabel + " (normalized)"
 
     if args.ny:
-        normalize(ys, np.abs(get_max(ys)))
+        ylabel = ylabel + " (normalized)"
+        max = np.abs(get_max(ys))
+        normalize(ys, max)
         if args.ys:
-            normalize(ys_dev, np.abs(get_max(ys)))
-
+            normalize(ys_dev, max)
     simulator = target_file.split('_')[-1].split('.csv')[0].split('.')[-1]
     plot_measure(ax, xs, ys, ys_dev, color=SIMULATOR_COLORS[simulator],
-                 simulator=SIMULATOR_LABELS[simulator], xlabel=DIM_LABELS[keys[args.x]],
-                 ylabel=DIM_LABELS[keys[args.y]], ymin=args.ymin, ymax=args.ymax)
+                 simulator=SIMULATOR_LABELS[simulator], xlabel=xlabel,
+                 ylabel=ylabel, ymin=args.ymin, ymax=args.ymax)
 
 if not os.path.exists("images"):
     os.mkdir("images")
