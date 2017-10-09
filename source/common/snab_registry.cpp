@@ -41,18 +41,18 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
 	        OutputFrequencyMultipleNeurons(backend, bench_index)),
 	    std::make_shared<RefractoryPeriod>(
 	        RefractoryPeriod(backend, bench_index)),
-	    /*std::make_shared<MaxInputOneToOne>(
+	    std::make_shared<MaxInputOneToOne>(
 	        MaxInputOneToOne(backend, bench_index)),
 	    std::make_shared<MaxInputAllToAll>(
 	        MaxInputAllToAll(backend, bench_index)),
 	    std::make_shared<MaxInputFixedOutConnector>(
-	        MaxInputFixedOutConnector(backend, bench_index)),
+	        MaxInputFixedOutConnector(backend, bench_index))/*,
 	    std::make_shared<SingleMaxFreqToGroup>(
 	        SingleMaxFreqToGroup(backend, bench_index)),
 	    std::make_shared<GroupMaxFreqToGroup>(
 	        GroupMaxFreqToGroup(backend, bench_index)),
 	    std::make_shared<GroupMaxFreqToGroupAllToAll>(
-	        GroupMaxFreqToGroupAllToAll(backend, bench_index))*/};
+	        GroupMaxFreqToGroupAllToAll(backend, bench_index))*/ };
 	return vec;
 }
 }
