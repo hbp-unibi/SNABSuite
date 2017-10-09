@@ -41,7 +41,7 @@
 			"v_reset": -65.0,
 			"e_rev_I": 0.0
 		},
-		"#neurons" : [128,256],
+		"#neurons" : [192,256],
 		"weight" : 0.015,
 		"#spikes" : 100
 	},
