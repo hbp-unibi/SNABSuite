@@ -59,9 +59,9 @@ def plot_measure(ax, xs, ys, ys_std, color, simulator, xlabel, ylabel,
     ax.plot(xs, ys, color=color, lw=1.0, zorder=1, label=simulator)
 
     if ys_std is not None:
-        ax.plot(xs, ys - ys_std * 0.5, lw=0.5,
+        ax.plot(xs, ys - ys_std, lw=0.5,
                 linestyle=':', color=color, zorder=0)
-        ax.plot(xs, ys + ys_std * 0.5, lw=0.5,
+        ax.plot(xs, ys + ys_std, lw=0.5,
                 linestyle=':', color=color, zorder=0)
 
     ax.set_xlabel(xlabel)
