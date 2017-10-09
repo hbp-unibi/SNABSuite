@@ -53,9 +53,10 @@ DIM_LABELS = {
     "neurons": "Number of Neurons",
     "Average_frequency_of_neurons": "Average frequency in 1/ms",
     "Average_deviation_from_refractory_period": "Average deviation in ms",
-    "time" : "Time in [ms]",
+    "time" : "Time in ms",
     "neuron id" : "Neuron ID",
     "spikes" : "Spikes",
+    "input_neurons" : "Number of input neurons",
 }
 
 
