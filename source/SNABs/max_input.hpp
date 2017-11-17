@@ -64,23 +64,40 @@ public:
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;
 };
+
 /**
  * Check the input bandwidth by injecting spikes per fixed fan out connection.
  * Check if output neurons spike accordingly
  */
 class MaxInputFixedOutConnector : public SNABBase {
-private:
+protected:
 	cypress::PopulationBase m_pop;
 	cypress::Population<cypress::SpikeSourceArray> m_pop_source;
 	size_t m_num_neurons = 0, m_num_inp_neurons = 0, m_num_spikes = 0;
 	NeuronParameters m_neuro_params;
 	cypress::Real simulation_length = 100;  // ms
-
+    MaxInputFixedOutConnector(std::string name, std::string backend,
+	         std::initializer_list<std::string> indicator_names,
+	         std::initializer_list<std::string> indicator_types,
+	         std::initializer_list<std::string> indicator_measures,
+	         std::initializer_list<std::string> required_parameters,
+	         size_t bench_index);
 public:
 	MaxInputFixedOutConnector(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;
+};
+
+
+/**
+ * Check the input bandwidth by injecting spikes per fixed fan out connection.
+ * Check if output neurons spike accordingly
+ */
+class MaxInputFixedInConnector : public MaxInputFixedOutConnector {
+public:
+	MaxInputFixedInConnector(const std::string backend, size_t bench_index);
+	cypress::Network &build_netw(cypress::Network &netw) override;
 };
 }
 #endif /* SNABSUITE_SNABS_MAX_INPUT_HPP */
