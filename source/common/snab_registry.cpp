@@ -46,7 +46,9 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
 	    std::make_shared<MaxInputAllToAll>(
 	        MaxInputAllToAll(backend, bench_index)),
 	    std::make_shared<MaxInputFixedOutConnector>(
-	        MaxInputFixedOutConnector(backend, bench_index))/*,
+	        MaxInputFixedOutConnector(backend, bench_index)),
+	    std::make_shared<MaxInputFixedInConnector>(
+	        MaxInputFixedInConnector(backend, bench_index))/*,
 	    std::make_shared<SingleMaxFreqToGroup>(
 	        SingleMaxFreqToGroup(backend, bench_index)),
 	    std::make_shared<GroupMaxFreqToGroup>(
