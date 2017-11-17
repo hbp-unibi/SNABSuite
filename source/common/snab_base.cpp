@@ -59,13 +59,8 @@ SNABBase::SNABBase(std::string name, std::string backend,
 		m_config_file.erase("setup");
 	}
 
-	bool changed = replace_arrays_by_value(m_config_file, bench_index);
+	bool changed = replace_arrays_by_value(m_config_file, bench_index, name);
 	if (!changed && bench_index != 0) {
-		cypress::global_logger().warn(
-		    "SNABSuite",
-		    name +
-		        ": Benchmark index is not zero, but no "
-		        "array was found in config file!");
 		m_valid = false;
 	}
 }

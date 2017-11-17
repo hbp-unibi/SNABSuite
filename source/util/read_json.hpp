@@ -141,7 +141,7 @@ std::vector<std::vector<T>> json_2Darray_to_vector(const cypress::Json &json)
  * @param index index of value used
  * @return true if json was changed
  */
-bool replace_arrays_by_value(cypress::Json &json, const size_t &index = 0);
+bool replace_arrays_by_value(cypress::Json &json, const size_t &index = 0, std::string name = "");
 }
 
 #endif /* SNABSUITE_UTIL_READ_JSON_HPP */

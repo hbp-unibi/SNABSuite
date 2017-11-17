@@ -119,7 +119,7 @@ bool check_json_for_parameters(const std::vector<std::string> &parameters,
 	return true;
 }
 
-bool replace_arrays_by_value(cypress::Json &json, const size_t &index)
+bool replace_arrays_by_value(cypress::Json &json, const size_t &index, std::string name)
 {
 	bool anything_changed = false;
 	for (Json::iterator i = json.begin(); i != json.end(); ++i) {
@@ -131,15 +131,23 @@ bool replace_arrays_by_value(cypress::Json &json, const size_t &index)
 		}
 		else if (i.value().is_array()) {
 			if (i.value().size() <= index) {
-				throw std::length_error(
-				    "The array of size " + std::to_string(i.value().size()) +
+				global_logger().debug("SNABSuite", name + 
+				    ": The array of size " + std::to_string(i.value().size()) +
 				    " is too small for requested index of " +
 				    std::to_string(index));
+                return false;
 			}
 			i.value() = i.value()[index];
 			anything_changed = true;
 		}
 	}
+	if(!anything_changed){
+        cypress::global_logger().debug(
+		    "SNABSuite",
+		    name +
+		        ": Benchmark index is not zero, but no "
+		        "array was found in config file!");
+    }
 	return anything_changed;
 }
 }
