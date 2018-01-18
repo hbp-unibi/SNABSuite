@@ -271,6 +271,7 @@ TEST(ReadJSON, replace_arrays_by_value)
 	EXPECT_EQ(28, int(json2["new_key"]));
 
 	json2["new_key"] = {1, 3, 5, 28};
-	ASSERT_ANY_THROW(replace_arrays_by_value(json2, 4));
+	ASSERT_NO_THROW(replace_arrays_by_value(json2, 4));
+	EXPECT_FALSE(replace_arrays_by_value(json2, 4));
 }
 }
