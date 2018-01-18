@@ -66,7 +66,8 @@ def get_label(key):
 
 SIMULATOR_LABELS = {
     "ess": "ESS",
-    "nmpm1": "NM-PM1",
+    "nmpm1": "BrainScaleS",
+    "slurm.nmpm1": "BrainScaleS",
     "spiNNaker": "SpiNNaker",
     "spinnaker": "SpiNNaker",
     "spinnaker2": "SpiNNaker@0.1ms",

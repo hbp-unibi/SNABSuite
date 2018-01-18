@@ -67,10 +67,14 @@ def round_to_divisable(value, divisable):
 
 
 def plot_measure2d(xs, ys, zs, xlabel, ylabel, zlabel="", zmin=None,
-                   zmax=None, qualitative=False, contour=True):
+                   zmax=None, qualitative=False, contour=True, title=None):
     fig = plt.figure(figsize=(cm2inch(5.5), cm2inch(5.5)))
+    
     ax1 = fig.add_axes([0.0, 0.25, 1.0, 0.85])
+    if title is not None:
+        plt.title(title)
     ax2 = fig.add_axes([0.0, 0.0, 1.0, 0.05])
+    
 
     _, steps_x = np.unique(xs, return_counts=True)
     _, steps_y = np.unique(ys, return_counts=True)
@@ -128,6 +132,8 @@ if not os.path.exists("images"):
     os.mkdir("images")
 
 for target_file in args.files:
+    simulator = target_file.split('_')[-1].split('.csv')[0]
+
     #import data
     results = np.genfromtxt(target_file, delimiter=',', names=True)
     keys = results.dtype.names
@@ -138,12 +144,13 @@ for target_file in args.files:
     fig = plot_measure2d(data[:, 0], data[:, 1], data[:, args.z],
                          xlabel=get_label(keys[0]), ylabel=get_label(keys[1]),
                          zlabel=get_label(keys[args.z]), zmin=args.zmin,
-                         zmax=args.zmax, qualitative=args.q, contour=args.c)
+                         zmax=args.zmax, qualitative=args.q, contour=args.c,
+                         title=SIMULATOR_LABELS[simulator])
 
     if target_file.split('/')[-2]:
-        fig.savefig("images/" + target_file.split('/')[-2] + "_" +
-                    target_file.split('/')[-1] + ".pdf", format='pdf',
+        fig.savefig("images/" + target_file.split('/')[-2] + "/" +
+                    simulator + ".pdf", format='pdf',
                     bbox_inches='tight')
     else:
-        fig.savefig("images/" + target_file.split('/')[-1] + ".pdf", format='pdf',
+        fig.savefig("images/" + simulator + ".pdf", format='pdf',
                     bbox_inches='tight')

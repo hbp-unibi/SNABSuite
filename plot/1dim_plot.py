@@ -128,7 +128,9 @@ if not os.path.exists("images"):
 ax.legend(loc='lower center', bbox_to_anchor=(0.5, 1.05),
           ncol=4)
 if args.files[-1].split('/')[-2]:
-    fig.savefig("images/" + args.files[-1].split('/')[-2] + "_" + args.files[-1].split(
+    if not os.path.exists("images/" + args.files[-1].split('/')[-2]):
+        os.mkdir("images/" + args.files[-1].split('/')[-2])
+    fig.savefig("images/" + args.files[-1].split('/')[-2] + "/" + args.files[-1].split(
         '/')[-1].split('_')[0] + ".pdf", format='pdf', bbox_inches='tight')
 else:
     fig.savefig("images/" + args.files[-1].split('/')[-1].split('_')
