@@ -133,6 +133,7 @@ if not os.path.exists("images"):
 
 for target_file in args.files:
     simulator = target_file.split('_')[-1].split('.csv')[0]
+    experiment = target_file.split('/')[-1].split(simulator)[0]
 
     #import data
     results = np.genfromtxt(target_file, delimiter=',', names=True)
@@ -148,9 +149,11 @@ for target_file in args.files:
                          title=SIMULATOR_LABELS[simulator])
 
     if target_file.split('/')[-2]:
+        if not os.path.exists("images/" + target_file.split('/')[-2]):
+            os.mkdir("images/" + target_file.split('/')[-2])
         fig.savefig("images/" + target_file.split('/')[-2] + "/" +
-                    simulator + ".pdf", format='pdf',
+                    experiment + simulator + ".pdf", format='pdf',
                     bbox_inches='tight')
     else:
-        fig.savefig("images/" + simulator + ".pdf", format='pdf',
+        fig.savefig("images/" + experiment + simulator + ".pdf", format='pdf',
                     bbox_inches='tight')
