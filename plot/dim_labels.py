@@ -51,12 +51,18 @@ DIM_LABELS = {
     "Standard_deviation": "Standard deviation",
     "Average_number_of_spikes": "Average spike count",
     "neurons": "Number of Neurons",
+    "#neurons": "Neurons",
     "Average_frequency_of_neurons": "Average frequency in 1/ms",
     "Average_deviation_from_refractory_period": "Average deviation in ms",
     "time" : "Time in ms",
     "neuron id" : "Neuron ID",
     "spikes" : "Spikes",
-    "input_neurons" : "Number of input neurons",
+    "input_neurons" : "Input Neurons",
+    "Minimum #spikes" : "Minimal Spike Count",
+    "Maximum #spikes" : "Maximal Spike Count",
+    "#input_neurons" : "Input Neurons",
+    "#ConnectionsPerInput" : "Connections per Input",
+    "#ConnectionsPerOutput" : "Connections per Output",
 }
 
 
