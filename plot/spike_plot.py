@@ -30,6 +30,8 @@ parser.add_argument("files", metavar="files", nargs='+', help="files to plot")
 
 # Optional arguments
 parser.add_argument("-s", type=str, help="Name of the simulator", default="")
+parser.add_argument("-p", help="Save as png instead of pdf",
+                    default=False, action="store_true")
 
 args = parser.parse_args()
 
@@ -74,5 +76,9 @@ for target_file in args.files:
 
     fig = raster_plot(data, args.s)
 
-    fig.savefig(target_file.split(".csv")[0] + ".pdf", format='pdf',
-                bbox_inches='tight')
+    if args.p:
+        fig.savefig(target_file.split(".csv")[0] + ".png", format='png', 
+                    dpi=600, bbox_inches='tight')
+    else:
+        fig.savefig(target_file.split(".csv")[0] + ".pdf", format='pdf',
+                    bbox_inches='tight')
