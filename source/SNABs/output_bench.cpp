@@ -85,6 +85,9 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 	std::vector<cypress::Real> frequencies;
 	// Get spikes
 	auto spikes = m_pop[0].signals().data(0);
+	if (spikes.size() == 0) {
+		return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
+	}
 
 	// Calculate frequencies
 	if (spikes.size() > 1) {
@@ -113,7 +116,7 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron::evaluate()
 #endif
 
 	if (frequencies.size() == 0) {
-		return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
+		return std::vector<cypress::Real>({0, 0, 0, 0});
 	}
 
 	// Calculate statistics
@@ -180,14 +183,14 @@ void OutputFrequencySingleNeuron2::run_netw(cypress::Network &netw)
 std::vector<cypress::Real> OutputFrequencySingleNeuron2::evaluate()
 {
 	if (m_spikes.size() == 0) {
-		return std::vector<cypress::Real>({0, 0, 0, 0});
+		return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
 	}
 	bool did_spike = false;
 	std::vector<cypress::Real> mean_freq;
 	for (size_t i = 0; i < m_spikes.size(); i++) {
 		std::vector<cypress::Real> frequencies;
 		for (int j = 0; j < int(m_spikes[i].size()) - 1; j++) {
-            did_spike = true;
+			did_spike = true;
 			if (m_spikes[i][j] > 50) {
 				// Workaround for a Bug in BrainScaleS
 				if (m_spikes[i][j + 1] == m_spikes[i][j]) {
@@ -217,7 +220,7 @@ std::vector<cypress::Real> OutputFrequencySingleNeuron2::evaluate()
 	                          false, -10, "Average Frequency");
 #endif
 	if (!did_spike) {
-		return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
+		return std::vector<cypress::Real>({0, 0, 0, 0});
 	}
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;
@@ -271,16 +274,19 @@ std::vector<cypress::Real> OutputFrequencyMultipleNeurons::evaluate()
 {
 	// Gather the average frequency of every neuron
 	std::vector<cypress::Real> averages(m_num_neurons, -1);
-    bool did_spike = false;
+	bool did_spike = false;
 	for (size_t i = 0; i < m_num_neurons; i++) {
 		// Vector of frequencies
 		std::vector<cypress::Real> frequencies;
 
 		// Get spikes
 		auto spikes = m_pop[i].signals().data(0);
+		if (spikes.size() == 0) {
+			return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
+		}
 		// Calculate frequencies
 		if (spikes.size() > 1) {
-            did_spike = true;
+			did_spike = true;
 
 			for (size_t i = 0; i < spikes.size() - 1; i++) {
 				if (spikes[i] > 50) {
@@ -318,7 +324,7 @@ std::vector<cypress::Real> OutputFrequencyMultipleNeurons::evaluate()
 	                          -10, "Averages");
 #endif
 	if (!did_spike) {
-		return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
+		return std::vector<cypress::Real>({0, 0, 0, 0});
 	}
 
 	// Calculate statistics
@@ -326,4 +332,4 @@ std::vector<cypress::Real> OutputFrequencyMultipleNeurons::evaluate()
 	Utilities::calculate_statistics(averages, min, max, avg, std_dev);
 	return std::vector<cypress::Real>({avg, std_dev, max, min});
 }
-}
+}  // namespace SNAB
