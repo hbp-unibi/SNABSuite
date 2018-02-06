@@ -66,7 +66,7 @@ if not os.path.exists("images"):
 for target_file in args.files:
     #import data
     results = np.recfromtxt(target_file, delimiter=',', loose=True)
-    xlabel = target_file.split(".csv")[0].split("_")[-1]
+    xlabel = DIM_LABELS[target_file.split(".csv")[0].split("_")[-1]]
     if args.t is "":
         title = target_file.split("/")[-1].split("_")[0]
     else:

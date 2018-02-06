@@ -63,6 +63,9 @@ DIM_LABELS = {
     "#input_neurons" : "Input Neurons",
     "#ConnectionsPerInput" : "Connections per Input",
     "#ConnectionsPerOutput" : "Connections per Output",
+    "averages" : "Average spike frequency",
+    "freq" : "Average spike frequency",
+    "periods" : "Length of Refractory Period",
 }
 
 
