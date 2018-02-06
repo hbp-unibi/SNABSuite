@@ -14,5 +14,10 @@
         "#neurons" : 384,
 		"#input_neurons" : 256,
 		"#ConnectionsPerInput" : [0,384,100]
+    },
+    "nmpm1" : {
+        "#neurons" : 60,
+		"#input_neurons" : 60,
+		"#ConnectionsPerInput" : [1,60, 60]
     }
 }
