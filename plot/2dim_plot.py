@@ -53,6 +53,8 @@ def cm2inch(value):
 
 
 def round_to_divisable(value, divisable):
+    if value == 0:
+        return 0
     temp = np.abs(value)
     a = 0
     while temp < divisable:
@@ -96,7 +98,9 @@ def plot_measure2d(xs, ys, zs, xlabel, ylabel, zlabel="", zmin=None,
         else:
             zmin = int(zmin)
     if zmax is None:
-        zmax = round_to_divisable(np.max(zs[idcs]), args.nl - 1) + zmin
+        zmax = round_to_divisable(np.max(zs[idcs]), args.nl - 1)
+        if zmin > 0:
+        	zmax = zmax + zmin
         if 0 < zmax < 1:
             zmax = 1
 
