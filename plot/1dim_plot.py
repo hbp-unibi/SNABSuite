@@ -114,7 +114,7 @@ for target_file in args.files:
 
     if args.ny:
         ylabel = ylabel + " (normalized)"
-        max = np.abs(get_max(ys))
+        max = get_max(np.abs(ys))
         normalize(ys, max)
         if args.ys:
             normalize(ys_dev, max)
