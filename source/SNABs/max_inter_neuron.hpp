@@ -26,11 +26,19 @@
 #include "common/snab_base.hpp"
 
 namespace SNAB {
+/**
+ * The aim of this SNAB is to measure the bandwidth between neuron populations.
+ * Therefore, taking parameters from the OutputFrequency benchmarks, a single
+ * continously spiking neuron is connected to a population of neurons. The
+ * number of spikes of the population is measured and taken as the benchmark
+ * measure.
+ *
+ */
 class SingleMaxFreqToGroup : public SNABBase {
 private:
 	cypress::PopulationBase m_pop_single, m_pop_group;
-	size_t m_num_neurons = 0;
-	cypress::Real simulation_length = 150;  // ms
+	cypress::Real m_simulation_length = 150;  // ms
+	cypress::Real m_start_time = 50;          // ms
 	NeuronParameters m_group_params;
 
 public:

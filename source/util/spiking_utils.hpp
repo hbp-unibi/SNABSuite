@@ -69,8 +69,8 @@ public:
 	/**
 	 * Runs SpikingUtils::add_typed_population, but gets a string containing the
 	 * neuron type instead of a template argument
-     * 
-     * @param neuron_type_str string naming the neuron type
+	 *
+	 * @param neuron_type_str string naming the neuron type
 	 * @param network instace in wich the population is placed
 	 * @param neuronParams Neuron parameters of the cell in the population
 	 * @param size Number of neurons in the population
@@ -92,7 +92,52 @@ public:
 	 */
 	static bool rerun_fixed_number_trials(Network &network, Backend &backend,
 	                                      Real time, size_t n_trials = 3);
+
+	/**
+	 * @brief Calculate the number of spikes of spiketrain in intervall
+	 * [start,stop]
+	 *
+	 * @param spiketrain The spiketrain for which the number of spikes should be
+	 * calculated
+	 * @param start Timepoint from which counting starts
+	 * @param end Endpoint where counting stops
+	 * @return int returns the number of spikes in [start, stop]
+	 */
+	static int calc_num_spikes(const std::vector<cypress::Real> &spiketrain,
+	                           const cypress::Real start = 0.0,
+	                           const cypress::Real end = 0.0);
+
+	/**
+	 * @brief Calculate the number of spikes in a vector of spiketrains in
+	 * intervall [start,stop]
+	 *
+	 * @param spiketrains The vector of spiketrains for which the number of
+	 * spikes should be calculated
+	 * @param start Timepoint from which counting starts
+	 * @param end Endpoint where counting stops, leave empty to count all
+	 * @return int returns the number of spikes in [start, stop]
+	 */
+	template <typename T>
+	static std::vector<int> calc_num_spikes_vec(
+	    const cypress::Matrix<T> &spiketrains, const cypress::Real start = 0.0,
+	    const cypress::Real end = std::numeric_limits<cypress::Real>::max())
+	{
+		std::vector<int> res;
+		size_t rows = spiketrains.rows();
+		size_t colls = spiketrains.cols();
+		for (size_t i = 0; i < rows; i++) {
+			int counter = 0;
+			for (size_t j = 0; j < colls; j++) {
+				if ((spiketrains[i * colls + j] >= start - 0.001) &&
+				    (spiketrains[i * colls + j] <= end + 0.001)) {
+					counter++;
+				}
+			}
+			res.push_back(counter);
+		}
+		return res;
+	}
 };
-}
+}  // namespace SNAB
 
 #endif /* SNAB_UTIL_SPIKING_UTILS_HPP */

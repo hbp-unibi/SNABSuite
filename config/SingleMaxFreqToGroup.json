@@ -13,37 +13,39 @@
 		},
 		"neuron_params_group": {
 			"e_rev_E": 0.0,
-			"v_rest": -67.0,
-			"v_reset": -67.0,
-			"v_thresh": -65,
+			"v_rest": -80.0,
+			"v_reset": -80.0,
+			"v_thresh": -78,
 			"tau_syn_E": 1.0,
 			"tau_refrac": 0.0,
-			"tau_m": 0.2,
+			"e_rev_E": 0.0,
+			"tau_m": 1.0,
 			"cm": 0.2
 		},
-		"weight" : 0.1,
-		"#neurons" : 100
+		"weight" : 0.01,
+		"#neurons" : [255,4080,16065,189450]
 	},
 	"spikey" : {
+		"setup" : {"calibIcb" : 1},
 		"neuron_type" : "IfFacetsHardware1",
 		"neuron_params_max": {
-			"g_leak": 0.2,
-			"tau_refrac": 0.0,
+			"tau_m": 1.0,
+			"tau_refrac": 0.00000000001,
 			"v_rest": -55.0,
-			"v_thresh": -68.0,
-			"v_reset": -70.0,
-			"e_rev_I": 0.0
+			"v_thresh": -78,
+			"v_reset": -80.0,
+			"e_rev_I": -80.0
 		},
 		"neuron_params_group": {
-			"g_leak": 2.0,
-			"tau_refrac": 0.0,
-			"v_rest": -55.0,
+			"tau_m": 5.0,
+			"tau_refrac": 2.0,
+			"v_rest": -80.0,
 			"v_thresh": -55.0,
-			"v_reset": -25.0,
-			"e_rev_I": 0.0
+			"v_reset": -80.0,
+			"e_rev_I": -80.0
 		},
-		"#neurons" : 126,
-		"weight" : 0.03
+		"#neurons" : [191,383],
+		"weight" : 0.001
 	},
 	"nest" : {
 		"neuron_type" : "IF_cond_exp",
@@ -67,7 +69,36 @@
 			"tau_m": 0.2,
 			"cm": 0.2
 		},
+		"weight" : 0.1,
+		"#neurons" : [100, 1000, 10000]
+    },
+    "nmpm1" : {
+		"neuron_type" : "IF_cond_exp",
+		"setup": {
+			"calib_path": "/wang/data/calibration/guidebook/",
+			"neuron_size" : 2
+		},
+		"neuron_params_max": {
+			"e_rev_E": 0.0,
+			"v_rest": 50.0,
+			"v_reset": -60.0,
+			"v_thresh": -100.0,
+			"tau_syn_E": 2.0,
+			"tau_refrac": 0.1,
+			"tau_m": 0.1,
+			"cm": 0.2
+		},
+		"neuron_params_group": {
+			"e_rev_E": 0.0,
+			"v_rest": -67.0,
+			"v_reset": -67.0,
+			"v_thresh": -65,
+			"tau_syn_E": 1.0,
+			"tau_refrac": 0.0,
+			"tau_m": 0.2,
+			"cm": 0.2
+		},
 		"weight" : 0.01,
-		"#neurons" : 100
+		"#neurons" : [85, 160]
     }
 }

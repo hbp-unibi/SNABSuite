@@ -30,10 +30,13 @@
 #include "util/utilities.hpp"
 
 namespace SNAB {
+using cypress::global_logger;
+auto NaN = std::numeric_limits<cypress::Real>::quiet_NaN;
 SingleMaxFreqToGroup::SingleMaxFreqToGroup(const std::string backend,
                                            size_t bench_index)
-    : SNABBase(__func__, backend, {"Average spike number deviation",
-                                   "Standard deviation", "Maximum", "Minimum"},
+    : SNABBase(__func__, backend,
+               {"Average spike number deviation", "Standard deviation",
+                "Maximum", "Minimum"},
                {"quality", "quality", "quality", "quality"},
                {"1/ms", "1/ms", "1/ms", "1/ms"},
                {"neuron_type", "neuron_params_max", "neuron_params_group",
@@ -54,7 +57,7 @@ cypress::Network &SingleMaxFreqToGroup::build_netw(cypress::Network &netw)
 	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params_group"]);
 
-	// Create the single, alway spiking population
+	// Create the single, always spiking population
 	m_pop_single = SpikingUtils::add_population(neuron_type_str, netw, params,
 	                                            1, "spikes");
 	// Create the group population
@@ -77,23 +80,27 @@ void SingleMaxFreqToGroup::run_netw(cypress::Network &netw)
 	cypress::PowerManagementBackend pwbackend(
 	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
-	netw.run(pwbackend, simulation_length);
+	netw.run(pwbackend, m_simulation_length);
 }
 
 std::vector<cypress::Real> SingleMaxFreqToGroup::evaluate()
 {
 	// Reference spike count
-	size_t spike_ref = m_pop_single[0].signals().data(0).size();
-	if (spike_ref == 0) {
-		std::cerr << "SNAB SingleMaxFreqToGroup was not configured correctly! "
+	size_t spike_ref = SpikingUtils::calc_num_spikes(
+	    m_pop_single[0].signals().data(0), m_start_time);
+	if (spike_ref < (m_simulation_length - m_start_time) /
+	                    10) {  // less than a spike every 10 ms
+		std::cerr << "SNAB SingleMaxFreqToGroup was probably not configured "
+		             "correctly! "
 		             "No spikes from single population!"
 		          << std::endl;
-		return std::vector<cypress::Real>();
+		return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
 	}
 
-	std::vector<cypress::Real> num_spikes;
-	for (size_t i = 0; i < size_t(m_config_file["#neurons"]); i++) {
-		num_spikes.push_back(m_pop_group[i].signals().data(0).size());
+	std::vector<int> num_spikes;
+	for (size_t i = 0; i < m_pop_group.size(); i++) {
+		num_spikes.push_back(SpikingUtils::calc_num_spikes(
+		    m_pop_group[i].signals().data(0), m_start_time));
 	}
 
 #if SNAB_DEBUG
@@ -118,9 +125,12 @@ std::vector<cypress::Real> SingleMaxFreqToGroup::evaluate()
 #endif
 
 	// Calculate statistics
-	cypress::Real max, min, avg, std_dev;
-	Utilities::calculate_statistics(num_spikes, min, max, avg, std_dev);
-	return std::vector<cypress::Real>({avg - spike_ref, max, min});
+	cypress::Real avg, std_dev;
+	int min, max;
+	Utilities::calculate_statistics<int>(num_spikes, min, max, avg, std_dev);
+	return std::vector<cypress::Real>({avg - cypress::Real(spike_ref), std_dev,
+	                                   max - cypress::Real(spike_ref),
+	                                   min - cypress::Real(spike_ref)});
 }
 
 GroupMaxFreqToGroup::GroupMaxFreqToGroup(const std::string backend,

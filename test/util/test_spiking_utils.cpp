@@ -66,4 +66,57 @@ TEST(SpikingUtils, add_population)
 	EXPECT_FALSE(pop3.signals().is_recording(
 	    cypress::IfCondExp::inst().signal_index("spikes").value()));
 }
+
+TEST(SpikingUtils, calc_num_spikes)
+{
+	std::vector<cypress::Real> spiketrain;
+    EXPECT_EQ(SpikingUtils::calc_num_spikes(spiketrain, 0.0), 0);
+	for (size_t i = 0; i < 50; i++) {
+		spiketrain.push_back(cypress::Real(i) * 0.3);
+	}
+	EXPECT_EQ(SpikingUtils::calc_num_spikes(spiketrain, 20.0), 0);
+	EXPECT_EQ(SpikingUtils::calc_num_spikes(spiketrain, 15.0), 0);
+	EXPECT_EQ(SpikingUtils::calc_num_spikes(spiketrain, 14.7), 1);
+	EXPECT_EQ(SpikingUtils::calc_num_spikes(spiketrain, 14.4), 2);
+	EXPECT_EQ(SpikingUtils::calc_num_spikes(spiketrain, 14.0), 3);
+	EXPECT_EQ(SpikingUtils::calc_num_spikes(spiketrain, 13.6), 4);
+	EXPECT_EQ(SpikingUtils::calc_num_spikes(spiketrain, 0.0), 50);
+    
+    EXPECT_EQ(SpikingUtils::calc_num_spikes(spiketrain, 10.0, 11.4), 05);
+    EXPECT_EQ(SpikingUtils::calc_num_spikes(spiketrain, 10.0, 11.7), 06);
+    EXPECT_EQ(SpikingUtils::calc_num_spikes(spiketrain, 10.0, 12.0), 07);
+    EXPECT_EQ(SpikingUtils::calc_num_spikes(spiketrain, 10.0, 13.0), 10);
+    EXPECT_EQ(SpikingUtils::calc_num_spikes(spiketrain, 10.0, 14.0), 13);
+    EXPECT_EQ(SpikingUtils::calc_num_spikes(spiketrain, 10.0, 15.0), 16);
 }
+
+TEST(SpikingUtils, calc_num_spikes_vec)
+{
+	std::array<cypress::Real, 50> spiketrain, spiketrain2;
+	for (size_t i = 0; i < 50; i++) {
+		spiketrain[i]=cypress::Real(i) * 0.3;
+        spiketrain2[i]= cypress::Real(i) * 0.4;
+	}
+	cypress::Matrix<cypress::Real> spiketrains(std::array<std::array<cypress::Real,50>,2>{{spiketrain, spiketrain2}});
+    
+	EXPECT_EQ(SpikingUtils::calc_num_spikes_vec(spiketrains, 20.0)[0], 0);
+	EXPECT_EQ(SpikingUtils::calc_num_spikes_vec(spiketrains, 15.0)[0], 0);
+	EXPECT_EQ(SpikingUtils::calc_num_spikes_vec(spiketrains, 14.7)[0], 1);
+	EXPECT_EQ(SpikingUtils::calc_num_spikes_vec(spiketrains, 14.4)[0], 2);
+	EXPECT_EQ(SpikingUtils::calc_num_spikes_vec(spiketrains, 14.0)[0], 3);
+	EXPECT_EQ(SpikingUtils::calc_num_spikes_vec(spiketrains, 13.6)[0], 4);
+	EXPECT_EQ(SpikingUtils::calc_num_spikes_vec(spiketrains)[0], 50);
+    
+    EXPECT_EQ(SpikingUtils::calc_num_spikes_vec(spiketrains, 10.0, 11.4)[0], 5);
+    EXPECT_EQ(SpikingUtils::calc_num_spikes_vec(spiketrains, 10.0, 11.7)[0], 6);
+    EXPECT_EQ(SpikingUtils::calc_num_spikes_vec(spiketrains, 10.0, 12.0)[0], 7);
+    EXPECT_EQ(SpikingUtils::calc_num_spikes_vec(spiketrains, 10.0, 13.0)[0], 10);
+    EXPECT_EQ(SpikingUtils::calc_num_spikes_vec(spiketrains, 10.0, 14.0)[0], 13);
+    EXPECT_EQ(SpikingUtils::calc_num_spikes_vec(spiketrains, 10.0, 15.0)[0], 16);
+    
+    EXPECT_EQ(SpikingUtils::calc_num_spikes_vec(spiketrains, 0.0)[1], 50);
+    EXPECT_EQ(SpikingUtils::calc_num_spikes_vec(spiketrains, 8.0, 9.0)[1], 3);
+    EXPECT_EQ(SpikingUtils::calc_num_spikes_vec(spiketrains, 8.0, 10.0)[1], 6);
+    
+}
+}  // namespace SNAB
