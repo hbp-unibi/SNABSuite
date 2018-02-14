@@ -135,11 +135,12 @@ std::vector<cypress::Real> SingleMaxFreqToGroup::evaluate()
 
 GroupMaxFreqToGroup::GroupMaxFreqToGroup(const std::string backend,
                                          size_t bench_index)
-    : SNABBase(__func__, backend, {"Average spike number deviation",
-                                   "Standard deviation", "Maximum", "Minimum"},
+    : SNABBase(__func__, backend,
+               {"Average number of spikes", "Standard deviation",
+                "Maximum", "Minimum"},
                {"quality", "quality", "quality", "quality"},
-               {"1/ms", "1/ms", "1/ms", "1/ms"},
-               {"neuron_type", "neuron_params_max", "neuron_params_group",
+               {"", "", "", ""},
+               {"neuron_type", "neuron_params_max", "neuron_params_retr",
                 "weight", "#neurons"},
                bench_index),
       m_pop_max(m_netw, 0),
@@ -154,17 +155,17 @@ cypress::Network &GroupMaxFreqToGroup::build_netw(cypress::Network &netw)
 	NeuronParameters params(SpikingUtils::detect_type(neuron_type_str),
 	                        m_config_file["neuron_params_max"]);
 	m_retr_params = NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
-	                                 m_config_file["neuron_params_group"]);
+	                                 m_config_file["neuron_params_retr"]);
 
-	// Create the single, alway spiking population
+	// Create the always spiking population
 	m_pop_max = SpikingUtils::add_population(
-	    neuron_type_str, netw, params, m_config_file["#neurons"], "spikes");
+	    neuron_type_str, netw, params, m_config_file["#neurons"]);
 	// Create the group population
 	m_pop_retr =
 	    SpikingUtils::add_population(neuron_type_str, netw, m_retr_params,
 	                                 m_config_file["#neurons"], "spikes");
 
-	// Connnect the spiking neurons to the group
+	// Connect the spiking neurons to the group
 	netw.add_connection(
 	    m_pop_max, m_pop_retr,
 	    Connector::one_to_one(cypress::Real(m_config_file["weight"])));
@@ -179,10 +180,42 @@ void GroupMaxFreqToGroup::run_netw(cypress::Network &netw)
 	cypress::PowerManagementBackend pwbackend(
 	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
-	netw.run(pwbackend, simulation_length);
+	netw.run(pwbackend, m_simulation_length);
 }
 
 std::vector<cypress::Real> GroupMaxFreqToGroup::evaluate()
+{
+    std::vector<size_t> num_spikes;
+	for (size_t i = 0; i < m_pop_retr.size(); i++) {
+		num_spikes.push_back(SpikingUtils::calc_num_spikes(
+		    m_pop_retr[i].signals().data(0), m_start_time));
+	}
+
+#if SNAB_DEBUG
+	// Write data to files
+	std::vector<std::vector<cypress::Real>> spikes;
+	for (size_t i = 0; i < m_pop_retr.size(); i++) {
+		spikes.push_back(m_pop_retr[i].signals().data(0));
+	}
+	Utilities::write_vector2_to_csv(spikes,
+	                                _debug_filename("spikes.csv"));
+
+	Utilities::write_vector_to_csv(num_spikes,
+	                               _debug_filename("num_spikes.csv"));
+
+	// Trigger plots
+	Utilities::plot_spikes(_debug_filename("spikes.csv"), m_backend);
+	Utilities::plot_histogram(_debug_filename("num_spikes.csv"), m_backend,
+	                          false, -10, "'Number of Spikes (Target)'");
+#endif
+
+	// Calculate statistics
+	cypress::Real avg, std_dev;
+    size_t min, max;
+	Utilities::calculate_statistics<size_t>(num_spikes, min, max, avg, std_dev);
+
+	return std::vector<cypress::Real>({avg, std_dev, cypress::Real(max), cypress::Real(min)});
+}
 {
 	// Reference spike count
 	size_t spike_test = m_pop_max[0].signals().data(0).size();

@@ -48,11 +48,17 @@ public:
 	std::vector<cypress::Real> evaluate() override;
 };
 
+/**
+ * Similar to the benchmark before, this SNAB measures the bandwidth between
+ * neuron populations. Now, the input population firing at maximal frequency
+ * consist of the same number of neurons as the target population. The
+ * populations are connected via a OneToOne-Connector.
+ */
 class GroupMaxFreqToGroup : public SNABBase {
 private:
 	cypress::PopulationBase m_pop_max, m_pop_retr;
-	size_t m_num_neurons = 0;
-	cypress::Real simulation_length = 150;  // ms
+	cypress::Real m_simulation_length = 150;  // ms
+	cypress::Real m_start_time = 50;          // ms
 	NeuronParameters m_retr_params;
 
 public:
