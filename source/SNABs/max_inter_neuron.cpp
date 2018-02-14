@@ -216,6 +216,19 @@ std::vector<cypress::Real> GroupMaxFreqToGroup::evaluate()
 
 	return std::vector<cypress::Real>({avg, std_dev, cypress::Real(max), cypress::Real(min)});
 }
+
+GroupMaxFreqToGroup::GroupMaxFreqToGroup(
+    std::string name, std::string backend,
+    std::initializer_list<std::string> indicator_names,
+    std::initializer_list<std::string> indicator_types,
+    std::initializer_list<std::string> indicator_measures,
+    std::initializer_list<std::string> required_parameters, size_t bench_index)
+    : SNABBase(name, backend, indicator_names, indicator_types,
+               indicator_measures, required_parameters, bench_index),
+      m_pop_max(m_netw, 0),
+      m_pop_retr(m_netw, 0)
+{
+}
 {
 	// Reference spike count
 	size_t spike_test = m_pop_max[0].signals().data(0).size();

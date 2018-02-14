@@ -55,11 +55,22 @@ public:
  * populations are connected via a OneToOne-Connector.
  */
 class GroupMaxFreqToGroup : public SNABBase {
-private:
+protected:
 	cypress::PopulationBase m_pop_max, m_pop_retr;
 	cypress::Real m_simulation_length = 150;  // ms
 	cypress::Real m_start_time = 50;          // ms
 	NeuronParameters m_retr_params;
+
+	/**
+	 * Constructor used by by child classes. Just hands everything to SNABBase
+	 * class Constructor.
+	 */
+	GroupMaxFreqToGroup(std::string name, std::string backend,
+	                    std::initializer_list<std::string> indicator_names,
+	                    std::initializer_list<std::string> indicator_types,
+	                    std::initializer_list<std::string> indicator_measures,
+	                    std::initializer_list<std::string> required_parameters,
+	                    size_t bench_index);
 
 public:
 	GroupMaxFreqToGroup(const std::string backend, size_t bench_index);
