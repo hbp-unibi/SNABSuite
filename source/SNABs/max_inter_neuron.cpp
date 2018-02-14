@@ -39,7 +39,7 @@ SingleMaxFreqToGroup::SingleMaxFreqToGroup(const std::string backend,
                 "Maximum", "Minimum"},
                {"quality", "quality", "quality", "quality"},
                {"1/ms", "1/ms", "1/ms", "1/ms"},
-               {"neuron_type", "neuron_params_max", "neuron_params_group",
+               {"neuron_type", "neuron_params_max", "neuron_params_retr",
                 "weight", "#neurons"},
                bench_index),
       m_pop_single(m_netw, 0),
@@ -55,7 +55,7 @@ cypress::Network &SingleMaxFreqToGroup::build_netw(cypress::Network &netw)
 	                        m_config_file["neuron_params_max"]);
 	m_group_params =
 	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params_group"]);
+	                     m_config_file["neuron_params_retr"]);
 
 	// Create the single, always spiking population
 	m_pop_single = SpikingUtils::add_population(neuron_type_str, netw, params,
@@ -65,7 +65,7 @@ cypress::Network &SingleMaxFreqToGroup::build_netw(cypress::Network &netw)
 	    SpikingUtils::add_population(neuron_type_str, netw, m_group_params,
 	                                 m_config_file["#neurons"], "spikes");
 
-	// Connnect the spiking neuron to the group
+	// Connect the spiking neuron to the group
 	netw.add_connection(
 	    m_pop_single, m_pop_group,
 	    Connector::all_to_all(cypress::Real(m_config_file["weight"])));

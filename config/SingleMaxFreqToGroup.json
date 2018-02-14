@@ -11,7 +11,7 @@
 			"tau_m": 10,
 			"cm": 0.2
 		},
-		"neuron_params_group": {
+		"neuron_params_retr": {
 			"e_rev_E": 0.0,
 			"v_rest": -80.0,
 			"v_reset": -80.0,
@@ -36,16 +36,16 @@
 			"v_reset": -80.0,
 			"e_rev_I": -80.0
 		},
-		"neuron_params_group": {
-			"tau_m": 5.0,
+		"neuron_params_retr": {
+			"tau_m": 2.0,
 			"tau_refrac": 2.0,
 			"v_rest": -80.0,
-			"v_thresh": -55.0,
+			"v_thresh": -69.0,
 			"v_reset": -80.0,
 			"e_rev_I": -80.0
 		},
 		"#neurons" : [191,383],
-		"weight" : 0.001
+		"weight" : 0.015
 	},
 	"nest" : {
 		"neuron_type" : "IF_cond_exp",
@@ -59,7 +59,7 @@
 			"tau_m": 1,
 			"cm": 0.2
 		},
-		"neuron_params_group": {
+		"neuron_params_retr": {
 			"e_rev_E": 0.0,
 			"v_rest": -67.0,
 			"v_reset": -67.0,
@@ -88,7 +88,7 @@
 			"tau_m": 0.1,
 			"cm": 0.2
 		},
-		"neuron_params_group": {
+		"neuron_params_retr": {
 			"e_rev_E": 0.0,
 			"v_rest": -67.0,
 			"v_reset": -67.0,
