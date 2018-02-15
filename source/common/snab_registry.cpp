@@ -48,13 +48,16 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
 	    std::make_shared<MaxInputFixedOutConnector>(
 	        MaxInputFixedOutConnector(backend, bench_index)),
 	    std::make_shared<MaxInputFixedInConnector>(
-	        MaxInputFixedInConnector(backend, bench_index))/*,
+	        MaxInputFixedInConnector(backend, bench_index)),
 	    std::make_shared<SingleMaxFreqToGroup>(
 	        SingleMaxFreqToGroup(backend, bench_index)),
 	    std::make_shared<GroupMaxFreqToGroup>(
 	        GroupMaxFreqToGroup(backend, bench_index)),
 	    std::make_shared<GroupMaxFreqToGroupAllToAll>(
-	        GroupMaxFreqToGroupAllToAll(backend, bench_index))*/ };
+	        GroupMaxFreqToGroupAllToAll(backend, bench_index)),
+	    std::make_shared<GroupMaxFreqToGroupProb>(
+	        GroupMaxFreqToGroupProb(backend, bench_index)),
+	};
 	return vec;
 }
-}
+}  // namespace SNAB
