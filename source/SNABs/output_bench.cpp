@@ -32,7 +32,6 @@
 
 namespace SNAB {
 using cypress::global_logger;
-auto NaN = std::numeric_limits<cypress::Real>::quiet_NaN;
 
 OutputFrequencySingleNeuron::OutputFrequencySingleNeuron(
     const std::string backend, size_t bench_index)

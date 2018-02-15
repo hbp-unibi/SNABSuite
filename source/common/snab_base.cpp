@@ -87,4 +87,5 @@ std::string SNABBase::_debug_filename(const std::string append) const
 	return std::string("debug/" + shortened_backend + "/" + m_snab_name + "_" +
 	                   append);
 }
-}
+cypress::Real NaN() { return std::numeric_limits<cypress::Real>::quiet_NaN(); }
+}  // namespace SNAB

@@ -25,7 +25,6 @@
 #include <string>
 
 namespace SNAB {
-
 /**
  * @brief Virtual Base class for SNABs(Benchmarks).
  * All SNABs should have seperate building of networks, execution and an
@@ -243,6 +242,11 @@ protected:
 	 */
 	std::string _debug_filename(const std::string append = std::string()) const;
 };
-}
+
+/**
+ * @brief Used to indicate bad or invalid results
+ */
+cypress::Real NaN();
+}  // namespace SNAB
 
 #endif /* SNABSUITE_COMMON_SNAB_BASE_HPP */

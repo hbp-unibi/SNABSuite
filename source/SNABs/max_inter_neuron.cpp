@@ -31,7 +31,7 @@
 
 namespace SNAB {
 using cypress::global_logger;
-auto NaN = std::numeric_limits<cypress::Real>::quiet_NaN;
+
 SingleMaxFreqToGroup::SingleMaxFreqToGroup(const std::string backend,
                                            size_t bench_index)
     : SNABBase(__func__, backend,
