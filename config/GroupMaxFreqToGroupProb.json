@@ -22,8 +22,10 @@
 			"tau_m": 1.0,
 			"cm": 0.2
 		},
-		"weight" : 0.01,
-		"#neurons" : [255,2040,8160,99960]
+		"weight" : 0.000078,
+		"#neurons_retr" : [255,3825,16065,189450],
+		"#neurons_max" : 255,
+		"probability" : 0.5
 	},
 	"spikey" : {
 		"setup" : {"calibIcb" : 1},
@@ -44,8 +46,10 @@
 			"v_reset": -80.0,
 			"e_rev_I": -80.0
 		},
-		"#neurons" : [96,192],
-		"weight" : 0.015
+		"#neurons_retr" : [192],
+		"weight" : 0.015,
+		"#neurons_max" : 192,
+		"probability" : 0.5
 	},
 	"nest" : {
 		"neuron_type" : "IF_cond_exp",
@@ -69,7 +73,9 @@
 			"tau_m": 0.2,
 			"cm": 0.2
 		},
-		"weight" : 0.008,
-		"#neurons" : [100,1000,10000]
+		"weight" : 0.01,
+		"#neurons_retr" : [100,1000,10000],
+		"#neurons_max" : 100,
+		"probability" : 0.5
     }
 }
