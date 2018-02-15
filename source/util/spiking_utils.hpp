@@ -74,12 +74,13 @@ public:
 	 * @param network instace in wich the population is placed
 	 * @param neuronParams Neuron parameters of the cell in the population
 	 * @param size Number of neurons in the population
-	 * @param record_signal string of the signal to be recorded by the backend
+	 * @param record_signal string of the signal to be recorded by the backend,
+	 * e.g. "spikes" or "v"
 	 */
 	static cypress::PopulationBase add_population(
 	    const std::string neuron_type_str, Network &network,
 	    const NeuronParameters &neuronParams, const size_t size,
-	    const std::string record_signal = "spikes");
+	    const std::string record_signal = "");
 
 	/**
 	 * Tries to run the simulation on given backend several times if backend
