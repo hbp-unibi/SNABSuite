@@ -73,7 +73,7 @@
 			"tau_m": 0.2,
 			"cm": 0.2
 		},
-		"weight" : 0.01,
+		"weight" : 0.00025,
 		"#neurons_retr" : [100,1000,10000],
 		"#neurons_max" : 100,
 		"probability" : 0.5
