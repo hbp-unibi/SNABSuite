@@ -78,6 +78,26 @@ public:
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;
 };
-}
+
+/**
+ * Identical to GroupMaxFreqToGroup, but using the AllToAll connector and
+ * allowing different number of input neurons
+ */
+class GroupMaxFreqToGroupAllToAll : public GroupMaxFreqToGroup {
+public:
+	GroupMaxFreqToGroupAllToAll(const std::string backend, size_t bench_index);
+	cypress::Network &build_netw(cypress::Network &netw) override;
+};
+
+/**
+ * Identical to GroupMaxFreqToGroup, but using the FixedProbability connector
+ * and allowing different number of input neurons
+ */
+class GroupMaxFreqToGroupProb : public GroupMaxFreqToGroup {
+public:
+	GroupMaxFreqToGroupProb(const std::string backend, size_t bench_index);
+	cypress::Network &build_netw(cypress::Network &netw) override;
+};
+}  // namespace SNAB
 
 #endif /* SNABSUITE_SNABS_MAX_INTER_NEURON_HPP */
