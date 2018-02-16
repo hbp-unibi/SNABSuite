@@ -26,6 +26,7 @@
 #include "SNABs/max_inter_neuron.hpp"
 #include "SNABs/output_bench.hpp"
 #include "SNABs/refractory_period.hpp"
+#include "SNABs/setup_time.hpp"
 #include "common/snab_base.hpp"
 
 namespace SNAB {
@@ -57,6 +58,12 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
 	        GroupMaxFreqToGroupAllToAll(backend, bench_index)),
 	    std::make_shared<GroupMaxFreqToGroupProb>(
 	        GroupMaxFreqToGroupProb(backend, bench_index)),
+	    std::make_shared<SetupTimeOneToOne>(
+	        SetupTimeOneToOne(backend, bench_index)),
+	    std::make_shared<SetupTimeAllToAll>(
+	        SetupTimeAllToAll(backend, bench_index)),
+	    std::make_shared<SetupTimeRandom>(
+	        SetupTimeRandom(backend, bench_index)),
 	};
 	return vec;
 }

@@ -111,6 +111,7 @@ add_library(benchmarks
     source/SNABs/refractory_period
     source/SNABs/max_input
     source/SNABs/max_inter_neuron
+    source/SNABs/setup_time
 )
 target_link_libraries(benchmarks
 	cypress
