@@ -48,7 +48,7 @@ TEST(SpikingUtils, add_population)
 	EXPECT_EQ(netw.neuron_count(IfFacetsHardware1::inst()), size_t(0));
 	EXPECT_FALSE(pop1.signals().is_recording(
 	    cypress::IfCondExp::inst().signal_index("v").value()));
-	EXPECT_TRUE(pop1.signals().is_recording(
+	EXPECT_FALSE(pop1.signals().is_recording(
 	    cypress::IfCondExp::inst().signal_index("spikes").value()));
 
 	EXPECT_EQ(pop1.size(), size_t(1));
