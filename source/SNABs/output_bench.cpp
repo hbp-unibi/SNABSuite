@@ -56,8 +56,8 @@ cypress::Network &OutputFrequencySingleNeuron::build_netw(
 	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params"]);
 	// Set up population
-	m_pop =
-	    SpikingUtils::add_population(neuron_type_str, netw, neuron_params, 1);
+	m_pop = SpikingUtils::add_population(neuron_type_str, netw, neuron_params,
+	                                     1, "spikes");
 	return netw;
 }
 
@@ -253,7 +253,7 @@ cypress::Network &OutputFrequencyMultipleNeurons::build_netw(
 
 	// Set up population
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, neuron_params,
-	                                     m_num_neurons);
+	                                     m_num_neurons, "spikes");
 	return netw;
 }
 
