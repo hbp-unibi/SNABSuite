@@ -52,6 +52,11 @@ SNABBase::SNABBase(std::string name, std::string backend,
 	else {
 		return;
 	}
+	
+	bool changed = replace_arrays_by_value(m_config_file, bench_index, name);
+	if (!changed && bench_index != 0) {
+		m_valid = false;
+	}
 
 	// Check for backend related setup config
 	if (m_config_file.find("setup") != m_config_file.end()) {
@@ -59,10 +64,7 @@ SNABBase::SNABBase(std::string name, std::string backend,
 		m_config_file.erase("setup");
 	}
 
-	bool changed = replace_arrays_by_value(m_config_file, bench_index, name);
-	if (!changed && bench_index != 0) {
-		m_valid = false;
-	}
+	
 }
 
 cypress::Json SNABBase::evaluate_json()
