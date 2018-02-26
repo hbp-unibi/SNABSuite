@@ -51,7 +51,7 @@
 	"nmpm1" : {
 		"neuron_type" : "IF_cond_exp",
 		"setup": {
-			"calib_path": "/wang/data/calibration/guidebook/",
+			"calib_path": "/wang/data/calibration/brainscales/default-2017-09-26-1",
 			"neuron_size" : 2
 		},
 		"neuron_params": {
