@@ -52,22 +52,23 @@
 		"neuron_type" : "IF_cond_exp",
 		"setup": {
 			"calib_path": "/wang/data/calibration/brainscales/default-2017-09-26-1",
-			"neuron_size" : 2
+			"neuron_size" : 4,
+			"digital_weight" : true
 		},
 		"neuron_params": {
 			"e_rev_E": 0.0,
 			"e_rev_I": -100.0,
 			"v_rest": -65.0,
 			"v_reset": -65.0,
-			"v_thresh": -60.0,
+			"v_thresh": -53.0,
 			"tau_syn_E": 2.0,
-			"tau_refrac": 2.0,
-			"tau_m": 40.0,
+			"tau_refrac": 1.0,
+			"tau_m": 5.0,
 			"cm": 0.2
         },
 		"#neurons" : [60, 120],
 		"#input_neurons" : 100,
-		"weight" : 0.029,
-		"#spikes" : 100
+		"weight" : 1,
+		"#spikes" : 10
 	}
 }
