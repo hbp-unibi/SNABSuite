@@ -13,10 +13,13 @@
 		},
 		"#neurons" : [100, 1000, 10000],
 		"#input_neurons" : 100,
-		"weight" : 0.03,
-		"#spikes" : 100
+		"weight" : 0.0005,
+		"#spikes" : 10
     },
     "spinnaker" : {
+        "setup" : {
+            "time_scale_factor" : 1
+        },
 		"neuron_type" : "IF_cond_exp",
 		"neuron_params": {
 			"e_rev_E": 0.0,
@@ -30,23 +33,26 @@
 		},
 		"#neurons" : [255,3825,16065,189400],
 		"#input_neurons" : 100,
-		"weight" : 0.03,
-		"#spikes" : 100
+		"weight" : 0.0005,
+		"#spikes" : 10
     },
 	"spikey" : {
+		"setup": {
+            "calibIcb": true
+		},
 		"neuron_type" : "IfFacetsHardware1",
 		"neuron_params": {
-			"tau_m": 10.0,
-			"tau_refrac": 0.0,
-			"v_rest": -60.0,
-			"v_thresh": -57.0,
+			"tau_m": 1.0,
+			"tau_refrac": 8.0,
+			"v_rest": -63.0,
+			"v_thresh": -55.0,
 			"v_reset": -65.0,
 			"e_rev_I": 0.0
 		},
 		"#neurons" : [192,384],
 		"#input_neurons" : 100,
 		"weight" : 0.015,
-		"#spikes" : 100
+		"#spikes" : 10
 	},
 	"nmpm1" : {
 		"neuron_type" : "IF_cond_exp",
