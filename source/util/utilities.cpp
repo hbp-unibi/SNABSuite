@@ -57,6 +57,14 @@ void Utilities::progress_callback(double p)
 	}
 	std::cerr << "]\r";
 }
+namespace {
+inline bool ends_with(std::string const &value, std::string const &ending)
+{
+	if (ending.size() > value.size())
+		return false;
+	return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+}
+}  // namespace
 
 Json Utilities::merge_json(const Json &a, const Json &b)
 {
@@ -64,6 +72,14 @@ Json Utilities::merge_json(const Json &a, const Json &b)
 	Json tmp = b.flatten();
 
 	for (Json::iterator it = tmp.begin(); it != tmp.end(); ++it) {
+		if (ends_with(it.key(), "/0")) {
+			std::string tmp = it.key();
+			tmp.pop_back();
+			tmp.pop_back();
+			if (result.find(tmp) != result.end()) {
+				result.erase(result.find(tmp));
+			}
+		}
 		result[it.key()] = it.value();
 	}
 
@@ -153,4 +169,4 @@ void Utilities::plot_voltages_spikes(std::string filename,
 		std::cerr << "Calling spike_plot.py caused an error!" << std::endl;
 	}
 }
-}
+}  // namespace SNAB

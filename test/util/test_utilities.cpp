@@ -130,6 +130,19 @@ static const std::string test_json4 =
     "\t}\n"
     "}\n";
 
+static const std::string test_json5 =
+    "{\n"
+    "\t\"data\": {\n"
+    "\t\t\"misc\": [21,22,23]\n"
+    "\t}\n"
+    "}\n";
+static const std::string test_json6 =
+    "{\n"
+    "\t\"data\": {\n"
+    "\t\t\"misc2\": [21,22,23]\n"
+    "\t}\n"
+    "}\n";
+
 using cypress::Json;
 TEST(Utilities, merge_json)
 {
@@ -137,6 +150,8 @@ TEST(Utilities, merge_json)
 	Json json2 = Json::parse(test_json2);
 	Json json3 = Json::parse(test_json3);
 	Json json4 = Json::parse(test_json4);
+	Json json5 = Json::parse(test_json5);
+	Json json6 = Json::parse(test_json6);
 
 	// Test for overwriting values
 	Json test1 = Utilities::merge_json(json1, json2);
@@ -157,6 +172,13 @@ TEST(Utilities, merge_json)
 	// Test for append in a sub structure
 	Json test3 = Utilities::merge_json(json1, json4);
 	EXPECT_EQ(21, int(test3["data"]["misc"]));
+
+	// Test for replace entry by array
+	Json test4 = Utilities::merge_json(json4, json5);
+	EXPECT_EQ(json5, test4);
+	Json test5 = Utilities::merge_json(json5, json6);
+	EXPECT_EQ(json5["data"]["misc"], test5["data"]["misc"]);
+	EXPECT_EQ(json6["data"]["misc2"], test5["data"]["misc2"]);
 }
 
 TEST(Utilities, manipulate_backend)
@@ -203,4 +225,4 @@ TEST(Utilities, manipulate_backend)
 	EXPECT_STREQ("back", Utilities::split(backend3, '=')[0].c_str());
 	EXPECT_EQ(18, int(test2["data"]["misc"]));
 }
-}
+}  // namespace SNAB
