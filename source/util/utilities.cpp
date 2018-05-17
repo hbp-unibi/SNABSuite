@@ -64,25 +64,42 @@ inline bool ends_with(std::string const &value, std::string const &ending)
 		return false;
 	return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
+
+void remove_existing_entries(Json &a, const Json &b)
+{
+	for (auto it = b.begin(); it != b.end(); ++it) {
+		if (a.find(it.key()) != a.end()) {
+			if (a[it.key()].is_object()) {
+				remove_existing_entries(a[it.key()], b[it.key()]);
+			}
+			else {
+				a.erase(a.find(it.key()));
+			}
+		}
+	}
+}
+
 }  // namespace
 
 Json Utilities::merge_json(const Json &a, const Json &b)
 {
-	Json result = a.flatten();
+	Json result = a;
+	remove_existing_entries(result, b);
+    result = result.flatten();
 	Json tmp = b.flatten();
 
 	for (Json::iterator it = tmp.begin(); it != tmp.end(); ++it) {
 		if (ends_with(it.key(), "/0")) {
-			std::string tmp = it.key();
-			tmp.pop_back();
-			tmp.pop_back();
-			if (result.find(tmp) != result.end()) {
-				result.erase(result.find(tmp));
+			std::string temp = it.key();
+			temp.pop_back();
+			temp.pop_back();
+			if (result.find(temp) != result.end()) {
+				result.erase(result.find(temp));
 			}
 		}
+
 		result[it.key()] = it.value();
 	}
-
 	return result.unflatten();
 }
 

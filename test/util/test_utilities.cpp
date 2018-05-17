@@ -179,6 +179,10 @@ TEST(Utilities, merge_json)
 	Json test5 = Utilities::merge_json(json5, json6);
 	EXPECT_EQ(json5["data"]["misc"], test5["data"]["misc"]);
 	EXPECT_EQ(json6["data"]["misc2"], test5["data"]["misc2"]);
+    
+    // Test for replace array by entry
+    Json test6 = Utilities::merge_json(json5, json4);
+	EXPECT_EQ(json4, test6);
 }
 
 TEST(Utilities, manipulate_backend)
