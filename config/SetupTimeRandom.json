@@ -10,5 +10,9 @@
 	"nest" : {
 		"neuron_type" : "IF_cond_exp",
 		"#neurons" : [100,1000,10000]
+    },
+    "nmpm1" : {
+                "neuron_type" : "IF_cond_exp",
+                "#neurons" : [15,30,60]
     }
 }
