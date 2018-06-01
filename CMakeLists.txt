@@ -42,13 +42,37 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 
 # Include the Cypress library
-find_package(Cypress REQUIRED)
-include_directories(${CYPRESS_INCLUDE_DIR})
+# Fetch External Project "Cypress"
+find_package(PythonLibs 2.7 REQUIRED )
+include(ExternalProject)
+ExternalProject_Add(cypress_ext
+    GIT_REPOSITORY        "https://github.com/hbp-unibi/cypress/"
+    GIT_TAG               pybind
+    UPDATE_COMMAND        git pull
+    CMAKE_ARGS            -DSTATIC_LINKING=${STATIC_LINKING} -DCMAKE_INSTALL_PREFIX:path=<INSTALL_DIR>
+    INSTALL_COMMAND 	  ""
+    EXCLUDE_FROM_ALL      1
+)
+ExternalProject_Get_Property(cypress_ext SOURCE_DIR BINARY_DIR)
+set(CYPRESS_INCLUDE_DIRS 
+	${SOURCE_DIR}/
+	${SOURCE_DIR}/external/pybind11/include/
+	${BINARY_DIR}/
+	${BINARY_DIR}/include/
+	${PYTHON_INCLUDE_DIRS}
+)
+set(CYPRESS_LIBRARY
+	${BINARY_DIR}/libcypress.a
+    ${PYTHON_LIBRARIES}
+    -pthread
+)
 
 # Automatically download and compile Google-Test
 include(gtest_external)
 
-
+include_directories(
+	${CYPRESS_INCLUDE_DIRS}
+)
 
 # Enable all warnings on MSVC and GCC/Clang/Intel
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -86,10 +110,10 @@ add_library(benchmark_utils
 	source/util/spiking_utils
 	source/util/utilities
 )
-target_link_libraries(benchmark_utils
-	cypress
-	-pthread
+target_link_libraries(benchmark_utils	
+    ${CYPRESS_LIBRARY}
 )
+add_dependencies(benchmark_utils cypress_ext)
 
 add_library(benchmark_common
     source/common/benchmark
@@ -101,10 +125,10 @@ add_library(benchmark_common
 )
 target_link_libraries(benchmark_common
     benchmarks
-	cypress
 	benchmark_utils
-	-pthread
+    ${CYPRESS_LIBRARY}
 )
+add_dependencies(benchmark_common cypress_ext)
 
 add_library(benchmarks 
     source/SNABs/output_bench
@@ -114,15 +138,16 @@ add_library(benchmarks
     source/SNABs/setup_time
 )
 target_link_libraries(benchmarks
-	cypress
 	benchmark_common
 	benchmark_utils
-	-pthread
+    ${CYPRESS_LIBRARY}
 )
+add_dependencies(benchmarks cypress_ext)
 
 add_executable(benchmark
     source/exec/snab.cpp
 )
+add_dependencies(benchmark cypress_ext)
 
 target_link_libraries(benchmark
     benchmark_utils
@@ -133,6 +158,7 @@ target_link_libraries(benchmark
 add_executable(sweep
     source/exec/snab_sweep.cpp
 )
+add_dependencies(sweep cypress_ext)
 
 target_link_libraries(sweep
     benchmark_utils
