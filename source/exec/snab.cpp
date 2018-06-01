@@ -30,6 +30,7 @@ int main(int argc, const char *argv[])
 		          << " <SIMULATOR> [snab] [bench_index] [NMPI]" << std::endl;
 		return 1;
 	}
+	auto python = cypress::PythonInstance();
 
 	if (std::string(argv[argc - 1]) == "NMPI" &&
 	    !cypress::NMPI::check_args(argc, argv)) {
