@@ -72,10 +72,10 @@
 			"tau_m": 5.0,
 			"cm": 0.2
         },
-		"#neurons" : [60, 120],
-		"#input_neurons" : [60,120],
+		"#neurons" : [10,20,40],
+		"#input_neurons" : [10,10,15],
 		"weight" : 15,
 		"#spikes" : 1,
-		"#ConnectionsPerOutput" : [30,60]
+		"#ConnectionsPerOutput" : [5,10,10]
 	}
 }

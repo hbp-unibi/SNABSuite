@@ -105,7 +105,7 @@
 			"cm": 0.2
 		},
 		"weight" : 1,
-		"#neurons_retr" : [15,30,60],
-		"#neurons_max" : 15
+		"#neurons_retr" : [8,15,30],
+		"#neurons_max" : 7
     }
 }

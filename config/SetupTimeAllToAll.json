@@ -13,6 +13,6 @@
     },
     "nmpm1" : {
                 "neuron_type" : "IF_cond_exp",
-                "#neurons" : [15,30,60]
+                "#neurons" : [15,30,40]
     }
 }

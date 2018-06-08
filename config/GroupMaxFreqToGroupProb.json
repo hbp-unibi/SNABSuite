@@ -108,8 +108,8 @@
 			"cm": 0.2
 		},
 		"weight" : 6,
-		"#neurons_retr" : [16,32,64],
-		"#neurons_max" : 16,
+		"#neurons_retr" : [8,23,53],
+		"#neurons_max" : 7,
 		"probability" : 0.5
     }
 }

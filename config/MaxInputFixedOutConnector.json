@@ -68,14 +68,14 @@
 			"v_reset": -65.0,
 			"v_thresh": -60.0,
 			"tau_syn_E": 2.0,
-			"tau_refrac": 1.0,
-			"tau_m": 5.0,
+			"tau_refrac": 10.0,
+			"tau_m": 2.0,
 			"cm": 0.2
         },
-		"#neurons" : [60, 120],
-		"#input_neurons" : [60,120],
+		"#neurons" : [10,20,40],
+		"#input_neurons" : [10,10,15],
 		"weight" : 15,
 		"#spikes" : 1,
-		"#ConnectionsPerInput" : [30,60]
+		"#ConnectionsPerInput" : [5,10,10]
 	}
 }

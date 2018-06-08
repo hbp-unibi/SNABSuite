@@ -10,6 +10,6 @@
         "#input_neurons" : [1, 10000, 100]
     },
     "nmpm1" : {
-        "#input_neurons" : [1, 100 ,100]
+        "#input_neurons" : [1, 50 ,50]
     }
 }
