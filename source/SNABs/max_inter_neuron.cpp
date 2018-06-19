@@ -88,15 +88,14 @@ std::vector<cypress::Real> SingleMaxFreqToGroup::evaluate()
 	// Reference spike count
 	size_t spike_ref = SpikingUtils::calc_num_spikes(
 	    m_pop_single[0].signals().data(0), m_start_time);
+    bool valid = true;
 	if (spike_ref < (m_simulation_length - m_start_time) /
 	                    10) {  // less than a spike every 10 ms
-		std::cerr << "SNAB SingleMaxFreqToGroup was probably not configured "
+		global_logger().error("SNABSuite", "SNAB SingleMaxFreqToGroup was probably not configured "
 		             "correctly! "
-		             "No spikes from single population!"
-		          << std::endl;
-		return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
+		             "No spikes from single population!");
+		valid = false;
 	}
-    std::cout << ">>>>>>>>>>>>>> " << spike_ref << std::endl;
 	std::vector<int> num_spikes;
 	for (size_t i = 0; i < m_pop_group.size(); i++) {
 		num_spikes.push_back(SpikingUtils::calc_num_spikes(
@@ -123,12 +122,15 @@ std::vector<cypress::Real> SingleMaxFreqToGroup::evaluate()
 	Utilities::plot_histogram(_debug_filename("num_spikes.csv"), m_backend,
 	                          false, -10, "'Number of Spikes'");
 #endif
+    
+    if(!valid){
+        return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
+    }
 
 	// Calculate statistics
 	cypress::Real avg, std_dev;
 	int min, max;
 	Utilities::calculate_statistics<int>(num_spikes, min, max, avg, std_dev);
-    std::cout << "<<<<<<<<<<<<<<<<<" << avg <<std::endl;
 	return std::vector<cypress::Real>({avg - cypress::Real(spike_ref), std_dev,
 	                                   max - cypress::Real(spike_ref),
 	                                   min - cypress::Real(spike_ref)});
