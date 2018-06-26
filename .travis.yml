@@ -116,6 +116,7 @@ before_install:
 install: 
   - sudo pip install cython numpy pyNN requests pyminifier
 script: 
+  - mkdir build && cd build
   - cmake .. -DSTATIC_LINKING=FALSE -DSNAB_DEBUG=TRUE
   - make && make test ARGS=-V
   - cmake .. -DSTATIC_LINKING=TRUE -DSNAB_DEBUG=TRUE
