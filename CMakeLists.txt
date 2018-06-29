@@ -20,7 +20,6 @@ project(SNABSuite)
 
 # Enable C++14 support
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
-find_package(PythonLibs 2.7 REQUIRED )
 
 # Add configuration option for static linking 
 set(STATIC_LINKING TRUE CACHE BOOL "True for static linking")

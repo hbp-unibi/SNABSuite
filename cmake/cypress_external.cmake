@@ -15,9 +15,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
-project(cypress_download NONE)
-cmake_minimum_required (VERSION 3.2)
+find_package(PythonLibs 2.7 REQUIRED )
+find_package(PythonInterp 2.7 REQUIRED)
 
 include(ExternalProject)
 ExternalProject_Add(cypress_ext
@@ -49,8 +48,17 @@ set(GTEST_LIBRARIES
 )
 set(GTEST_INCLUDE_DIRS ${SOURCE_DIR}/googletest-prefix/googletest/googletest/include/)
 set(GTEST_FOUND TRUE)
+message(warning ${PYTHON_EXECUTABLE})
+execute_process(
+    COMMAND "${PYTHON_EXECUTABLE}" -c
+            "from __future__ import print_function\nimport numpy; print(numpy.get_include(), end='')"
+            OUTPUT_VARIABLE numpy_path)
+            
+find_path(PYTHON_NUMPY_INCLUDE_DIR numpy/arrayobject.h 
+    HINTS "${numpy_path}" "${PYTHON_INCLUDE_PATH}" NO_DEFAULT_PATH)
 
 include_directories(
 	${CYPRESS_INCLUDE_DIRS}
 	${GTEST_INCLUDE_DIRS}
+    ${PYTHON_NUMPY_INCLUDE_DIR}
 )
