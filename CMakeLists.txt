@@ -43,36 +43,7 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 
 # Include the Cypress library
-# Fetch External Project "Cypress"
-include(ExternalProject)
-ExternalProject_Add(cypress_ext
-    GIT_REPOSITORY        "https://github.com/hbp-unibi/cypress/"
-    GIT_TAG               pybind
-    UPDATE_COMMAND        git pull
-    CMAKE_ARGS            -DSTATIC_LINKING=${STATIC_LINKING} -DCMAKE_INSTALL_PREFIX:path=<INSTALL_DIR> -DCMAKE_BUILD_TYPE:STRING=${DCMAKE_BUILD_TYPE}
-    INSTALL_COMMAND 	  ""
-    EXCLUDE_FROM_ALL      1
-)
-ExternalProject_Get_Property(cypress_ext SOURCE_DIR BINARY_DIR)
-set(CYPRESS_INCLUDE_DIRS 
-	${SOURCE_DIR}/
-	${SOURCE_DIR}/external/pybind11/include/
-	${BINARY_DIR}/
-	${BINARY_DIR}/include/
-	${PYTHON_INCLUDE_DIRS}
-)
-set(CYPRESS_LIBRARY
-	${BINARY_DIR}/libcypress.a
-    ${PYTHON_LIBRARIES}
-    -pthread
-)
-
-# Automatically download and compile Google-Test
-include(gtest_external)
-
-include_directories(
-	${CYPRESS_INCLUDE_DIRS}
-)
+include(cypress_external)
 
 # Enable all warnings on MSVC and GCC/Clang/Intel
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
