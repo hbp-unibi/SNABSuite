@@ -46,7 +46,7 @@ set(GTEST_LIBRARIES
     ${BINARY_DIR}/googletest-prefix/src/googletest-build/googlemock/gtest/libgtest.a
 	${BINARY_DIR}/googletest-prefix/src/googletest-build/googlemock/gtest/libgtest_main.a
 )
-set(GTEST_INCLUDE_DIRS ${SOURCE_DIR}/googletest-prefix/googletest/googletest/include/)
+set(GTEST_INCLUDE_DIRS ${BINARY_DIR}/googletest-prefix/src/googletest/googletest/include/)
 set(GTEST_FOUND TRUE)
 message(warning ${PYTHON_EXECUTABLE})
 execute_process(
