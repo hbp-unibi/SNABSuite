@@ -24,6 +24,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
 # Add configuration option for static linking 
 set(STATIC_LINKING TRUE CACHE BOOL "True for static linking")
 
+find_package(PythonLibs 2.7 REQUIRED )
+
 # Link statically
 if(STATIC_LINKING)
 	SET(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
@@ -75,44 +77,25 @@ include_directories(source/)
 # Benchmark basic libraries
 #
 
-add_library(benchmark_utils
+add_library(benchmark_library
 	source/util/read_json
 	source/util/spiking_utils
 	source/util/utilities
-)
-target_link_libraries(benchmark_utils	
-    ${CYPRESS_LIBRARY}
-)
-add_dependencies(benchmark_utils cypress_ext)
-
-add_library(benchmark_common
     source/common/benchmark
     source/common/neuron_parameters
     source/common/parameter_sweep
 	source/common/snab_base
 	source/common/snab_registry
-	
-)
-target_link_libraries(benchmark_common
-    benchmarks
-	benchmark_utils
-    ${CYPRESS_LIBRARY}
-)
-add_dependencies(benchmark_common cypress_ext)
-
-add_library(benchmarks 
     source/SNABs/output_bench
     source/SNABs/refractory_period
     source/SNABs/max_input
     source/SNABs/max_inter_neuron
     source/SNABs/setup_time
 )
-target_link_libraries(benchmarks
-	benchmark_common
-	benchmark_utils
+target_link_libraries(benchmark_library
     ${CYPRESS_LIBRARY}
 )
-add_dependencies(benchmarks cypress_ext)
+add_dependencies(benchmark_library cypress_ext)
 
 add_executable(benchmark
     source/exec/snab.cpp
@@ -120,9 +103,7 @@ add_executable(benchmark
 add_dependencies(benchmark cypress_ext)
 
 target_link_libraries(benchmark
-    benchmark_utils
-    benchmark_common
-    benchmarks
+    benchmark_library
 )
 
 add_executable(sweep
@@ -131,9 +112,7 @@ add_executable(sweep
 add_dependencies(sweep cypress_ext)
 
 target_link_libraries(sweep
-    benchmark_utils
-    benchmark_common
-    benchmarks
+    benchmark_library
 )
 
 #

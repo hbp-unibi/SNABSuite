@@ -48,7 +48,7 @@ set(GTEST_LIBRARIES
 )
 set(GTEST_INCLUDE_DIRS ${BINARY_DIR}/googletest-prefix/src/googletest/googletest/include/)
 set(GTEST_FOUND TRUE)
-message(warning ${PYTHON_EXECUTABLE})
+
 execute_process(
     COMMAND "${PYTHON_EXECUTABLE}" -c
             "from __future__ import print_function\nimport numpy; print(numpy.get_include(), end='')"
