@@ -25,6 +25,9 @@
 
 using namespace SNAB;
 
+// Compatibility hack for for older glibc
+__asm__(".symver glob64,glob64@GLIBC_2.2.5");
+
 // Global Pointer to a sweep instance, used to access member in sig handler
 ParameterSweep *sweep_pointer;
 

@@ -23,6 +23,9 @@
 
 using namespace SNAB;
 
+// Compatibility hack for for older glibc
+__asm__(".symver glob64,glob64@GLIBC_2.2.5");
+
 int main(int argc, const char *argv[])
 {
 	if ((argc < 2 || argc > 5) && !cypress::NMPI::check_args(argc, argv)) {
