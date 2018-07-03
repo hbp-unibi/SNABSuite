@@ -21,11 +21,11 @@
 #ifndef SNABSUITE_COMMON_SPIKING_PARAMETERS_HPP
 #define SNABSUITE_COMMON_SPIKING_PARAMETERS_HPP
 
+#include <cypress/cypress.hpp>
+
 #include <array>
 #include <iostream>
 #include <string>
-
-#include <cypress/cypress.hpp>
 
 /**
  * Macro used for defining the getters and setters associated with a parameter

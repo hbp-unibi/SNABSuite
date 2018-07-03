@@ -21,6 +21,8 @@
 #ifndef SNABSUITE_UTIL_UTILITIES_HPP
 #define SNABSUITE_UTIL_UTILITIES_HPP
 
+#include <cypress/cypress.hpp>
+
 #include <algorithm>  // Minimal and Maximal element
 #include <cmath>
 #include <fstream>
@@ -28,8 +30,6 @@
 #include <numeric>  // std::accumulate
 #include <string>
 #include <vector>
-
-#include <cypress/cypress.hpp>
 
 namespace SNAB {
 

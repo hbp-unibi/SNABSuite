@@ -16,12 +16,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cypress/cypress.hpp>
+
 #include <sstream>
 #include <vector>
 
 #include "gtest/gtest.h"
 
-#include <cypress/cypress.hpp>
 #include "common/neuron_parameters.hpp"
 
 namespace SNAB {

@@ -21,11 +21,12 @@
 #ifndef SNABSUITE_COMMON_PARAMETER_SWEEP
 #define SNABSUITE_COMMON_PARAMETER_SWEEP
 
+#include <cypress/cypress.hpp>
+
 #include <fstream>
 #include <memory>
 #include <string>
 
-#include <cypress/cypress.hpp>
 #include "common/snab_base.hpp"
 
 namespace SNAB {

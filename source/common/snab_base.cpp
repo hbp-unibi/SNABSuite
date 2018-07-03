@@ -16,10 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cypress/cypress.hpp>
+
 #include "snab_base.hpp"
 
 #include <sys/stat.h>
-#include <cypress/cypress.hpp>
 #include <string>
 
 #include "util/read_json.hpp"

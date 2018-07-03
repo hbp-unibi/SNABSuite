@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cypress/cypress.hpp>
+
 #include <algorithm>  // std::find
 #include <cstdio>
 #include <cstdlib>
@@ -27,7 +29,6 @@
 
 #include <unistd.h>  // unlink file
 
-#include <cypress/cypress.hpp>
 #include "common/snab_base.hpp"
 #include "common/snab_registry.hpp"
 #include "parameter_sweep.hpp"
