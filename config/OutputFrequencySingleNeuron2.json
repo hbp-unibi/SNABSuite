@@ -15,6 +15,7 @@
 		"#neurons" : [255,4080,16320,189700]
 	},
 	"spikey" : {
+		"invalid" : true,
         "setup" : {"calibIcb" : 1},
 		"neuron_type" : "IfFacetsHardware1",
 		"neuron_params": {
