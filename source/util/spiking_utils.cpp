@@ -132,4 +132,20 @@ int SpikingUtils::calc_num_spikes(const std::vector<cypress::Real> &spiketrain,
 	}
 }
 
+std::vector<size_t> SpikingUtils::spike_time_binning(
+    const Real &start, const Real &stop, const size_t &n_bins,
+    const std::vector<cypress::Real> &spike_times)
+{
+	Real bin_size = (stop - start) / n_bins;
+	std::vector<size_t> bin_counts(n_bins, 0);
+	for (Real spike : spike_times) {
+		if (spike >= stop || spike < start) {
+			continue;
+		}
+		size_t bin_idx = size_t((spike - start) / bin_size);
+		bin_counts[bin_idx]++;
+	}
+	return bin_counts;
+}
+
 }  // namespace SNAB

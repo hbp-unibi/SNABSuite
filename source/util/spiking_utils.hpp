@@ -138,6 +138,9 @@ public:
 		}
 		return res;
 	}
+
+	static std::vector<size_t> spike_time_binning(const Real& start, const Real& stop, const size_t& n_bins,
+										   const std::vector<cypress::Real> &spike_times);
 };
 }  // namespace SNAB
 
