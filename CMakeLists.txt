@@ -112,6 +112,7 @@ add_library(benchmarks
     source/SNABs/max_input
     source/SNABs/max_inter_neuron
     source/SNABs/setup_time
+    source/SNABs/wta_like
 )
 target_link_libraries(benchmarks
 	cypress
