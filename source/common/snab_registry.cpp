@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cypress/cypress.hpp> // Avoid a warning
+
 #include "common/snab_registry.hpp"
 
 #include <memory>

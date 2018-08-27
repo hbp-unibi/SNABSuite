@@ -16,12 +16,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "util/utilities.hpp"
+
 #include <cmath>
 #include <string>
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "util/utilities.hpp"
 namespace SNAB {
 TEST(Utilities, split)
 {

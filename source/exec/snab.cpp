@@ -15,13 +15,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <cypress/cypress.hpp>
 
 #include <glob.h>
 
-#include <cypress/cypress.hpp>
 #include "common/benchmark.hpp"
 
 using namespace SNAB;
+
+// Compatibility hack for for older glibc
+__asm__(".symver glob64,glob64@GLIBC_2.2.5");
 
 int main(int argc, const char *argv[])
 {

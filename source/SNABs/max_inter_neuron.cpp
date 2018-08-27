@@ -17,11 +17,12 @@
  */
 //#include <algorithm>  // Minimal and Maximal element
 //#include <numeric>    // std::accumulate
+#include <cypress/cypress.hpp>               // Neural network frontend
+
 #include <string>
 #include <vector>
 
 #include <cypress/backend/power/netio4.hpp>  // Control of power via NetIO4 Bank
-#include <cypress/cypress.hpp>               // Neural network frontend
 
 #include "common/neuron_parameters.hpp"
 #include "max_inter_neuron.hpp"

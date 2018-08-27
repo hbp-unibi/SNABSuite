@@ -16,19 +16,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//#include <memory>
-//#include <random>
-//#include <string>
-//#include <vector>
-
-#include <cypress/backend/power/netio4.hpp>  // Control of power via NetIO4 Bank
 #include <cypress/cypress.hpp>               // Neural network frontend
 
-//#include "common/neuron_parameters.hpp"
+#include <cypress/backend/power/netio4.hpp>  // Control of power via NetIO4 Bank
+
+
 #include <util/spiking_utils.hpp>
 #include "setup_time.hpp"
-//#include "util/spiking_utils.hpp"
-//#include "util/utilities.hpp"
 
 namespace SNAB {
 

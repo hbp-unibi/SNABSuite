@@ -21,15 +21,13 @@
 #ifndef SNABSUITE_UTIL_READ_JSON_HPP
 #define SNABSUITE_UTIL_READ_JSON_HPP
 
+#include <cypress/cypress.hpp>
+
 #include <fstream>
 #include <limits>
 #include <map>
 #include <string>
 #include <vector>
-
-#include <cypress/cypress.hpp>
-
-//#include "util/utilities.hpp"
 
 namespace SNAB {
 using cypress::global_logger;

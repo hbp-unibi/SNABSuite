@@ -24,15 +24,17 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
 # Add configuration option for static linking 
 set(STATIC_LINKING TRUE CACHE BOOL "True for static linking")
 
+find_package(PythonLibs 2.7 REQUIRED )
+
 # Link statically
 if(STATIC_LINKING)
 	SET(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 	SET(BUILD_SHARED_LIBRARIES OFF)
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-        SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -Wl,--no-export-dynamic")
+        SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++ -static-libgcc  -Wl,--no-export-dynamic")
         SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s -Wl,--no-export-dynamic")
     else()
-        SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+        SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++ -static-libgcc")
         SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s")
     endif()
 endif()
@@ -42,13 +44,7 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 
 # Include the Cypress library
-find_package(Cypress REQUIRED)
-include_directories(${CYPRESS_INCLUDE_DIR})
-
-# Automatically download and compile Google-Test
-include(gtest_external)
-
-
+include(cypress_external)
 
 # Enable all warnings on MSVC and GCC/Clang/Intel
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -81,32 +77,15 @@ include_directories(source/)
 # Benchmark basic libraries
 #
 
-add_library(benchmark_utils
+add_library(benchmark_library
 	source/util/read_json
 	source/util/spiking_utils
 	source/util/utilities
-)
-target_link_libraries(benchmark_utils
-	cypress
-	-pthread
-)
-
-add_library(benchmark_common
     source/common/benchmark
     source/common/neuron_parameters
     source/common/parameter_sweep
 	source/common/snab_base
 	source/common/snab_registry
-	
-)
-target_link_libraries(benchmark_common
-    benchmarks
-	cypress
-	benchmark_utils
-	-pthread
-)
-
-add_library(benchmarks 
     source/SNABs/output_bench
     source/SNABs/refractory_period
     source/SNABs/max_input
@@ -114,31 +93,27 @@ add_library(benchmarks
     source/SNABs/setup_time
     source/SNABs/wta_like
 )
-target_link_libraries(benchmarks
-	cypress
-	benchmark_common
-	benchmark_utils
-	-pthread
+target_link_libraries(benchmark_library
+    ${CYPRESS_LIBRARY}
 )
+add_dependencies(benchmark_library cypress_ext)
 
 add_executable(benchmark
     source/exec/snab.cpp
 )
+add_dependencies(benchmark cypress_ext)
 
 target_link_libraries(benchmark
-    benchmark_utils
-    benchmark_common
-    benchmarks
+    benchmark_library
 )
 
 add_executable(sweep
     source/exec/snab_sweep.cpp
 )
+add_dependencies(sweep cypress_ext)
 
 target_link_libraries(sweep
-    benchmark_utils
-    benchmark_common
-    benchmarks
+    benchmark_library
 )
 
 #

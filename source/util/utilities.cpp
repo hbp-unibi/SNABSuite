@@ -15,6 +15,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <cypress/cypress.hpp>
+
 #include "utilities.hpp"
 
 #include <cmath>
@@ -23,8 +25,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
-#include <cypress/cypress.hpp>
 
 namespace SNAB {
 using cypress::Json;
