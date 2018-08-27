@@ -169,12 +169,10 @@ std::vector<Real> SimpleWTA::calculate_WTA_metrics(
 	size_t win_streak_0 = 0, win_streak_1 = 0, max_win_streak = 0;
 	size_t num_state_changes = 0, num_time_dead = 0;
 	for (size_t i = 0; i < bins.size(); i++) {
-		std::cout << bins[i] << ", " << bins2[i] <<std::endl;
 		if (bins[i] > 5 + bins2[i]) {
 			// Pop 1 is winner
 			if (win_streak_0 == 0 && i!=0) {
 				// State change
-				std::cout << "state Change" <<std::endl;
 				num_state_changes++;
 				if (win_streak_1 > 0) {
 					if (win_streak_1 > max_win_streak) {
@@ -189,7 +187,6 @@ std::vector<Real> SimpleWTA::calculate_WTA_metrics(
 			// Pop2 is winner
 			if (win_streak_1 == 0 && i!=0) {
 				// State change
-				std::cout << "state Change" <<std::endl;
 				num_state_changes++;
 				if (win_streak_0 > 0) {
 					if (win_streak_0 > max_win_streak) {
@@ -203,14 +200,12 @@ std::vector<Real> SimpleWTA::calculate_WTA_metrics(
 		else {
 			// no one is winner
 			if (win_streak_0 > 0) {
-				std::cout << "state Change" <<std::endl;
 				num_state_changes++;
 				if (win_streak_0 > max_win_streak) {
 					max_win_streak = win_streak_0;
 				}
 			}
 			else if (win_streak_1 > 0) {
-				std::cout << "state Change" <<std::endl;
 				num_state_changes++;
 				if (win_streak_1 > max_win_streak) {
 					max_win_streak = win_streak_1;
