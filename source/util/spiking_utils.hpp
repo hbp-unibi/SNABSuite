@@ -138,9 +138,22 @@ public:
 		}
 		return res;
 	}
-
-	static std::vector<size_t> spike_time_binning(const Real& start, const Real& stop, const size_t& n_bins,
-										   const std::vector<cypress::Real> &spike_times);
+	/**
+	 * Calculate the number of spikes in given intervals (bins) of a single
+	 * spike train. Size of bins is calculated from start, stop and the number
+	 * of bins n_bins
+	 * @param start time for starting the binning. First bin is [start, start +
+	 * bin_size]
+	 * @param stop end time of last bin
+	 * @param n_bins number of bins
+	 * @param spike_times vector containing spike times as given by
+	 * neuron.signals().data(0)
+	 * @return A vector with each entry representing a bin, containing the
+	 * number of spikes that appeared in that bin
+	 */
+	static std::vector<size_t> spike_time_binning(
+	    const Real &start, const Real &stop, const size_t &n_bins,
+	    const std::vector<cypress::Real> &spike_times);
 };
 }  // namespace SNAB
 

@@ -136,22 +136,24 @@ void SimpleWTA::run_netw(cypress::Network &netw)
 
 namespace {
 std::vector<size_t> calculate_summed_bins(const PopulationBase &pop,
-                                          const Real &simulation_length)
+                                          const Real &simulation_length,
+                                          const Real bin_size = 15.0)
 {
-	std::vector<size_t> bins(size_t(simulation_length - 50.0) / 15.0, 0);
+	std::vector<size_t> bins(size_t((simulation_length - 50.0) / bin_size), 0);
 	for (size_t neuron_id = 0; neuron_id < pop.size(); neuron_id++) {
 		auto spikes = pop[0][neuron_id].signals().data(0);
 		auto temp_bins = SpikingUtils::spike_time_binning(
-		    50, simulation_length, (simulation_length - 50.0) / 15.0, spikes);
+		    50, simulation_length, (simulation_length - 50.0) / bin_size, spikes);
 		for (size_t i = 0; i < temp_bins.size(); i++) {
 			bins[i] += temp_bins[i];
 		}
 	}
 	return bins;
 }
+}  // namespace
 
-std::vector<Real> calculate_WTA_metrics(std::vector<size_t> bins,
-                                        std::vector<size_t> bins2)
+std::vector<Real> SimpleWTA::calculate_WTA_metrics(
+    const std::vector<size_t> &bins, const std::vector<size_t> &bins2, const Real bin_size)
 {
 	bool empty_bins = true;
 	for (size_t i = 0; i < bins.size(); i++) {
@@ -167,13 +169,14 @@ std::vector<Real> calculate_WTA_metrics(std::vector<size_t> bins,
 	size_t win_streak_0 = 0, win_streak_1 = 0, max_win_streak = 0;
 	size_t num_state_changes = 0, num_time_dead = 0;
 	for (size_t i = 0; i < bins.size(); i++) {
-		if (bins[i] - bins2[i] > 5) {
+		std::cout << bins[i] << ", " << bins2[i] <<std::endl;
+		if (bins[i] > 5 + bins2[i]) {
 			// Pop 1 is winner
-			if (win_streak_0 == 0) {
+			if (win_streak_0 == 0 && i!=0) {
 				// State change
+				std::cout << "state Change" <<std::endl;
 				num_state_changes++;
 				if (win_streak_1 > 0) {
-					num_state_changes++;
 					if (win_streak_1 > max_win_streak) {
 						max_win_streak = win_streak_1;
 					}
@@ -182,13 +185,13 @@ std::vector<Real> calculate_WTA_metrics(std::vector<size_t> bins,
 			}
 			win_streak_0++;
 		}
-		else if (bins[i] - bins2[i] > 5) {
+		else if (bins2[i] > 5 + bins[i]) {
 			// Pop2 is winner
-			if (win_streak_1 == 0) {
-				num_state_changes++;
+			if (win_streak_1 == 0 && i!=0) {
 				// State change
+				std::cout << "state Change" <<std::endl;
+				num_state_changes++;
 				if (win_streak_0 > 0) {
-					num_state_changes++;
 					if (win_streak_0 > max_win_streak) {
 						max_win_streak = win_streak_0;
 					}
@@ -199,22 +202,18 @@ std::vector<Real> calculate_WTA_metrics(std::vector<size_t> bins,
 		}
 		else {
 			// no one is winner
-			if (win_streak_1 == 0) {
-				// State change
-				if (win_streak_0 > 0) {
-					num_state_changes++;
-					if (win_streak_0 > max_win_streak) {
-						max_win_streak = win_streak_0;
-					}
+			if (win_streak_0 > 0) {
+				std::cout << "state Change" <<std::endl;
+				num_state_changes++;
+				if (win_streak_0 > max_win_streak) {
+					max_win_streak = win_streak_0;
 				}
 			}
-			else if (win_streak_0 == 0) {
-				// State change
-				if (win_streak_1 > 0) {
-					num_state_changes++;
-					if (win_streak_1 > max_win_streak) {
-						max_win_streak = win_streak_1;
-					}
+			else if (win_streak_1 > 0) {
+				std::cout << "state Change" <<std::endl;
+				num_state_changes++;
+				if (win_streak_1 > max_win_streak) {
+					max_win_streak = win_streak_1;
 				}
 			}
 			win_streak_0 = 0;
@@ -222,11 +221,17 @@ std::vector<Real> calculate_WTA_metrics(std::vector<size_t> bins,
 			num_time_dead++;
 		}
 	}
-	return std::vector<Real>({Real(max_win_streak) * 15.0,
+	if (win_streak_1 > max_win_streak) {
+		max_win_streak = win_streak_1;
+	}
+	if (win_streak_0 > max_win_streak) {
+		max_win_streak = win_streak_0;
+	}
+	return std::vector<Real>({Real(max_win_streak) * bin_size,
 	                          Real(num_state_changes),
-	                          Real(num_time_dead) * 15.0});
+	                          Real(num_time_dead) * bin_size});
 }
-}  // namespace
+
 std::vector<cypress::Real> SimpleWTA::evaluate()
 {
 #if SNAB_DEBUG
@@ -257,16 +262,16 @@ std::vector<cypress::Real> SimpleWTA::evaluate()
 #endif
 
 	// Time binning of first populations spikes
-	auto bins = calculate_summed_bins(m_pop[0], m_simulation_length);
+	auto bins = calculate_summed_bins(m_pop[0], m_simulation_length, m_bin_size);
 
 	// Time binning of second populations spikes
-	auto bins2 = calculate_summed_bins(m_pop[1], m_simulation_length);
+	auto bins2 = calculate_summed_bins(m_pop[1], m_simulation_length, m_bin_size);
 
 #if SNAB_DEBUG
 	std::vector<std::vector<size_t>> bins22({bins, bins2});
 	Utilities::write_vector2_to_csv(bins22, _debug_filename("bins.csv"));
 #endif
-	return calculate_WTA_metrics(bins, bins2);
+	return calculate_WTA_metrics(bins, bins2, m_bin_size);
 }
 
 LateralInhibWTA::LateralInhibWTA(const std::string backend, size_t bench_index)
@@ -423,16 +428,16 @@ std::vector<Real> LateralInhibWTA::evaluate()
 #endif
 
 	// Time binning of first populations spikes
-	auto bins = calculate_summed_bins(m_pop[0], m_simulation_length);
+	auto bins = calculate_summed_bins(m_pop[0], m_simulation_length, m_bin_size);
 
 	// Time binning of second populations spikes
-	auto bins2 = calculate_summed_bins(m_pop[1], m_simulation_length);
+	auto bins2 = calculate_summed_bins(m_pop[1], m_simulation_length,m_bin_size);
 
 #if SNAB_DEBUG
 	std::vector<std::vector<size_t>> bins22({bins, bins2});
 	Utilities::write_vector2_to_csv(bins22, _debug_filename("bins.csv"));
 #endif
-	return calculate_WTA_metrics(bins, bins2);
+	return SimpleWTA::calculate_WTA_metrics(bins, bins2, m_bin_size);
 }
 
 MirrorInhibWTA::MirrorInhibWTA(const std::string backend, size_t bench_index)
@@ -594,16 +599,16 @@ std::vector<Real> MirrorInhibWTA::evaluate()
 #endif
 
 	// Time binning of first populations spikes
-	auto bins = calculate_summed_bins(m_pop[0], m_simulation_length);
+	auto bins = calculate_summed_bins(m_pop[0], m_simulation_length, m_bin_size);
 
 	// Time binning of second populations spikes
-	auto bins2 = calculate_summed_bins(m_pop[1], m_simulation_length);
+	auto bins2 = calculate_summed_bins(m_pop[1], m_simulation_length, m_bin_size);
 
 #if SNAB_DEBUG
 	std::vector<std::vector<size_t>> bins22({bins, bins2});
 	Utilities::write_vector2_to_csv(bins22, _debug_filename("bins.csv"));
 #endif
-	return calculate_WTA_metrics(bins, bins2);
+	return SimpleWTA::calculate_WTA_metrics(bins, bins2, m_bin_size);
 }
 
 }  // namespace SNAB

@@ -38,14 +38,22 @@ add_executable(SNABSuite_test_common
 	common/test_neuron_parameters.cpp
 	common/test_parameter_sweep.cpp
 )
-
-
 target_link_libraries(SNABSuite_test_common
 	benchmark_utils
 	benchmark_common
 	${GTEST_LIBRARIES}
 )
 add_test(SNABSuite_test_common SNABSuite_test_common)
+
+add_executable(SNABSuite_test_SNABs
+	SNABs/test_WTA_like.cpp
+	)
+target_link_libraries(SNABSuite_test_SNABs
+	benchmark_utils
+	benchmark_common
+	${GTEST_LIBRARIES}
+)
+add_test(SNABSuite_test_SNABs SNABSuite_test_SNABs)
 
 
 

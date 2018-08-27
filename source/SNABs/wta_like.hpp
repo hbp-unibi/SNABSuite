@@ -42,6 +42,7 @@ private:
 	cypress::Real m_firing_rate;
 	NeuronParameters m_neuro_params;
 	cypress::Real m_simulation_length = 10000;  // ms
+	cypress::Real m_bin_size = 15.0; //ms
 
 	// Network parameters
 	cypress::Real m_weight_inp = 0, m_delay = 1.0, m_weight_self = 0.0,
@@ -53,6 +54,17 @@ public:
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;
+
+	/**
+	 * Calculate the metrics for comparing WTA networks
+	 * @param bins summed binned number of spikes of first population
+	 * @param bins2 the same for the second population
+	 * @return three component vector containing {Length of the longest winning
+	 * period in ms, number of state changes, simulation time spent without a
+	 * winner}
+	 */
+	static std::vector<Real> calculate_WTA_metrics(
+	    const std::vector<size_t> &bins, const std::vector<size_t> &bins2, const Real bin_size);
 };
 
 /**
@@ -69,6 +81,7 @@ private:
 	cypress::Real m_firing_rate;
 	NeuronParameters m_neuro_params;
 	cypress::Real m_simulation_length = 10000;  // ms
+	cypress::Real m_bin_size = 15.0; //ms
 
 	// Network parameters
 	cypress::Real m_weight_inp = 0, m_delay = 1.0, m_weight_self = 0.0,
@@ -96,6 +109,7 @@ private:
 	cypress::Real m_firing_rate;
 	NeuronParameters m_neuro_params;
 	cypress::Real m_simulation_length = 10000;  // ms
+	cypress::Real m_bin_size = 15.0; //ms
 
 	// Network parameters
 	cypress::Real m_weight_inp = 0, m_delay = 1.0, m_weight_self = 0.0,
