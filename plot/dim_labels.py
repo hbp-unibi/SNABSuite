@@ -67,6 +67,10 @@ DIM_LABELS = {
     "freq" : "Average spike frequency",
     "periods" : "Length of Refractory Period",
     "Average_spike_number_deviation" : "Average deviation (spikes)",
+    "probability" : "Connection Probability",
+    "neurons_max" : "\\#Neurons in Source",
+    "neurons_retr" : "\\#Neurons in Target",
+    "#neurons_retr" : "\\#Neurons in Target",
 }
 
 

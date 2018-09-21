@@ -46,10 +46,10 @@ from dim_labels import *
 def histogram_plot(data, xlabel, title="", bins='auto', normed=False):
     fig = plt.figure()
     if bins is not "auto":
-        plt.hist(data, bins=int(bins), normed=normed, color='black',
+        plt.hist(data, bins=int(bins), density=normed, color='black',
              histtype="bar", rwidth=0.95)
     else:
-        plt.hist(data, normed=normed, color='black',
+        plt.hist(data, density=normed, color='black',
              histtype="bar", rwidth=0.95)
     plt.xlabel(xlabel)
     if normed:
