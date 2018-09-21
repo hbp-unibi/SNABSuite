@@ -12,7 +12,10 @@
 		"#neurons" : [100,1000,10000]
     },
         "nmpm1" : {
+		"setup": {
+			"synapse_loss" : true
+		},
                 "neuron_type" : "IF_cond_exp",
-                "#neurons" : [30,60,140]
+                "#neurons" : [30,60,120]
     }
 }
