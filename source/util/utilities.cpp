@@ -190,10 +190,11 @@ void Utilities::plot_voltages_spikes(std::string filename,
 void Utilities::plot_1d_curve(std::string filename, std::string simulator,
                               size_t x_col, size_t y_col, int std_dev_vol)
 {
-    std::string short_sim = split(split(simulator, '=')[0], '.').back();
-    std::string output_file = split(filename, '.')[0];
+	std::string short_sim = split(split(simulator, '=')[0], '.').back();
+	std::string output_file = split(filename, '.')[0] + ".pdf";
 	std::string exec = "../plot/1dim_plot.py " + filename + " -x " +
-	                   std::to_string(x_col) + " -y " + std::to_string(y_col) + " -s " + simulator + " -o " + output_file; 
+	                   std::to_string(x_col) + " -y " + std::to_string(y_col) +
+	                   " -s " + short_sim + " -o " + output_file;
 	if (std_dev_vol != -1) {
 		exec = exec + " -ys " + std::to_string(std_dev_vol);
 	}

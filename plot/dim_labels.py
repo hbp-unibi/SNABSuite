@@ -66,6 +66,7 @@ DIM_LABELS = {
     "averages" : "Average spike frequency",
     "freq" : "Average spike frequency",
     "periods" : "Length of Refractory Period",
+    "Average_deviation": "Average Spike Count Deviation"
 }
 
 
