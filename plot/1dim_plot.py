@@ -32,6 +32,8 @@ parser.add_argument("--ymax", type=float, help="maximal y-value")
 parser.add_argument(
     "-ys", type=int, help="Column of std-deviation of y-values")
 parser.add_argument("-x", type=int, help="Column of x-values", default=0)
+parser.add_argument("-s", type=str, help="Name of the simulator", default="")
+parser.add_argument("-o", type=str, help="Output filename", default="")
 
 # Required Parameters
 parser.add_argument("-y", type=int, required=True, help="Column of y-values")
@@ -119,6 +121,8 @@ for target_file in args.files:
         if args.ys:
             normalize(ys_dev, max)
     simulator = target_file.split('_')[-1].split('.csv')[0].split('.')[-1]
+    if args.s != "":
+        simulator = args.s
     plot_measure(ax, xs, ys, ys_dev, color=SIMULATOR_COLORS[simulator],
                  simulator=SIMULATOR_LABELS[simulator], xlabel=xlabel,
                  ylabel=ylabel, ymin=args.ymin, ymax=args.ymax)
@@ -127,11 +131,14 @@ if not os.path.exists("images"):
     os.mkdir("images")
 ax.legend(loc='lower center', bbox_to_anchor=(0.5, 1.05),
           ncol=4)
-if args.files[-1].split('/')[-2]:
-    if not os.path.exists("images/" + args.files[-1].split('/')[-2]):
-        os.mkdir("images/" + args.files[-1].split('/')[-2])
-    fig.savefig("images/" + args.files[-1].split('/')[-2] + "/" + args.files[-1].split(
-        '/')[-1].split('_')[0] + ".pdf", format='pdf', bbox_inches='tight')
-else:
-    fig.savefig("images/" + args.files[-1].split('/')[-1].split('_')
-                [0] + ".pdf", format='pdf', bbox_inches='tight')
+if args.o == "":
+    if args.files[-1].split('/')[-2]:
+        if not os.path.exists("images/" + args.files[-1].split('/')[-2]):
+            os.mkdir("images/" + args.files[-1].split('/')[-2])
+        fig.savefig("images/" + args.files[-1].split('/')[-2] + "/" + args.files[-1].split(
+            '/')[-1].split('_')[0] + ".pdf", format='pdf', bbox_inches='tight')
+    else:
+        fig.savefig("images/" + args.files[-1].split('/')[-1].split('_')
+                    [0] + ".pdf", format='pdf', bbox_inches='tight')
+else: 
+    fig.savefig(args.o, format='pdf', bbox_inches='tight')

@@ -144,12 +144,15 @@ public:
 	 * @param file_name string containing filename, make sure folders already
 	 * exists
 	 */
-	static void
-	write_vector2_to_csv(T &data, std::string file_name)
+	static void write_vector2_to_csv(T &data, std::string file_name,
+	                                 std::string first_line = "")
 	{
 		std::ofstream file;
 		file.open(file_name, std::ofstream::out);
 		if (file.good()) {
+			if (first_line != "") {
+				file << first_line << std::endl;
+			}
 			for (auto i : data) {
 				for (auto j : i) {
 					file << j << ", ";
@@ -194,10 +197,11 @@ public:
 	 * inside
 	 */
 	static void plot_spikes(std::string filename, std::string simulator);
+
 	/**
 	 * @brief Plotting a histogram a one dimensional data in a csv
 	 *
-	 * @param filename File and path to the cssv
+	 * @param filename File and path to the csv
 	 * @param simulator simulator string, options will be stripped insider
 	 * @param normalized flag whether histogram should be normalized
 	 * @param n_bins  number of bins for the histogram, negative values use
@@ -223,7 +227,19 @@ public:
 	                                 size_t t_col = 0,
 	                                 std::string spikes_file = "",
 	                                 size_t spikes_col = 0);
+
+	/**
+	 * @brief Plotting a curve with optional standard deviation
+	 *
+	 * @param filename file containing data
+	 * @param simulator the (unshortened) backend/simulator string
+	 * @param x_col column of x values
+	 * @param y_col column of y values
+	 * @param std_dev_vol column of standard deviation values
+	 */
+	static void plot_1d_curve(std::string filename, std::string simulator,
+	                          size_t x_col, size_t y_col, int std_dev_vol = -1);
 };
-}
+}  // namespace SNAB
 
 #endif /* SNABSUITE_UTIL_UTILITIES_HPP */

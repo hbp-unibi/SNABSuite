@@ -85,7 +85,7 @@ Json Utilities::merge_json(const Json &a, const Json &b)
 {
 	Json result = a;
 	remove_existing_entries(result, b);
-    result = result.flatten();
+	result = result.flatten();
 	Json tmp = b.flatten();
 
 	for (Json::iterator it = tmp.begin(); it != tmp.end(); ++it) {
@@ -179,6 +179,25 @@ void Utilities::plot_voltages_spikes(std::string filename,
 		exec = exec + " -sp " + spikes_file + " -spc " +
 		       std::to_string(spikes_col);
 	}
+	try {
+		system((exec + " &").c_str());
+	}
+	catch (...) {
+		std::cerr << "Calling spike_plot.py caused an error!" << std::endl;
+	}
+}
+
+void Utilities::plot_1d_curve(std::string filename, std::string simulator,
+                              size_t x_col, size_t y_col, int std_dev_vol)
+{
+    std::string short_sim = split(split(simulator, '=')[0], '.').back();
+    std::string output_file = split(filename, '.')[0];
+	std::string exec = "../plot/1dim_plot.py " + filename + " -x " +
+	                   std::to_string(x_col) + " -y " + std::to_string(y_col) + " -s " + simulator + " -o " + output_file; 
+	if (std_dev_vol != -1) {
+		exec = exec + " -ys " + std::to_string(std_dev_vol);
+	}
+	std::cout << exec << std::endl;
 	try {
 		system((exec + " &").c_str());
 	}
