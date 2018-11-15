@@ -143,7 +143,7 @@ bool replace_arrays_by_value(cypress::Json &json, const size_t &index,
 			anything_changed = true;
 		}
 	}
-	if (!anything_changed) {
+	if (!anything_changed && index!=0) {
 		if (warn) {
 			cypress::global_logger().debug(
 			    "SNABSuite", name +
