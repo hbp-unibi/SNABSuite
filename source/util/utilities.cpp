@@ -198,7 +198,6 @@ void Utilities::plot_1d_curve(std::string filename, std::string simulator,
 	if (std_dev_vol != -1) {
 		exec = exec + " -ys " + std::to_string(std_dev_vol);
 	}
-	std::cout << exec << std::endl;
 	try {
 		system((exec + " &").c_str());
 	}
