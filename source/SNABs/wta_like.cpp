@@ -15,12 +15,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include <string>
-#include <vector>
+#include <cypress/cypress.hpp>  // Neural network frontend
 
 #include <cypress/backend/power/netio4.hpp>  // Control of power via NetIO4 Bank
-#include <cypress/cypress.hpp>               // Neural network frontend
+#include <string>
+#include <vector>
 
 #include "common/neuron_parameters.hpp"
 #include "util/read_json.hpp"
@@ -143,7 +142,8 @@ std::vector<size_t> calculate_summed_bins(const PopulationBase &pop,
 	for (size_t neuron_id = 0; neuron_id < pop.size(); neuron_id++) {
 		auto spikes = pop[0][neuron_id].signals().data(0);
 		auto temp_bins = SpikingUtils::spike_time_binning(
-		    50, simulation_length, (simulation_length - 50.0) / bin_size, spikes);
+		    50, simulation_length, (simulation_length - 50.0) / bin_size,
+		    spikes);
 		for (size_t i = 0; i < temp_bins.size(); i++) {
 			bins[i] += temp_bins[i];
 		}
@@ -153,7 +153,8 @@ std::vector<size_t> calculate_summed_bins(const PopulationBase &pop,
 }  // namespace
 
 std::vector<Real> SimpleWTA::calculate_WTA_metrics(
-    const std::vector<size_t> &bins, const std::vector<size_t> &bins2, const Real bin_size)
+    const std::vector<size_t> &bins, const std::vector<size_t> &bins2,
+    const Real bin_size)
 {
 	bool empty_bins = true;
 	for (size_t i = 0; i < bins.size(); i++) {
@@ -171,7 +172,7 @@ std::vector<Real> SimpleWTA::calculate_WTA_metrics(
 	for (size_t i = 0; i < bins.size(); i++) {
 		if (bins[i] > 5 + bins2[i]) {
 			// Pop 1 is winner
-			if (win_streak_0 == 0 && i!=0) {
+			if (win_streak_0 == 0 && i != 0) {
 				// State change
 				num_state_changes++;
 				if (win_streak_1 > 0) {
@@ -185,7 +186,7 @@ std::vector<Real> SimpleWTA::calculate_WTA_metrics(
 		}
 		else if (bins2[i] > 5 + bins[i]) {
 			// Pop2 is winner
-			if (win_streak_1 == 0 && i!=0) {
+			if (win_streak_1 == 0 && i != 0) {
 				// State change
 				num_state_changes++;
 				if (win_streak_0 > 0) {
@@ -257,10 +258,12 @@ std::vector<cypress::Real> SimpleWTA::evaluate()
 #endif
 
 	// Time binning of first populations spikes
-	auto bins = calculate_summed_bins(m_pop[0], m_simulation_length, m_bin_size);
+	auto bins =
+	    calculate_summed_bins(m_pop[0], m_simulation_length, m_bin_size);
 
 	// Time binning of second populations spikes
-	auto bins2 = calculate_summed_bins(m_pop[1], m_simulation_length, m_bin_size);
+	auto bins2 =
+	    calculate_summed_bins(m_pop[1], m_simulation_length, m_bin_size);
 
 #if SNAB_DEBUG
 	std::vector<std::vector<size_t>> bins22({bins, bins2});
@@ -423,10 +426,12 @@ std::vector<Real> LateralInhibWTA::evaluate()
 #endif
 
 	// Time binning of first populations spikes
-	auto bins = calculate_summed_bins(m_pop[0], m_simulation_length, m_bin_size);
+	auto bins =
+	    calculate_summed_bins(m_pop[0], m_simulation_length, m_bin_size);
 
 	// Time binning of second populations spikes
-	auto bins2 = calculate_summed_bins(m_pop[1], m_simulation_length,m_bin_size);
+	auto bins2 =
+	    calculate_summed_bins(m_pop[1], m_simulation_length, m_bin_size);
 
 #if SNAB_DEBUG
 	std::vector<std::vector<size_t>> bins22({bins, bins2});
@@ -594,10 +599,12 @@ std::vector<Real> MirrorInhibWTA::evaluate()
 #endif
 
 	// Time binning of first populations spikes
-	auto bins = calculate_summed_bins(m_pop[0], m_simulation_length, m_bin_size);
+	auto bins =
+	    calculate_summed_bins(m_pop[0], m_simulation_length, m_bin_size);
 
 	// Time binning of second populations spikes
-	auto bins2 = calculate_summed_bins(m_pop[1], m_simulation_length, m_bin_size);
+	auto bins2 =
+	    calculate_summed_bins(m_pop[1], m_simulation_length, m_bin_size);
 
 #if SNAB_DEBUG
 	std::vector<std::vector<size_t>> bins22({bins, bins2});

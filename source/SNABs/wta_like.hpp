@@ -21,9 +21,9 @@
 #ifndef SNABSUITE_SNABS_WTA_HPP
 #define SNABSUITE_SNABS_WTA_HPP
 
-#include <vector>
-
 #include <cypress/cypress.hpp>
+
+#include <vector>
 
 #include "common/neuron_parameters.hpp"
 #include "common/snab_base.hpp"
