@@ -16,22 +16,23 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cypress/cypress.hpp>
+
+#include "SNABs/wta_like.hpp"
 #include "gtest/gtest.h"
 
-#include <cypress/cypress.hpp>
-#include "SNABs/wta_like.hpp"
-
-namespace SNAB{
+namespace SNAB {
 using cypress::Real;
 
-TEST(SimpleWTA, calculate_WTA_metrics){
-	std::vector<size_t> bins({0,0,0,0,0,0,0,0,0,0,0,0,0,0});
+TEST(SimpleWTA, calculate_WTA_metrics)
+{
+	std::vector<size_t> bins({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 	std::vector<Real> res = SimpleWTA::calculate_WTA_metrics(bins, bins, 1);
 	EXPECT_TRUE(res[0] != res[0]);
 	EXPECT_TRUE(res[1] != res[0]);
 	EXPECT_TRUE(res[2] != res[0]);
 
-	std::vector<size_t> bins2({3,3,3,3,3,3,3,3,3,3,3,3,3,3});
+	std::vector<size_t> bins2({3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3});
 	res = SimpleWTA::calculate_WTA_metrics(bins, bins2, 1.0);
 	EXPECT_NEAR(0.0, res[0], 1e-8);
 	EXPECT_NEAR(0.0, res[1], 1e-8);
@@ -47,8 +48,8 @@ TEST(SimpleWTA, calculate_WTA_metrics){
 	EXPECT_NEAR(0.0, res[1], 1e-8);
 	EXPECT_NEAR(14.0, res[2], 1e-8);
 
-	bins = std::vector<size_t>({0,8,8,8,0,0,0,0,4,4,8,8,8,8});
-	bins2 = std::vector<size_t>({0,0,0,0,8,8,8,8,4,4,0,0,0,0});
+	bins = std::vector<size_t>({0, 8, 8, 8, 0, 0, 0, 0, 4, 4, 8, 8, 8, 8});
+	bins2 = std::vector<size_t>({0, 0, 0, 0, 8, 8, 8, 8, 4, 4, 0, 0, 0, 0});
 	res = SimpleWTA::calculate_WTA_metrics(bins, bins2, 1);
 	EXPECT_NEAR(4.0, res[0], 1e-8);
 	EXPECT_NEAR(4.0, res[1], 1e-8);
@@ -58,8 +59,8 @@ TEST(SimpleWTA, calculate_WTA_metrics){
 	EXPECT_NEAR(4.0, res[1], 1e-8);
 	EXPECT_NEAR(3.0, res[2], 1e-8);
 
-	bins = std::vector<size_t>(20,8);
-	bins2 = std::vector<size_t>(20,0);
+	bins = std::vector<size_t>(20, 8);
+	bins2 = std::vector<size_t>(20, 0);
 	res = SimpleWTA::calculate_WTA_metrics(bins2, bins, 1);
 	EXPECT_NEAR(20.0, res[0], 1e-8);
 	EXPECT_NEAR(0.0, res[1], 1e-8);
@@ -69,4 +70,4 @@ TEST(SimpleWTA, calculate_WTA_metrics){
 	EXPECT_NEAR(0.0, res[1], 1e-8);
 	EXPECT_NEAR(0.0, res[2], 1e-8);
 }
-}
+}  // namespace SNAB

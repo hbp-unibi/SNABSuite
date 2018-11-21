@@ -141,7 +141,7 @@ std::vector<size_t> calculate_summed_bins(const PopulationBase &pop,
 	std::vector<size_t> bins(size_t((simulation_length - 50.0) / bin_size), 0);
 	for (size_t neuron_id = 0; neuron_id < pop.size(); neuron_id++) {
 		auto spikes = pop[0][neuron_id].signals().data(0);
-		auto temp_bins = SpikingUtils::spike_time_binning(
+		auto temp_bins = SpikingUtils::spike_time_binning<size_t>(
 		    50, simulation_length, (simulation_length - 50.0) / bin_size,
 		    spikes);
 		for (size_t i = 0; i < temp_bins.size(); i++) {

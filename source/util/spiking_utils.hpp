@@ -151,9 +151,22 @@ public:
 	 * @return A vector with each entry representing a bin, containing the
 	 * number of spikes that appeared in that bin
 	 */
-	static std::vector<size_t> spike_time_binning(
+	template <typename T>
+	static std::vector<T> spike_time_binning(
 	    const Real &start, const Real &stop, const size_t &n_bins,
-	    const std::vector<cypress::Real> &spike_times);
+	    const std::vector<cypress::Real> &spike_times)
+	{
+		Real bin_size = (stop - start) / n_bins;
+		std::vector<T> bin_counts(n_bins, 0);
+		for (Real spike : spike_times) {
+			if (spike >= stop || spike < start) {
+				continue;
+			}
+			size_t bin_idx = size_t((spike - start) / bin_size);
+			bin_counts[bin_idx]++;
+		}
+		return bin_counts;
+	}
 };
 }  // namespace SNAB
 

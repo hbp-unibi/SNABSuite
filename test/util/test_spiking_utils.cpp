@@ -133,7 +133,7 @@ TEST(SpikingUtils, calc_num_spikes_vec)
 TEST(SpikingUtils, spike_time_binning)
 {
 	std::vector<Real> spikes = {};
-	auto bins = SpikingUtils::spike_time_binning(0, 1, 10, spikes);
+	auto bins = SpikingUtils::spike_time_binning<size_t>(0, 1, 10, spikes);
 	EXPECT_EQ(size_t(10), bins.size());
 	for (auto i : bins) {
 		EXPECT_EQ(size_t(0), i);
@@ -142,24 +142,24 @@ TEST(SpikingUtils, spike_time_binning)
 	for (size_t i = 0; i < 100; i++) {
 		spikes.push_back(i * 0.1);
 	}
-	bins = SpikingUtils::spike_time_binning(0, 10, 10, spikes);
+	bins = SpikingUtils::spike_time_binning<size_t>(0, 10, 10, spikes);
 	EXPECT_EQ(size_t(10), bins.size());
 	for (auto i : bins) {
 		EXPECT_EQ(size_t(10), i);
 	}
 
-	bins = SpikingUtils::spike_time_binning(1, 10, 9, spikes);
+	bins = SpikingUtils::spike_time_binning<size_t>(1, 10, 9, spikes);
 	EXPECT_EQ(size_t(9), bins.size());
 	for (auto i : bins) {
 		EXPECT_EQ(size_t(10), i);
 	}
-	bins = SpikingUtils::spike_time_binning(1, 9, 8, spikes);
+	bins = SpikingUtils::spike_time_binning<size_t>(1, 9, 8, spikes);
 	EXPECT_EQ(size_t(8), bins.size());
 	for (auto i : bins) {
 		EXPECT_EQ(size_t(10), i);
 	}
 
-	bins = SpikingUtils::spike_time_binning(1, 9, 16, spikes);
+	bins = SpikingUtils::spike_time_binning<size_t>(1, 9, 16, spikes);
 	EXPECT_EQ(size_t(16), bins.size());
 	for (auto i : bins) {
 		EXPECT_EQ(size_t(5), i);
@@ -167,7 +167,7 @@ TEST(SpikingUtils, spike_time_binning)
 	spikes.push_back(3.421);
 	spikes.push_back(8.95);
 	std::sort(spikes.begin(), spikes.end());
-	bins = SpikingUtils::spike_time_binning(1, 9, 8, spikes);
+	bins = SpikingUtils::spike_time_binning<size_t>(1, 9, 8, spikes);
 	EXPECT_EQ(size_t(8), bins.size());
 
 	EXPECT_EQ(size_t(11), bins[2]);
