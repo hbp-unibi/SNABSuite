@@ -47,12 +47,14 @@ DIM_LABELS = {
     "sigma_t": "Spike time noise $\sigma_t$ in ms",
     "sigma_offs": "Spike time offset noise $\sigma_t^{\\mathrm{offs}}$ in ms",
     "Average_frequency": "Average frequency [1/ms]",
+    "Average_Frequency": "Average frequency [1/s]",
     "ConnectionsPerInput": "\\#Connections per source neuron / \\#Target neurons",
     "Standard_deviation": "Standard deviation",
     "Average_number_of_spikes": "Average spike count",
     "neurons": "Number of Neurons",
     "#neurons": "Neurons",
     "Average_frequency_of_neurons": "Average frequency in 1/ms",
+    "Average_Frequency_of_neurons": "Average frequency in 1/s",
     "Average_deviation_from_refractory_period": "Average deviation in ms",
     "time" : "Time in ms",
     "neuron id" : "Neuron ID",
@@ -66,7 +68,8 @@ DIM_LABELS = {
     "averages" : "Average spike frequency",
     "freq" : "Average spike frequency",
     "periods" : "Length of Refractory Period",
-    "Average_deviation": "Average Spike Count Deviation"
+    "Average_deviation": "Average Spike Count Deviation",
+    "Average_freq_deviation": "Average Frequency Deviation",
 }
 
 
