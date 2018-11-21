@@ -96,7 +96,7 @@ int main(int argc, const char *argv[])
 	try {
 		sweep.execute();
 	}
-	catch (cypress::CypressException e) {
+	catch (cypress::CypressException& e) {
 		sweep_pointer->backup_simulation_results();
 		std::cout << "Backup complete!" << std::endl;
 		throw e;
