@@ -21,10 +21,11 @@
 #ifndef SNABSUITE_COMMON_BENCHMARK_HPP
 #define SNABSUITE_COMMON_BENCHMARK_HPP
 
+#include <cypress/cypress.hpp>
+
 #include <fstream>
 #include <string>
 
-#include <cypress/cypress.hpp>
 #include "common/snab_registry.hpp"
 
 namespace SNAB {

@@ -69,17 +69,18 @@ public:
 	/**
 	 * Runs SpikingUtils::add_typed_population, but gets a string containing the
 	 * neuron type instead of a template argument
-     * 
-     * @param neuron_type_str string naming the neuron type
+	 *
+	 * @param neuron_type_str string naming the neuron type
 	 * @param network instace in wich the population is placed
 	 * @param neuronParams Neuron parameters of the cell in the population
 	 * @param size Number of neurons in the population
-	 * @param record_signal string of the signal to be recorded by the backend
+	 * @param record_signal string of the signal to be recorded by the backend,
+	 * e.g. "spikes" or "v"
 	 */
 	static cypress::PopulationBase add_population(
 	    const std::string neuron_type_str, Network &network,
 	    const NeuronParameters &neuronParams, const size_t size,
-	    const std::string record_signal = "spikes");
+	    const std::string record_signal = "");
 
 	/**
 	 * Tries to run the simulation on given backend several times if backend
@@ -92,7 +93,81 @@ public:
 	 */
 	static bool rerun_fixed_number_trials(Network &network, Backend &backend,
 	                                      Real time, size_t n_trials = 3);
+
+	/**
+	 * @brief Calculate the number of spikes of spiketrain in intervall
+	 * [start,stop]
+	 *
+	 * @param spiketrain The spiketrain for which the number of spikes should be
+	 * calculated
+	 * @param start Timepoint from which counting starts
+	 * @param end Endpoint where counting stops
+	 * @return int returns the number of spikes in [start, stop]
+	 */
+	static int calc_num_spikes(const std::vector<cypress::Real> &spiketrain,
+	                           const cypress::Real start = 0.0,
+	                           const cypress::Real end = 0.0);
+
+	/**
+	 * @brief Calculate the number of spikes in a vector of spiketrains in
+	 * intervall [start,stop]
+	 *
+	 * @param spiketrains The vector of spiketrains for which the number of
+	 * spikes should be calculated
+	 * @param start Timepoint from which counting starts
+	 * @param end Endpoint where counting stops, leave empty to count all
+	 * @return int returns the number of spikes in [start, stop]
+	 */
+	template <typename T>
+	static std::vector<int> calc_num_spikes_vec(
+	    const cypress::Matrix<T> &spiketrains, const cypress::Real start = 0.0,
+	    const cypress::Real end = std::numeric_limits<cypress::Real>::max())
+	{
+		std::vector<int> res;
+		size_t rows = spiketrains.rows();
+		size_t colls = spiketrains.cols();
+		for (size_t i = 0; i < rows; i++) {
+			int counter = 0;
+			for (size_t j = 0; j < colls; j++) {
+				if ((spiketrains[i * colls + j] >= start - 0.001) &&
+				    (spiketrains[i * colls + j] <= end + 0.001)) {
+					counter++;
+				}
+			}
+			res.push_back(counter);
+		}
+		return res;
+	}
+	/**
+	 * Calculate the number of spikes in given intervals (bins) of a single
+	 * spike train. Size of bins is calculated from start, stop and the number
+	 * of bins n_bins
+	 * @param start time for starting the binning. First bin is [start, start +
+	 * bin_size]
+	 * @param stop end time of last bin
+	 * @param n_bins number of bins
+	 * @param spike_times vector containing spike times as given by
+	 * neuron.signals().data(0)
+	 * @return A vector with each entry representing a bin, containing the
+	 * number of spikes that appeared in that bin
+	 */
+	template <typename T>
+	static std::vector<T> spike_time_binning(
+	    const Real &start, const Real &stop, const size_t &n_bins,
+	    const std::vector<cypress::Real> &spike_times)
+	{
+		Real bin_size = (stop - start) / n_bins;
+		std::vector<T> bin_counts(n_bins, 0);
+		for (Real spike : spike_times) {
+			if (spike >= stop || spike < start) {
+				continue;
+			}
+			size_t bin_idx = size_t((spike - start) / bin_size);
+			bin_counts[bin_idx]++;
+		}
+		return bin_counts;
+	}
 };
-}
+}  // namespace SNAB
 
 #endif /* SNAB_UTIL_SPIKING_UTILS_HPP */

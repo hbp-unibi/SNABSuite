@@ -26,11 +26,19 @@
 #include "common/snab_base.hpp"
 
 namespace SNAB {
+/**
+ * The aim of this SNAB is to measure the bandwidth between neuron populations.
+ * Therefore, taking parameters from the OutputFrequency benchmarks, a single
+ * continously spiking neuron is connected to a population of neurons. The
+ * number of spikes of the population is measured and taken as the benchmark
+ * measure.
+ *
+ */
 class SingleMaxFreqToGroup : public SNABBase {
 private:
 	cypress::PopulationBase m_pop_single, m_pop_group;
-	size_t m_num_neurons = 0;
-	cypress::Real simulation_length = 150;  // ms
+	cypress::Real m_simulation_length = 150;  // ms
+	cypress::Real m_start_time = 50;          // ms
 	NeuronParameters m_group_params;
 
 public:
@@ -40,12 +48,29 @@ public:
 	std::vector<cypress::Real> evaluate() override;
 };
 
+/**
+ * Similar to the benchmark before, this SNAB measures the bandwidth between
+ * neuron populations. Now, the input population firing at maximal frequency
+ * consist of the same number of neurons as the target population. The
+ * populations are connected via a OneToOne-Connector.
+ */
 class GroupMaxFreqToGroup : public SNABBase {
-private:
+protected:
 	cypress::PopulationBase m_pop_max, m_pop_retr;
-	size_t m_num_neurons = 0;
-	cypress::Real simulation_length = 150;  // ms
+	cypress::Real m_simulation_length = 150;  // ms
+	cypress::Real m_start_time = 50;          // ms
 	NeuronParameters m_retr_params;
+
+	/**
+	 * Constructor used by by child classes. Just hands everything to SNABBase
+	 * class Constructor.
+	 */
+	GroupMaxFreqToGroup(std::string name, std::string backend,
+	                    std::initializer_list<std::string> indicator_names,
+	                    std::initializer_list<std::string> indicator_types,
+	                    std::initializer_list<std::string> indicator_measures,
+	                    std::initializer_list<std::string> required_parameters,
+	                    size_t bench_index);
 
 public:
 	GroupMaxFreqToGroup(const std::string backend, size_t bench_index);
@@ -53,6 +78,26 @@ public:
 	void run_netw(cypress::Network &netw) override;
 	std::vector<cypress::Real> evaluate() override;
 };
-}
+
+/**
+ * Identical to GroupMaxFreqToGroup, but using the AllToAll connector and
+ * allowing different number of input neurons
+ */
+class GroupMaxFreqToGroupAllToAll : public GroupMaxFreqToGroup {
+public:
+	GroupMaxFreqToGroupAllToAll(const std::string backend, size_t bench_index);
+	cypress::Network &build_netw(cypress::Network &netw) override;
+};
+
+/**
+ * Identical to GroupMaxFreqToGroup, but using the FixedProbability connector
+ * and allowing different number of input neurons
+ */
+class GroupMaxFreqToGroupProb : public GroupMaxFreqToGroup {
+public:
+	GroupMaxFreqToGroupProb(const std::string backend, size_t bench_index);
+	cypress::Network &build_netw(cypress::Network &netw) override;
+};
+}  // namespace SNAB
 
 #endif /* SNABSUITE_SNABS_MAX_INTER_NEURON_HPP */

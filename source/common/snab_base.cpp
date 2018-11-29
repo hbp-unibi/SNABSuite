@@ -16,10 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cypress/cypress.hpp>
+
 #include "snab_base.hpp"
 
 #include <sys/stat.h>
-#include <cypress/cypress.hpp>
 #include <string>
 
 #include "util/read_json.hpp"
@@ -52,6 +53,11 @@ SNABBase::SNABBase(std::string name, std::string backend,
 	else {
 		return;
 	}
+	
+	bool changed = replace_arrays_by_value(m_config_file, bench_index, name);
+	if (!changed && bench_index != 0) {
+		m_valid = false;
+	}
 
 	// Check for backend related setup config
 	if (m_config_file.find("setup") != m_config_file.end()) {
@@ -59,10 +65,7 @@ SNABBase::SNABBase(std::string name, std::string backend,
 		m_config_file.erase("setup");
 	}
 
-	bool changed = replace_arrays_by_value(m_config_file, bench_index, name);
-	if (!changed && bench_index != 0) {
-		m_valid = false;
-	}
+	
 }
 
 cypress::Json SNABBase::evaluate_json()
@@ -87,4 +90,5 @@ std::string SNABBase::_debug_filename(const std::string append) const
 	return std::string("debug/" + shortened_backend + "/" + m_snab_name + "_" +
 	                   append);
 }
-}
+cypress::Real NaN() { return std::numeric_limits<cypress::Real>::quiet_NaN(); }
+}  // namespace SNAB

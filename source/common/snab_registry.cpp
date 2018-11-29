@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cypress/cypress.hpp>  // Avoid a warning
+
 #include "common/snab_registry.hpp"
 
 #include <memory>
@@ -26,6 +28,8 @@
 #include "SNABs/max_inter_neuron.hpp"
 #include "SNABs/output_bench.hpp"
 #include "SNABs/refractory_period.hpp"
+#include "SNABs/setup_time.hpp"
+#include "SNABs/wta_like.hpp"
 #include "common/snab_base.hpp"
 
 namespace SNAB {
@@ -48,13 +52,26 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
 	    std::make_shared<MaxInputFixedOutConnector>(
 	        MaxInputFixedOutConnector(backend, bench_index)),
 	    std::make_shared<MaxInputFixedInConnector>(
-	        MaxInputFixedInConnector(backend, bench_index))/*,
+	        MaxInputFixedInConnector(backend, bench_index)),
 	    std::make_shared<SingleMaxFreqToGroup>(
 	        SingleMaxFreqToGroup(backend, bench_index)),
 	    std::make_shared<GroupMaxFreqToGroup>(
 	        GroupMaxFreqToGroup(backend, bench_index)),
 	    std::make_shared<GroupMaxFreqToGroupAllToAll>(
-	        GroupMaxFreqToGroupAllToAll(backend, bench_index))*/ };
+	        GroupMaxFreqToGroupAllToAll(backend, bench_index)),
+	    std::make_shared<GroupMaxFreqToGroupProb>(
+	        GroupMaxFreqToGroupProb(backend, bench_index)),
+	    std::make_shared<SetupTimeOneToOne>(
+	        SetupTimeOneToOne(backend, bench_index)),
+	    std::make_shared<SetupTimeAllToAll>(
+	        SetupTimeAllToAll(backend, bench_index)),
+	    std::make_shared<SetupTimeRandom>(
+	        SetupTimeRandom(backend, bench_index)),
+	    std::make_shared<SimpleWTA>(SimpleWTA(backend, bench_index)),
+	    std::make_shared<LateralInhibWTA>(
+	        LateralInhibWTA(backend, bench_index)),
+	    std::make_shared<MirrorInhibWTA>(MirrorInhibWTA(backend, bench_index)),
+	};
 	return vec;
 }
-}
+}  // namespace SNAB

@@ -1,0 +1,21 @@
+{
+	"spinnaker" : {
+		"neuron_type" : "IF_cond_exp",
+		"#neurons" : [255,2040,5000]
+	},
+	"spikey" : {
+		"neuron_type" : "IfFacetsHardware1",
+		"#neurons" : [96, 192]
+	},
+	"nest" : {
+		"neuron_type" : "IF_cond_exp",
+		"#neurons" : [100,1000,10000]
+    },
+    "nmpm1" : {
+                "setup": {
+                        "synapse_loss" : true
+                },
+                "neuron_type" : "IF_cond_exp",
+                "#neurons" : [15,30,40]
+    }
+}

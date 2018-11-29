@@ -15,6 +15,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <cypress/cypress.hpp>               // Neural network frontend
+
 #include <algorithm>  // Minimal and Maximal element
 #include <limits>
 #include <numeric>  // std::accumulate
@@ -22,7 +24,6 @@
 #include <vector>
 
 #include <cypress/backend/power/netio4.hpp>  // Control of power via NetIO4 Bank
-#include <cypress/cypress.hpp>               // Neural network frontend
 
 #include "common/neuron_parameters.hpp"
 #include "output_bench.hpp"
@@ -32,7 +33,6 @@
 
 namespace SNAB {
 using cypress::global_logger;
-auto NaN = std::numeric_limits<cypress::Real>::quiet_NaN;
 
 OutputFrequencySingleNeuron::OutputFrequencySingleNeuron(
     const std::string backend, size_t bench_index)
@@ -57,8 +57,8 @@ cypress::Network &OutputFrequencySingleNeuron::build_netw(
 	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params"]);
 	// Set up population
-	m_pop =
-	    SpikingUtils::add_population(neuron_type_str, netw, neuron_params, 1);
+	m_pop = SpikingUtils::add_population(neuron_type_str, netw, neuron_params,
+	                                     1, "spikes");
 	return netw;
 }
 
@@ -254,7 +254,7 @@ cypress::Network &OutputFrequencyMultipleNeurons::build_netw(
 
 	// Set up population
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, neuron_params,
-	                                     m_num_neurons);
+	                                     m_num_neurons, "spikes");
 	return netw;
 }
 
@@ -282,7 +282,8 @@ std::vector<cypress::Real> OutputFrequencyMultipleNeurons::evaluate()
 		// Get spikes
 		auto spikes = m_pop[i].signals().data(0);
 		if (spikes.size() == 0) {
-			return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
+			averages[i] = 0;
+			continue;
 		}
 		// Calculate frequencies
 		if (spikes.size() > 1) {

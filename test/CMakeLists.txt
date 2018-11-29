@@ -25,27 +25,32 @@ add_executable(SNABSuite_test_util
 	util/test_spiking_utils.cpp
 	util/test_utilities.cpp
 )
-
-
 target_link_libraries(SNABSuite_test_util
-	benchmark_utils
-	benchmark_common
+	benchmark_library
 	${GTEST_LIBRARIES}
 )
 add_test(SNABSuite_test_util SNABSuite_test_util)
+add_dependencies(SNABSuite_test_util cypress_ext)
 
 add_executable(SNABSuite_test_common
 	common/test_neuron_parameters.cpp
 	common/test_parameter_sweep.cpp
 )
-
-
 target_link_libraries(SNABSuite_test_common
-	benchmark_utils
-	benchmark_common
+	benchmark_library
 	${GTEST_LIBRARIES}
 )
 add_test(SNABSuite_test_common SNABSuite_test_common)
+add_dependencies(SNABSuite_test_common cypress_ext)
+
+add_executable(SNABSuite_test_SNABs
+	SNABs/test_WTA_like.cpp
+	)
+target_link_libraries(SNABSuite_test_SNABs
+    benchmark_library
+	${GTEST_LIBRARIES}
+)
+add_test(SNABSuite_test_SNABs SNABSuite_test_SNABs)
 
 
 

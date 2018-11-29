@@ -1,0 +1,106 @@
+{
+	"nest" : {
+		"neuron_type" : "IF_cond_exp",
+		"neuron_params": {
+			"e_rev_E": 0.0,
+			"v_rest": -70.0,
+			"v_reset": -80.0,
+			"v_thresh": -60.0,
+			"tau_syn_E": 2.0,
+			"tau_refrac": 1.0,
+			"tau_m": 1,
+			"cm": 0.2
+		},
+		"num_neurons_pop" : 10,
+		"num_source_neurons" : 10,
+		"num_inhibitory_neurons" : 10,
+		"weight_inp" : 0.01,
+		"weight_self" : 0.008,
+		"weight_to_inh" : 0.005,
+		"weight_from_inh" : -0.005,
+		"prob_inp" : 0.8,
+		"prob_self" : 0.8,
+		"prob_to_inh" : 0.8,
+		"firing_rate" : 80
+    },
+	"spinnaker" : {
+		"neuron_type" : "IF_cond_exp",
+		"neuron_params": {
+			"e_rev_E": 0.0,
+			"e_rev_I": -80.0,
+			"v_rest": -70.0,
+			"v_reset": -80.0,
+			"v_thresh": -60.0,
+			"tau_syn_E": 2.0,
+			"tau_refrac": 1.0,
+			"tau_m": 1,
+			"cm": 0.2
+		},
+		"num_neurons_pop" : 10,
+		"num_source_neurons" : 10,
+		"num_inhibitory_neurons" : 10,
+		"weight_inp" : 0.01,
+		"weight_self" : 0.0084,
+		"weight_to_inh" : 0.005,
+		"weight_from_inh" : -0.005,
+		"prob_inp" : 0.8,
+		"prob_self" : 0.8,
+		"prob_to_inh" : 0.8,
+		"firing_rate" : 80
+	},
+	"spikey" : {
+		"neuron_type" : "IfFacetsHardware1",
+		"neuron_params": {
+			"tau_m": 6.0,
+			"tau_refrac": 1.0,
+			"v_rest": -70.0,
+			"v_thresh": -55.0,
+			"v_reset": -70.0,
+			"e_rev_I": -80.0
+		},
+		"num_neurons_pop" : 20,
+		"num_source_neurons" : 10,
+		"num_inhibitory_neurons" : 15,
+		"weight_inp" : 0.002,
+		"weight_self" : 0.001,
+		"weight_from_inh" : -0.015,
+		"weight_to_inh" : 0.001,
+		"prob_inp" : 0.9,
+		"prob_self" : 0.5,
+		"prob_to_inh" : 0.8,
+		"firing_rate" : 80
+	},
+	"nmpm1" : {
+		"setup": {
+            "calib_path" : "/wang/data/calibration/brainscales/default-2017-09-26-1",
+			"neuron_size" : 4,
+			"digital_weight" : true,
+			"bandwidth" : 0.8,
+			"synapse_loss" : true
+		},
+		"neuron_type" : "IF_cond_exp",
+		"neuron_params": {
+				"e_rev_E": 30.0,
+				"e_rev_I": -100.0,
+				"v_rest": -60.0,
+				"v_reset": -80.0,
+				"v_thresh": -40.0,
+				"tau_syn_E": 3.0,
+				"tau_syn_I": 3.0,
+				"tau_refrac": 1.0,
+				"tau_m": 5.0,
+				"cm": 0.2
+		},
+		"num_neurons_pop" : 10,
+		"num_source_neurons" : 10,
+		"num_inhibitory_neurons" : 10,
+		"weight_inp" : 11,
+		"weight_self" : 7,
+		"weight_from_inh" : -10,
+		"weight_to_inh" : 1,
+		"prob_inp" : 0.3,
+		"prob_self" : 0.8,
+		"prob_to_inh" : 0.80,
+		"firing_rate" : 40
+		}
+}

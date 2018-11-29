@@ -15,10 +15,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <cypress/cypress.hpp>
 
 #include <algorithm>
-
-#include <cypress/cypress.hpp>
 
 #include "spiking_utils.hpp"
 
@@ -111,4 +110,24 @@ bool SpikingUtils::rerun_fixed_number_trials(Network &network, Backend &backend,
 	}
 	return false;
 }
+
+int SpikingUtils::calc_num_spikes(const std::vector<cypress::Real> &spiketrain,
+                                  const cypress::Real start,
+                                  const cypress::Real end)
+{
+	if (start == 0.0 and end == 0.0) {
+		return spiketrain.size();
+	}
+	else if (end == 0.0) {
+		return spiketrain.end() - std::lower_bound(spiketrain.begin(),
+		                                           spiketrain.end(),
+		                                           start - 0.001);
+	}
+	else {
+		return std::lower_bound(spiketrain.begin(), spiketrain.end(),
+		                        end + 0.001) -
+		       std::lower_bound(spiketrain.begin(), spiketrain.end(),
+		                        start - 0.001);
+	}
 }
+}  // namespace SNAB

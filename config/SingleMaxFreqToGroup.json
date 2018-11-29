@@ -11,39 +11,41 @@
 			"tau_m": 10,
 			"cm": 0.2
 		},
-		"neuron_params_group": {
+		"neuron_params_retr": {
 			"e_rev_E": 0.0,
-			"v_rest": -67.0,
-			"v_reset": -67.0,
-			"v_thresh": -65,
+			"v_rest": -80.0,
+			"v_reset": -80.0,
+			"v_thresh": -78,
 			"tau_syn_E": 1.0,
 			"tau_refrac": 0.0,
-			"tau_m": 0.2,
+			"e_rev_E": 0.0,
+			"tau_m": 1.0,
 			"cm": 0.2
 		},
-		"weight" : 0.1,
-		"#neurons" : 100
+		"weight" : 0.01,
+		"#neurons" : [255,4080,16065,189450]
 	},
 	"spikey" : {
+		"setup" : {"calibIcb" : 1},
 		"neuron_type" : "IfFacetsHardware1",
 		"neuron_params_max": {
-			"g_leak": 0.2,
-			"tau_refrac": 0.0,
+			"tau_m": 1.0,
+			"tau_refrac": 10,
 			"v_rest": -55.0,
-			"v_thresh": -68.0,
-			"v_reset": -70.0,
-			"e_rev_I": 0.0
+			"v_thresh": -75,
+			"v_reset": -80.0,
+			"e_rev_I": -80.0
 		},
-		"neuron_params_group": {
-			"g_leak": 2.0,
-			"tau_refrac": 0.0,
-			"v_rest": -55.0,
-			"v_thresh": -55.0,
-			"v_reset": -25.0,
-			"e_rev_I": 0.0
+		"neuron_params_retr": {
+			"tau_m": 2.0,
+			"tau_refrac": 2.0,
+			"v_rest": -80.0,
+			"v_thresh": -69.0,
+			"v_reset": -80.0,
+			"e_rev_I": -80.0
 		},
-		"#neurons" : 126,
-		"weight" : 0.03
+		"#neurons" : [191,383],
+		"weight" : 0.015
 	},
 	"nest" : {
 		"neuron_type" : "IF_cond_exp",
@@ -57,7 +59,7 @@
 			"tau_m": 1,
 			"cm": 0.2
 		},
-		"neuron_params_group": {
+		"neuron_params_retr": {
 			"e_rev_E": 0.0,
 			"v_rest": -67.0,
 			"v_reset": -67.0,
@@ -67,7 +69,37 @@
 			"tau_m": 0.2,
 			"cm": 0.2
 		},
-		"weight" : 0.01,
-		"#neurons" : 100
+		"weight" : 0.1,
+		"#neurons" : [100, 1000, 10000]
+    },
+    	"nmpm1" : {
+		"neuron_type" : "IF_cond_exp",
+		"setup": {
+			"calib_path": "/wang/data/calibration/brainscales/default-2017-09-26-1",
+			"digital_weight" : true,
+			"neuron_size" : 4
+		},
+		"neuron_params_max": {
+			"e_rev_E": 0.0,
+			"v_rest": 50.0,
+			"v_reset": -67.0,
+			"v_thresh": -60.0,
+			"tau_syn_E": 2.0,
+			"tau_refrac": 8.0,
+			"tau_m": 0.1,
+			"cm": 0.2
+		},
+		"neuron_params_retr": {
+			"e_rev_E": 0.0,
+			"v_rest": -67.0,
+			"v_reset": -67.0,
+			"v_thresh": -60,
+			"tau_syn_E": 3.0,
+			"tau_refrac": 6.0,
+			"tau_m": 4.0,
+			"cm": 0.2
+		},
+		"weight" : 15,
+		"#neurons" : [60, 120]
     }
 }

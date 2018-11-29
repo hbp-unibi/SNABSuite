@@ -1,4 +1,6 @@
 build*/
+*build*/
+.idea/
 *.kdev4
 plot/images*/
 plot/tables*/

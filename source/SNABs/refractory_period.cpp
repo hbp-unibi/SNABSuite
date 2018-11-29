@@ -15,13 +15,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <cypress/cypress.hpp>               // Neural network frontend
 
 #include <limits>
 #include <string>
 #include <vector>
 
 #include <cypress/backend/power/netio4.hpp>  // Control of power via NetIO4 Bank
-#include <cypress/cypress.hpp>               // Neural network frontend
 
 #include "common/neuron_parameters.hpp"
 #include "refractory_period.hpp"

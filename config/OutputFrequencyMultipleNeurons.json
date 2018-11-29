@@ -11,7 +11,7 @@
 			"tau_m": 10,
 			"cm": 0.2
 		},
-		"#neurons" : [255,4080,16320,189700]
+		"#neurons" : [255,4080,16320,189000]
 	},
 	"spikey" : {
 		"setup" : {"calibIcb" : 1},
@@ -43,8 +43,8 @@
 	"nmpm1" : {
 		"neuron_type" : "IF_cond_exp",
 		"setup": {
-			"calib_path": "/wang/data/calibration/guidebook/",
-			"neuron_size" : 2
+			"calib_path": "/wang/data/calibration/brainscales/default-2017-09-26-1",
+			"neuron_size" : 4
 		},
 		"neuron_params": {
 			"e_rev_E": 0.0,
@@ -56,6 +56,6 @@
 			"tau_m": 0.1,
 			"cm": 0.2
 		},
-		"#neurons" : [85, 160]
+		"#neurons" : [85, 140, 220]
 	}
 }

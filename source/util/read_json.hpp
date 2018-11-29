@@ -21,21 +21,19 @@
 #ifndef SNABSUITE_UTIL_READ_JSON_HPP
 #define SNABSUITE_UTIL_READ_JSON_HPP
 
+#include <cypress/cypress.hpp>
+
 #include <fstream>
 #include <limits>
 #include <map>
 #include <string>
 #include <vector>
 
-#include <cypress/cypress.hpp>
-
-//#include "util/utilities.hpp"
-
 namespace SNAB {
 using cypress::global_logger;
 /**
-* Store input form json in a map to check everything!
-*/
+ * Store input form json in a map to check everything!
+ */
 template <typename T>
 std::map<std::string, T> json_to_map(const cypress::Json &obj)
 {
@@ -139,9 +137,11 @@ std::vector<std::vector<T>> json_2Darray_to_vector(const cypress::Json &json)
  * Replaces all arrays in a json object with one entry of the same array
  * @param json object to be manipulated
  * @param index index of value used
+ * @param warn When set to true, warning is given when nothing has been replaced
  * @return true if json was changed
  */
-bool replace_arrays_by_value(cypress::Json &json, const size_t &index = 0, std::string name = "");
-}
+bool replace_arrays_by_value(cypress::Json &json, const size_t &index = 0,
+                             std::string name = "", bool warn = true);
+}  // namespace SNAB
 
 #endif /* SNABSUITE_UTIL_READ_JSON_HPP */

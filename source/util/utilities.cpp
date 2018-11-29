@@ -15,6 +15,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <cypress/cypress.hpp>
+
 #include "utilities.hpp"
 
 #include <cmath>
@@ -23,8 +25,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
-#include <cypress/cypress.hpp>
 
 namespace SNAB {
 using cypress::Json;
@@ -57,16 +57,49 @@ void Utilities::progress_callback(double p)
 	}
 	std::cerr << "]\r";
 }
+namespace {
+inline bool ends_with(std::string const &value, std::string const &ending)
+{
+	if (ending.size() > value.size())
+		return false;
+	return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+}
+
+void remove_existing_entries(Json &a, const Json &b)
+{
+	for (auto it = b.begin(); it != b.end(); ++it) {
+		if (a.find(it.key()) != a.end()) {
+			if (a[it.key()].is_object()) {
+				remove_existing_entries(a[it.key()], b[it.key()]);
+			}
+			else {
+				a.erase(a.find(it.key()));
+			}
+		}
+	}
+}
+
+}  // namespace
 
 Json Utilities::merge_json(const Json &a, const Json &b)
 {
-	Json result = a.flatten();
+	Json result = a;
+	remove_existing_entries(result, b);
+	result = result.flatten();
 	Json tmp = b.flatten();
 
 	for (Json::iterator it = tmp.begin(); it != tmp.end(); ++it) {
+		if (ends_with(it.key(), "/0")) {
+			std::string temp = it.key();
+			temp.pop_back();
+			temp.pop_back();
+			if (result.find(temp) != result.end()) {
+				result.erase(result.find(temp));
+			}
+		}
+
 		result[it.key()] = it.value();
 	}
-
 	return result.unflatten();
 }
 
@@ -153,4 +186,23 @@ void Utilities::plot_voltages_spikes(std::string filename,
 		std::cerr << "Calling spike_plot.py caused an error!" << std::endl;
 	}
 }
+
+void Utilities::plot_1d_curve(std::string filename, std::string simulator,
+                              size_t x_col, size_t y_col, int std_dev_vol)
+{
+	std::string short_sim = split(split(simulator, '=')[0], '.').back();
+	std::string output_file = split(filename, '.')[0] + ".pdf";
+	std::string exec = "../plot/1dim_plot.py " + filename + " -x " +
+	                   std::to_string(x_col) + " -y " + std::to_string(y_col) +
+	                   " -s " + short_sim + " -o " + output_file;
+	if (std_dev_vol != -1) {
+		exec = exec + " -ys " + std::to_string(std_dev_vol);
+	}
+	try {
+		system((exec + " &").c_str());
+	}
+	catch (...) {
+		std::cerr << "Calling spike_plot.py caused an error!" << std::endl;
+	}
 }
+}  // namespace SNAB

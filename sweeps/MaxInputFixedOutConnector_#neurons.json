@@ -4,12 +4,12 @@
         "#neurons" : [96, 384,100]
     },
     "spinnaker" : {
-        "#neurons" : [122, 4000,100]
+        "#neurons" : [127, 4000,100]
     },
     "nest" : {
         "#neurons" : [50, 4000, 100]
     },
     "nmpm1" : {
-        "#neurons" : [30, 70 ,41]
+        "#neurons" : [10, 40 ,41]
     }
 }

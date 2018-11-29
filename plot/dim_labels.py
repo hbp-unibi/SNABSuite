@@ -71,6 +71,7 @@ DIM_LABELS = {
     "neurons_max" : "\\#Neurons in Source",
     "neurons_retr" : "\\#Neurons in Target",
     "#neurons_retr" : "\\#Neurons in Target",
+    "Average_deviation": "Average Spike Count Deviation"
 }
 
 

@@ -45,7 +45,9 @@
 	},
 	"nmpm1" : {
 		"setup": {
-			"neuron_size" : 2
+            "calib_path" : "/wang/data/calibration/brainscales/default-2017-09-26-1",
+			"neuron_size" : 4,
+			"digital_weight" : true
 		},
 		"neuron_type" : "IF_cond_exp",
 			"neuron_params": {
@@ -53,13 +55,13 @@
 				"e_rev_I": -100.0,
 				"v_rest": -65.0,
 				"v_reset": -80.0,
-				"v_thresh": -60.0,
+				"v_thresh": -54.0,
 				"tau_syn_E": 2.0,
 				"tau_refrac": 2.0,
 				"tau_m": 1.0,
 				"cm": 0.2
 			},
-		"weight" : 0.028,
+		"weight" : 6,
 		"tolerance" : 1.0
 		}
 }

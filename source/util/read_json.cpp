@@ -119,35 +119,39 @@ bool check_json_for_parameters(const std::vector<std::string> &parameters,
 	return true;
 }
 
-bool replace_arrays_by_value(cypress::Json &json, const size_t &index, std::string name)
+bool replace_arrays_by_value(cypress::Json &json, const size_t &index,
+                             std::string name, bool warn)
 {
 	bool anything_changed = false;
 	for (Json::iterator i = json.begin(); i != json.end(); ++i) {
 		if (i.value().is_object()) {
-			bool temp = replace_arrays_by_value(i.value(), index);
+			bool temp = replace_arrays_by_value(i.value(), index, name, false);
 			if (!anything_changed && temp) {
 				anything_changed = true;
 			}
 		}
 		else if (i.value().is_array()) {
 			if (i.value().size() <= index) {
-				global_logger().debug("SNABSuite", name + 
-				    ": The array of size " + std::to_string(i.value().size()) +
-				    " is too small for requested index of " +
-				    std::to_string(index));
-                return false;
+				global_logger().debug(
+				    "SNABSuite", name + ": The array of size " +
+				                     std::to_string(i.value().size()) +
+				                     " is too small for requested index of " +
+				                     std::to_string(index));
+				return false;
 			}
 			i.value() = i.value()[index];
 			anything_changed = true;
 		}
 	}
-	if(!anything_changed){
-        cypress::global_logger().debug(
-		    "SNABSuite",
-		    name +
-		        ": Benchmark index is not zero, but no "
-		        "array was found in config file!");
-    }
+	if (!anything_changed && index!=0) {
+		if (warn) {
+			cypress::global_logger().debug(
+			    "SNABSuite", name +
+			                     ": Benchmark index is not zero, but no "
+			                     "array was found in config file!");
+		}
+	}
+
 	return anything_changed;
 }
-}
+}  // namespace SNAB
