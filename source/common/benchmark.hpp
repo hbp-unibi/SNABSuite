@@ -93,7 +93,12 @@ public:
 			file.open(
 			    (backend + "_" + std::to_string(bench_index) + ".json").c_str(),
 			    std::fstream::out);
-			file << results.dump(4) << std::endl;
+            if (results.size() > 1){
+                file << results.dump(4) << std::endl;
+            }
+            else{
+                file << results[0].dump(4) << std::endl;
+            }
 			file.close();
 		}
 	};
