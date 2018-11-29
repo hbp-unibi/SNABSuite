@@ -21,7 +21,7 @@ find_package(PythonInterp 2.7 REQUIRED)
 include(ExternalProject)
 ExternalProject_Add(cypress_ext
     GIT_REPOSITORY        "https://github.com/hbp-unibi/cypress/"
-    GIT_TAG               pybind
+    GIT_TAG               master
     UPDATE_COMMAND        git pull
     CMAKE_ARGS            -DSTATIC_LINKING=${STATIC_LINKING} -DCMAKE_INSTALL_PREFIX:path=<INSTALL_DIR> -DCMAKE_BUILD_TYPE:STRING=${DCMAKE_BUILD_TYPE}
     INSTALL_COMMAND 	  ""
