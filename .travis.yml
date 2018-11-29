@@ -18,7 +18,7 @@ matrix:
       after_success:
         - cmake .. -DSTATIC_LINKING=FALSE -DSNAB_DEBUG=FALSE
         - make && make test ARGS=-V
-        - git clone ${DEPLOY_ADDRESS}
+        - git clone "https://${GITHUB_TOKEN}@${DEPLOY_ADDRESS}" master &>/dev/null
         - cd SNABSuite_Deploy
         - cp ../benchmark benchmark
         - cp -r ../../config config
