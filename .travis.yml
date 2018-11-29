@@ -18,7 +18,7 @@ matrix:
       after_success:
         - python ../source/util/generate_bench_json.py
         - git clone "https://${GITHUB_TOKEN}@${DEPLOY_ADDRESS}" &>/dev/null
-        - cd SNABSuite_Deploy
+        - cd SNABSuite_deploy
         - cp ../benchmark benchmark
         - cp ../benchmarks.json benchmarks.json
         - cp -r ../../config/ ./
