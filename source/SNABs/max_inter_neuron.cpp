@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-#include <cypress/backend/power/netio4.hpp>  // Control of power via NetIO4 Bank
+#include <cypress/backend/power/power.hpp>  // Control of power via netw
 
 #include "common/neuron_parameters.hpp"
 #include "max_inter_neuron.hpp"
@@ -76,9 +76,7 @@ void SingleMaxFreqToGroup::run_netw(cypress::Network &netw)
 	// Debug logger, may be ignored in the future
 	netw.logger().min_level(cypress::DEBUG, 0);
 
-	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
-	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
 	netw.run(pwbackend, m_simulation_length);
 }
@@ -177,9 +175,7 @@ void GroupMaxFreqToGroup::run_netw(cypress::Network &netw)
 	// Debug logger, may be ignored in the future
 	netw.logger().min_level(cypress::DEBUG, 0);
 
-	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
-	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
 	netw.run(pwbackend, m_simulation_length);
 }

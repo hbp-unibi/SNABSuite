@@ -18,7 +18,7 @@
 
 #include <cypress/cypress.hpp>  // Neural network frontend
 
-#include <cypress/backend/power/netio4.hpp>  // Control of power via NetIO4 Bank
+#include <cypress/backend/power/power.hpp>  // Control of power via netw
 
 #include <util/spiking_utils.hpp>
 #include "setup_time.hpp"
@@ -51,9 +51,7 @@ cypress::Network &SetupTimeOneToOne::build_netw(cypress::Network &netw)
 void SetupTimeOneToOne::run_netw(cypress::Network &netw)
 {
 	netw.add_connection(m_pop1, m_pop2, Connector::one_to_one(1.0, 1.0));
-	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
-	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
 	m_netw2.run(pwbackend, 1);
 	netw.run(pwbackend, 1);
@@ -101,9 +99,7 @@ SetupTimeAllToAll::SetupTimeAllToAll(const std::string backend,
 void SetupTimeAllToAll::run_netw(cypress::Network &netw)
 {
 	netw.add_connection(m_pop1, m_pop2, Connector::all_to_all(1.0, 1.0));
-	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
-	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
 	m_netw2.run(pwbackend, 1);
 	netw.run(pwbackend, 1);
@@ -128,9 +124,8 @@ SetupTimeRandom::SetupTimeRandom(const std::string backend, size_t bench_index)
 void SetupTimeRandom::run_netw(cypress::Network &netw)
 {
 	netw.add_connection(m_pop1, m_pop2, Connector::random(1.0, 1.0, 0.5));
-	// PowerManagementBackend to use netio4
+
 	cypress::PowerManagementBackend pwbackend(
-	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
 	m_netw2.run(pwbackend, 1);
 	netw.run(pwbackend, 1);

@@ -17,7 +17,7 @@
  */
 #include <cypress/cypress.hpp>  // Neural network frontend
 
-#include <cypress/backend/power/netio4.hpp>  // Control of power via NetIO4 Bank
+#include <cypress/backend/power/power.hpp>  // Control of power via netw
 #include <string>
 #include <vector>
 
@@ -119,9 +119,7 @@ cypress::Network &SimpleWTA::build_netw(cypress::Network &netw)
 
 void SimpleWTA::run_netw(cypress::Network &netw)
 {
-	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
-	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
 	try {
 		netw.run(pwbackend, m_simulation_length);
@@ -379,9 +377,7 @@ Network &LateralInhibWTA::build_netw(cypress::Network &netw)
 
 void LateralInhibWTA::run_netw(cypress::Network &netw)
 {
-	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
-	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
 	try {
 		netw.run(pwbackend, m_simulation_length);
@@ -553,9 +549,7 @@ Network &MirrorInhibWTA::build_netw(cypress::Network &netw)
 
 void MirrorInhibWTA::run_netw(cypress::Network &netw)
 {
-	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
-	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
 	try {
 		netw.run(pwbackend, m_simulation_length);

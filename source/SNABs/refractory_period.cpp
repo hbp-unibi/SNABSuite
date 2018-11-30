@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include <cypress/backend/power/netio4.hpp>  // Control of power via NetIO4 Bank
+#include <cypress/backend/power/power.hpp>  // Control of power via netw
 
 #include "common/neuron_parameters.hpp"
 #include "refractory_period.hpp"
@@ -72,9 +72,7 @@ cypress::Network &RefractoryPeriod::build_netw(cypress::Network &netw)
 
 void RefractoryPeriod::run_netw(cypress::Network &netw)
 {
-	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
-	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
 	SpikingUtils::rerun_fixed_number_trials(netw, pwbackend, 250, 3);
 }

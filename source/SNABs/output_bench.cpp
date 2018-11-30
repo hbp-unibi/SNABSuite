@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include <cypress/backend/power/netio4.hpp>  // Control of power via NetIO4 Bank
+#include <cypress/backend/power/power.hpp>  // Control of power via netw
 
 #include "common/neuron_parameters.hpp"
 #include "output_bench.hpp"
@@ -61,10 +61,8 @@ cypress::Network &OutputFrequencySingleNeuron::build_netw(
 
 void OutputFrequencySingleNeuron::run_netw(cypress::Network &netw)
 {
-	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
-	    std::make_shared<cypress::NetIO4>(),
-	    cypress::Network::make_backend(m_backend));
+	    cypress::Network::make_backend(m_backend));;
 	try {
 		netw.run(pwbackend, 150.0);
 	}
@@ -155,9 +153,7 @@ void OutputFrequencySingleNeuron2::run_netw(cypress::Network &netw)
 	// Debug logger, may be ignored in the future
 	netw.logger().min_level(cypress::DEBUG, 0);
 
-	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
-	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
 
 	// Record Spikes only for ~16 neurons
@@ -256,9 +252,7 @@ void OutputFrequencyMultipleNeurons::run_netw(cypress::Network &netw)
 	// Debug logger, may be ignored in the future
 	netw.logger().min_level(cypress::DEBUG, 0);
 
-	// PowerManagementBackend to use netio4
 	cypress::PowerManagementBackend pwbackend(
-	    std::make_shared<cypress::NetIO4>(),
 	    cypress::Network::make_backend(m_backend));
 	netw.run(pwbackend, 150.0);
 }
