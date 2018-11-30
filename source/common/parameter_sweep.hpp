@@ -51,7 +51,7 @@ private:
 	// Names and Keys for parameters swept over
 	std::vector<std::string> m_sweep_names;
 	// Vector containing all resulting json files
-	std::vector<std::vector<cypress::Real>> m_results;
+	std::vector<std::vector<std::array<cypress::Real, 4>>> m_results;
 	// TODO: Number of repetitions for every simulation
 	size_t m_repetitions = 1;
 

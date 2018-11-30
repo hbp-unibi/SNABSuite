@@ -34,14 +34,15 @@ class SNABBase {
 public:
 	/**
 	 * @brief Constructor which reads in platform specific config file
-	 * For description of the indicator_* initializers look into the comment of
-	 * their declaration below
+	 * For description of the indicator initializers look into the comment of
+	 * their declaration below.
 	 *
 	 * @param name name of the SNAB, and therefore of the config file
 	 * @param backend string containing the simulation backend
 	 * @param indicator_names names of benchmark indicators
 	 * @param indicator_types types...
 	 * @param indicator_measures measures...
+	 * @param indicator_units units...
 	 * @param required_parameters list of parameters which are required in the
 	 * JSON file, which should be checked before unnecessary building networks
 	 * @param bench_index in case of parameters to choose from (e.g. network
@@ -52,6 +53,7 @@ public:
 	         std::initializer_list<std::string> indicator_names,
 	         std::initializer_list<std::string> indicator_types,
 	         std::initializer_list<std::string> indicator_measures,
+	         std::initializer_list<std::string> indicator_units,
 	         std::initializer_list<std::string> required_parameters,
 	         size_t bench_index);
 
@@ -130,10 +132,11 @@ public:
 
 	/**
 	 * @brief This should contain the evaluation process and return the result
-	 * in order
-	 * of those in names(), types() and measures()
+	 * in order of those in names(), types() and measures(). The array contains
+     * in this order: result, standard deviation, minimal value, maximal value.
+     * If these are not provided, use NaN() as entry.
 	 */
-	virtual std::vector<cypress::Real> evaluate() = 0;
+	virtual std::vector<std::array<cypress::Real, 4>> evaluate() = 0;
 
 	/**
 	 * @brief The result of evaluation() is converted into the format used by
@@ -230,9 +233,16 @@ protected:
 
 	/**
 	 * @brief indicator_measures should be the "type of the measurement",
-	 * therefore the unit of the value. See also SNABBase::indicator_names.
+	 * or what has been measures, e.g. norm, p-value, time. See also
+	 * SNABBase::indicator_names.
 	 */
 	const std::vector<std::string> m_indicator_measures;
+
+	/**
+	 * @brief indicator_units should be the "unit of the measurement",
+	 * therefore the unit of the value.
+	 */
+	const std::vector<std::string> m_indicator_units;
 
 	/**
 	 * @brief Beginning of the filename of all debug data (including

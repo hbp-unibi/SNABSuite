@@ -16,10 +16,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cypress/cypress.hpp>               // Neural network frontend
+#include <cypress/cypress.hpp>  // Neural network frontend
 
 #include <cypress/backend/power/netio4.hpp>  // Control of power via NetIO4 Bank
-
 
 #include <util/spiking_utils.hpp>
 #include "setup_time.hpp"
@@ -29,7 +28,7 @@ namespace SNAB {
 SetupTimeOneToOne::SetupTimeOneToOne(const std::string backend,
                                      size_t bench_index)
     : SNABBase(__func__, backend, {"Setup Time", "Speedup"},
-               {"performance", "quality"}, {"ms", ""},
+               {"performance", "quality"}, {"time", "speedup"}, {"ms", ""},
                {"#neurons", "neuron_type"}, bench_index),
       m_pop1(m_netw, 0),
       m_pop2(m_netw, 0)
@@ -68,9 +67,12 @@ void SetupTimeOneToOne::run_netw(cypress::Network &netw)
 	netw.run(pwbackend, 1);
 	m_rt_list = netw.runtime().sim;
 }
-std::vector<cypress::Real> SetupTimeOneToOne::evaluate()
+
+std::vector<std::array<cypress::Real, 4>> SetupTimeOneToOne::evaluate()
 {
-	return std::vector<cypress::Real>({m_rt_conn, m_rt_list / m_rt_conn});
+	return {std::array<cypress::Real, 4>({m_rt_conn, NaN(), NaN(), NaN()}),
+	        std::array<cypress::Real, 4>(
+	            {m_rt_list / m_rt_conn, NaN(), NaN(), NaN()})};
 }
 
 SetupTimeOneToOne::SetupTimeOneToOne(
@@ -78,9 +80,11 @@ SetupTimeOneToOne::SetupTimeOneToOne(
     std::initializer_list<std::string> indicator_names,
     std::initializer_list<std::string> indicator_types,
     std::initializer_list<std::string> indicator_measures,
+    std::initializer_list<std::string> indicator_units,
     std::initializer_list<std::string> required_parameters, size_t bench_index)
     : SNABBase(name, backend, indicator_names, indicator_types,
-               indicator_measures, required_parameters, bench_index),
+               indicator_measures, indicator_units, required_parameters,
+               bench_index),
       m_pop1(m_netw, 0),
       m_pop2(m_netw, 0)
 {
@@ -89,8 +93,8 @@ SetupTimeOneToOne::SetupTimeOneToOne(
 SetupTimeAllToAll::SetupTimeAllToAll(const std::string backend,
                                      size_t bench_index)
     : SetupTimeOneToOne(__func__, backend, {"Setup Time", "Speedup"},
-                        {"performance", "quality"}, {"ms", ""},
-                        {"#neurons", "neuron_type"}, bench_index)
+                        {"performance", "quality"}, {"time", "speedup"},
+                        {"ms", ""}, {"#neurons", "neuron_type"}, bench_index)
 {
 }
 
@@ -116,8 +120,8 @@ void SetupTimeAllToAll::run_netw(cypress::Network &netw)
 
 SetupTimeRandom::SetupTimeRandom(const std::string backend, size_t bench_index)
     : SetupTimeOneToOne(__func__, backend, {"Setup Time", "Speedup"},
-                        {"performance", "quality"}, {"ms", ""},
-                        {"#neurons", "neuron_type"}, bench_index)
+                        {"performance", "quality"}, {"time", "speedup"},
+                        {"ms", ""}, {"#neurons", "neuron_type"}, bench_index)
 {
 }
 

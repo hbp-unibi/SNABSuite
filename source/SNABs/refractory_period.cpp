@@ -35,8 +35,8 @@ RefractoryPeriod::RefractoryPeriod(const std::string backend,
                                    size_t bench_index)
     : SNABBase(
           __func__, backend,
-          {"Average deviation from refractory period", "Standard deviation"},
-          {"quality", "quality"}, {"ms", "ms"},
+          {"Average deviation from refractory period"},
+          {"quality"},{"deviation"}, {"ms"},
           {"neuron_type", "neuron_params", "weight", "tolerance"}, bench_index),
       m_pop(m_netw, 0),
       m_pop_source(cypress::PopulationBase(m_netw, 0))
@@ -79,7 +79,7 @@ void RefractoryPeriod::run_netw(cypress::Network &netw)
 	SpikingUtils::rerun_fixed_number_trials(netw, pwbackend, 250, 3);
 }
 
-std::vector<cypress::Real> RefractoryPeriod::evaluate()
+std::vector<std::array<cypress::Real, 4>> RefractoryPeriod::evaluate()
 {
 	auto voltage = m_pop[0].signals().data(1);
 	auto spike_time = m_pop[0].signals().data(0);
@@ -147,14 +147,14 @@ std::vector<cypress::Real> RefractoryPeriod::evaluate()
 		global_logger().warn(
 		    "SNABSuite",
 		    "Refractory period could not be measured! Adjust parameters.");
-		return std::vector<cypress::Real>(
+		return {std::array<cypress::Real, 4>(
 		    {std::numeric_limits<cypress::Real>::quiet_NaN(),
-		     std::numeric_limits<cypress::Real>::quiet_NaN()});
+		     std::numeric_limits<cypress::Real>::quiet_NaN()})};
 	}
 
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;
 	Utilities::calculate_statistics(diffs, min, max, avg, std_dev);
-	return std::vector<cypress::Real>({avg, std_dev});
+	return {std::array<cypress::Real, 4>({avg, std_dev, min, max})};
 }
 }

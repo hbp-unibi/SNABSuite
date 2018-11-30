@@ -53,7 +53,7 @@ public:
 	SimpleWTA(std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
-	std::vector<cypress::Real> evaluate() override;
+	std::vector<std::array<cypress::Real, 4>> evaluate() override;
 
 	/**
 	 * Calculate the metrics for comparing WTA networks
@@ -92,7 +92,7 @@ public:
 	LateralInhibWTA(std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &network) override;
 	void run_netw(cypress::Network &network) override;
-	std::vector<Real> evaluate() override;
+	std::vector<std::array<cypress::Real, 4>> evaluate() override;
 };
 
 /**
@@ -120,7 +120,7 @@ public:
 	MirrorInhibWTA(std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &network) override;
 	void run_netw(cypress::Network &network) override;
-	std::vector<Real> evaluate() override;
+	std::vector<std::array<cypress::Real, 4>> evaluate() override;
 };
 }  // namespace SNAB
 

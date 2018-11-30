@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <cypress/cypress.hpp>               // Neural network frontend
+#include <cypress/cypress.hpp>  // Neural network frontend
 
 #include <memory>
 #include <random>
@@ -34,10 +34,8 @@ namespace SNAB {
 MaxInputOneToOne::MaxInputOneToOne(const std::string backend,
                                    size_t bench_index)
     : SNABBase(
-          __func__, backend,
-          {"Average number of spikes", "Standard deviation", "Maximum #spikes",
-           "Minimum #spikes"},
-          {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
+          __func__, backend, {"Average number of spikes"}, {"quality"},
+          {"#spikes"}, {""},
           {"neuron_type", "neuron_params", "weight", "#neurons", "#spikes"},
           bench_index),
       m_pop(m_netw, 0),
@@ -59,8 +57,8 @@ cypress::Network &MaxInputOneToOne::build_netw(cypress::Network &netw)
 	                                     m_num_neurons, "spikes");
 	std::vector<cypress::Real> spike_times;
 	for (size_t i = 0; i < m_num_spikes; i++) {
-		spike_times.emplace_back(
-		    10.0 + cypress::Real(i) * simulation_length / m_num_spikes);
+		spike_times.emplace_back(10.0 + cypress::Real(i) * simulation_length /
+		                                    m_num_spikes);
 	}
 	m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
 	    m_num_neurons, SpikeSourceArrayParameters(spike_times));
@@ -81,7 +79,7 @@ void MaxInputOneToOne::run_netw(cypress::Network &netw)
 	netw.run(pwbackend, simulation_length + 50.0);
 }
 
-std::vector<cypress::Real> MaxInputOneToOne::evaluate()
+std::vector<std::array<cypress::Real, 4>> MaxInputOneToOne::evaluate()
 {
 	// Gather the average #spikes of every neuron
 	std::vector<cypress::Real> spikes(m_num_neurons, -1);
@@ -107,15 +105,13 @@ std::vector<cypress::Real> MaxInputOneToOne::evaluate()
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;
 	Utilities::calculate_statistics(spikes, min, max, avg, std_dev);
-	return std::vector<cypress::Real>({avg, std_dev, max, min});
+	return {std::array<cypress::Real, 4>({avg, std_dev, min, max})};
 }
 
 MaxInputAllToAll::MaxInputAllToAll(const std::string backend,
                                    size_t bench_index)
-    : SNABBase(__func__, backend,
-               {"Average number of spikes", "Standard deviation",
-                "Maximum #spikes", "Minimum #spikes"},
-               {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
+    : SNABBase(__func__, backend, {"Average number of spikes"}, {"quality"},
+               {"#spikes"}, {""},
                {"neuron_type", "neuron_params", "weight", "#neurons", "#spikes",
                 "#input_neurons"},
                bench_index),
@@ -139,8 +135,8 @@ cypress::Network &MaxInputAllToAll::build_netw(cypress::Network &netw)
 	                                     m_num_neurons, "spikes");
 	std::vector<cypress::Real> spike_times;
 	for (size_t i = 0; i < m_num_spikes; i++) {
-		spike_times.emplace_back(
-		    10.0 + cypress::Real(i) * simulation_length / m_num_spikes);
+		spike_times.emplace_back(10.0 + cypress::Real(i) * simulation_length /
+		                                    m_num_spikes);
 	}
 	m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
 	    m_num_inp_neurons, SpikeSourceArrayParameters(spike_times));
@@ -161,7 +157,7 @@ void MaxInputAllToAll::run_netw(cypress::Network &netw)
 	netw.run(pwbackend, simulation_length + 50.0);
 }
 
-std::vector<cypress::Real> MaxInputAllToAll::evaluate()
+std::vector<std::array<cypress::Real, 4>> MaxInputAllToAll::evaluate()
 {
 	// Gather the average #spikes of every neuron
 	std::vector<cypress::Real> spikes(m_num_neurons, -1);
@@ -188,15 +184,13 @@ std::vector<cypress::Real> MaxInputAllToAll::evaluate()
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;
 	Utilities::calculate_statistics(spikes, min, max, avg, std_dev);
-	return std::vector<cypress::Real>({avg, std_dev, max, min});
+	return {std::array<cypress::Real, 4>({avg, std_dev, min, max})};
 }
 
 MaxInputFixedOutConnector::MaxInputFixedOutConnector(const std::string backend,
                                                      size_t bench_index)
-    : SNABBase(__func__, backend,
-               {"Average number of spikes", "Standard deviation",
-                "Maximum #spikes", "Minimum #spikes"},
-               {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
+    : SNABBase(__func__, backend, {"Average number of spikes"}, {"quality"},
+               {"#spikes"}, {""},
                {"neuron_type", "neuron_params", "weight", "#neurons", "#spikes",
                 "#input_neurons", "#ConnectionsPerInput"},
                bench_index),
@@ -220,12 +214,12 @@ cypress::Network &MaxInputFixedOutConnector::build_netw(cypress::Network &netw)
 	                                     m_num_neurons, "spikes");
 	std::vector<cypress::Real> spike_times;
 	for (size_t i = 0; i < m_num_spikes; i++) {
-		spike_times.emplace_back(
-		    10.0 + cypress::Real(i) * simulation_length / m_num_spikes);
+		spike_times.emplace_back(10.0 + cypress::Real(i) * simulation_length /
+		                                    m_num_spikes);
 	}
 	m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
 	    m_num_inp_neurons, SpikeSourceArrayParameters(spike_times));
-    
+
 	netw.add_connection(
 	    m_pop_source, m_pop,
 	    Connector::fixed_fan_out(size_t(m_config_file["#ConnectionsPerInput"]),
@@ -244,7 +238,7 @@ void MaxInputFixedOutConnector::run_netw(cypress::Network &netw)
 	netw.run(pwbackend, simulation_length + 50.0);
 }
 
-std::vector<cypress::Real> MaxInputFixedOutConnector::evaluate()
+std::vector<std::array<cypress::Real, 4>> MaxInputFixedOutConnector::evaluate()
 {
 	// Gather the average #spikes of every neuron, init with -1
 	std::vector<cypress::Real> spikes(m_num_neurons, -1);
@@ -271,28 +265,32 @@ std::vector<cypress::Real> MaxInputFixedOutConnector::evaluate()
 	// Calculate statistics
 	cypress::Real max, min, avg, std_dev;
 	Utilities::calculate_statistics(spikes, min, max, avg, std_dev);
-	return std::vector<cypress::Real>({avg, std_dev, max, min});
+	return {std::array<cypress::Real, 4>({avg, std_dev, min, max})};
 }
-MaxInputFixedOutConnector::MaxInputFixedOutConnector(std::string name, std::string backend,
-	         std::initializer_list<std::string> indicator_names,
-	         std::initializer_list<std::string> indicator_types,
-	         std::initializer_list<std::string> indicator_measures,
-	         std::initializer_list<std::string> required_parameters,
-	         size_t bench_index) : SNABBase(name, backend, indicator_names, indicator_types, indicator_measures, required_parameters, bench_index),
+
+MaxInputFixedOutConnector::MaxInputFixedOutConnector(
+    std::string name, std::string backend,
+    std::initializer_list<std::string> indicator_names,
+    std::initializer_list<std::string> indicator_types,
+    std::initializer_list<std::string> indicator_measures,
+    std::initializer_list<std::string> indicator_units,
+    std::initializer_list<std::string> required_parameters, size_t bench_index)
+    : SNABBase(name, backend, indicator_names, indicator_types,
+               indicator_measures, indicator_units, required_parameters,
+               bench_index),
       m_pop(m_netw, 0),
-      m_pop_source(cypress::PopulationBase(m_netw, 0)){}
-
-
+      m_pop_source(cypress::PopulationBase(m_netw, 0))
+{
+}
 
 MaxInputFixedInConnector::MaxInputFixedInConnector(const std::string backend,
-                                                     size_t bench_index)
-    : MaxInputFixedOutConnector(__func__, backend,
-               {"Average number of spikes", "Standard deviation",
-                "Maximum #spikes", "Minimum #spikes"},
-               {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
-               {"neuron_type", "neuron_params", "weight", "#neurons", "#spikes",
-                "#input_neurons", "#ConnectionsPerOutput"},
-               bench_index)
+                                                   size_t bench_index)
+    : MaxInputFixedOutConnector(
+          __func__, backend, {"Average number of spikes"}, {"quality"},
+          {"#spikes"}, {""},
+          {"neuron_type", "neuron_params", "weight", "#neurons", "#spikes",
+           "#input_neurons", "#ConnectionsPerOutput"},
+          bench_index)
 {
 }
 cypress::Network &MaxInputFixedInConnector::build_netw(cypress::Network &netw)
@@ -311,17 +309,17 @@ cypress::Network &MaxInputFixedInConnector::build_netw(cypress::Network &netw)
 	                                     m_num_neurons, "spikes");
 	std::vector<cypress::Real> spike_times;
 	for (size_t i = 0; i < m_num_spikes; i++) {
-		spike_times.emplace_back(
-		    10.0 + cypress::Real(i) * simulation_length / m_num_spikes);
+		spike_times.emplace_back(10.0 + cypress::Real(i) * simulation_length /
+		                                    m_num_spikes);
 	}
 	m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
 	    m_num_inp_neurons, SpikeSourceArrayParameters(spike_times));
-    
+
 	netw.add_connection(
 	    m_pop_source, m_pop,
 	    Connector::fixed_fan_in(size_t(m_config_file["#ConnectionsPerOutput"]),
-	                             cypress::Real(m_config_file["weight"])));
+	                            cypress::Real(m_config_file["weight"])));
 	return netw;
 }
 
-}
+}  // namespace SNAB

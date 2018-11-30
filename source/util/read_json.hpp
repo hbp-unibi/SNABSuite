@@ -116,8 +116,34 @@ std::vector<T> json_array_to_vector(const cypress::Json &json)
 }
 
 /**
+ * Function to convert a JSON array to a array. This is used for one
+ * dimensional arrays only!
+ * @param json array to be converted. This should not be an object!
+ * @return Vector of type T containing values of the array
+ */
+template <typename T, int n>
+std::array<T, n> json_array_to_array(const cypress::Json &json)
+{
+	if (!json.is_array() || json.size() == 0 || json[0].is_array()) {
+		throw std::invalid_argument("Error in conversion from Json to array!");
+	}
+	std::array<T, n>  res;
+    size_t index = 0;
+	for (auto i : json) {
+		if (i.is_null()) {
+			res[index] = std::numeric_limits<T>::quiet_NaN();
+		}
+		else {
+			res[index] = T(i);
+		}
+		index ++;
+	}
+	return res;
+}
+
+/**
  * Function to convert a two dimensional array to a vector.
- * @param json 2D array to be converted. This shouold not be an object!
+ * @param json 2D array to be converted. This should not be an object!
  * @return Vector of vectors of type T containing values of the 2D array
  */
 template <typename T>
@@ -129,6 +155,28 @@ std::vector<std::vector<T>> json_2Darray_to_vector(const cypress::Json &json)
 	std::vector<std::vector<T>> res;
 	for (auto i : json) {
 		res.push_back(json_array_to_vector<T>(i));
+	}
+	return res;
+}
+
+/**
+ * Function to convert a three dimensional array to a vector.
+ * @param json 3D array to be converted. This should not be an object!
+ * @return Vector of vectors of type T containing values of the 2D array
+ */
+template <typename T, int n>
+std::vector<std::vector<std::array<T, n>>> json_3Darray_to_vector(const cypress::Json &json)
+{
+	if (!json.is_array() || !json[0].is_array()) {
+		throw std::invalid_argument("Error in conversion from Json to array!");
+	}
+	std::vector<std::vector<std::array<T, n>>> res;
+	for (size_t i = 0; i< json.size(); i++) {
+        std::vector<std::array<T, n>> res2;
+        for (size_t j = 0; j< json[i].size(); j++) {
+            res2.push_back(json_array_to_array<T, n>(json[i][j]));
+        }
+		res.push_back(res2);
 	}
 	return res;
 }

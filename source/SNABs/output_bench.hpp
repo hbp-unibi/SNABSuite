@@ -38,7 +38,7 @@ public:
 	OutputFrequencySingleNeuron(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
-	std::vector<cypress::Real> evaluate() override;
+	std::vector<std::array<cypress::Real, 4>> evaluate() override;
 };
 
 /**
@@ -55,7 +55,7 @@ public:
 	OutputFrequencySingleNeuron2(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
-	std::vector<cypress::Real> evaluate() override;
+	std::vector<std::array<cypress::Real, 4>> evaluate() override;
 };
 
 /**
@@ -74,7 +74,7 @@ public:
 	                               size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
-	std::vector<cypress::Real> evaluate() override;
+	std::vector<std::array<cypress::Real, 4>> evaluate() override;
 };
-}
+}  // namespace SNAB
 #endif /* SNABSUITE_SNABS_OUTPUT_BENCH_HPP */

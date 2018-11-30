@@ -36,7 +36,8 @@ SimpleWTA::SimpleWTA(const std::string backend, size_t bench_index)
     : SNABBase(__func__, backend,
                {"Max Winning Streak", "Number of state changes",
                 "Time without winner"},
-               {"quality", "quality", "quality"}, {"ms", "", "ms"},
+               {"quality", "quality", "quality"},
+               {"time", "state changes", "time"}, {"ms", "", "ms"},
                {"neuron_type", "neuron_params", "num_neurons_pop",
                 "num_source_neurons", "weight_inp", "weight_self", "weight_inh",
                 "prob_inp", "prob_self", "prob_inh", "firing_rate"},
@@ -228,7 +229,7 @@ std::vector<Real> SimpleWTA::calculate_WTA_metrics(
 	                          Real(num_time_dead) * bin_size});
 }
 
-std::vector<cypress::Real> SimpleWTA::evaluate()
+std::vector<std::array<cypress::Real, 4>> SimpleWTA::evaluate()
 {
 #if SNAB_DEBUG
 	// Write data to files
@@ -269,14 +270,18 @@ std::vector<cypress::Real> SimpleWTA::evaluate()
 	std::vector<std::vector<size_t>> bins22({bins, bins2});
 	Utilities::write_vector2_to_csv(bins22, _debug_filename("bins.csv"));
 #endif
-	return calculate_WTA_metrics(bins, bins2, m_bin_size);
+	auto res = calculate_WTA_metrics(bins, bins2, m_bin_size);
+	return {std::array<cypress::Real, 4>({res[0], NaN(), NaN(), NaN()}),
+	        std::array<cypress::Real, 4>({res[1], NaN(), NaN(), NaN()}),
+	        std::array<cypress::Real, 4>({res[2], NaN(), NaN(), NaN()})};
 }
 
 LateralInhibWTA::LateralInhibWTA(const std::string backend, size_t bench_index)
     : SNABBase(__func__, backend,
                {"Max Winning Streak", "Number of state changes",
                 "Time without winner"},
-               {"quality", "quality", "quality"}, {"ms", "", "ms"},
+               {"quality", "quality", "quality"},
+               {"time", "state changes", "time"}, {"ms", "", "ms"},
                {"neuron_type", "neuron_params", "num_neurons_pop",
                 "num_source_neurons", "weight_inp", "weight_self",
                 "weight_lat_inh", "weight_lat_exc", "prob_inp", "prob_self",
@@ -388,7 +393,7 @@ void LateralInhibWTA::run_netw(cypress::Network &netw)
 		    "Wrong parameter setting or backend error! Simulation broke down");
 	}
 }
-std::vector<Real> LateralInhibWTA::evaluate()
+std::vector<std::array<cypress::Real, 4>> LateralInhibWTA::evaluate()
 {
 #if SNAB_DEBUG
 	// Write data to files
@@ -437,14 +442,18 @@ std::vector<Real> LateralInhibWTA::evaluate()
 	std::vector<std::vector<size_t>> bins22({bins, bins2});
 	Utilities::write_vector2_to_csv(bins22, _debug_filename("bins.csv"));
 #endif
-	return SimpleWTA::calculate_WTA_metrics(bins, bins2, m_bin_size);
+	auto res = SimpleWTA::calculate_WTA_metrics(bins, bins2, m_bin_size);
+	return {std::array<cypress::Real, 4>({res[0], NaN(), NaN(), NaN()}),
+	        std::array<cypress::Real, 4>({res[1], NaN(), NaN(), NaN()}),
+	        std::array<cypress::Real, 4>({res[2], NaN(), NaN(), NaN()})};
 }
 
 MirrorInhibWTA::MirrorInhibWTA(const std::string backend, size_t bench_index)
     : SNABBase(__func__, backend,
                {"Max Winning Streak", "Number of state changes",
                 "Time without winner"},
-               {"quality", "quality", "quality"}, {"ms", "", "ms"},
+               {"quality", "quality", "quality"},
+               {"time", "state changes", "time"}, {"ms", "", "ms"},
                {"neuron_type", "neuron_params", "num_neurons_pop",
                 "num_source_neurons", "weight_inp", "weight_self",
                 "weight_to_inh", "weight_from_inh", "prob_inp", "prob_self",
@@ -558,7 +567,7 @@ void MirrorInhibWTA::run_netw(cypress::Network &netw)
 		    "Wrong parameter setting or backend error! Simulation broke down");
 	}
 }
-std::vector<Real> MirrorInhibWTA::evaluate()
+std::vector<std::array<cypress::Real, 4>> MirrorInhibWTA::evaluate()
 {
 #if SNAB_DEBUG
 	// Write data to files
@@ -610,7 +619,10 @@ std::vector<Real> MirrorInhibWTA::evaluate()
 	std::vector<std::vector<size_t>> bins22({bins, bins2});
 	Utilities::write_vector2_to_csv(bins22, _debug_filename("bins.csv"));
 #endif
-	return SimpleWTA::calculate_WTA_metrics(bins, bins2, m_bin_size);
+	auto res = SimpleWTA::calculate_WTA_metrics(bins, bins2, m_bin_size);
+	return {std::array<cypress::Real, 4>({res[0], NaN(), NaN(), NaN()}),
+	        std::array<cypress::Real, 4>({res[1], NaN(), NaN(), NaN()}),
+	        std::array<cypress::Real, 4>({res[2], NaN(), NaN(), NaN()})};
 }
 
 }  // namespace SNAB

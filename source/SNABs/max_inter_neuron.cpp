@@ -36,10 +36,9 @@ using cypress::global_logger;
 SingleMaxFreqToGroup::SingleMaxFreqToGroup(const std::string backend,
                                            size_t bench_index)
     : SNABBase(__func__, backend,
-               {"Average spike number deviation", "Standard deviation",
-                "Maximum", "Minimum"},
-               {"quality", "quality", "quality", "quality"},
-               {"1/ms", "1/ms", "1/ms", "1/ms"},
+               {"Average frequency deviation"},
+               {"quality"}, {"frequency"},
+               {"mHz"},
                {"neuron_type", "neuron_params_max", "neuron_params_retr",
                 "weight", "#neurons"},
                bench_index),
@@ -84,7 +83,7 @@ void SingleMaxFreqToGroup::run_netw(cypress::Network &netw)
 	netw.run(pwbackend, m_simulation_length);
 }
 
-std::vector<cypress::Real> SingleMaxFreqToGroup::evaluate()
+std::vector<std::array<cypress::Real, 4>> SingleMaxFreqToGroup::evaluate()
 {
 	// Reference spike count
 	size_t spike_ref = SpikingUtils::calc_num_spikes(
@@ -125,25 +124,23 @@ std::vector<cypress::Real> SingleMaxFreqToGroup::evaluate()
 #endif
     
     if(!valid){
-        return std::vector<cypress::Real>({NaN(), NaN(), NaN(), NaN()});
+        return {std::array<cypress::Real, 4>({NaN(), NaN(), NaN(), NaN()})};
     }
 
 	// Calculate statistics
 	cypress::Real avg, std_dev;
 	int min, max;
 	Utilities::calculate_statistics<int>(num_spikes, min, max, avg, std_dev);
-	return std::vector<cypress::Real>({avg - cypress::Real(spike_ref), std_dev,
-	                                   max - cypress::Real(spike_ref),
-	                                   min - cypress::Real(spike_ref)});
+	return {std::array<cypress::Real, 4>({avg - cypress::Real(spike_ref), std_dev,
+	                                   min - cypress::Real(spike_ref), max - cypress::Real(spike_ref)})};
 }
 
 GroupMaxFreqToGroup::GroupMaxFreqToGroup(const std::string backend,
                                          size_t bench_index)
     : SNABBase(__func__, backend,
-               {"Average number of spikes", "Standard deviation",
-                "Maximum", "Minimum"},
-               {"quality", "quality", "quality", "quality"},
-               {"", "", "", ""},
+               {"Average number of spikes"},
+               {"quality"}, {"spikes"},
+               {""},
                {"neuron_type", "neuron_params_max", "neuron_params_retr",
                 "weight", "#neurons"},
                bench_index),
@@ -187,7 +184,7 @@ void GroupMaxFreqToGroup::run_netw(cypress::Network &netw)
 	netw.run(pwbackend, m_simulation_length);
 }
 
-std::vector<cypress::Real> GroupMaxFreqToGroup::evaluate()
+std::vector<std::array<cypress::Real, 4>> GroupMaxFreqToGroup::evaluate()
 {
     std::vector<size_t> num_spikes;
 	for (size_t i = 0; i < m_pop_retr.size(); i++) {
@@ -218,7 +215,7 @@ std::vector<cypress::Real> GroupMaxFreqToGroup::evaluate()
     size_t min, max;
 	Utilities::calculate_statistics<size_t>(num_spikes, min, max, avg, std_dev);
 
-	return std::vector<cypress::Real>({avg, std_dev, cypress::Real(max), cypress::Real(min)});
+	return {std::array<cypress::Real, 4>({avg, std_dev, cypress::Real(min), cypress::Real(max)})};
 }
 
 GroupMaxFreqToGroup::GroupMaxFreqToGroup(
@@ -226,9 +223,10 @@ GroupMaxFreqToGroup::GroupMaxFreqToGroup(
     std::initializer_list<std::string> indicator_names,
     std::initializer_list<std::string> indicator_types,
     std::initializer_list<std::string> indicator_measures,
+    std::initializer_list<std::string> indicator_units,
     std::initializer_list<std::string> required_parameters, size_t bench_index)
     : SNABBase(name, backend, indicator_names, indicator_types,
-               indicator_measures, required_parameters, bench_index),
+               indicator_measures, indicator_units, required_parameters, bench_index),
       m_pop_max(m_netw, 0),
       m_pop_retr(m_netw, 0)
 {
@@ -237,10 +235,9 @@ GroupMaxFreqToGroup::GroupMaxFreqToGroup(
 GroupMaxFreqToGroupAllToAll::GroupMaxFreqToGroupAllToAll(
     const std::string backend, size_t bench_index)
     : GroupMaxFreqToGroup(__func__, backend,
-               {"Average number of spikes", "Standard deviation",
-                "Maximum", "Minimum"},
-               {"quality", "quality", "quality", "quality"},
-               {"", "", "", ""},
+               {"Average number of spikes"},
+               {"quality"}, {"spikes"},
+               {""},
                {"neuron_type", "neuron_params_max", "neuron_params_retr",
                 "weight", "#neurons_max", "#neurons_retr"},
                bench_index)
@@ -276,10 +273,9 @@ cypress::Network &GroupMaxFreqToGroupAllToAll::build_netw(
 GroupMaxFreqToGroupProb::GroupMaxFreqToGroupProb(
     const std::string backend, size_t bench_index)
     : GroupMaxFreqToGroup(__func__, backend,
-               {"Average number of spikes", "Standard deviation",
-                "Maximum", "Minimum"},
-               {"quality", "quality", "quality", "quality"},
-               {"", "", "", ""},
+               {"Average number of spikes"},
+               {"quality"}, {"spikes"},
+               {""},
                {"neuron_type", "neuron_params_max", "neuron_params_retr",
                 "weight", "#neurons_max", "#neurons_retr", "probability"},
                bench_index)

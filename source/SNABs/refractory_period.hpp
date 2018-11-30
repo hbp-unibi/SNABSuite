@@ -23,7 +23,6 @@
 
 #include <cypress/cypress.hpp>
 
-#include "common/neuron_parameters.hpp"
 #include "common/snab_base.hpp"
 
 namespace SNAB {
@@ -44,7 +43,7 @@ public:
 	RefractoryPeriod(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
-	std::vector<cypress::Real> evaluate() override;
+	std::vector<std::array<cypress::Real, 4>> evaluate() override;
 };
 }
 
