@@ -21,6 +21,7 @@ matrix:
         - git clone "https://${GITHUB_TOKEN}@${DEPLOY_ADDRESS}" &>/dev/null
         - cd SNABSuite_deploy
         - cp ../benchmark benchmark
+        - cp ../../source/util/benchmark.py benchmark.py
         - cp ../benchmarks.json benchmarks.json
         - cp -r ../../config/ ./
         - git add *

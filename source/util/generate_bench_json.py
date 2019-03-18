@@ -136,7 +136,7 @@ for headername in os.listdir("../source/SNABs/"):
             set_task = False  # Is there any viable task
             task_dict = {}
             task_dict["name"] = bench_index[i]
-            task_dict["command"] = "./benchmark " " {system="
+            task_dict["command"] = "benchmark.py " " {system="
             for j in xrange(0, len(simulators)):
                 if i < avail_list[j]:
                     task_dict["command"] += web_simulators[j] + ","
