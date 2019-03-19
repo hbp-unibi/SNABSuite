@@ -28,8 +28,8 @@ import os
 import json
 
 simulators = ["nest", "spinnaker", "nmpm1", "spikey"]  # SNABSuite simulators
-web_simulators = ["nest", "spiNNaker", "hardware.hbp_pm",
-                  "spikey"]  # Web frontend simulators
+web_simulators = ["NEST", "SpiNNaker", "BrainScaleS",
+                  "Spikey"]  # Web frontend simulators
 bench_index = ["Single Core/Smallest Network", "Single Chip",
                "Small System", "Large System"]  # Benchmark index and their description
 
@@ -136,15 +136,15 @@ for headername in os.listdir("../source/SNABs/"):
             set_task = False  # Is there any viable task
             task_dict = {}
             task_dict["name"] = bench_index[i]
-            task_dict["command"] = "benchmark.py " " {system="
+            task_dict["command"] = "benchmark.py {system} "
+            task_dict["target"] = []
             for j in xrange(0, len(simulators)):
                 if i < avail_list[j]:
-                    task_dict["command"] += web_simulators[j] + ","
+                    task_dict["target"].append(web_simulators[j])
                     set_task = True
             if not set_task:
                 continue
-            task_dict["command"] = task_dict["command"][:-1]
-            task_dict["command"] += "} " + clazz['name'] + " " + str(i)
+            task_dict["command"] += clazz['name'] + " " + str(i)
             tasks.append(task_dict)
             set_snab = True
         if not set_snab:
