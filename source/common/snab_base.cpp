@@ -78,9 +78,9 @@ cypress::Json SNABBase::evaluate_json()
 		temp["name"] = m_indicator_names[i];
 		temp["type"] = m_indicator_types[i];
 		temp["value"] = results[i][0];
-		temp["measures"] = m_indicator_measures[i];
+		temp["measure"] = m_indicator_measures[i];
         if(m_indicator_units[i] != ""){
-            temp["unit"] = m_indicator_units[i];
+            temp["units"] = m_indicator_units[i];
         }
 		if (!(results[i][1] != results[i][1])) {
 			temp["std_dev"] = results[i][1];
