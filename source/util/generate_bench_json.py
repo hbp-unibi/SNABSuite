@@ -145,6 +145,14 @@ for headername in os.listdir("../source/SNABs/"):
             if not set_task:
                 continue
             task_dict["command"] += clazz['name'] + " " + str(i)
+            task_dict["config"] = {}
+            if i < avail_list[2]:
+                task_dict["config"] [web_simulators[2]]= {}
+                task_dict["config"] [web_simulators[2]]["WAFER_MODULE"] = 33
+                if "wafer" in json_temp[simulators[2]]["setup"]:
+                    task_dict["config"] [web_simulators[2]]["WAFER_MODULE"]  = json_temp[simulators[2]]["setup"]["wafer"]
+            if not task_dict["config"]:
+                task_dict.pop('config', None)
             tasks.append(task_dict)
             set_snab = True
         if not set_snab:
