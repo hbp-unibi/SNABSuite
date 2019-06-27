@@ -40,7 +40,15 @@ set(CYPRESS_LIBRARY
 	${BINARY_DIR}/libcypress.a
     ${PYTHON_LIBRARIES}
     -pthread
+    dl
 )
+
+
+if(STATIC_LINKING)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${BINARY_DIR}/include/glibc.h")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -include ${BINARY_DIR}/include/glibc.h")
+endif()
+
 
 set(GTEST_LIBRARIES
     ${BINARY_DIR}/googletest-prefix/src/googletest-build/googlemock/gtest/libgtest.a
