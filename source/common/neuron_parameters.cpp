@@ -19,7 +19,9 @@
 #include <cypress/cypress.hpp>
 
 #include <algorithm>  //std::sort
+#include <iomanip>
 #include <random>
+#include <sstream>
 #include <string>
 #include <vector>
 
