@@ -86,6 +86,7 @@ add_library(benchmark_library
     source/common/parameter_sweep
 	source/common/snab_base
 	source/common/snab_registry
+    source/SNABs/activation_curve
     source/SNABs/output_bench
     source/SNABs/refractory_period
     source/SNABs/max_input
