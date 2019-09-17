@@ -24,6 +24,7 @@ matrix:
         - cp ../../source/util/benchmark.py benchmark.py
         - cp ../benchmarks.json benchmarks.json
         - cp -r ../../config/ ./
+        - cp ../cypress_ext-prefix/src/cypress_ext-build/libBS2CYPRESS.so ./
         - git add *
         - git commit -m "Update to latest SNABSuite master"
         - git push "https://${GITHUB_TOKEN}@${DEPLOY_ADDRESS}" master &>/dev/null

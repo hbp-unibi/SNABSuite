@@ -23,10 +23,11 @@ ExternalProject_Add(cypress_ext
     GIT_REPOSITORY        "https://github.com/hbp-unibi/cypress/"
     GIT_TAG               master
     UPDATE_COMMAND        git pull
-    CMAKE_ARGS            -DSTATIC_LINKING=${STATIC_LINKING} -DCMAKE_INSTALL_PREFIX:path=<INSTALL_DIR> -DCMAKE_BUILD_TYPE:STRING=${DCMAKE_BUILD_TYPE}
+    CMAKE_ARGS            -DSTATIC_LINKING=${STATIC_LINKING} -DCMAKE_INSTALL_PREFIX:path=<INSTALL_DIR> -DCMAKE_BUILD_TYPE:STRING=${DCMAKE_BUILD_TYPE} -DBUILD_TEST_EXAMPLES=False
     INSTALL_COMMAND 	  ""
     EXCLUDE_FROM_ALL      1
 )
+
 ExternalProject_Get_Property(cypress_ext SOURCE_DIR BINARY_DIR)
 
 
