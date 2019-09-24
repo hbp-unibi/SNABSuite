@@ -36,6 +36,7 @@ WeightDependentActivation::WeightDependentActivation(const std::string backend,
                {"Average spike deviation", "Average standard deviation",
                 "Maximum deviation", "Minimum deviation"},
                {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
+               {"", "", "", ""},
                {"neuron_type", "neuron_params", "weight_min", "weight_max",
                 "step_size", "#neurons", "isi", "expected_output"},
                bench_index),
@@ -58,9 +59,11 @@ WeightDependentActivation::WeightDependentActivation(
     std::initializer_list<std::string> indicator_names,
     std::initializer_list<std::string> indicator_types,
     std::initializer_list<std::string> indicator_measures,
+    std::initializer_list<std::string> indicator_units,
     std::initializer_list<std::string> required_parameters, size_t bench_index)
     : SNABBase(name, backend, indicator_names, indicator_types,
-               indicator_measures, required_parameters, bench_index),
+               indicator_measures, indicator_units, required_parameters,
+               bench_index),
       m_pop(m_netw, 0)
 {
 }
@@ -134,12 +137,9 @@ std::vector<std::vector<Real>> WeightDependentActivation::binned_spike_counts()
 }
 
 namespace {
-Real round_2_dec(Real val)
-{
-	return std::llround(val * 100.0) / 100.0;
-}
+Real round_2_dec(Real val) { return std::llround(val * 100.0) / 100.0; }
 }  // namespace
-std::vector<cypress::Real> WeightDependentActivation::evaluate()
+std::vector<std::array<cypress::Real, 4>> WeightDependentActivation::evaluate()
 {
 	// Gather the #spikes of every neuron
 	std::vector<std::vector<cypress::Real>> spikes;
@@ -200,7 +200,8 @@ std::vector<cypress::Real> WeightDependentActivation::evaluate()
 	}
 
 	for (size_t i = 0; i < m_num_steps; i++) {
-		plot_data[i][1] = round_2_dec(avg[i] - Real(m_config_file["expected_output"][i]));
+		plot_data[i][1] =
+		    round_2_dec(avg[i] - Real(m_config_file["expected_output"][i]));
 	}
 
 	if (m_snab_name == "WeightDependentActivation") {
@@ -240,8 +241,9 @@ std::vector<cypress::Real> WeightDependentActivation::evaluate()
 	Utilities::calculate_statistics(avg, dummy2, dummy, avg_avg, dummy2);
 	Utilities::calculate_statistics(std_dev, dummy2, dummy, avg_std_dev,
 	                                dummy2);
-	return {round_2_dec(avg_avg), round_2_dec(avg_std_dev),
-	        round_2_dec(max_max), round_2_dec(min_min)};
+	return {std::array<cypress::Real, 4>(
+	    {round_2_dec(avg_avg), round_2_dec(avg_std_dev), round_2_dec(max_max),
+	     round_2_dec(min_min)})};
 }
 
 RateBasedWeightDependentActivation::RateBasedWeightDependentActivation(
@@ -251,6 +253,7 @@ RateBasedWeightDependentActivation::RateBasedWeightDependentActivation(
           {"Average frequency deviation", "Average standard deviation",
            "Maximum deviation", "Minimum deviation"},
           {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
+          {"", "", "", ""},
           {"neuron_type", "neuron_params", "weight_min", "weight_max",
            "step_size", "#neurons", "presentation_time", "rate",
            "expected_output"},
