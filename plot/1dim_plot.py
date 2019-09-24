@@ -116,7 +116,7 @@ for target_file in args.files:
 
     if args.ny:
         ylabel = ylabel + " (normalized)"
-        max = np.abs(get_max(ys))
+        max = get_max(np.abs(ys))
         normalize(ys, max)
         if args.ys:
             normalize(ys_dev, max)
@@ -131,12 +131,17 @@ if not os.path.exists("images"):
     os.mkdir("images")
 ax.legend(loc='lower center', bbox_to_anchor=(0.5, 1.05),
           ncol=4)
+
 if args.o == "":
     if args.files[-1].split('/')[-2]:
         if not os.path.exists("images/" + args.files[-1].split('/')[-2]):
             os.mkdir("images/" + args.files[-1].split('/')[-2])
-        fig.savefig("images/" + args.files[-1].split('/')[-2] + "/" + args.files[-1].split(
-            '/')[-1].split('_')[0] + ".pdf", format='pdf', bbox_inches='tight')
+        if args.files[-1].split('/')[-1].split('_')[1] != "max":
+            fig.savefig("images/" + args.files[-1].split('/')[-2] + "/" + args.files[-1].split(
+                '/')[-1].split('_')[0] + ".pdf", format='pdf', bbox_inches='tight')
+        else:
+            fig.savefig("images/" + args.files[-1].split('/')[-2] + "/" + args.files[-1].split(
+                '/')[-1].split('_')[0] + "_max.pdf", format='pdf', bbox_inches='tight')
     else:
         fig.savefig("images/" + args.files[-1].split('/')[-1].split('_')
                     [0] + ".pdf", format='pdf', bbox_inches='tight')

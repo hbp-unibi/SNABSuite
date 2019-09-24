@@ -172,14 +172,14 @@ void ParameterSweep::recover_broken_simulation()
 
 	// Recover data
 	m_indices = json_array_to_vector<size_t>(backup["indices"]);
-	m_results = json_2Darray_to_vector<cypress::Real>(backup["results"]);
+	m_results = json_3Darray_to_vector<cypress::Real, 4>(backup["results"]);
 	m_jobs_done = json_array_to_vector<size_t>(backup["jobs_done"]);
 
 	// Check for invalid results (NaN) and repeat these experiments
 	for (size_t i = 0; i < m_indices.size(); i++) {
 		bool is_nan = false;
 		for (auto j : m_results[i]) {
-			if (std::isnan(j)) {
+			if (std::isnan(j[0])) {
 				is_nan = true;
 				break;
 			}
@@ -192,7 +192,7 @@ void ParameterSweep::recover_broken_simulation()
 			}
 		}
 	}
-	
+
 	std::cout << "Succesfully recovered old parameter sweep!" << std::endl;
 }
 
@@ -238,9 +238,10 @@ ParameterSweep::ParameterSweep(std::string backend, cypress::Json &config,
 	m_sweep_vector = generate_sweep_vector(m_sweep_config, m_snab->get_config(),
 	                                       m_sweep_names);
 	shuffle_sweep_indices(m_sweep_vector.size());
-	m_results = std::vector<std::vector<cypress::Real>>(
-	    m_indices.size(),
-	    std::vector<cypress::Real>(m_snab->indicator_names().size(), 0));
+	m_results = std::vector<std::vector<std::array<cypress::Real, 4>>>(
+	    m_indices.size(), std::vector<std::array<cypress::Real, 4>>(
+	                          m_snab->indicator_names().size(),
+	                          std::array<cypress::Real, 4>({0, 0, 0, 0})));
 	recover_broken_simulation();
 }
 
@@ -292,6 +293,32 @@ cypress::Real get_value_with_flattened_key(const cypress::Json &json,
 	return json_temp;
 }
 
+namespace {
+// See
+// https://stackoverflow.com/questions/17074324/how-can-i-sort-two-vectors-in-the-same-way-with-criteria-that-uses-only-one-of
+template <typename T, typename Compare>
+std::vector<std::size_t> sort_permutation(const std::vector<T> &vec,
+                                          Compare compare)
+{
+	std::vector<std::size_t> p(vec.size());
+	std::iota(p.begin(), p.end(), 0);
+	std::sort(p.begin(), p.end(), [&](std::size_t i, std::size_t j) {
+		return compare(vec[i], vec[j]);
+	});
+	return p;
+}
+template <typename T>
+std::vector<T> apply_permutation(const std::vector<T> &vec,
+                                 const std::vector<std::size_t> &p)
+{
+	std::vector<T> sorted_vec(vec.size());
+	std::transform(p.begin(), p.end(), sorted_vec.begin(),
+	               [&](std::size_t i) { return vec[i]; });
+	return sorted_vec;
+}
+
+}  // namespace
+
 void ParameterSweep::write_csv()
 {
 	// Get the direct parameter names without json key
@@ -299,28 +326,31 @@ void ParameterSweep::write_csv()
 	for (auto i : m_sweep_names) {
 		shortened_sweep_names.push_back(Utilities::split(i, '/').back());
 	}
-
+	std::vector<std::vector<cypress::Real>> sweep_values;
 	// Put the sweep parameters into the results structure
 	for (size_t i = 0; i < m_results.size(); i++) {
+		sweep_values.emplace_back(std::vector<cypress::Real>());
 		for (size_t j = 0; j < m_sweep_names.size(); j++) {
-			m_results[i].emplace_back(get_value_with_flattened_key(
+			sweep_values[i].emplace_back(get_value_with_flattened_key(
 			    m_sweep_vector[m_indices[i]], m_sweep_names[j]));
 		}
 	}
 
 	// Sort the structure for the last entries (sweep parameters)
 	size_t sweep_size = m_sweep_names.size();
-	std::sort(m_results.begin(), m_results.end(),
-	          [&sweep_size](const std::vector<cypress::Real> a,
-	                        const std::vector<cypress::Real> b) {
-		          size_t size = a.size();
-		          for (size_t i = 1; i <= sweep_size; i++) {
-			          if (a[size - i] != b[size - i]) {
-				          return a[size - i] < b[size - i];
-			          }
-		          }
-		          return a.back() < b.back();
-		      });
+	auto perm = sort_permutation<std::vector<cypress::Real>>(
+	    sweep_values, [&sweep_size](const std::vector<cypress::Real> a,
+	                                const std::vector<cypress::Real> b) {
+		    size_t size = a.size();
+		    for (size_t i = 1; i <= sweep_size; i++) {
+			    if (a[size - i] != b[size - i]) {
+				    return a[size - i] < b[size - i];
+			    }
+		    }
+		    return a.back() < b.back();
+	    });
+	sweep_values = apply_permutation(sweep_values, perm);
+	m_results = apply_permutation(m_results, perm);
 
 	std::string filename = m_snab->snab_name() + "/";
 
@@ -345,12 +375,17 @@ void ParameterSweep::write_csv()
 	}
 	auto indicator_names = m_snab->indicator_names();
 	for (size_t i = 1; i <= indicator_names.size(); i++) {
-		ofs << indicator_names[indicator_names.size() - i] << ",";
+		ofs << indicator_names[indicator_names.size() - i]
+		    << ",std_dev,min,max,";
 	}
 	ofs << "\n";
 	for (size_t i = 0; i < m_results.size(); i++) {
+		for (int j = sweep_values[i].size() - 1; j >= 0; j--) {
+			ofs << sweep_values[i][j] << ",";
+		}
 		for (int j = m_results[0].size() - 1; j >= 0; j--) {
-			ofs << m_results[i][j] << ",";
+			ofs << m_results[i][j][0] << "," << m_results[i][j][1] << ","
+			    << m_results[i][j][2] << "," << m_results[i][j][3] << ",";
 		}
 		ofs << "\n";
 	}
@@ -361,4 +396,4 @@ void ParameterSweep::write_csv()
 }
 
 ParameterSweep::~ParameterSweep() = default;
-}
+}  // namespace SNAB

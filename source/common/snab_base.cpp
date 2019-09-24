@@ -21,6 +21,7 @@
 #include "snab_base.hpp"
 
 #include <sys/stat.h>
+#include <algorithm>
 #include <string>
 
 #include "util/read_json.hpp"
@@ -31,13 +32,15 @@ SNABBase::SNABBase(std::string name, std::string backend,
                    std::initializer_list<std::string> indicator_names,
                    std::initializer_list<std::string> indicator_types,
                    std::initializer_list<std::string> indicator_measures,
+                   std::initializer_list<std::string> indicator_units,
                    std::initializer_list<std::string> required_parameters,
                    size_t bench_index)
     : m_backend(backend),
       m_snab_name(name),
       m_indicator_names(indicator_names),
       m_indicator_types(indicator_types),
-      m_indicator_measures(indicator_measures)
+      m_indicator_measures(indicator_measures),
+      m_indicator_units(indicator_units)
 {
 	m_config_file = read_config(name, m_backend);
 	std::vector<std::string> required_parameters_vec(required_parameters);
@@ -53,7 +56,7 @@ SNABBase::SNABBase(std::string name, std::string backend,
 	else {
 		return;
 	}
-	
+
 	bool changed = replace_arrays_by_value(m_config_file, bench_index, name);
 	if (!changed && bench_index != 0) {
 		m_valid = false;
@@ -64,19 +67,31 @@ SNABBase::SNABBase(std::string name, std::string backend,
 		Utilities::manipulate_backend_string(m_backend, m_config_file["setup"]);
 		m_config_file.erase("setup");
 	}
-
-	
 }
 
 cypress::Json SNABBase::evaluate_json()
 {
-	std::vector<cypress::Real> results = evaluate();
+	auto results = evaluate();
 	cypress::Json json;
 	for (size_t i = 0; i < results.size(); i++) {
-		json.push_back({{"type", m_indicator_types[i]},
-		                {"name", m_indicator_names[i]},
-		                {"value", results[i]},
-		                {"measures", m_indicator_measures[i]}});
+		cypress::Json temp;
+		temp["name"] = m_indicator_names[i];
+		temp["type"] = m_indicator_types[i];
+		temp["value"] = results[i][0];
+		temp["measure"] = m_indicator_measures[i];
+        if(m_indicator_units[i] != ""){
+            temp["units"] = m_indicator_units[i];
+        }
+		if (!(results[i][1] != results[i][1])) {
+			temp["std_dev"] = results[i][1];
+		}
+		if (!(results[i][2] != results[i][2])) {
+			temp["min"] = results[i][2];
+		}
+		if (!(results[i][3] != results[i][3])) {
+			temp["max"] = results[i][3];
+		}
+		json.push_back(temp);
 	}
 	return json;
 }

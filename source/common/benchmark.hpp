@@ -65,6 +65,12 @@ private:
 		       "T" + convert_time(Tm->tm_hour) + ":" +
 		       convert_time(Tm->tm_min) + ":" + convert_time(Tm->tm_sec);
 	}
+	
+	/**
+     * Convert bench index to task string
+     */
+	std::vector<std::string> bench_index_str{"Single Core/Smallest Network", "Single Chip",
+               "Small System", "Large System"};
 
 public:
 	/**
@@ -82,8 +88,9 @@ public:
 				global_logger().info("SNABSuite", "Executing " + i->snab_name());
 				i->build();
 				i->run();
-				results.push_back({{"name", i->snab_name()},
+				results.push_back({{"model", i->snab_name()},
 				                   {"timestamp", timestamp()},
+                                   {"task",  bench_index_str[bench_index]},
 				                   {"results", i->evaluate_json()}});
 			}
 		}
@@ -93,7 +100,12 @@ public:
 			file.open(
 			    (backend + "_" + std::to_string(bench_index) + ".json").c_str(),
 			    std::fstream::out);
-			file << results.dump(4) << std::endl;
+            if (results.size() > 1){
+                file << results.dump(4) << std::endl;
+            }
+            else{
+                file << results[0].dump(4) << std::endl;
+            }
 			file.close();
 		}
 	};

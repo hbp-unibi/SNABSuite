@@ -45,7 +45,7 @@ public:
 	SingleMaxFreqToGroup(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
-	std::vector<cypress::Real> evaluate() override;
+	std::vector<std::array<cypress::Real, 4>> evaluate() override;
 };
 
 /**
@@ -69,6 +69,7 @@ protected:
 	                    std::initializer_list<std::string> indicator_names,
 	                    std::initializer_list<std::string> indicator_types,
 	                    std::initializer_list<std::string> indicator_measures,
+	                    std::initializer_list<std::string> indicator_units,
 	                    std::initializer_list<std::string> required_parameters,
 	                    size_t bench_index);
 
@@ -76,7 +77,7 @@ public:
 	GroupMaxFreqToGroup(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
-	std::vector<cypress::Real> evaluate() override;
+	std::vector<std::array<cypress::Real, 4>> evaluate() override;
 };
 
 /**

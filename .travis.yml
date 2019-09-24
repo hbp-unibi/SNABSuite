@@ -15,6 +15,19 @@ matrix:
       before_install: 
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 50
         - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 50
+        - sudo pip install CppHeaderParser
+      after_success:
+        - python ../source/util/generate_bench_json.py
+        - git clone "https://${GITHUB_TOKEN}@${DEPLOY_ADDRESS}" &>/dev/null
+        - cd SNABSuite_deploy
+        - cp ../benchmark benchmark
+        - cp ../../source/util/benchmark.py benchmark.py
+        - cp ../benchmarks.json benchmarks.json
+        - cp -r ../../config/ ./
+        - cp ../cypress_ext-prefix/src/cypress_ext-build/libBS2CYPRESS.so ./
+        - git add *
+        - git commit -m "Update to latest SNABSuite master"
+        - git push "https://${GITHUB_TOKEN}@${DEPLOY_ADDRESS}" master &>/dev/null
 
     - os: linux
       dist: trusty
@@ -114,10 +127,10 @@ before_install:
     - eval "${MATRIX_EVAL}"
 
 install: 
-  - sudo pip install cython numpy pyNN requests pyminifier
+  - sudo pip install cython numpy pyNN==0.9.2 requests pyminifier
 script: 
   - mkdir build && cd build
   - cmake .. -DSTATIC_LINKING=FALSE -DSNAB_DEBUG=TRUE
   - make && make test ARGS=-V
-  - cmake .. -DSTATIC_LINKING=TRUE -DSNAB_DEBUG=TRUE
+  - cmake .. -DSTATIC_LINKING=TRUE -DSNAB_DEBUG=FALSE
   - make && make test ARGS=-V

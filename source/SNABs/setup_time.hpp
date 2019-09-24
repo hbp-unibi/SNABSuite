@@ -23,38 +23,37 @@
 
 #include <cypress/cypress.hpp>
 
-//#include "common/neuron_parameters.hpp"
 #include "common/snab_base.hpp"
 
 namespace SNAB {
 
 class SetupTimeOneToOne : public SNABBase {
 protected:
-    // Populations to be connected
+	// Populations to be connected
 	cypress::PopulationBase m_pop1, m_pop2;
-    // Simulation times for Connector and List connection
-    cypress::Real m_rt_conn, m_rt_list;
-    // Dummy network to assure the machine is booted
-    cypress::Network m_netw2;
-    
-    /**
+	// Simulation times for Connector and List connection
+	cypress::Real m_rt_conn, m_rt_list;
+	// Dummy network to assure the machine is booted
+	cypress::Network m_netw2;
+
+	/**
 	 * Constructor used by by child classes. Just hands everything to SNABBase
 	 * class Constructor.
 	 */
 	SetupTimeOneToOne(std::string name, std::string backend,
-	                    std::initializer_list<std::string> indicator_names,
-	                    std::initializer_list<std::string> indicator_types,
-	                    std::initializer_list<std::string> indicator_measures,
-	                    std::initializer_list<std::string> required_parameters,
-	                    size_t bench_index);
+	                  std::initializer_list<std::string> indicator_names,
+	                  std::initializer_list<std::string> indicator_types,
+	                  std::initializer_list<std::string> indicator_measures,
+	                  std::initializer_list<std::string> indicator_units,
+	                  std::initializer_list<std::string> required_parameters,
+	                  size_t bench_index);
 
 public:
 	SetupTimeOneToOne(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
-	std::vector<cypress::Real> evaluate() override;
+	std::vector<std::array<cypress::Real, 4>> evaluate() override;
 };
-
 
 class SetupTimeAllToAll : public SetupTimeOneToOne {
 public:

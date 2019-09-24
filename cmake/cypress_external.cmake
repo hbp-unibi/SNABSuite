@@ -27,6 +27,7 @@ ExternalProject_Add(cypress_ext
     INSTALL_COMMAND 	  ""
     EXCLUDE_FROM_ALL      1
 )
+
 ExternalProject_Get_Property(cypress_ext SOURCE_DIR BINARY_DIR)
 
 
@@ -42,6 +43,13 @@ set(CYPRESS_LIBRARY
     -pthread
     dl
 )
+
+
+if(STATIC_LINKING)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${BINARY_DIR}/include/glibc.h")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -include ${BINARY_DIR}/include/glibc.h")
+endif()
+
 
 set(GTEST_LIBRARIES
     ${BINARY_DIR}/googletest-prefix/src/googletest-build/googlemock/gtest/libgtest.a
