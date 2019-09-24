@@ -33,7 +33,7 @@ cypress::Json read_config(const std::string &name, const std::string &backend)
 	for (auto i : dir) {
 		std::ifstream ifs(i + name + ".json");
 		if (ifs.good()) {
-			config << ifs;
+			ifs >> config;
 			valid = true;
 			break;
 		}
@@ -143,7 +143,7 @@ bool replace_arrays_by_value(cypress::Json &json, const size_t &index,
 			anything_changed = true;
 		}
 	}
-	if (!anything_changed && index!=0) {
+	if (!anything_changed && index != 0) {
 		if (warn) {
 			cypress::global_logger().debug(
 			    "SNABSuite", name +

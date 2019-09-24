@@ -19,7 +19,9 @@
 #include <cypress/cypress.hpp>
 
 #include <algorithm>  //std::sort
+#include <iomanip>
 #include <random>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -66,7 +68,7 @@ std::vector<cypress::Real> read_neuron_parameters_from_json(
 	return read_check<cypress::Real>(input, type.parameter_names,
 	                                 type.parameter_defaults);
 }
-}
+}  // namespace
 
 NeuronParameters::NeuronParameters(const cypress::NeuronType &type,
                                    const cypress::Json &json)
@@ -81,4 +83,4 @@ NeuronParameters::NeuronParameters(const cypress::NeuronType &type,
 	}
 	global_logger().debug("SNABSuite", msg.str());
 }
-}
+}  // namespace SNAB
