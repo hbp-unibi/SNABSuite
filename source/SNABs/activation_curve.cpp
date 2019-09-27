@@ -60,7 +60,7 @@ WeightDependentActivation::WeightDependentActivation(
 
 cypress::Network &WeightDependentActivation::build_netw(cypress::Network &netw)
 {
-    
+
 	Real step_size = m_config_file["step_size"];
 	m_num_steps = size_t((Real(m_config_file["weight_max"]) -
 	                      Real(m_config_file["weight_min"])) /
@@ -278,7 +278,7 @@ std::vector<Real> spike_rate(Real t_begin, Real t_end, Real freq)
 cypress::Network &RateBasedWeightDependentActivation::build_netw(
     cypress::Network &netw)
 {
-    
+
 	Real step_size = m_config_file["step_size"];
 	m_num_steps = size_t((Real(m_config_file["weight_max"]) -
 	                      Real(m_config_file["weight_min"])) /

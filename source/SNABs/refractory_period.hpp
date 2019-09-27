@@ -35,7 +35,7 @@ namespace SNAB {
 class RefractoryPeriod : public SNABBase {
 private:
 	cypress::PopulationBase m_pop;
-    cypress::Real m_tolerance = 1.0;
+	cypress::Real m_tolerance = 1.0;
 	cypress::Population<cypress::SpikeSourceArray> m_pop_source;
 	NeuronParameters m_neuro_params;
 
@@ -44,7 +44,11 @@ public:
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<std::array<cypress::Real, 4>> evaluate() override;
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<RefractoryPeriod>(m_backend, m_bench_index);
+	}
 };
-}
+}  // namespace SNAB
 
 #endif /* SNABSUITE_SNABS_REFRACTORY_PERIOD_HPP*/

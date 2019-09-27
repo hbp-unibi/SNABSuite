@@ -133,8 +133,8 @@ public:
 	/**
 	 * @brief This should contain the evaluation process and return the result
 	 * in order of those in names(), types() and measures(). The array contains
-     * in this order: result, standard deviation, minimal value, maximal value.
-     * If these are not provided, use NaN() as entry.
+	 * in this order: result, standard deviation, minimal value, maximal value.
+	 * If these are not provided, use NaN() as entry.
 	 */
 	virtual std::vector<std::array<cypress::Real, 4>> evaluate() = 0;
 
@@ -177,6 +177,11 @@ public:
 	 * @return bool True when benchmark is valid for execution
 	 */
 	bool valid() const { return m_valid; }
+
+	/**
+	 * @brief Virtual method cloning the SNAB without knowing which SNAB it is
+	 */
+	virtual std::shared_ptr<SNABBase> clone() = 0;
 
 	/**
 	 * @brief Default destructor
@@ -251,6 +256,8 @@ protected:
 	 * @return std::__cxx11::string "debug/[backend]/[snabname]_"
 	 */
 	std::string _debug_filename(const std::string append = std::string()) const;
+
+	const size_t m_bench_index;
 };
 
 /**

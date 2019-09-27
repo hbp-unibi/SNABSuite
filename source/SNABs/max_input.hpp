@@ -44,6 +44,10 @@ public:
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<std::array<cypress::Real, 4>> evaluate() override;
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<MaxInputOneToOne>(m_backend, m_bench_index);
+	}
 };
 
 /**
@@ -63,6 +67,10 @@ public:
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<std::array<cypress::Real, 4>> evaluate() override;
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<MaxInputAllToAll>(m_backend, m_bench_index);
+	}
 };
 
 /**
@@ -76,20 +84,26 @@ protected:
 	size_t m_num_neurons = 0, m_num_inp_neurons = 0, m_num_spikes = 0;
 	NeuronParameters m_neuro_params;
 	cypress::Real simulation_length = 100;  // ms
-    MaxInputFixedOutConnector(std::string name, std::string backend,
-	         std::initializer_list<std::string> indicator_names,
-	         std::initializer_list<std::string> indicator_types,
-	         std::initializer_list<std::string> indicator_measures,
-	         std::initializer_list<std::string> indicator_units,
-	         std::initializer_list<std::string> required_parameters,
-	         size_t bench_index);
+	MaxInputFixedOutConnector(
+	    std::string name, std::string backend,
+	    std::initializer_list<std::string> indicator_names,
+	    std::initializer_list<std::string> indicator_types,
+	    std::initializer_list<std::string> indicator_measures,
+	    std::initializer_list<std::string> indicator_units,
+	    std::initializer_list<std::string> required_parameters,
+	    size_t bench_index);
+
 public:
 	MaxInputFixedOutConnector(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<std::array<cypress::Real, 4>> evaluate() override;
+	virtual std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<MaxInputFixedOutConnector>(m_backend,
+		                                                   m_bench_index);
+	}
 };
-
 
 /**
  * Check the input bandwidth by injecting spikes per fixed fan out connection.
@@ -99,6 +113,11 @@ class MaxInputFixedInConnector : public MaxInputFixedOutConnector {
 public:
 	MaxInputFixedInConnector(const std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<MaxInputFixedInConnector>(m_backend,
+		                                                  m_bench_index);
+	}
 };
-}
+}  // namespace SNAB
 #endif /* SNABSUITE_SNABS_MAX_INPUT_HPP */

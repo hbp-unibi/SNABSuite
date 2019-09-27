@@ -40,7 +40,8 @@ SNABBase::SNABBase(std::string name, std::string backend,
       m_indicator_names(indicator_names),
       m_indicator_types(indicator_types),
       m_indicator_measures(indicator_measures),
-      m_indicator_units(indicator_units)
+      m_indicator_units(indicator_units),
+      m_bench_index(bench_index)
 {
 	m_config_file = read_config(name, m_backend);
 	std::vector<std::string> required_parameters_vec(required_parameters);

@@ -39,6 +39,11 @@ public:
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<std::array<cypress::Real, 4>> evaluate() override;
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<OutputFrequencySingleNeuron>(m_backend,
+		                                                     m_bench_index);
+	}
 };
 
 /**
@@ -56,6 +61,11 @@ public:
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<std::array<cypress::Real, 4>> evaluate() override;
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<OutputFrequencySingleNeuron2>(m_backend,
+		                                                      m_bench_index);
+	}
 };
 
 /**
@@ -75,6 +85,11 @@ public:
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<std::array<cypress::Real, 4>> evaluate() override;
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<OutputFrequencyMultipleNeurons>(m_backend,
+		                                                        m_bench_index);
+	}
 };
 }  // namespace SNAB
 #endif /* SNABSUITE_SNABS_OUTPUT_BENCH_HPP */

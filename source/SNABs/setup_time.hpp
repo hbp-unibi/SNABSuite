@@ -53,18 +53,30 @@ public:
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<std::array<cypress::Real, 4>> evaluate() override;
+	virtual std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<SetupTimeOneToOne>(m_backend, m_bench_index);
+	}
 };
 
 class SetupTimeAllToAll : public SetupTimeOneToOne {
 public:
 	SetupTimeAllToAll(const std::string backend, size_t bench_index);
 	void run_netw(cypress::Network &netw) override;
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<SetupTimeAllToAll>(m_backend, m_bench_index);
+	}
 };
 
 class SetupTimeRandom : public SetupTimeOneToOne {
 public:
 	SetupTimeRandom(const std::string backend, size_t bench_index);
 	void run_netw(cypress::Network &netw) override;
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<SetupTimeRandom>(m_backend, m_bench_index);
+	}
 };
 }  // namespace SNAB
 

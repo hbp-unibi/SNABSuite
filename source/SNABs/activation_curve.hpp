@@ -57,6 +57,11 @@ public:
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 	std::vector<std::array<cypress::Real, 4>> evaluate() override;
+	virtual std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<WeightDependentActivation>(m_backend,
+		                                                   m_bench_index);
+	}
 };
 
 class RateBasedWeightDependentActivation : public WeightDependentActivation {
@@ -69,6 +74,11 @@ public:
 	                                   size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<RateBasedWeightDependentActivation>(
+		    m_backend, m_bench_index);
+	}
 };
 
 }  // namespace SNAB

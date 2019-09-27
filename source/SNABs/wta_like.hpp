@@ -42,7 +42,7 @@ private:
 	cypress::Real m_firing_rate;
 	NeuronParameters m_neuro_params;
 	cypress::Real m_simulation_length = 10000;  // ms
-	cypress::Real m_bin_size = 15.0; //ms
+	cypress::Real m_bin_size = 15.0;            // ms
 
 	// Network parameters
 	cypress::Real m_weight_inp = 0, m_delay = 1.0, m_weight_self = 0.0,
@@ -55,6 +55,11 @@ public:
 	void run_netw(cypress::Network &netw) override;
 	std::vector<std::array<cypress::Real, 4>> evaluate() override;
 
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<SimpleWTA>(m_backend, m_bench_index);
+	}
+
 	/**
 	 * Calculate the metrics for comparing WTA networks
 	 * @param bins summed binned number of spikes of first population
@@ -64,7 +69,8 @@ public:
 	 * winner}
 	 */
 	static std::vector<Real> calculate_WTA_metrics(
-	    const std::vector<size_t> &bins, const std::vector<size_t> &bins2, const Real bin_size);
+	    const std::vector<size_t> &bins, const std::vector<size_t> &bins2,
+	    const Real bin_size);
 };
 
 /**
@@ -81,7 +87,7 @@ private:
 	cypress::Real m_firing_rate;
 	NeuronParameters m_neuro_params;
 	cypress::Real m_simulation_length = 10000;  // ms
-	cypress::Real m_bin_size = 15.0; //ms
+	cypress::Real m_bin_size = 15.0;            // ms
 
 	// Network parameters
 	cypress::Real m_weight_inp = 0, m_delay = 1.0, m_weight_self = 0.0,
@@ -93,6 +99,11 @@ public:
 	cypress::Network &build_netw(cypress::Network &network) override;
 	void run_netw(cypress::Network &network) override;
 	std::vector<std::array<cypress::Real, 4>> evaluate() override;
+
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<LateralInhibWTA>(m_backend, m_bench_index);
+	}
 };
 
 /**
@@ -109,7 +120,7 @@ private:
 	cypress::Real m_firing_rate;
 	NeuronParameters m_neuro_params;
 	cypress::Real m_simulation_length = 10000;  // ms
-	cypress::Real m_bin_size = 15.0; //ms
+	cypress::Real m_bin_size = 15.0;            // ms
 
 	// Network parameters
 	cypress::Real m_weight_inp = 0, m_delay = 1.0, m_weight_self = 0.0,
@@ -121,6 +132,10 @@ public:
 	cypress::Network &build_netw(cypress::Network &network) override;
 	void run_netw(cypress::Network &network) override;
 	std::vector<std::array<cypress::Real, 4>> evaluate() override;
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<MirrorInhibWTA>(m_backend, m_bench_index);
+	}
 };
 }  // namespace SNAB
 
