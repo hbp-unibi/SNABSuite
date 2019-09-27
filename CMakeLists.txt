@@ -93,6 +93,7 @@ add_library(benchmark_library
     source/SNABs/max_inter_neuron
     source/SNABs/setup_time
     source/SNABs/wta_like
+    source/SNABs/mnist/mnist
 )
 target_link_libraries(benchmark_library
     ${CYPRESS_LIBRARY}

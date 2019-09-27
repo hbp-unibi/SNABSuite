@@ -1,0 +1,23 @@
+{
+    "nest":{
+		"neuron_type" : "IF_cond_exp",
+		"neuron_params": {
+			"e_rev_E": 0.0,
+			"v_rest": -70.0,
+			"v_reset": -80.0,
+			"v_thresh": -60.0,
+			"tau_syn_E": 2.0,
+			"tau_syn_I": 2.0,
+			"tau_refrac": 1.0,
+			"tau_m": 5,
+			"cm": 0.2
+		},
+		"images": 100, 
+		"batchsize" : 100,
+		"duration" : 50,
+		"max_freq": 150,
+		"pause": 10, 
+		"poisson" : false,
+		"max_weight" : 0.02
+    }
+}

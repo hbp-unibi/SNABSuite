@@ -31,6 +31,7 @@
 #include "SNABs/refractory_period.hpp"
 #include "SNABs/setup_time.hpp"
 #include "SNABs/wta_like.hpp"
+#include "SNABs/mnist/mnist.hpp"
 #include "common/snab_base.hpp"
 
 namespace SNAB {
@@ -76,6 +77,8 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
 	        WeightDependentActivation(backend, bench_index)),
 	    std::make_shared<RateBasedWeightDependentActivation>(
 	        RateBasedWeightDependentActivation(backend, bench_index)),
+	    std::make_shared<SimpleMnist>(
+	        SimpleMnist(backend, bench_index)),
 	};
 	return vec;
 }
