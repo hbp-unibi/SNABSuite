@@ -27,6 +27,9 @@
 #include <string>
 #include <vector>
 
+#include <mutex>
+#include <shared_mutex>
+
 #include <unistd.h>  // unlink file
 
 #include "common/snab_base.hpp"
@@ -218,7 +221,7 @@ void ParameterSweep::backup_simulation_results()
 }
 
 ParameterSweep::ParameterSweep(std::string backend, cypress::Json &config,
-                               size_t bench_index)
+                               size_t bench_index, size_t threads)
     : m_backend(backend)
 {
 	std::string snab_name = config["snab_name"];
@@ -243,38 +246,74 @@ ParameterSweep::ParameterSweep(std::string backend, cypress::Json &config,
 	                          m_snab->indicator_names().size(),
 	                          std::array<cypress::Real, 4>({0, 0, 0, 0})));
 	recover_broken_simulation();
+
+	std::string simulator =
+	    Utilities::split(Utilities::split(m_backend, '=')[0], '.')[0];
+	if ((simulator == "json") || (simulator == "nest") ||
+	    (simulator == "genn")) {
+		m_n_threads = threads;
+	}
+	else if (threads != 1) {
+		global_logger().info("SNABSuite", "Backend cannot be parallelized");
+	}
 }
 
 void ParameterSweep::execute()
 {
 
 	size_t backup_count = 0;
+	size_t current_job_idx = 0;
+	std::mutex idx_mutex, res_mutex;
 
-	for (size_t i = 0; i < m_indices.size(); i++) {
-		// Report the percentage of jobs done
-		Utilities::progress_callback(double(i) / double(m_indices.size()));
+	std::vector<std::thread> threads;
+	// auto current_snab = *m_snab.get();
+	for (size_t i = 0; i < m_n_threads; i++) {
+		threads.emplace_back([&]() mutable {
+			size_t index, this_idx;
+			auto snab = m_snab->clone();
+			while (true) {
+				{
+					std::lock_guard<std::mutex> lock(idx_mutex);
+					if (current_job_idx >= m_indices.size()) {
+						return;
+					}
+					this_idx = current_job_idx++;
 
-		// Get the new index
-		size_t current_index = m_indices[i];
-		// Check if simulation has been done in previous (broken) simulation
-		if (std::find(m_jobs_done.begin(), m_jobs_done.end(), current_index) !=
-		    m_jobs_done.end()) {
-			continue;
-		}
-		// Resetting the cypress::network structure in the SNAB
-		m_snab->reset_network();
-		m_snab->set_config(m_sweep_vector[current_index]);
-		m_snab->build();
-		m_snab->run();
-		m_results[i] = m_snab->evaluate();
-		// Add the current job to the list of finished indices
-		m_jobs_done.emplace_back(current_index);
-		backup_count++;
-		if (backup_count >= 50) {
-			backup_simulation_results();
-			backup_count = 0;
-		}
+					Utilities::progress_callback(double(this_idx) /
+					                             double(m_indices.size()));
+				}
+				index = m_indices[this_idx];
+
+				if (std::find(m_jobs_done.begin(), m_jobs_done.end(), index) !=
+				    m_jobs_done.end()) {
+					continue;
+				}
+				// Resetting the cypress::network structure in the SNAB
+				snab->reset_network();
+				snab->set_config(m_sweep_vector[index]);
+				snab->build();
+				snab->run();
+				auto res = snab->evaluate();
+				{
+					std::lock_guard<std::mutex> lock(res_mutex);
+					m_results[i] = res;
+					// Add the current job to the list of finished indices
+					m_jobs_done.emplace_back(index);
+					backup_count++;
+					if (backup_count >= 50) {
+						backup_simulation_results();
+						backup_count = 0;
+					}
+				}
+			}
+		});
 	}
+
+	// Wait for all threads to finish
+	for (size_t i = 0; i < threads.size(); i++) {
+		threads[i].join();
+	}
+
 	// Finalize output in terminal
 	Utilities::progress_callback(1.0);
 	std::cerr << std::endl;

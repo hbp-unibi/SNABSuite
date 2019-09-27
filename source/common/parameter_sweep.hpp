@@ -55,6 +55,9 @@ private:
 	// TODO: Number of repetitions for every simulation
 	size_t m_repetitions = 1;
 
+	// Number of threads for panellizing sweep
+	size_t m_n_threads = 1;
+
 	/**
 	 * Function for shuffling indices, reduces covariance between neighbouring
 	 * simulations on analogue hardware
@@ -81,9 +84,11 @@ public:
 	 * to sweep from a to b in c steps.
 	 * @param bench_index: if the benchmark config contains several values like
 	 * different network sizes, this the entry id to choose
+	 * @param threads number of threads for parallel execution. Note: not every
+	 * backend is threadsafe!
 	 */
 	ParameterSweep(std::string backend, cypress::Json &config,
-	               size_t bench_index = 0);
+	               size_t bench_index = 0, size_t threads = 1);
 
 	/**
 	 * Execution of the sweep simulations. Results are stored in m_results
@@ -122,6 +127,6 @@ public:
 	 */
 	~ParameterSweep();
 };
-}
+}  // namespace SNAB
 
 #endif

@@ -45,14 +45,15 @@ void backup_wrapper_sig_handler(int i)
 
 int main(int argc, const char *argv[])
 {
-	if ((argc < 3 || argc > 5) && !cypress::NMPI::check_args(argc, argv)) {
-		std::cout << "Usage: " << argv[0]
-		          << " <SIMULATOR> <SWEEP_CONFIG> [bench_index] [NMPI]"
-		          << std::endl;
+	if ((argc < 4 || argc > 6) && !cypress::NMPI::check_args(argc, argv)) {
+		std::cout
+		    << "Usage: " << argv[0]
+		    << " <SIMULATOR> <SWEEP_CONFIG> <bench_index> [threads] [NMPI]"
+		    << std::endl;
 		return 1;
 	}
 
-	if (argc == 4 && std::string(argv[3]) == "NMPI" &&
+	if (std::string(argv[argc - 1]) == "NMPI" &&
 	    !cypress::NMPI::check_args(argc, argv)) {
 
 		// Gather all config file to upload them to the server
@@ -70,9 +71,11 @@ int main(int argc, const char *argv[])
 		return 0;
 	}
 
-	size_t bench_index = 0;
-	if (isdigit(*argv[argc - 1])) {
-		bench_index = std::stoi(argv[argc - 1]);
+	size_t bench_index = std::stoi(argv[3]);
+
+	size_t threads = 1;
+	if ((argc > 4) && isdigit(*argv[argc - 1])) {
+		threads = std::stoi(argv[argc - 1]);
 	}
 
 	// Open sweep config
@@ -86,7 +89,7 @@ int main(int argc, const char *argv[])
 	// Suppress all logging
 	cypress::global_logger().min_level(cypress::LogSeverity::ERROR, 1);
 
-	ParameterSweep sweep(argv[1], json, bench_index);
+	ParameterSweep sweep(argv[1], json, bench_index, threads);
 
 	// Use customized signal handler to backup sweep
 	sweep_pointer = &sweep;
@@ -96,7 +99,7 @@ int main(int argc, const char *argv[])
 	try {
 		sweep.execute();
 	}
-	catch (cypress::CypressException& e) {
+	catch (cypress::CypressException &e) {
 		sweep_pointer->backup_simulation_results();
 		std::cout << "Backup complete!" << std::endl;
 		throw e;
