@@ -42,16 +42,6 @@ WeightDependentActivation::WeightDependentActivation(const std::string backend,
                bench_index),
       m_pop(m_netw, 0)
 {
-	Real step_size = m_config_file["step_size"];
-	m_num_steps = size_t((Real(m_config_file["weight_max"]) -
-	                      Real(m_config_file["weight_min"])) /
-	                     step_size);
-	if (m_config_file["expected_output"].size() != m_num_steps) {
-		global_logger().warn("SNABSuite",
-		                     "WeightDependentActivation: size of expected "
-		                     "output does not match with configuration!");
-		m_valid = false;
-	}
 }
 
 WeightDependentActivation::WeightDependentActivation(
@@ -70,6 +60,17 @@ WeightDependentActivation::WeightDependentActivation(
 
 cypress::Network &WeightDependentActivation::build_netw(cypress::Network &netw)
 {
+    
+	Real step_size = m_config_file["step_size"];
+	m_num_steps = size_t((Real(m_config_file["weight_max"]) -
+	                      Real(m_config_file["weight_min"])) /
+	                     step_size);
+	if (m_config_file["expected_output"].size() != m_num_steps) {
+		global_logger().warn("SNABSuite",
+		                     "WeightDependentActivation: size of expected "
+		                     "output does not match with configuration!");
+		m_valid = false;
+	}
 	// Get neuron neuron_parameters
 	auto neuro_params = NeuronParameters(
 	    SpikingUtils::detect_type(m_config_file["neuron_type"]),
@@ -79,7 +80,6 @@ cypress::Network &WeightDependentActivation::build_netw(cypress::Network &netw)
 	                                     neuro_params,
 	                                     m_config_file["#neurons"], "spikes");
 
-	Real step_size = m_config_file["step_size"];
 	m_num_steps = size_t((Real(m_config_file["weight_max"]) -
 	                      Real(m_config_file["weight_min"])) /
 	                     step_size);
@@ -259,17 +259,6 @@ RateBasedWeightDependentActivation::RateBasedWeightDependentActivation(
            "expected_output"},
           bench_index)
 {
-	Real step_size = m_config_file["step_size"];
-	m_num_steps = size_t((Real(m_config_file["weight_max"]) -
-	                      Real(m_config_file["weight_min"])) /
-	                     step_size);
-	if (m_config_file["expected_output"].size() != m_num_steps) {
-		global_logger().warn(
-		    "SNABSuite",
-		    "RateBasedWeightDependentActivation: size of expected "
-		    "output does not match with configuration!");
-		m_valid = false;
-	}
 }
 
 namespace {
@@ -289,6 +278,18 @@ std::vector<Real> spike_rate(Real t_begin, Real t_end, Real freq)
 cypress::Network &RateBasedWeightDependentActivation::build_netw(
     cypress::Network &netw)
 {
+    
+	Real step_size = m_config_file["step_size"];
+	m_num_steps = size_t((Real(m_config_file["weight_max"]) -
+	                      Real(m_config_file["weight_min"])) /
+	                     step_size);
+	if (m_config_file["expected_output"].size() != m_num_steps) {
+		global_logger().warn(
+		    "SNABSuite",
+		    "RateBasedWeightDependentActivation: size of expected "
+		    "output does not match with configuration!");
+		m_valid = false;
+	}
 	// Get neuron neuron_parameters
 	auto neuro_params = NeuronParameters(
 	    SpikingUtils::detect_type(m_config_file["neuron_type"]),
@@ -298,7 +299,6 @@ cypress::Network &RateBasedWeightDependentActivation::build_netw(
 	                                     neuro_params,
 	                                     m_config_file["#neurons"], "spikes");
 
-	Real step_size = m_config_file["step_size"];
 	m_num_steps = size_t((Real(m_config_file["weight_max"]) -
 	                      Real(m_config_file["weight_min"])) /
 	                     step_size);
