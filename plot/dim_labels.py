@@ -94,6 +94,7 @@ SIMULATOR_LABELS = {
     "nest": "NEST",
     "pynn": "NEST",
     "pynn.nest": "NEST",
+    "genn": "GeNN",
 }
 
 # Colors for all simulators
@@ -107,4 +108,5 @@ SIMULATOR_COLORS = {
     "nest": "#3465a4",
     "pynn": "#3465a4",
     "pynn.nest": "#3465a4",
+    "genn": "#000000",
 }
