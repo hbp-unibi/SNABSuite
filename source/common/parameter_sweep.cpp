@@ -296,7 +296,7 @@ void ParameterSweep::execute()
 				auto res = snab->evaluate();
 				{
 					std::lock_guard<std::mutex> lock(res_mutex);
-					m_results[i] = res;
+					m_results[this_idx] = res;
 					// Add the current job to the list of finished indices
 					m_jobs_done.emplace_back(index);
 					backup_count++;
