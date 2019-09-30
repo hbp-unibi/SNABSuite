@@ -246,12 +246,12 @@ CYPRESS_CONN dense_weights_to_conn(const Json &json, Real scale, Real delay)
 }
 
 std::vector<uint16_t> spikes_to_labels(
-    const std::vector<std::vector<Real>> &spikes, Real duration, Real pause,
+    const std::vector<std::vector<Real>> &pop_spikes, Real duration, Real pause,
     size_t batch_size)
 {
 	std::vector<uint16_t> res(batch_size);
 	std::vector<std::vector<uint16_t>> binned_spike_counts;
-	for (const auto &spikes : spikes) {
+	for (const auto &spikes : pop_spikes) {
 		binned_spike_counts.push_back(SpikingUtils::spike_time_binning<uint16_t>(
 		    -pause * 0.5, batch_size * (duration + pause) - (pause * 0.5),
 		    batch_size, spikes));
