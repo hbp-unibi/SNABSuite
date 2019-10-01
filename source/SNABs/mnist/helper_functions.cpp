@@ -57,6 +57,9 @@ MNIST_DATA loadMnistData(const size_t num_data, const std::string path)
 		for (size_t row = 0; row < 28; row++) {
 			for (size_t col = 0; col < 28; col++) {
 				images.read((char *)&tmp, sizeof(tmp));
+				if (images.eof()) {
+					throw std::runtime_error("Error reading file!");
+				}
 				image.push_back(((Real)tmp) / 255.0);
 			}
 		}
@@ -252,40 +255,44 @@ std::vector<uint16_t> spikes_to_labels(
 	std::vector<uint16_t> res(batch_size);
 	std::vector<std::vector<uint16_t>> binned_spike_counts;
 	for (const auto &spikes : pop_spikes) {
-		binned_spike_counts.push_back(SpikingUtils::spike_time_binning<uint16_t>(
-		    -pause * 0.5, batch_size * (duration + pause) - (pause * 0.5),
-		    batch_size, spikes));
+		binned_spike_counts.push_back(
+		    SpikingUtils::spike_time_binning<uint16_t>(
+		        -pause * 0.5, batch_size * (duration + pause) - (pause * 0.5),
+		        batch_size, spikes));
 	}
 
 	for (size_t sample = 0; sample < batch_size; sample++) {
-        uint16_t max = 0;
-        uint16_t index = std::numeric_limits<uint16_t>::max();
-        for(size_t neuron= 0 ; neuron < binned_spike_counts.size(); neuron ++){
-            if(binned_spike_counts[neuron][sample] > max){
-                index = neuron;
-                max = binned_spike_counts[neuron][sample] ;
-            }
-            else if(binned_spike_counts[neuron][sample] == max){
-                // Multiple neurons have the same decision
-                index = std::numeric_limits<uint16_t>::max();
-            }
-        }
-        res[sample] = index;
-    }
-    return res;
+		uint16_t max = 0;
+		uint16_t index = std::numeric_limits<uint16_t>::max();
+		for (size_t neuron = 0; neuron < binned_spike_counts.size(); neuron++) {
+			if (binned_spike_counts[neuron][sample] > max) {
+				index = neuron;
+				max = binned_spike_counts[neuron][sample];
+			}
+			else if (binned_spike_counts[neuron][sample] == max) {
+				// Multiple neurons have the same decision
+				index = std::numeric_limits<uint16_t>::max();
+			}
+		}
+		res[sample] = index;
+	}
+	return res;
 }
 
-size_t compare_labels(std::vector<uint16_t> label, std::vector<uint16_t> res){
-    size_t count_correct = 0;
-    if(label.size() != res.size()){
-        throw std::runtime_error("label data has incorrect size! Target: " + std::to_string(label.size() ) + " Result: " + std::to_string(res.size()));
-    }
-    for(size_t i = 0 ; i< label.size(); i++){
-        if (label[i] == res[i]){
-            count_correct++;
-        }
-    }
-    return count_correct;
+size_t compare_labels(std::vector<uint16_t> label, std::vector<uint16_t> res)
+{
+	size_t count_correct = 0;
+	if (label.size() != res.size()) {
+		throw std::runtime_error("label data has incorrect size! Target: " +
+		                         std::to_string(label.size()) +
+		                         " Result: " + std::to_string(res.size()));
+	}
+	for (size_t i = 0; i < label.size(); i++) {
+		if (label[i] == res[i]) {
+			count_correct++;
+		}
+	}
+	return count_correct;
 }
 
 }  // namespace mnist_helper
