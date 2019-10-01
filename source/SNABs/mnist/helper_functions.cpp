@@ -39,15 +39,15 @@ MNIST_DATA loadMnistData(const size_t num_data, const std::string path)
 {
 	MNIST_DATA res;
 	std::ifstream images, labels;
-	images.open(path + "-images.idx3-ubyte", std::ios::binary);
+	images.open(path + "-images-idx3-ubyte", std::ios::binary);
 	if (!images.good()) {
 		throw std::runtime_error("Could not open image file " + path +
-		                         "-images.idx3-ubyte!");
+		                         "-images-idx3-ubyte!");
 	}
-	labels.open(path + "-labels.idx1-ubyte", std::ios::binary);
+	labels.open(path + "-labels-idx1-ubyte", std::ios::binary);
 	if (!images.good()) {
 		throw std::runtime_error("Could not open label file " + path +
-		                         "-labels.idx1-ubyte");
+		                         "-labels-idx1-ubyte");
 	}
 
 	images.seekg(16, images.beg);

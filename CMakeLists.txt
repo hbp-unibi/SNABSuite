@@ -124,6 +124,20 @@ target_link_libraries(sweep
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/plot/matplotlibrc ${CMAKE_CURRENT_BINARY_DIR}/matplotlibrc COPYONLY)
 
+#
+# Download MNIST dataset
+#
+function(down_extract NAME)
+    if(NOT EXISTS ${CMAKE_BINARY_DIR}/${NAME})
+    file(DOWNLOAD http://yann.lecun.com/exdb/mnist/${NAME}.gz ${CMAKE_BINARY_DIR}/${NAME}.gz SHOW_PROGRESS)
+    execute_process(COMMAND gunzip ${NAME}.gz)
+    endif()
+endfunction()
+
+down_extract(train-images-idx3-ubyte)
+down_extract(train-labels-idx1-ubyte)
+down_extract(t10k-images-idx3-ubyte)
+down_extract(t10k-labels-idx1-ubyte)
 
 #
 # Unit tests -- only enable if gtest is present
