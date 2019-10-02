@@ -213,20 +213,18 @@ Json read_network(std::string path, bool msgpack = true)
 	return json;
 }
 
-Real max_weight(const Json &json){
-    Real max = 0.0;
+Real max_weight(const Json &json)
+{
+	Real max = 0.0;
 	for (size_t i = 0; i < json.size(); i++) {
 		for (size_t j = 0; j < json[i].size(); j++) {
-            Real tmp = json[i][j].get<Real>();
-            if(tmp > max){
-                max = tmp;
-            }
-            else if(-tmp > max){
-                max = -tmp;
-            }
-        }
-    }
-    return max;
+			Real tmp = json[i][j].get<Real>();
+			if (tmp > max) {
+				max = tmp;
+			}
+		}
+	}
+	return max;
 }
 
 CYPRESS_CONN dense_weights_to_conn(const Json &json, Real scale, Real delay)

@@ -45,6 +45,7 @@ add_dependencies(SNABSuite_test_common cypress_ext)
 
 add_executable(SNABSuite_test_SNABs
 	SNABs/test_WTA_like.cpp
+	SNABs/test_mnist.cpp
 	)
 target_link_libraries(SNABSuite_test_SNABs
     benchmark_library
