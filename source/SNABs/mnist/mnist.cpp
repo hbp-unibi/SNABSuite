@@ -67,7 +67,7 @@ cypress::Network &SimpleMnist::build_netw(cypress::Network &netw)
 	mnist_helper::create_spike_source(netw, m_batch_data[0]);
 
 #if SNAB_DEBUG
-	Utilities::write_vector2_to_csv(std::get<0>(batch_data[0]),
+	Utilities::write_vector2_to_csv(std::get<0>(m_batch_data[0]),
 	                                _debug_filename("spikes_input.csv"));
 	Utilities::plot_spikes(_debug_filename("spikes_input.csv"), m_backend);
 #endif
