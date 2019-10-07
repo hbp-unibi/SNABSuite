@@ -40,17 +40,26 @@ public:
 	{
 		return std::make_shared<SimpleMnist>(m_backend, m_bench_index);
 	}
-private:
+
+protected:
 	NeuronParameters m_neuro_params;
-    std::string m_neuron_type_str;
-    size_t m_images, m_batchsize;
-    cypress::Real m_duration, m_max_freq, m_pause;
-    bool m_poisson;
-    Real m_max_weight;
-    
-    std::vector<std::pair<std::vector<std::vector<Real>>, std::vector<uint16_t>>> m_batch_data;
-    
-    void create_deep_network(const cypress::Json &data, cypress::Network &netw);
+	std::string m_neuron_type_str;
+	size_t m_images, m_batchsize;
+	cypress::Real m_duration, m_max_freq, m_pause;
+	bool m_poisson, m_train_data;
+	Real m_max_weight;
+
+	std::vector<
+	    std::pair<std::vector<std::vector<Real>>, std::vector<uint16_t>>>
+	    m_batch_data;
+
+	void create_deep_network(const cypress::Json &data, cypress::Network &netw);
+
+	SimpleMnist(const std::string backend, size_t bench_index,
+	            std::string name);
+
+	void read_config();
+};
 };
 
 }  // namespace SNAB

@@ -31,16 +31,22 @@
 
 namespace SNAB {
 SimpleMnist::SimpleMnist(const std::string backend, size_t bench_index)
-    : SNABBase(__func__, backend, {""}, {""}, {""}, {""},
-               {
-                   "neuron_type",
-                   "neuron_params",
-               },
-               bench_index)
+    : SimpleMnist(backend, bench_index, __func__)
 {
 }
 
-cypress::Network &SimpleMnist::build_netw(cypress::Network &netw)
+SimpleMnist::SimpleMnist(const std::string backend, size_t bench_index,
+                         std::string name)
+    : SNABBase(
+          name, backend, {"accuracy", "sim_time"}, {"quality", "performance"},
+          {"accuracy", "time"}, {"", "ms"},
+          {"neuron_type", "neuron_params", "images", "batchsize", "duration",
+           "max_freq", "pause", "poisson", "max_weight", "train_data"},
+          bench_index)
+{
+}
+
+void SimpleMnist::read_config()
 {
 	m_neuron_type_str = m_config_file["neuron_type"].get<std::string>();
 
@@ -57,13 +63,26 @@ cypress::Network &SimpleMnist::build_netw(cypress::Network &netw)
 	m_pause = m_config_file["pause"].get<Real>();
 	m_poisson = m_config_file["poisson"].get<bool>();
 	m_max_weight = m_config_file["max_weight"].get<Real>();
-	auto data = mnist_helper::loadMnistData(m_images, "t10k");
+	m_train_data = m_config_file["train_data"].get<bool>();
+}
+
+cypress::Network &SimpleMnist::build_netw(cypress::Network &netw)
+{
+	read_config();
+	mnist_helper::MNIST_DATA data;
+	if (m_train_data) {
+		data = mnist_helper::loadMnistData(m_images, "train");
+	}
+	else {
+		data = mnist_helper::loadMnistData(m_images, "t10k");
+	}
 
 	auto spike_mnist =
 	    mnist_helper::mnist_to_spike(data, m_duration, m_max_freq, m_poisson);
 	m_batch_data = mnist_helper::create_batch(spike_mnist, m_batchsize,
 	                                          m_duration, m_pause, false);
 
+	// TODO Batchsize
 	mnist_helper::create_spike_source(netw, m_batch_data[0]);
 
 #if SNAB_DEBUG
