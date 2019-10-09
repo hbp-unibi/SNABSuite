@@ -1,0 +1,17 @@
+{
+	"snab_name" : "SmallMnist",
+	"nest" : {
+		"max_weight" : [0.001, 0.1, 20],
+		"max_freq" : [10, 250, 20],
+        "train_data": true,
+		"images": 100, 
+		"batchsize" : 100
+	},
+	"spikey" : {
+		"max_weight" : [0.001, 0.015, 15],
+		"max_freq" : [10, 250, 20],
+        "train_data": true,
+		"images": 100, 
+		"batchsize" : 100
+	}
+}
