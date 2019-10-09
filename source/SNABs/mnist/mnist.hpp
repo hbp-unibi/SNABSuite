@@ -60,6 +60,20 @@ protected:
 
 	void read_config();
 };
+
+class SmallMnist : public SimpleMnist {
+public:
+	SmallMnist(const std::string backend, size_t bench_index)
+	    : SimpleMnist(backend, bench_index, __func__)
+	{
+	}
+
+	cypress::Network &build_netw(cypress::Network &netw) override;
+
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<SmallMnist>(m_backend, m_bench_index);
+	}
 };
 
 }  // namespace SNAB

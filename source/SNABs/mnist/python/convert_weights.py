@@ -25,13 +25,19 @@ for ind, layer in enumerate(netw["config"]["layers"]):
     if(layer["class_name"] == "Dropout"):
         print("Ignoring dropout layer")
         continue
+    elif(layer["class_name"] == "Flatten"):
+        print("Ignoring Flatten layer")
+        continue
+    elif(layer["class_name"] == "AveragePooling2D"):
+        print("Ignoring AveragePooling2D layer")
+        continue
     elif(layer["class_name"] == "Dense"):
         layer_dict["class_name"] = "Dense"
         layer_dict["size"] = layer["config"]["units"]
         layer_dict["weights"] = model.layers[ind].get_weights()[0].tolist()
         # Weight[i][j]: i input, j output
     else:
-        raise RuntimeError("Unknown layer type!")
+        raise RuntimeError("Unknown layer type " + layer["class_name"] + "!")
     data["netw"].append(layer_dict)
     
 

@@ -79,6 +79,8 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
 	        RateBasedWeightDependentActivation(backend, bench_index)),
 	    std::make_shared<SimpleMnist>(
 	        SimpleMnist(backend, bench_index)),
+	    std::make_shared<SmallMnist>(
+	        SmallMnist(backend, bench_index)),
 	};
 	return vec;
 }

@@ -20,6 +20,25 @@
 		"pause": 20, 
 		"poisson" : false,
 		"max_weight" : 0.011,
-        "train_data": false
+        "train_data": true
+    },
+    "spikey":{
+		"neuron_type" : "IfFacetsHardware1",
+		"neuron_params": {
+			"tau_m": 10.0,
+			"tau_refrac": 1.0,
+			"v_rest": -70.0,
+			"v_thresh": -55.0,
+			"v_reset": -60.0,
+			"e_rev_I": -120.0
+		},
+		"images": 10, 
+		"batchsize" : 10,
+		"duration" : 100,
+		"max_freq": 47.8,
+		"pause": 20, 
+		"poisson" : false,
+		"max_weight" : 0.011,
+        "train_data": true
     }
 }
