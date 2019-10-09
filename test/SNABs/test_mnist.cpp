@@ -1646,7 +1646,8 @@ TEST(mnist_helper, create_batch)
 	Real max_freq = 10000.0;
 	auto mnist_data = loadMnistData(10, "../train");
 	auto spiking_mnist = mnist_to_spike(mnist_data, duration, max_freq, false);
-	auto spiking_batch = create_batch(spiking_mnist, 10, duration, 10.0, false);
+	auto spiking_batch =
+	    create_batches(spiking_mnist, 10, duration, 10.0, false);
 
 	EXPECT_EQ(std::get<1>(mnist_data), std::get<1>(spiking_batch[0]));
 	for (size_t i = 0; i < 10; i++) {

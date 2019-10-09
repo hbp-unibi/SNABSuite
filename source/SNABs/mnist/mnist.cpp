@@ -79,8 +79,8 @@ cypress::Network &SimpleMnist::build_netw(cypress::Network &netw)
 
 	auto spike_mnist =
 	    mnist_helper::mnist_to_spike(data, m_duration, m_max_freq, m_poisson);
-	m_batch_data = mnist_helper::create_batch(spike_mnist, m_batchsize,
-	                                          m_duration, m_pause, false);
+	m_batch_data = mnist_helper::create_batches(spike_mnist, m_batchsize,
+	                                            m_duration, m_pause, false);
 
 	// TODO Batchsize
 	mnist_helper::create_spike_source(netw, m_batch_data[0]);
@@ -183,8 +183,8 @@ cypress::Network &SmallMnist::build_netw(cypress::Network &netw)
 
 	auto spike_mnist = mnist_helper::mnist_to_spike(data_scaled, m_duration,
 	                                                m_max_freq, m_poisson);
-	m_batch_data = mnist_helper::create_batch(spike_mnist, m_batchsize,
-	                                          m_duration, m_pause, false);
+	m_batch_data = mnist_helper::create_batches(spike_mnist, m_batchsize,
+	                                            m_duration, m_pause, false);
 
 	/*for (auto image : std::get<0>(data_scaled)) {
 	    mnist_helper::print_image(image, 14);
