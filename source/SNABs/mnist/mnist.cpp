@@ -89,6 +89,7 @@ cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw,
 	                                            m_duration, m_pause, false);
 
 	auto kerasdata = mnist_helper::read_network(network_path, true);
+	m_label_pops.clear();
 	for (auto &i : m_batch_data) {
 		mnist_helper::create_spike_source(netw, i);
 		create_deep_network(kerasdata, netw);
@@ -192,7 +193,7 @@ void SimpleMnist::create_deep_network(const Json &data, Network &netw)
 
 cypress::Network &SmallMnist::build_netw(cypress::Network &netw)
 {
-	return build_netw_int(netw, false, "dnn_spikey.msgpack");
+	return build_netw_int(netw, true, "dnn_spikey.msgpack");
 }
 
 }  // namespace SNAB

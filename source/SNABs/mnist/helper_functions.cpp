@@ -380,7 +380,7 @@ std::vector<uint16_t> spikes_to_labels(
  * @param res label from simulation
  * @return number of correct labels
  */
-size_t compare_labels(std::vector<uint16_t> label, std::vector<uint16_t> res)
+size_t compare_labels(std::vector<uint16_t> &label, std::vector<uint16_t> &res)
 {
 	size_t count_correct = 0;
 	if (label.size() > res.size()) {
@@ -405,7 +405,7 @@ size_t compare_labels(std::vector<uint16_t> label, std::vector<uint16_t> res)
  * @param pooling_size size of the pooling window (e.g. 2)
  * @return the downscaled image
  */
-std::vector<Real> av_pooling_image(std::vector<Real> image, size_t height,
+std::vector<Real> av_pooling_image(std::vector<Real> &image, size_t height,
                                    size_t width, size_t pooling_size)
 {
 	size_t new_h = std::ceil(Real(height) / Real(pooling_size));
