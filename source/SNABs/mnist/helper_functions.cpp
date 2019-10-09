@@ -201,6 +201,9 @@ std::vector<MNIST_DATA> create_batches(const SPIKING_MNIST &mnist_data,
 		for (size_t pixel = 0; pixel < image_size; pixel++) {
 			std::vector<Real> spike_pxl;
 			for (size_t index = 0; index < batch_size; index++) {
+				if (counter + index >= indices.size()) {
+					break;
+				}
 				size_t shfld_index = indices[counter + index];
 
 				auto pxl_spk = std::get<0>(mnist_data)[shfld_index][pixel];
@@ -215,6 +218,9 @@ std::vector<MNIST_DATA> create_batches(const SPIKING_MNIST &mnist_data,
 		}
 		std::vector<uint16_t> &labels = std::get<1>(single_batch_combined);
 		for (size_t index = 0; index < batch_size; index++) {
+			if (counter + index >= indices.size()) {
+				break;
+			}
 			size_t shfld_index = indices[counter + index];
 			labels.emplace_back(std::get<1>(mnist_data)[shfld_index]);
 		}
@@ -377,7 +383,7 @@ std::vector<uint16_t> spikes_to_labels(
 size_t compare_labels(std::vector<uint16_t> label, std::vector<uint16_t> res)
 {
 	size_t count_correct = 0;
-	if (label.size() != res.size()) {
+	if (label.size() > res.size()) {
 		throw std::runtime_error("label data has incorrect size! Target: " +
 		                         std::to_string(label.size()) +
 		                         " Result: " + std::to_string(res.size()));

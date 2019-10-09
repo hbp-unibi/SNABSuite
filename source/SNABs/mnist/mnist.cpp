@@ -66,7 +66,9 @@ void SimpleMnist::read_config()
 	m_train_data = m_config_file["train_data"].get<bool>();
 }
 
-cypress::Network &SimpleMnist::build_netw(cypress::Network &netw)
+cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw,
+                                              bool scale,
+                                              std::string network_path)
 {
 	read_config();
 	mnist_helper::MNIST_DATA data;
@@ -76,25 +78,35 @@ cypress::Network &SimpleMnist::build_netw(cypress::Network &netw)
 	else {
 		data = mnist_helper::loadMnistData(m_images, "t10k");
 	}
+	if (scale) {
+		auto data_scaled = mnist_helper::scale_mnist(data);
+		data = data_scaled;
+	}
 
 	auto spike_mnist =
 	    mnist_helper::mnist_to_spike(data, m_duration, m_max_freq, m_poisson);
 	m_batch_data = mnist_helper::create_batches(spike_mnist, m_batchsize,
 	                                            m_duration, m_pause, false);
 
-	// TODO Batchsize
-	mnist_helper::create_spike_source(netw, m_batch_data[0]);
+	auto kerasdata = mnist_helper::read_network(network_path, true);
+	for (auto &i : m_batch_data) {
+		mnist_helper::create_spike_source(netw, i);
+		create_deep_network(kerasdata, netw);
+		m_label_pops.emplace_back(netw.populations().back());
+	}
 
 #if SNAB_DEBUG
 	Utilities::write_vector2_to_csv(std::get<0>(m_batch_data[0]),
 	                                _debug_filename("spikes_input.csv"));
 	Utilities::plot_spikes(_debug_filename("spikes_input.csv"), m_backend);
 #endif
-
-	auto kerasdata = mnist_helper::read_network(
-	    "../source/SNABs/mnist/python/test.msgpack", true);
-	create_deep_network(kerasdata, netw);
 	return netw;
+}
+
+cypress::Network &SimpleMnist::build_netw(cypress::Network &netw)
+{
+	return build_netw_int(netw, false,
+	                      "../source/SNABs/mnist/python/test.msgpack");
 }
 
 void SimpleMnist::run_netw(cypress::Network &netw)
@@ -114,34 +126,43 @@ void SimpleMnist::run_netw(cypress::Network &netw)
 
 std::vector<std::array<cypress::Real, 4>> SimpleMnist::evaluate()
 {
-
-	std::vector<std::vector<cypress::Real>> spikes;
-	auto pop = m_netw.populations().back();
-	for (size_t i = 0; i < pop.size(); i++) {
-		spikes.push_back(pop[i].signals().data(0));
-	}
-	auto labels = mnist_helper::spikes_to_labels(spikes, m_duration, m_pause,
-	                                             m_batchsize);
-	auto &orig_labels = std::get<1>(m_batch_data[0]);
-	auto correct = mnist_helper::compare_labels(orig_labels, labels);
-	Real accuracy = Real(correct) / Real(orig_labels.size());
+	size_t global_correct(0);
+	size_t images(0);
+	for (size_t batch = 0; batch < m_label_pops.size(); batch++) {
+		std::vector<std::vector<cypress::Real>> spikes;
+		auto pop = m_label_pops[batch];
+		for (size_t i = 0; i < pop.size(); i++) {
+			spikes.push_back(pop[i].signals().data(0));
+		}
+		auto labels = mnist_helper::spikes_to_labels(spikes, m_duration,
+		                                             m_pause, m_batchsize);
+		auto &orig_labels = std::get<1>(m_batch_data[batch]);
+		auto correct = mnist_helper::compare_labels(orig_labels, labels);
+		global_correct += correct;
+		images += orig_labels.size();
 
 #if SNAB_DEBUG
-	std::cout << "Target\t Infer" << std::endl;
-	for (size_t i = 0; i < labels.size(); i++) {
-		std::cout << orig_labels[i] << "\t" << labels[i] << std::endl;
-	}
-	Utilities::write_vector2_to_csv(spikes, _debug_filename("spikes.csv"));
-	Utilities::plot_spikes(_debug_filename("spikes.csv"), m_backend);
+		std::cout << "Target\t Infer" << std::endl;
+		for (size_t i = 0; i < orig_labels.size(); i++) {
+			std::cout << orig_labels[i] << "\t" << labels[i] << std::endl;
+		}
+		Utilities::write_vector2_to_csv(
+		    spikes,
+		    _debug_filename("spikes_" + std::to_string(batch) + ".csv"));
+		Utilities::plot_spikes(
+		    _debug_filename("spikes_" + std::to_string(batch) + ".csv"),
+		    m_backend);
 #endif
-	return {std::array<cypress::Real, 4>({accuracy, NaN(), NaN(), NaN()}),
+	}
+	Real acc = Real(global_correct) / Real(images);
+	return {std::array<cypress::Real, 4>({acc, NaN(), NaN(), NaN()}),
 	        std::array<cypress::Real, 4>(
 	            {m_netw.runtime().sim, NaN(), NaN(), NaN()})};
 }
 
 void SimpleMnist::create_deep_network(const Json &data, Network &netw)
 {
-	size_t layer_id = 1;
+	size_t layer_id = netw.populations().size();
 	for (auto &layer : data["netw"]) {
 		if (layer["class_name"].get<std::string>() == "Dense") {
 			size_t size = layer["size"].get<size_t>();
@@ -152,6 +173,7 @@ void SimpleMnist::create_deep_network(const Json &data, Network &netw)
 
 			auto conns = mnist_helper::dense_weights_to_conn(
 			    layer["weights"], m_max_weight / max, 1.0);
+
 			netw.add_connection(netw.populations()[layer_id - 1], pop,
 			                    Connector::from_list(std::get<0>(conns)));
 			netw.add_connection(netw.populations()[layer_id - 1], pop,
@@ -170,38 +192,7 @@ void SimpleMnist::create_deep_network(const Json &data, Network &netw)
 
 cypress::Network &SmallMnist::build_netw(cypress::Network &netw)
 {
-	read_config();
-	mnist_helper::MNIST_DATA data;
-	if (m_train_data) {
-		data = mnist_helper::loadMnistData(m_images, "train");
-	}
-	else {
-		data = mnist_helper::loadMnistData(m_images, "t10k");
-	}
-	auto data_scaled = mnist_helper::scale_mnist(data);
-	data = mnist_helper::MNIST_DATA();
-
-	auto spike_mnist = mnist_helper::mnist_to_spike(data_scaled, m_duration,
-	                                                m_max_freq, m_poisson);
-	m_batch_data = mnist_helper::create_batches(spike_mnist, m_batchsize,
-	                                            m_duration, m_pause, false);
-
-	/*for (auto image : std::get<0>(data_scaled)) {
-	    mnist_helper::print_image(image, 14);
-	}*/
-
-	// TODO Batchsize
-	mnist_helper::create_spike_source(netw, m_batch_data[0]);
-
-#if SNAB_DEBUG
-	Utilities::write_vector2_to_csv(std::get<0>(m_batch_data[0]),
-	                                _debug_filename("spikes_input.csv"));
-	Utilities::plot_spikes(_debug_filename("spikes_input.csv"), m_backend);
-#endif
-
-	auto kerasdata = mnist_helper::read_network("dnn_spikey.msgpack", true);
-	create_deep_network(kerasdata, netw);
-	return netw;
+	return build_netw_int(netw, false, "dnn_spikey.msgpack");
 }
 
 }  // namespace SNAB

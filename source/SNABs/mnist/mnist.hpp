@@ -58,6 +58,8 @@ protected:
 	    std::pair<std::vector<std::vector<Real>>, std::vector<uint16_t>>>
 	    m_batch_data;  // Spiking data for the network
 
+	std::vector<cypress::PopulationBase> m_label_pops;  // vector of label pops
+
 	/**
 	 * @brief Converts a prepared json to a network
 	 *
@@ -82,6 +84,17 @@ protected:
 	 *
 	 */
 	void read_config();
+
+	/**
+	 * @brief Build the network, maybe scale down image
+	 *
+	 * @param netw cypress network
+	 * @param scale scale down or not
+	 * @param network_path path to network file
+	 * @return the final network
+	 */
+	cypress::Network &build_netw_int(cypress::Network &netw, bool scale,
+	                                 std::string network_path);
 };
 
 class SmallMnist : public SimpleMnist {
