@@ -33,8 +33,16 @@ typedef std::pair<std::vector<std::vector<std::vector<Real>>>,
     SPIKING_MNIST;
 typedef std::pair<std::vector<LocalConnection>, std::vector<LocalConnection>>
     CYPRESS_CONN;
-// Path = /path/to/data/train
-// or /path/to/data/t10k for test data
+
+/**
+ * @brief Read in MNIST data from files
+ *
+ * @param num_data Number of images
+ * @param path path to file, without end, e.g. /path/to/data/train for training
+ * data, /path/to/data/t10k for test data
+ * @return pair, std::get<0> is a vector of images, std::get<1> a vector of
+ * labels
+ */
 MNIST_DATA loadMnistData(const size_t num_data, const std::string path)
 {
 	MNIST_DATA res;
@@ -78,6 +86,12 @@ MNIST_DATA loadMnistData(const size_t num_data, const std::string path)
 	return res;
 }
 
+/**
+ * @brief Prints image to std::cout
+ *
+ * @param img the image
+ * @param wrap line wrap -> width of the image
+ */
 void print_image(const std::vector<Real> &img, size_t wrap)
 {
 	size_t count = 0;
@@ -96,6 +110,15 @@ void print_image(const std::vector<Real> &img, size_t wrap)
 	}
 }
 
+/**
+ * @brief Converts a vector of images to a rate based representation
+ *
+ * @param images vector of images
+ * @param duration duration of the rate
+ * @param max_freq maximal rate/frequency
+ * @param poisson False: regular spiking. True: poisson rates. Defaults to true.
+ * @return vector (images) of vector (pixel) of spikes
+ */
 std::vector<std::vector<std::vector<Real>>> image_to_rate(
     const std::vector<std::vector<Real>> &images, const Real duration,
     const Real max_freq, bool poisson = true)
@@ -118,6 +141,16 @@ std::vector<std::vector<std::vector<Real>>> image_to_rate(
 	return rate_images;
 }
 
+/**
+ * @brief Converts the full MNIST dataset to a spiking MNIST dataset
+ *
+ * @param mnist_data data container from loadMnistData
+ * @param duration duration of spikes per image
+ * @param max_freq Maximal rate (e.g. px = 1)
+ * @param poisson False: regular spiking. True: poisson rates. Defaults to true.
+ * @return pair, std::get<0> is a vector of spiking images, std::get<1> a vector
+ * of labels
+ */
 SPIKING_MNIST mnist_to_spike(const MNIST_DATA &mnist_data, const Real duration,
                              const Real max_freq, bool poisson = true)
 {
@@ -128,10 +161,23 @@ SPIKING_MNIST mnist_to_spike(const MNIST_DATA &mnist_data, const Real duration,
 	return res;
 }
 
-std::vector<MNIST_DATA> create_batch(const SPIKING_MNIST &mnist_data,
-                                     const size_t batch_size, Real duration,
-                                     Real pause, const bool shuffle = false,
-                                     unsigned seed = 0)
+/**
+ * @brief Creates batches of spikes representing the MNIST data
+ *
+ * @param mnist_data Spiking MNIST data
+ * @param batch_size number of images per batch
+ * @param duration duration of every image
+ * @param pause time in between images
+ * @param shuffle True for shuffling images. Defaults to false.
+ * @param seed Seed for shuffling images Defaults to 0.
+ * @return A vector of spike batches, every vector entry gives a container.
+ * std::get<0> give spikes for every pixel representing all images in one batch,
+ * std::get<1> returns labels
+ */
+std::vector<MNIST_DATA> create_batches(const SPIKING_MNIST &mnist_data,
+                                       const size_t batch_size, Real duration,
+                                       Real pause, const bool shuffle = false,
+                                       unsigned seed = 0)
 {
 	std::vector<size_t> indices(std::get<0>(mnist_data).size());
 	for (size_t i = 0; i < indices.size(); i++) {
@@ -178,7 +224,15 @@ std::vector<MNIST_DATA> create_batch(const SPIKING_MNIST &mnist_data,
 	return res;
 }
 
-void create_spike_source(Network &netw, const MNIST_DATA &spikes)
+/**
+ * @brief Creates Spike sources in network from spikes
+ *
+ * @param netw a cypress network
+ * @param spikes One batch from the return value of "create_batch"
+ * @return SpikeSourceArray Population
+ */
+cypress::Population<SpikeSourceArray> create_spike_source(
+    Network &netw, const MNIST_DATA &spikes)
 {
 	size_t size = std::get<0>(spikes).size();
 
@@ -188,8 +242,17 @@ void create_spike_source(Network &netw, const MNIST_DATA &spikes)
 	for (size_t nid = 0; nid < size; nid++) {
 		pop[nid].parameters().spike_times(std::get<0>(spikes)[nid]);
 	}
+	return pop;
 }
 
+/**
+ * @brief Read in the network file from json of msgpack. The Repo provides a
+ * script which creates compatible files
+ *
+ * @param path full path to file
+ * @param msgpack True: Compressed msgpack. False: plain Json. Defaults to true.
+ * @return The json containing the json from file
+ */
 Json read_network(std::string path, bool msgpack = true)
 {
 	std::ifstream file_in;
@@ -213,6 +276,12 @@ Json read_network(std::string path, bool msgpack = true)
 	return json;
 }
 
+/**
+ * @brief Calculate the max weight, ignore negative values
+ *
+ * @param json json array containing the weights
+ * @return max weight
+ */
 Real max_weight(const Json &json)
 {
 	Real max = 0.0;
@@ -227,6 +296,15 @@ Real max_weight(const Json &json)
 	return max;
 }
 
+/**
+ * @brief Convert a dense layer to list of Local Connections.
+ *
+ * @param json json matrix of weights
+ * @param scale scale factor for weights
+ * @param delay synaptic delay
+ * @return container of connections, std::get<0> are exc. connections,
+ * std::get<1> are inhib. connections
+ */
 CYPRESS_CONN dense_weights_to_conn(const Json &json, Real scale, Real delay)
 {
 	CYPRESS_CONN conns;
@@ -246,6 +324,17 @@ CYPRESS_CONN dense_weights_to_conn(const Json &json, Real scale, Real delay)
 	return conns;
 }
 
+/**
+ * @brief Converts the simulation results into label data
+ *
+ * @param pop_spikes the spikes of a populations
+ * @param duration presentation time of a sample
+ * @param pause pause time in between samples
+ * @param batch_size number of samples interpreted by these neurons (batch size)
+ * @return a vector of labels, for one hot coded neurons, if two neurons had the
+ * same activation or there was no activation at all,
+ * std::numeric_limits<uint16_t>::max() is returned
+ */
 std::vector<uint16_t> spikes_to_labels(
     const std::vector<std::vector<Real>> &pop_spikes, Real duration, Real pause,
     size_t batch_size)
@@ -277,6 +366,14 @@ std::vector<uint16_t> spikes_to_labels(
 	return res;
 }
 
+/**
+ * @brief Compare original labels with simulation labels, return number of
+ * correct labels
+ *
+ * @param label data label
+ * @param res label from simulation
+ * @return number of correct labels
+ */
 size_t compare_labels(std::vector<uint16_t> label, std::vector<uint16_t> res)
 {
 	size_t count_correct = 0;
@@ -293,8 +390,17 @@ size_t compare_labels(std::vector<uint16_t> label, std::vector<uint16_t> res)
 	return count_correct;
 }
 
+/**
+ * @brief Downscale an image by average pooling
+ *
+ * @param image the image itself
+ * @param height height of the image
+ * @param width width of the image
+ * @param pooling_size size of the pooling window (e.g. 2)
+ * @return the downscaled image
+ */
 std::vector<Real> av_pooling_image(std::vector<Real> image, size_t height,
-                                    size_t width, size_t pooling_size)
+                                   size_t width, size_t pooling_size)
 {
 	size_t new_h = std::ceil(Real(height) / Real(pooling_size));
 	size_t new_w = std::ceil(Real(width) / Real(pooling_size));
@@ -325,14 +431,21 @@ std::vector<Real> av_pooling_image(std::vector<Real> image, size_t height,
 	return res;
 }
 
-MNIST_DATA scale_mnist(MNIST_DATA &data){
-    MNIST_DATA res;
-    std::get<1>(res) = std::get<1>(data);
-    auto& tar_images = std::get<0>(res);
-    for(auto& image: std::get<0>(data)){
-        tar_images.emplace_back(av_pooling_image(image,28,28,2));
-    }
-    return res;
+/**
+ * @brief downscale the complete MNIST dataset
+ *
+ * @param data The MNIST dataset in a container
+ * @return downscaled MNIST dataset in a container
+ */
+MNIST_DATA scale_mnist(MNIST_DATA &data)
+{
+	MNIST_DATA res;
+	std::get<1>(res) = std::get<1>(data);
+	auto &tar_images = std::get<0>(res);
+	for (auto &image : std::get<0>(data)) {
+		tar_images.emplace_back(av_pooling_image(image, 28, 28, 2));
+	}
+	return res;
 }
 
 }  // namespace mnist_helper

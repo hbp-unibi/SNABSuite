@@ -27,8 +27,10 @@
 #include "common/snab_base.hpp"
 
 namespace SNAB {
+
 /**
- * TODO
+ * @brief A simple feed-forward network with densely connected layers.
+ * TODO: Network definition as soon as this is fixed.
  */
 class SimpleMnist : public SNABBase {
 public:
@@ -42,22 +44,43 @@ public:
 	}
 
 protected:
-	NeuronParameters m_neuro_params;
-	std::string m_neuron_type_str;
-	size_t m_images, m_batchsize;
-	cypress::Real m_duration, m_max_freq, m_pause;
-	bool m_poisson, m_train_data;
-	Real m_max_weight;
+	NeuronParameters m_neuro_params;  // Neuron Parameters
+	std::string m_neuron_type_str;    // String containing the neuron type
+	size_t m_images, m_batchsize;  // Number of images in general and per batch
+	cypress::Real m_duration, m_max_freq,
+	    m_pause;  // Spike data: Sample duration, Sample max freq, and pause
+	              // time between two images
+	bool m_poisson,
+	    m_train_data;  // Use poisson or regular spiking, Use train or test data
+	Real m_max_weight;  // Max weight to be scaled to
 
 	std::vector<
 	    std::pair<std::vector<std::vector<Real>>, std::vector<uint16_t>>>
-	    m_batch_data;
+	    m_batch_data;  // Spiking data for the network
 
+	/**
+	 * @brief Converts a prepared json to a network
+	 *
+	 * @param data data of the network. The repo provides a python script to
+	 * create a compatible json file
+	 * @param netw network object in which the deep network will be created
+	 */
 	void create_deep_network(const cypress::Json &data, cypress::Network &netw);
 
+	/**
+	 * @brief Constructor used by deriving classes
+	 *
+	 * @param backend backend
+	 * @param bench_index benchmark index
+	 * @param name Name of the derived benchmark
+	 */
 	SimpleMnist(const std::string backend, size_t bench_index,
 	            std::string name);
 
+	/**
+	 * @brief Read config from m_config
+	 *
+	 */
 	void read_config();
 };
 
