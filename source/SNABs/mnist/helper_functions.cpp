@@ -293,4 +293,46 @@ size_t compare_labels(std::vector<uint16_t> label, std::vector<uint16_t> res)
 	return count_correct;
 }
 
+std::vector<Real> av_pooling_image(std::vector<Real> image, size_t height,
+                                    size_t width, size_t pooling_size)
+{
+	size_t new_h = std::ceil(Real(height) / Real(pooling_size));
+	size_t new_w = std::ceil(Real(width) / Real(pooling_size));
+	std::vector<Real> res(new_h * new_w, 0.0);
+
+	for (size_t h = 0; h < new_h; h++) {
+		for (size_t w = 0; w < new_w; w++) {
+			std::vector<Real> vals(pooling_size * pooling_size, 0.0);
+			for (size_t h2 = 0; h2 < pooling_size; h2++) {
+				for (size_t w2 = 0; w2 < pooling_size; w2++) {
+					if ((h * pooling_size + h2) < height &&
+					    (w * pooling_size + w2) < width) {
+						vals[h2 * pooling_size + w2] =
+						    image[(h * pooling_size + h2) * width +
+						          w * pooling_size + w2];
+					}
+					else {
+						vals[h2 * pooling_size + w2] = 0.0;
+					}
+				}
+			}
+			// res[h * new_w + w] = *std::max_element(vals.begin(), vals.end());
+			res[h * new_w + w] =
+			    std::accumulate(vals.begin(), vals.end(), 0.0) /
+			    Real(vals.size());
+		}
+	}
+	return res;
+}
+
+MNIST_DATA scale_mnist(MNIST_DATA &data){
+    MNIST_DATA res;
+    std::get<1>(res) = std::get<1>(data);
+    auto& tar_images = std::get<0>(res);
+    for(auto& image: std::get<0>(data)){
+        tar_images.emplace_back(av_pooling_image(image,28,28,2));
+    }
+    return res;
+}
+
 }  // namespace mnist_helper
