@@ -134,7 +134,7 @@ std::vector<std::array<cypress::Real, 4>> SimpleMnist::evaluate()
 	Utilities::write_vector2_to_csv(spikes, _debug_filename("spikes.csv"));
 	Utilities::plot_spikes(_debug_filename("spikes.csv"), m_backend);
 #endif
-	return {std::array<cypress::Real, 4>({accuracy, NaN(), NaN(), NaN()})};
+	return {std::array<cypress::Real, 4>({accuracy, NaN(), NaN(), NaN()}), std::array<cypress::Real, 4>({m_netw.runtime().sim, NaN(), NaN(), NaN()})};
 }
 
 void SimpleMnist::create_deep_network(const Json &data, Network &netw)
