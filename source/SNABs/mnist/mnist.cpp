@@ -37,12 +37,12 @@ SimpleMnist::SimpleMnist(const std::string backend, size_t bench_index)
 
 SimpleMnist::SimpleMnist(const std::string backend, size_t bench_index,
                          std::string name)
-    : SNABBase(
-          name, backend, {"accuracy", "sim_time"}, {"quality", "performance"},
-          {"accuracy", "time"}, {"", "ms"},
-          {"neuron_type", "neuron_params", "images", "batchsize", "duration",
-           "max_freq", "pause", "poisson", "max_weight", "train_data"},
-          bench_index)
+    : SNABBase(name, backend, {"accuracy", "sim_time"},
+               {"quality", "performance"}, {"accuracy", "time"}, {"", "ms"},
+               {"neuron_type", "neuron_params", "images", "batchsize",
+                "duration", "max_freq", "pause", "poisson", "max_weight",
+                "train_data", "batch_parallel"},
+               bench_index)
 {
 }
 
@@ -64,6 +64,7 @@ void SimpleMnist::read_config()
 	m_poisson = m_config_file["poisson"].get<bool>();
 	m_max_weight = m_config_file["max_weight"].get<Real>();
 	m_train_data = m_config_file["train_data"].get<bool>();
+	m_batch_parallel = m_config_file["batch_parallel"].get<bool>();
 }
 
 cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw,
@@ -90,10 +91,20 @@ cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw,
 
 	auto kerasdata = mnist_helper::read_network(network_path, true);
 	m_label_pops.clear();
-	for (auto &i : m_batch_data) {
-		mnist_helper::create_spike_source(netw, i);
-		create_deep_network(kerasdata, netw);
-		m_label_pops.emplace_back(netw.populations().back());
+	if (m_batch_parallel) {
+		for (auto &i : m_batch_data) {
+			mnist_helper::create_spike_source(netw, i);
+			create_deep_network(kerasdata, netw);
+			m_label_pops.emplace_back(netw.populations().back());
+		}
+	}
+	else {
+		for (auto &i : m_batch_data) {
+			m_networks.push_back(cypress::Network());
+			mnist_helper::create_spike_source(m_networks.back(), i);
+			create_deep_network(kerasdata, m_networks.back());
+			m_label_pops.emplace_back(m_networks.back().populations().back());
+		}
 	}
 
 #if SNAB_DEBUG
@@ -115,7 +126,19 @@ void SimpleMnist::run_netw(cypress::Network &netw)
 	cypress::PowerManagementBackend pwbackend(
 	    cypress::Network::make_backend(m_backend));
 	try {
-		netw.run(pwbackend, m_batchsize * (m_duration + m_pause));
+
+		if (m_batch_parallel) {
+			netw.run(pwbackend, m_batchsize * (m_duration + m_pause));
+		}
+		else {
+			global_logger().info(
+			    "SNABSuite",
+			    "batch not run in parallel, using internal network objects!");
+			for (auto &pop : m_label_pops) {
+				pop.network().run(pwbackend,
+				                  m_batchsize * (m_duration + m_pause));
+			}
+		}
 	}
 	catch (const std::exception &exc) {
 		std::cerr << exc.what();
@@ -156,9 +179,16 @@ std::vector<std::array<cypress::Real, 4>> SimpleMnist::evaluate()
 #endif
 	}
 	Real acc = Real(global_correct) / Real(images);
+	Real sim_time = m_netw.runtime().sim;
+	if (!m_batch_parallel) {
+		sim_time = 0.0;
+		for (auto &pop : m_label_pops) {
+			sim_time += pop.network().runtime().sim;
+		}
+	}
 	return {std::array<cypress::Real, 4>({acc, NaN(), NaN(), NaN()}),
 	        std::array<cypress::Real, 4>(
-	            {m_netw.runtime().sim, NaN(), NaN(), NaN()})};
+	            {sim_time, NaN(), NaN(), NaN()})};  // TODO add up simtimes
 }
 
 void SimpleMnist::create_deep_network(const Json &data, Network &netw)

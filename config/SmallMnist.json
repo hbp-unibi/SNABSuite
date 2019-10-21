@@ -20,7 +20,8 @@
 		"pause": 20, 
 		"poisson" : false,
 		"max_weight" : 0.011,
-        "train_data": true
+        "train_data": true,
+        "batch_parallel": true
     },
     "spikey":{
 		"neuron_type" : "IfFacetsHardware1",
@@ -39,6 +40,7 @@
 		"pause": 20, 
 		"poisson" : false,
 		"max_weight" : 0.011,
-        "train_data": true
+        "train_data": true,
+        "batch_parallel": false
     }
 }

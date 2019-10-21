@@ -58,6 +58,11 @@ protected:
 	    std::pair<std::vector<std::vector<Real>>, std::vector<uint16_t>>>
 	    m_batch_data;  // Spiking data for the network
 
+	bool m_batch_parallel = true;  // Run batches parallel (in one network)
+
+	std::vector<cypress::Network>
+	    m_networks;  // Used for batches not run in parallel
+
 	std::vector<cypress::PopulationBase> m_label_pops;  // vector of label pops
 
 	/**
