@@ -1669,8 +1669,18 @@ TEST(mnist_helper, spikes_to_labels)
 	    {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
 	     {1, 2, 3, 8, 9, 10, 11, 12, 13, 14, 15, 16},
 	     {3, 4, 5, 8, 10, 13, 15, 18, 19, 20, 21, 22, 23}});
+	cypress::Network netw;
+	auto pop = netw.create_population<cypress::IfCondExp>(
+	    3, IfCondExpParameters(), IfCondExpSignals().record_spikes());
 
-	auto vec = spikes_to_labels(spikes, 5, 5, 4);
+	pop[0].signals().data(0,
+	                      std::make_shared<cypress::Matrix<Real>>(spikes[0]));
+	pop[1].signals().data(0,
+	                      std::make_shared<cypress::Matrix<Real>>(spikes[1]));
+	pop[2].signals().data(0,
+	                      std::make_shared<cypress::Matrix<Real>>(spikes[2]));
+
+	auto vec = spikes_to_labels(pop, 5, 5, 4);
 	EXPECT_EQ(vec[0], 0);
 	EXPECT_EQ(vec[1], 1);
 	EXPECT_EQ(vec[2], 2);
@@ -1683,6 +1693,52 @@ TEST(mnist_helper, compare_labels)
 	std::vector<uint16_t> label2{1, 2, 5, 6, 8, 11, 13};
 
 	EXPECT_EQ(compare_labels(label1, label2), size_t(4));
+}
+
+TEST(mnist_helper, dense_backprop)
+{
+	std::vector<std::vector<std::vector<Real>>> weights(
+	    {{{0.3, 0.2}, {0.2, 0.3}}});
+	std::vector<std::vector<std::vector<Real>>> output_rates(
+	    {{{1, 0}, {0, 1}, {1, 1}}, {{0.3, 0.2}, {0.2, 0.3}, {0.5, 0.5}}});
+	MNIST_DATA data;
+	std::get<1>(data) = std::vector<uint16_t>({0, 1, 1});
+	auto weights_bck = weights;
+	Real learn_rate = 0.1;
+	dense_backprop(output_rates, weights, data, learn_rate, 0.0);
+
+	std::vector<std::vector<std::vector<Real>>> weight_chg(
+	    {{{-0.2, -0.3}, {0.7, -1.2}}});
+	for (size_t i = 0; i < weights[0].size(); i++) {
+		for (size_t j = 0; j < weights[0][i].size(); j++) {
+			EXPECT_FLOAT_EQ(
+			    weights[0][i][j],
+			    weights_bck[0][i][j] - weight_chg[0][i][j] * learn_rate / 3.0);
+		}
+	}
+
+	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	std::vector<std::vector<std::vector<Real>>> weights1(
+	    {{{0.3, 0.2}, {0.2, 0.3}}, {{0.3, 0.2}, {0.2, 0.3}}});
+	std::vector<std::vector<std::vector<Real>>> output_rates1(
+	    {{{1, 0}, {0, 1}, {1, 1}},
+	     {{0.3, 0.2}, {0.2, 0.3}, {0.5, 0.5}},
+	     {{0.13, 0.12}, {0.12, 0.13}, {0.25, 0.25}}});
+	weights_bck = weights1;
+	std::vector<std::vector<std::vector<Real>>> weights1_chg(
+	    {{{-0.312, -0.313}, {-0.213, -0.412}},
+	     {{-0.112, -0.513}, {-0.013, -0.612}}});
+
+	dense_backprop(output_rates1, weights1, data, learn_rate, 0.0);
+	for (size_t n = 0; n < weights1.size(); n++) {
+		for (size_t i = 0; i < weights1[n].size(); i++) {
+			for (size_t j = 0; j < weights1[n][i].size(); j++) {
+				EXPECT_FLOAT_EQ(weights1[n][i][j],
+				                weights_bck[n][i][j] -
+				                    weights1_chg[n][i][j] * learn_rate / 3.0);
+			}
+		}
+	}
 }
 
 }  // namespace mnist_helper

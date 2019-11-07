@@ -81,6 +81,10 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
 	        SimpleMnist(backend, bench_index)),
 	    std::make_shared<SmallMnist>(
 	        SmallMnist(backend, bench_index)),
+	    std::make_shared<InTheLoopTrain>(
+	        InTheLoopTrain(backend, bench_index)),
+	    std::make_shared<InTheLoopTrain2>(
+	        InTheLoopTrain2(backend, bench_index)),
 	};
 	return vec;
 }

@@ -18,7 +18,9 @@
 
 #include <cypress/cypress.hpp>
 
+#include <assert.h>
 #include <chrono>
+#include <cmath>
 #include <fstream>
 #include <string>
 #include <utility>  //std::pair
@@ -252,6 +254,28 @@ cypress::Population<SpikeSourceArray> create_spike_source(
 }
 
 /**
+ * @brief Update Spike sources in network from spikes
+ *
+ * @param source a cypress source array
+ * @param spikes One batch from the return value of "create_batch"
+ * @return SpikeSourceArray Population
+ */
+cypress::Population<SpikeSourceArray> &update_spike_source(
+    cypress::Population<SpikeSourceArray> &source, const MNIST_DATA &spikes)
+{
+	size_t size = std::get<0>(spikes).size();
+
+	if (source.size() != size) {
+		throw std::runtime_error(
+		    "Spike source array size does not equal image size!");
+	}
+	for (size_t nid = 0; nid < size; nid++) {
+		source[nid].parameters().spike_times(std::get<0>(spikes)[nid]);
+	}
+	return source;
+}
+
+/**
  * @brief Read in the network file from json of msgpack. The Repo provides a
  * script which creates compatible files
  *
@@ -288,12 +312,28 @@ Json read_network(std::string path, bool msgpack = true)
  * @param json json array containing the weights
  * @return max weight
  */
-Real max_weight(const Json &json)
+template <typename T>
+Real max_weight(const T &json)
 {
 	Real max = 0.0;
 	for (size_t i = 0; i < json.size(); i++) {
 		for (size_t j = 0; j < json[i].size(); j++) {
-			Real tmp = json[i][j].get<Real>();
+			Real tmp = Real(json[i][j]);
+			if (tmp > max) {
+				max = tmp;
+			}
+		}
+	}
+	return max;
+}
+
+template <typename T>
+Real max_weight_abs(const T &json)
+{
+	Real max = 0.0;
+	for (size_t i = 0; i < json.size(); i++) {
+		for (size_t j = 0; j < json[i].size(); j++) {
+			Real tmp = fabs(Real(json[i][j]));
 			if (tmp > max) {
 				max = tmp;
 			}
@@ -330,6 +370,30 @@ CYPRESS_CONN dense_weights_to_conn(const Json &json, Real scale, Real delay)
 	return conns;
 }
 
+std::vector<LocalConnection> dense_weights_to_conn2(const Json &json,
+                                                    Real max_w, Real delay)
+{
+	/*int seed = std::chrono::system_clock::now().time_since_epoch().count();
+	auto rng = std::default_random_engine(seed);
+	std::normal_distribution<double> distribution(0.02, 0.03);
+	*/
+	std::vector<LocalConnection> conns;
+	Real max = 0.0;
+	if (max_w > 0) {
+		max = max_weight(json);
+	}
+
+	for (size_t i = 0; i < json.size(); i++) {
+		for (size_t j = 0; j < json[i].size(); j++) {
+			Real w = json[i][j].get<Real>();
+			w = max ? w * max_w / max : w;
+			// Real w = distribution(rng);  // TODO
+			conns.emplace_back(LocalConnection(i, j, w, delay));
+		}
+	}
+	return conns;
+}
+
 /**
  * @brief Converts the simulation results into label data
  *
@@ -341,17 +405,16 @@ CYPRESS_CONN dense_weights_to_conn(const Json &json, Real scale, Real delay)
  * same activation or there was no activation at all,
  * std::numeric_limits<uint16_t>::max() is returned
  */
-std::vector<uint16_t> spikes_to_labels(
-    const std::vector<std::vector<Real>> &pop_spikes, Real duration, Real pause,
-    size_t batch_size)
+std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,
+                                       Real pause, size_t batch_size)
 {
 	std::vector<uint16_t> res(batch_size);
 	std::vector<std::vector<uint16_t>> binned_spike_counts;
-	for (const auto &spikes : pop_spikes) {
+	for (const auto &neuron : pop) {
 		binned_spike_counts.push_back(
 		    SpikingUtils::spike_time_binning<uint16_t>(
 		        -pause * 0.5, batch_size * (duration + pause) - (pause * 0.5),
-		        batch_size, spikes));
+		        batch_size, neuron.signals().data(0)));
 	}
 
 	for (size_t sample = 0; sample < batch_size; sample++) {
@@ -368,6 +431,62 @@ std::vector<uint16_t> spikes_to_labels(
 			}
 		}
 		res[sample] = index;
+	}
+	return res;
+}
+
+/**
+ * @brief Converts the simulation results into values between 0 and 1
+ *
+ * @param pop_spikes the spikes of a populations
+ * @param duration presentation time of a sample
+ * @param pause pause time in between samples
+ * @param batch_size number of samples interpreted by these neurons (batch size)
+ * @return for every sample a vector of rates for every neuron
+ * (vec[sample][neuron])
+ */
+std::vector<std::vector<Real>> spikes_to_rates(const PopulationBase pop,
+                                               Real duration, Real pause,
+                                               size_t batch_size,
+                                               Real norm = 0.0)
+{
+	std::vector<std::vector<Real>> res(batch_size,
+	                                   std::vector<Real>(pop.size()));
+	std::vector<std::vector<uint16_t>> binned_spike_counts;
+	for (const auto &neuron : pop) {
+		binned_spike_counts.push_back(
+		    SpikingUtils::spike_time_binning<uint16_t>(
+		        -pause * 0.5, batch_size * (duration + pause) - (pause * 0.5),
+		        batch_size, neuron.signals().data(0)));
+	}
+	if (norm > 0.0) {
+		for (size_t sample = 0; sample < batch_size; sample++) {
+			uint16_t max = 0;
+			for (size_t neuron = 0; neuron < binned_spike_counts.size();
+			     neuron++) {
+				if (binned_spike_counts[neuron][sample] > max) {
+					max = binned_spike_counts[neuron][sample];
+				}
+
+				res[sample][neuron] =
+				    Real(binned_spike_counts[neuron][sample]) / norm;
+				// TODO?Works
+			}
+			if (max != 0) {
+				for (size_t neuron = 0; neuron < binned_spike_counts.size();
+				     neuron++) {
+					res[sample][neuron] /= Real(max);
+				}
+			}
+		}
+	}
+	else {
+		for (size_t sample = 0; sample < batch_size; sample++) {
+			for (size_t neuron = 0; neuron < binned_spike_counts.size();
+			     neuron++) {
+				res[sample][neuron] = Real(binned_spike_counts[neuron][sample]);
+			}
+		}
 	}
 	return res;
 }
@@ -452,6 +571,293 @@ MNIST_DATA scale_mnist(MNIST_DATA &data)
 		tar_images.emplace_back(av_pooling_image(image, 28, 28, 2));
 	}
 	return res;
+}
+
+/**
+ * @brief Reads in MNIST test or train data.
+ *
+ * @param num_images number of images to read in
+ * @param train_data true for training data, false for test
+ * @param duration duration of spikes per image
+ * @param max_freq Maximal rate (e.g. px = 1)
+ * @param poisson False: regular spiking. True: poisson rates. Defaults to true.
+ * @return pair, std::get<0> is a vector of spiking images, std::get<1> a vector
+ * of labels
+ */
+SPIKING_MNIST read_data_to_spike(const size_t num_images, bool train_data,
+                                 const Real duration, const Real max_freq,
+                                 bool poisson = true, bool scale_down = false)
+{
+	mnist_helper::MNIST_DATA data;
+	if (train_data) {
+		data = mnist_helper::loadMnistData(num_images, "train");
+	}
+	else {
+		data = mnist_helper::loadMnistData(num_images, "t10k");
+	}
+	if (scale_down) {
+		auto data_scaled = scale_mnist(data);
+		data = data_scaled;
+	}
+
+	return mnist_helper::mnist_to_spike(data, duration, max_freq, poisson);
+}
+
+std::vector<std::vector<Real>> calculate_errors(
+    const std::vector<std::vector<Real>> &output_rates,
+    const MNIST_DATA &spmnist)
+{
+	std::vector<std::vector<Real>> res = output_rates;  // Same size vector
+	auto labels = std::get<1>(spmnist);
+
+	if (output_rates.size() != labels.size()) {
+		throw std::runtime_error(
+		    "number of of labels is different from number of recalled samples");
+	}
+	for (size_t sample = 0; sample < output_rates.size(); sample++) {
+		for (size_t neuron = 0; neuron < output_rates[sample].size();
+		     neuron++) {
+			if (labels[sample] == neuron) {
+				res[sample][neuron] = output_rates[sample][neuron] - 1.0;
+			}
+			else {
+				res[sample][neuron] = output_rates[sample][neuron] - 0.0;
+			}
+		}
+	}
+	// Categorical cross-entropy
+	/*for (size_t sample = 0; sample < output_rates.size(); sample++) {
+	    Real norm = 0.0;
+	    for (size_t neuron = 0; neuron < output_rates[sample].size();
+	         neuron++) {
+	        norm +=std::exp(output_rates[sample][neuron]);
+	    }
+	    for (size_t neuron = 0; neuron < output_rates[sample].size();
+	         neuron++) {
+	        if (labels[sample] == neuron) {
+	            res[sample][neuron] =
+	(std::exp(output_rates[sample][neuron])/norm) - 1.0 ;
+	        }
+	        else {
+	            res[sample][neuron] =
+	std::exp(output_rates[sample][neuron])/norm ;
+	        }
+	    }
+	}
+	*/
+	return res;
+}
+
+void perceptron_rule(const std::vector<std::vector<Real>> &errors,
+                     std::vector<LocalConnection> &weights, Real learning_rate,
+                     const std::vector<std::vector<Real>> &pre_rates,
+                     bool positive = false, Real max_weight = 0.0)
+{
+	std::vector<std::vector<Real>> weightch(
+	    pre_rates[0].size(), std::vector<Real>(errors[0].size(), 0));
+	for (size_t sample = 0; sample < errors.size(); sample++) {
+		for (size_t j = 0; j < errors[sample].size(); j++) {
+			for (size_t i = 0; i < pre_rates[sample].size(); i++) {
+				weightch[i][j] += learning_rate * errors[sample][j] *
+				                  std::max(pre_rates[sample][i], 0.00) /
+				                  errors.size();  // Normalized
+			}
+		}
+	}
+
+	if (positive) {
+		for (auto &conn : weights) {
+			conn.SynapseParameters[0] += weightch[conn.src][conn.tar];
+			if (conn.SynapseParameters[0] < 0) {
+				conn.SynapseParameters[0] = 0.0;
+			}
+		}
+	}
+
+	if (max_weight != 0.0) {
+		Real max = 0.0;
+		for (auto &conn : weights) {
+			if (conn.SynapseParameters[0] > max) {
+				max = conn.SynapseParameters[0];
+			}
+		}
+		for (auto &conn : weights) {
+			conn.SynapseParameters[0] =
+			    conn.SynapseParameters[0] * max_weight / max;
+		}
+	}
+}
+
+std::vector<std::vector<Real>> conn_to_mat(
+    const std::vector<LocalConnection> &conns, const Real layer_size_in,
+    const Real layer_size_out)
+{
+	std::vector<std::vector<Real>> res(layer_size_in,
+	                                   std::vector<Real>(layer_size_out));
+	for (auto &conn : conns) {
+		res[conn.src][conn.tar] = conn.SynapseParameters[0];
+	}
+	return res;
+}
+
+std::vector<std::vector<std::vector<Real>>> all_conns_to_mat(Network &netw)
+{
+	std::vector<std::vector<std::vector<Real>>> res;
+	auto &conns = netw.connections();
+	for (auto &conn_descr : conns) {
+		std::vector<LocalConnection> connections;
+		conn_descr.connect(connections);
+		auto src = netw.populations()[conn_descr.pid_src()].size();
+		auto tar = netw.populations()[conn_descr.pid_tar()].size();
+		res.emplace_back(conn_to_mat(connections, src, tar));
+	}
+	return res;
+}
+
+std::vector<LocalConnection> conns_from_mat(
+    std::vector<std::vector<Real>> weights, Real delay, Real max_w = 0.0)
+{
+	std::vector<LocalConnection> res;
+	if (max_w > 0) {
+		Real max = max_weight(weights);
+		for (size_t i = 0; i < weights.size(); i++) {
+			for (size_t j = 0; j < weights[i].size(); j++) {
+				res.emplace_back(
+				    LocalConnection(i, j, weights[i][j] * max_w / max, delay));
+			}
+		}
+		return res;
+	}
+	for (size_t i = 0; i < weights.size(); i++) {
+		for (size_t j = 0; j < weights[i].size(); j++) {
+			res.emplace_back(LocalConnection(i, j, weights[i][j], delay));
+		}
+	}
+	return res;
+}
+
+void update_conns_from_mat(std::vector<std::vector<std::vector<Real>>> &weights,
+                           Network &netw, Real delay = 1.0,
+                           Real max_weight = 0.0)
+{
+	for (size_t i = 0; i < weights.size(); i++) {
+		netw.update_connection(
+		    Connector::from_list(conns_from_mat(weights[i], delay, max_weight)),
+		    ("dense_ex_" + std::to_string(i)).c_str());
+	}
+}
+
+std::vector<Real> weights_mult_delta(std::vector<std::vector<Real>> &weights,
+                                     std::vector<Real> &delta)
+{
+	assert(weights[0].size() == delta.size());
+	std::vector<Real> res(weights.size(), 0.0);
+	for (size_t i = 0; i < delta.size(); i++) {
+		for (size_t j = 0; j < weights.size(); j++) {
+			res[j] += (weights.at(j).at(i) * delta.at(i));
+		}
+	}
+	return res;
+}
+
+/*** Layer, sample, neuron
+ * Layer, src, tar
+ * output Rates should include source spikes */
+void dense_backprop(
+    const std::vector<std::vector<std::vector<Real>>> &output_rates,
+    std::vector<std::vector<std::vector<Real>>> &weights,
+    const MNIST_DATA &spmnist, const Real learning_rate, Real max_w)
+{
+
+	size_t num_weight_layers = weights.size();
+
+	// Construct empty vector
+	std::vector<std::vector<std::vector<Real>>> weight_change;
+	for (size_t layer = 0; layer < num_weight_layers; layer++) {
+		weight_change.emplace_back(std::vector<std::vector<Real>>(
+		    weights[layer].size(),
+		    std::vector<Real>(weights[layer][0].size(), 0)));
+	}
+
+	// sample, neuron
+	std::vector<std::vector<Real>> errors =
+	    calculate_errors(output_rates.back(), spmnist);
+	assert(errors[0].size() == weights.back()[0].size());
+
+	for (size_t sample = 0; sample < errors.size(); sample++) {
+		// Last layer
+		for (size_t neuron = 0; neuron < errors[sample].size(); neuron++) {
+			if (output_rates.back().at(sample).at(neuron) == 0) {
+				errors[sample][neuron] = 0.0;  // Derivative of ReLU
+			}
+		}
+		std::vector<Real> next_layer_errors = output_rates.back()[sample];
+		for (size_t pre_neuron = 0; pre_neuron < weight_change.back().size();
+		     pre_neuron++) {
+
+			for (size_t post_neuron = 0;
+			     post_neuron < weight_change.back()[pre_neuron].size();
+			     post_neuron++) {
+				weight_change.back().at(pre_neuron).at(post_neuron) +=
+				    errors.at(sample).at(post_neuron) *
+				    output_rates.at(output_rates.size() - 2)
+				        .at(sample)
+				        .at(pre_neuron);
+			}
+		}
+
+		auto delta = errors[sample];
+
+		// Output rate has size weight_layer + 1
+		// layer == connection layer
+		for (size_t inv_layer = 1; inv_layer < num_weight_layers; inv_layer++) {
+			auto post_layer = num_weight_layers - inv_layer;
+			auto pre_layer = post_layer - 1;
+			auto delta2 = weights_mult_delta(weights[post_layer],
+			                                 delta);  // l+1
+			delta = delta2;
+
+			for (size_t post_neuron = 0;
+			     post_neuron < weight_change.at(post_layer).at(0).size();  // l
+			     post_neuron++) {
+				Real multiplier = 1.0;
+				if (output_rates.at(post_layer).at(sample).at(post_neuron) ==
+				    0) {  // Derivative of ReLU
+					// multiplier = 0.1;  //  a bit leaky
+					continue;  // not leaky
+				}
+				for (size_t pre_neuron = 0;
+				     pre_neuron < weight_change.at(pre_layer).size();
+				     pre_neuron++) {
+					weight_change[pre_layer].at(pre_neuron).at(post_neuron) +=
+					    (delta.at(post_neuron) *
+					     output_rates.at(pre_layer).at(sample).at(pre_neuron) *
+					     multiplier);
+				}
+			}
+		}
+	}
+	// Update weights
+	for (size_t i = 0; i < weights.size(); i++) {
+		for (size_t j = 0; j < weights[i].size(); j++) {
+			for (size_t k = 0; k < weights[i][j].size(); k++) {
+				weights[i][j][k] -= (learning_rate * weight_change[i][j][k] /
+				                     Real(errors.size()));
+			}
+		}
+	}
+
+	if (max_w > 0) {
+		// Normalize weight layer wise
+		for (size_t i = 0; i < weights.size(); i++) {
+			Real max = max_weight(weights[i]);
+			for (size_t j = 0; j < weights[i].size(); j++) {
+				for (size_t k = 0; k < weights[i][j].size(); k++) {
+					weights[i][j][k] *= max_w / max;
+				}
+			}
+		}
+	}
 }
 
 }  // namespace mnist_helper

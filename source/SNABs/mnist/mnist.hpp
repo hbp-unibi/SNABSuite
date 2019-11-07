@@ -71,8 +71,10 @@ protected:
 	 * @param data data of the network. The repo provides a python script to
 	 * create a compatible json file
 	 * @param netw network object in which the deep network will be created
+	 * @return number of layers
 	 */
-	void create_deep_network(const cypress::Json &data, cypress::Network &netw);
+	size_t create_deep_network(const cypress::Json &data,
+	                           cypress::Network &netw, Real max_weight = 0.0);
 
 	/**
 	 * @brief Constructor used by deriving classes
@@ -114,6 +116,47 @@ public:
 	std::shared_ptr<SNABBase> clone() override
 	{
 		return std::make_shared<SmallMnist>(m_backend, m_bench_index);
+	}
+};
+
+class InTheLoopTrain : public SimpleMnist {
+public:
+	InTheLoopTrain(const std::string backend, size_t bench_index)
+	    : SimpleMnist(backend, bench_index, __func__)
+	{
+	}
+
+	cypress::Network &build_netw(cypress::Network &netw) override;
+	void run_netw(cypress::Network &netw) override;
+
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<InTheLoopTrain>(m_backend, m_bench_index);
+	}
+
+protected:
+	InTheLoopTrain(const std::string backend, size_t bench_index,
+	               std::string name)
+	    : SimpleMnist(backend, bench_index, name)
+	{
+	}
+	std::pair<std::vector<std::vector<std::vector<Real>>>,
+	          std::vector<uint16_t>>
+	    m_spmnist;
+};
+
+class InTheLoopTrain2 : public InTheLoopTrain {
+public:
+	InTheLoopTrain2(const std::string backend, size_t bench_index)
+	    : InTheLoopTrain(backend, bench_index, __func__)
+	{
+	}
+
+	void run_netw(cypress::Network &netw) override;
+
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<InTheLoopTrain2>(m_backend, m_bench_index);
 	}
 };
 

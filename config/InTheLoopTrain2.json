@@ -1,0 +1,50 @@
+{
+    "nest":{
+		"neuron_type" : "IF_cond_exp",
+		"neuron_params": {
+		"e_rev_E": 0.00,
+		"e_rev_I": -130.0,
+		"tau_syn_E": 5.0,
+		"tau_syn_I": 5.0,
+		"v_rest": -65.0,
+		"v_reset": -75.0,
+		"v_thresh": -55.0,
+		"tau_refrac": 1.0,
+		"tau_m": 20,
+		"cm": 0.2
+		},
+		"images": 100, 
+		"batchsize" : 50,
+		"duration" : 100,
+		"max_freq": 80,
+		"pause": 100, 
+		"poisson" : false,
+		"max_weight" : 0.03,
+        "train_data": true,
+        "batch_parallel": true,
+        "learn_rate" : 0.1,
+        "epochs": 150
+    },
+    "spikey":{
+		"neuron_type" : "IfFacetsHardware1",
+		"neuron_params": {
+			"tau_m": 10.0,
+			"tau_refrac": 1.0,
+			"v_rest": -70.0,
+			"v_thresh": -55.0,
+			"v_reset": -60.0,
+			"e_rev_I": -70.0
+		},
+		"images": 20, 
+		"batchsize" : 10,
+		"duration" : 200,
+		"max_freq": 40.9,
+		"pause": 50, 
+		"poisson" : false,
+		"max_weight" : 0.015,
+        "train_data": true,
+        "batch_parallel": false,
+        "learn_rate" : 0.01,
+        "epochs": 50
+    }
+}
