@@ -20,7 +20,9 @@
 """
 Plots data for two dimensional sweeps
 """
+from __future__ import division
 
+from builtins import range
 import argparse
 
 parser = argparse.ArgumentParser(description='Plot two-dimensional images')
@@ -143,7 +145,7 @@ for target_file in args.files:
     results = np.genfromtxt(target_file, delimiter=',', names=True)
     keys = results.dtype.names
     data = np.zeros((results.shape[0], len(keys)))
-    for i in xrange(0, len(results)):
+    for i in range(0, len(results)):
         data[i] = np.array(list(results[i]))
 
     fig = plot_measure2d(data[:, 0], data[:, 1], data[:, args.z],
