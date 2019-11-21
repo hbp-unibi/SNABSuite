@@ -13,15 +13,17 @@
 		"tau_m": 10,
 		"cm": 0.2
 		},
-		"images": 10, 
-		"batchsize" : 10,
+		"images": 100, 
+		"batchsize" : 100,
 		"duration" : 100,
 		"max_freq": 47.8,
 		"pause": 20, 
 		"poisson" : false,
 		"max_weight" : 0.011,
         "train_data": true,
-        "batch_parallel": true
+        "batch_parallel": true,
+        "dnn_file": "netw_spikey.msgpack",
+        "scaled_image": true
     },
     "spikey":{
 		"neuron_type" : "IfFacetsHardware1",
@@ -41,6 +43,8 @@
 		"poisson" : false,
 		"max_weight" : 0.011,
         "train_data": true,
-        "batch_parallel": false
+        "batch_parallel": false,
+        "dnn_file": "netw_spikey.msgpack",
+        "scaled_image": true
     }
 }

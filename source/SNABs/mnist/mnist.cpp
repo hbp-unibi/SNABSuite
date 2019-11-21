@@ -15,14 +15,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include <cypress/cypress.hpp>  // Neural network frontend
 
+#include <cypress/backend/power/power.hpp>
 #include <memory>
 #include <random>
 #include <string>
 #include <vector>
 
-#include <cypress/backend/power/power.hpp>
 #include "common/neuron_parameters.hpp"
 #include "helper_functions.cpp"
 #include "mnist.hpp"
@@ -41,7 +42,7 @@ SimpleMnist::SimpleMnist(const std::string backend, size_t bench_index,
                {"quality", "performance"}, {"accuracy", "time"}, {"", "ms"},
                {"neuron_type", "neuron_params", "images", "batchsize",
                 "duration", "max_freq", "pause", "poisson", "max_weight",
-                "train_data", "batch_parallel"},
+                "train_data", "batch_parallel", "dnn_file", "scaled_image"},
                bench_index)
 {
 }
@@ -65,19 +66,19 @@ void SimpleMnist::read_config()
 	m_max_weight = m_config_file["max_weight"].get<Real>();
 	m_train_data = m_config_file["train_data"].get<bool>();
 	m_batch_parallel = m_config_file["batch_parallel"].get<bool>();
+    m_dnn_file = m_config_file["dnn_file"].get<std::string>();
+    m_scaled_image = m_config_file["scaled_image"].get<bool>();
 }
 
-cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw,
-                                              bool scale,
-                                              std::string network_path)
+cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw)
 {
 	read_config();
 	auto spike_mnist = mnist_helper::read_data_to_spike(
-	    m_images, m_train_data, m_duration, m_max_freq, m_poisson, scale);
+	    m_images, m_train_data, m_duration, m_max_freq, m_poisson, m_scaled_image);
 	m_batch_data = mnist_helper::create_batches(spike_mnist, m_batchsize,
 	                                            m_duration, m_pause, false);
 
-	auto kerasdata = mnist_helper::read_network(network_path, true);
+	auto kerasdata = mnist_helper::read_network(m_dnn_file, true);
 	m_label_pops.clear();
 	if (m_batch_parallel) {
 		for (auto &i : m_batch_data) {
@@ -105,8 +106,7 @@ cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw,
 
 cypress::Network &SimpleMnist::build_netw(cypress::Network &netw)
 {
-	return build_netw_int(netw, false,
-	                      "../source/SNABs/mnist/python/test.msgpack");
+	return build_netw_int(netw);
 }
 
 void SimpleMnist::run_netw(cypress::Network &netw)
@@ -193,14 +193,14 @@ size_t SimpleMnist::create_deep_network(const Json &data, Network &netw,
 			/*auto max = mnist_helper::max_weight(layer["weights"]);
 			auto conns = mnist_helper::dense_weights_to_conn(
 -			    layer["weights"], m_max_weight / max, 1.0);*/
-			auto conns = mnist_helper::dense_weights_to_conn2(
-			    layer["weights"], max_weight,
-			    1.0);  // TODO
+			auto conns = mnist_helper::dense_weights_to_conn2(layer["weights"],
+			                                                  max_weight,
+			                                                  1.0);  // TODO
 
 			netw.add_connection(
 			    netw.populations()[layer_id - 1], pop,
 			    Connector::from_list(conns),
-			    ("dense_ex_" + std::to_string(counter)).c_str());
+			    ("dense_" + std::to_string(counter)).c_str());
 			/*netw.add_connection(
 			    netw.populations()[layer_id - 1], pop,
 			    Connector::from_list(std::get<1>(conns)),
@@ -218,11 +218,27 @@ size_t SimpleMnist::create_deep_network(const Json &data, Network &netw,
 	return counter;
 }
 
+
+std::vector<std::vector<std::vector<Real>>> all_conns_to_mat(const Json &data)
+{
+	std::vector<std::vector<std::vector<Real>>> res;
+	for (auto &layer : data["netw"]) {
+		if (layer["class_name"].get<std::string>() == "Dense") {
+            
+            res.push_back(layer["weights"].get<std::vector<std::vector<Real>>>());
+		}
+		else {
+			throw std::runtime_error("Unknown layer type");
+		}
+	}
+	return res;
+}
+
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cypress::Network &SmallMnist::build_netw(cypress::Network &netw)
 {
-	return build_netw_int(netw, true, "dnn_spikey.msgpack");
+	return build_netw_int(netw);
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -231,9 +247,8 @@ cypress::Network &InTheLoopTrain::build_netw(cypress::Network &netw)
 {
 	read_config();
 	m_spmnist = mnist_helper::read_data_to_spike(m_images, true, m_duration,
-	                                             m_max_freq, m_poisson, true);
+	                                             m_max_freq, m_poisson, m_scaled_image);
 	return netw;
-	// return build_netw_int(netw, true, "dnn_spikey.msgpack");
 }
 
 void InTheLoopTrain::run_netw(cypress::Network &netw)
@@ -241,7 +256,7 @@ void InTheLoopTrain::run_netw(cypress::Network &netw)
 	cypress::PowerManagementBackend pwbackend(
 	    cypress::Network::make_backend(m_backend));
 
-	auto kerasdata = mnist_helper::read_network("dnn_spikey.msgpack", true);
+	auto kerasdata = mnist_helper::read_network(m_dnn_file, true);
 
 	m_batch_data = mnist_helper::create_batches(m_spmnist, m_batchsize,
 	                                            m_duration, m_pause, true);
@@ -252,9 +267,10 @@ void InTheLoopTrain::run_netw(cypress::Network &netw)
 	auto pre_last_pop = netw.populations()[netw.populations().size() - 2];
 	pre_last_pop.signals().record(0);
 	auto conn = netw.connection(
-	    "dense_ex_" +
+	    "dense_" +
 	    std::to_string(n_layer - 1));  // last one is just inhibitory, dnn
 	                                   // spikey has no inhibitory connections
+                                        // TODO
 	std::vector<cypress::LocalConnection> conn_list;
 	conn.connect(conn_list);
 	//#if SNAB_DEBUG
@@ -294,7 +310,7 @@ void InTheLoopTrain::run_netw(cypress::Network &netw)
 			// conn.update_connector(Connector::from_list(conn_list));
 			netw.update_connection(
 			    Connector::from_list(conn_list),
-			    ("dense_ex_" + std::to_string(n_layer - 1)).c_str());
+			    ("dense_" + std::to_string(n_layer - 1)).c_str());
 
 			// Calculate batch accuracy
 			auto labels = mnist_helper::spikes_to_labels(
@@ -337,32 +353,43 @@ void InTheLoopTrain::run_netw(cypress::Network &netw)
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+cypress::Network &InTheLoopTrain2::build_netw(cypress::Network &netw)
+{
+	read_config();
+	m_spmnist = mnist_helper::read_data_to_spike(m_images, true, m_duration,
+	                                             m_max_freq, m_poisson, m_scaled_image);
+	if (m_config_file.find("positive") != m_config_file.end()) {
+		m_positive = m_config_file["positive"].get<bool>();
+	}
+	if (m_config_file.find("norm_rate_hidden") != m_config_file.end()) {
+		m_norm_rate_hidden = m_config_file["norm_rate_hidden"].get<Real>();
+	}
+	if (m_config_file.find("m_norm_rate_last") != m_config_file.end()) {
+		m_norm_rate_last = m_config_file["norm_rate_last"].get<Real>();
+	}
+
+	return netw;
+}
+
 void InTheLoopTrain2::run_netw(cypress::Network &netw)
 {
 	cypress::PowerManagementBackend pwbackend(
 	    cypress::Network::make_backend(m_backend));
 
-	auto kerasdata = mnist_helper::read_network("netw_mini.msgpack", true);
+	auto kerasdata = mnist_helper::read_network(m_dnn_file, true);
 
 	m_batch_data = mnist_helper::create_batches(m_spmnist, m_batchsize,
 	                                            m_duration, m_pause, false);
 	auto source_n = mnist_helper::create_spike_source(netw, m_batch_data[0]);
-	create_deep_network(kerasdata, netw);
+	create_deep_network(kerasdata, netw, m_max_weight);
 	m_label_pops.emplace_back(netw.populations().back());
 
 	for (auto pop : netw.populations()) {
 		pop.signals().record(0);
 	}
 
-	auto all_weights = mnist_helper::all_conns_to_mat(netw);
-	mnist_helper::update_conns_from_mat(all_weights, netw, 1.0, m_max_weight);
-	/*for (size_t j = 0; j < all_weights[0].size(); j++)
-	    std::cout << all_weights[0][j][20] << ", ";
-	std::cout << std::endl << "_________________" << std::endl;
-	for (auto w : all_weights[1][0])
-	    std::cout << w << ", ";
-	std::cout << std::endl;*/
-
+	auto all_weights = all_conns_to_mat(kerasdata);
 	//#if SNAB_DEBUG
 	std::vector<std::vector<Real>> accuracies;
 	size_t counter = 0;
@@ -379,17 +406,17 @@ void InTheLoopTrain2::run_netw(cypress::Network &netw)
 			for (auto &pop : netw.populations()) {
 				if (pop.pid() != netw.populations().back().pid()) {
 					output_rates.emplace_back(mnist_helper::spikes_to_rates(
-					    pop, m_duration, m_pause, m_batchsize, 5));
+					    pop, m_duration, m_pause, m_batchsize, m_norm_rate_hidden));
 				}
 				else {
 					output_rates.emplace_back(mnist_helper::spikes_to_rates(
-					    pop, m_duration, m_pause, m_batchsize, 5));
+					    pop, m_duration, m_pause, m_batchsize, m_norm_rate_last));
 				}
 			}
 
 			mnist_helper::dense_backprop(
 			    output_rates, all_weights, i,
-			    m_config_file["learn_rate"].get<Real>(), 0.0);
+			    m_config_file["learn_rate"].get<Real>(), 0.0, m_positive);
 
 			mnist_helper::update_conns_from_mat(all_weights, netw, 1.0,
 			                                    m_max_weight);

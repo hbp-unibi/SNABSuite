@@ -15,10 +15,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include <cypress/cypress.hpp>
 
 #include <assert.h>
+
 #include <chrono>
 #include <cmath>
 #include <fstream>
@@ -370,13 +370,22 @@ CYPRESS_CONN dense_weights_to_conn(const Json &json, Real scale, Real delay)
 	return conns;
 }
 
+/**
+ * @brief Convert a dense layer to list of Local Connections.
+ *
+ * @param json json matrix of weights
+ * @param scale scale factor for weights
+ * @param delay synaptic delay
+ * @return list of connections
+ */
 std::vector<LocalConnection> dense_weights_to_conn2(const Json &json,
-                                                    Real max_w, Real delay)
+                                                    Real max_w, Real delay,
+                                                    bool random = false)
 {
-	/*int seed = std::chrono::system_clock::now().time_since_epoch().count();
+	int seed = std::chrono::system_clock::now().time_since_epoch().count();
 	auto rng = std::default_random_engine(seed);
 	std::normal_distribution<double> distribution(0.02, 0.03);
-	*/
+
 	std::vector<LocalConnection> conns;
 	Real max = 0.0;
 	if (max_w > 0) {
@@ -387,7 +396,10 @@ std::vector<LocalConnection> dense_weights_to_conn2(const Json &json,
 		for (size_t j = 0; j < json[i].size(); j++) {
 			Real w = json[i][j].get<Real>();
 			w = max ? w * max_w / max : w;
-			// Real w = distribution(rng);  // TODO
+			if (random)
+				w = distribution(rng);
+			if (fabs(w) < 0.0001)
+				continue;
 			conns.emplace_back(LocalConnection(i, j, w, delay));
 		}
 	}
@@ -467,15 +479,12 @@ std::vector<std::vector<Real>> spikes_to_rates(const PopulationBase pop,
 				if (binned_spike_counts[neuron][sample] > max) {
 					max = binned_spike_counts[neuron][sample];
 				}
-
-				res[sample][neuron] =
-				    Real(binned_spike_counts[neuron][sample]) / norm;
 				// TODO?Works
 			}
 			if (max != 0) {
 				for (size_t neuron = 0; neuron < binned_spike_counts.size();
 				     neuron++) {
-					res[sample][neuron] /= Real(max);
+					res[sample][neuron] *= norm / Real(max);
 				}
 			}
 		}
@@ -527,8 +536,8 @@ size_t compare_labels(std::vector<uint16_t> &label, std::vector<uint16_t> &res)
 std::vector<Real> av_pooling_image(std::vector<Real> &image, size_t height,
                                    size_t width, size_t pooling_size)
 {
-	size_t new_h = std::ceil(Real(height) / Real(pooling_size));
-	size_t new_w = std::ceil(Real(width) / Real(pooling_size));
+	size_t new_h = std::floor(Real(height) / Real(pooling_size));
+	size_t new_w = std::floor(Real(width) / Real(pooling_size));
 	std::vector<Real> res(new_h * new_w, 0.0);
 
 	for (size_t h = 0; h < new_h; h++) {
@@ -568,7 +577,7 @@ MNIST_DATA scale_mnist(MNIST_DATA &data)
 	std::get<1>(res) = std::get<1>(data);
 	auto &tar_images = std::get<0>(res);
 	for (auto &image : std::get<0>(data)) {
-		tar_images.emplace_back(av_pooling_image(image, 28, 28, 2));
+		tar_images.emplace_back(av_pooling_image(image, 28, 28, 3));
 	}
 	return res;
 }
@@ -610,11 +619,11 @@ std::vector<std::vector<Real>> calculate_errors(
 	std::vector<std::vector<Real>> res = output_rates;  // Same size vector
 	auto labels = std::get<1>(spmnist);
 
-	if (output_rates.size() != labels.size()) {
+	if (output_rates.size() < labels.size()) {
 		throw std::runtime_error(
-		    "number of of labels is different from number of recalled samples");
+		    "Number of labels is different from number of recalled samples");
 	}
-	for (size_t sample = 0; sample < output_rates.size(); sample++) {
+	for (size_t sample = 0; sample < labels.size(); sample++) {
 		for (size_t neuron = 0; neuron < output_rates[sample].size();
 		     neuron++) {
 			if (labels[sample] == neuron) {
@@ -743,7 +752,7 @@ void update_conns_from_mat(std::vector<std::vector<std::vector<Real>>> &weights,
 	for (size_t i = 0; i < weights.size(); i++) {
 		netw.update_connection(
 		    Connector::from_list(conns_from_mat(weights[i], delay, max_weight)),
-		    ("dense_ex_" + std::to_string(i)).c_str());
+		    ("dense_" + std::to_string(i)).c_str());
 	}
 }
 
@@ -766,7 +775,8 @@ std::vector<Real> weights_mult_delta(std::vector<std::vector<Real>> &weights,
 void dense_backprop(
     const std::vector<std::vector<std::vector<Real>>> &output_rates,
     std::vector<std::vector<std::vector<Real>>> &weights,
-    const MNIST_DATA &spmnist, const Real learning_rate, Real max_w)
+    const MNIST_DATA &spmnist, const Real learning_rate, Real max_w,
+    Real positive)
 {
 
 	size_t num_weight_layers = weights.size();
@@ -818,13 +828,13 @@ void dense_backprop(
 			delta = delta2;
 
 			for (size_t post_neuron = 0;
-			     post_neuron < weight_change.at(post_layer).at(0).size();  // l
+			     post_neuron < weight_change.at(pre_layer).at(0).size();  // l
 			     post_neuron++) {
 				Real multiplier = 1.0;
 				if (output_rates.at(post_layer).at(sample).at(post_neuron) ==
-				    0) {  // Derivative of ReLU
-					// multiplier = 0.1;  //  a bit leaky
-					continue;  // not leaky
+				    0) {                // Derivative of ReLU
+					multiplier = 0.01;  //  a bit leaky
+					                    // continue;  // not leaky//TODO
 				}
 				for (size_t pre_neuron = 0;
 				     pre_neuron < weight_change.at(pre_layer).size();
@@ -858,6 +868,18 @@ void dense_backprop(
 			}
 		}
 	}
+	if (positive) {
+		for (size_t i = 0; i < weights.size(); i++) {
+			for (size_t j = 0; j < weights[i].size(); j++) {
+				for (size_t k = 0; k < weights[i][j].size(); k++) {
+					if (weights[i][j][k] < 0) {
+						weights[i][j][k] = 0;
+					}
+				}
+			}
+		}
+	}
 }
 
 }  // namespace mnist_helper
+

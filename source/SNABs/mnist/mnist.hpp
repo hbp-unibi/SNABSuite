@@ -35,10 +35,10 @@ namespace SNAB {
 class SimpleMnist : public SNABBase {
 public:
 	SimpleMnist(const std::string backend, size_t bench_index);
-	cypress::Network &build_netw(cypress::Network &netw) override;
+	virtual cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
-	std::vector<std::array<cypress::Real, 4>> evaluate() override;
-	std::shared_ptr<SNABBase> clone() override
+	virtual std::vector<std::array<cypress::Real, 4>> evaluate() override;
+	virtual std::shared_ptr<SNABBase> clone() override
 	{
 		return std::make_shared<SimpleMnist>(m_backend, m_bench_index);
 	}
@@ -64,6 +64,9 @@ protected:
 	    m_networks;  // Used for batches not run in parallel
 
 	std::vector<cypress::PopulationBase> m_label_pops;  // vector of label pops
+	
+	std::string m_dnn_file = "";
+    bool m_scaled_image = false;
 
 	/**
 	 * @brief Converts a prepared json to a network
@@ -96,12 +99,9 @@ protected:
 	 * @brief Build the network, maybe scale down image
 	 *
 	 * @param netw cypress network
-	 * @param scale scale down or not
-	 * @param network_path path to network file
 	 * @return the final network
 	 */
-	cypress::Network &build_netw_int(cypress::Network &netw, bool scale,
-	                                 std::string network_path);
+	cypress::Network &build_netw_int(cypress::Network &netw);
 };
 
 class SmallMnist : public SimpleMnist {
@@ -126,10 +126,10 @@ public:
 	{
 	}
 
-	cypress::Network &build_netw(cypress::Network &netw) override;
+	virtual cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 
-	std::shared_ptr<SNABBase> clone() override
+	virtual std::shared_ptr<SNABBase> clone() override
 	{
 		return std::make_shared<InTheLoopTrain>(m_backend, m_bench_index);
 	}
@@ -146,12 +146,16 @@ protected:
 };
 
 class InTheLoopTrain2 : public InTheLoopTrain {
+private:
+    bool m_positive = false;
+    Real m_norm_rate_hidden = 0.0;
+    Real m_norm_rate_last = 0.0;
 public:
 	InTheLoopTrain2(const std::string backend, size_t bench_index)
 	    : InTheLoopTrain(backend, bench_index, __func__)
 	{
 	}
-
+    cypress::Network &build_netw(cypress::Network &netw) override;
 	void run_netw(cypress::Network &netw) override;
 
 	std::shared_ptr<SNABBase> clone() override

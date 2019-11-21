@@ -1705,7 +1705,7 @@ TEST(mnist_helper, dense_backprop)
 	std::get<1>(data) = std::vector<uint16_t>({0, 1, 1});
 	auto weights_bck = weights;
 	Real learn_rate = 0.1;
-	dense_backprop(output_rates, weights, data, learn_rate, 0.0);
+	dense_backprop(output_rates, weights, data, learn_rate, 0.0, false);
 
 	std::vector<std::vector<std::vector<Real>>> weight_chg(
 	    {{{-0.2, -0.3}, {0.7, -1.2}}});
@@ -1729,7 +1729,7 @@ TEST(mnist_helper, dense_backprop)
 	    {{{-0.312, -0.313}, {-0.213, -0.412}},
 	     {{-0.112, -0.513}, {-0.013, -0.612}}});
 
-	dense_backprop(output_rates1, weights1, data, learn_rate, 0.0);
+	dense_backprop(output_rates1, weights1, data, learn_rate, 0.0, false);
 	for (size_t n = 0; n < weights1.size(); n++) {
 		for (size_t i = 0; i < weights1[n].size(); i++) {
 			for (size_t j = 0; j < weights1[n][i].size(); j++) {

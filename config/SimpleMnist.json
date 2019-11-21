@@ -13,14 +13,16 @@
 		"tau_m": 10,
 		"cm": 0.2
 		},
-		"images": 10, 
+		"images": 100, 
 		"batchsize" : 10,
 		"duration" : 100,
 		"max_freq": 47.8,
-		"pause": 20, 
+		"pause": 100, 
 		"poisson" : false,
 		"max_weight" : 0.011,
         "train_data": false,
-        "batch_parallel": true
+        "batch_parallel": true,
+        "dnn_file": "netw_mini.msgpack",
+        "scaled_image": false
     }
 }
