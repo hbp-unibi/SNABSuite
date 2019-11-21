@@ -19,14 +19,28 @@ find_package(PythonLibs 2.7 REQUIRED )
 find_package(PythonInterp 2.7 REQUIRED)
 
 include(ExternalProject)
-ExternalProject_Add(cypress_ext
-    GIT_REPOSITORY        "https://github.com/hbp-unibi/cypress/"
-    GIT_TAG               master
-    UPDATE_COMMAND        git pull
-    CMAKE_ARGS            -DSTATIC_LINKING=${STATIC_LINKING} -DCMAKE_INSTALL_PREFIX:path=<INSTALL_DIR> -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} -DBUILD_TEST_EXAMPLES:BOOL=False
-    INSTALL_COMMAND 	  ""
-    EXCLUDE_FROM_ALL      1
-)
+set(UPDATE_CYPRESS FALSE CACHE BOOL "True for update cypress every time")
+if(UPDATE_CYPRESS)
+    ExternalProject_Add(cypress_ext
+        GIT_REPOSITORY        "https://github.com/hbp-unibi/cypress/"
+        GIT_TAG               genn
+        CMAKE_ARGS            -DSTATIC_LINKING=${STATIC_LINKING} -DCMAKE_INSTALL_PREFIX:path=<INSTALL_DIR> -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} -DBUILD_TEST_EXAMPLES=False
+        INSTALL_COMMAND 	  ""
+        UPDATE_COMMAND git pull
+        EXCLUDE_FROM_ALL      TRUE
+        BUILD_ALWAYS    FALSE
+    )
+else()
+    ExternalProject_Add(cypress_ext
+        GIT_REPOSITORY        "https://github.com/hbp-unibi/cypress/"
+        GIT_TAG               genn
+        CMAKE_ARGS            -DSTATIC_LINKING=${STATIC_LINKING} -DCMAKE_INSTALL_PREFIX:path=<INSTALL_DIR> -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} -DBUILD_TEST_EXAMPLES=False
+        INSTALL_COMMAND 	  ""
+        UPDATE_COMMAND ""
+        EXCLUDE_FROM_ALL      TRUE
+        BUILD_ALWAYS    FALSE
+    )
+endif()
 
 ExternalProject_Get_Property(cypress_ext SOURCE_DIR BINARY_DIR)
 
