@@ -262,7 +262,7 @@ void InTheLoopTrain::run_netw(cypress::Network &netw)
 	                                            m_duration, m_pause, true);
 	auto source_n = mnist_helper::create_spike_source(netw, m_batch_data[0]);
 	auto n_layer = create_deep_network(kerasdata, netw);
-	m_label_pops.emplace_back(netw.populations().back());
+	m_label_pops = {netw.populations().back()};
 
 	auto pre_last_pop = netw.populations()[netw.populations().size() - 2];
 	pre_last_pop.signals().record(0);
@@ -383,7 +383,7 @@ void InTheLoopTrain2::run_netw(cypress::Network &netw)
 	                                            m_duration, m_pause, false);
 	auto source_n = mnist_helper::create_spike_source(netw, m_batch_data[0]);
 	create_deep_network(kerasdata, netw, m_max_weight);
-	m_label_pops.emplace_back(netw.populations().back());
+	m_label_pops = {netw.populations().back()};
 
 	for (auto pop : netw.populations()) {
 		pop.signals().record(0);
@@ -424,8 +424,8 @@ void InTheLoopTrain2::run_netw(cypress::Network &netw)
 			// Calculate batch accuracy
 			auto labels = mnist_helper::spikes_to_labels(
 			    m_label_pops[0], m_duration, m_pause, m_batchsize);
-			auto &orig_labels = std::get<1>(i);
-			auto correct = mnist_helper::compare_labels(orig_labels, labels);
+			//auto &orig_labels = std::get<1>(i);
+			auto correct = mnist_helper::compare_labels(std::get<1>(i), labels);
 			global_logger().debug(
 			    "SNABsuite", "Batch accuracy: " +
 			                     std::to_string(Real(correct) /
@@ -454,11 +454,12 @@ void InTheLoopTrain2::run_netw(cypress::Network &netw)
 	Utilities::write_vector2_to_csv(spikes_pre,
 	                                _debug_filename("spikes_pre.csv"));
 	Utilities::plot_spikes(_debug_filename("spikes_pre.csv"), m_backend);
-#endif
+
 
 	Utilities::write_vector2_to_csv(accuracies,
 	                                _debug_filename("accuracies.csv"));
 	Utilities::plot_1d_curve(_debug_filename("accuracies.csv"), m_backend, 0,
 	                         1);
+#endif
 }
 }  // namespace SNAB
