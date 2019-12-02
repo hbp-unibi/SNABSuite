@@ -83,7 +83,7 @@ cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw)
 	if (m_batch_parallel) {
 		for (auto &i : m_batch_data) {
 			mnist_helper::create_spike_source(netw, i);
-			create_deep_network(kerasdata, netw);
+			create_deep_network(kerasdata, netw, m_max_weight);
 			m_label_pops.emplace_back(netw.populations().back());
 		}
 	}
@@ -91,7 +91,7 @@ cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw)
 		for (auto &i : m_batch_data) {
 			m_networks.push_back(cypress::Network());
 			mnist_helper::create_spike_source(m_networks.back(), i);
-			create_deep_network(kerasdata, m_networks.back());
+			create_deep_network(kerasdata, m_networks.back(), m_max_weight);
 			m_label_pops.emplace_back(m_networks.back().populations().back());
 		}
 	}
@@ -261,7 +261,7 @@ void InTheLoopTrain::run_netw(cypress::Network &netw)
 	m_batch_data = mnist_helper::create_batches(m_spmnist, m_batchsize,
 	                                            m_duration, m_pause, true);
 	auto source_n = mnist_helper::create_spike_source(netw, m_batch_data[0]);
-	auto n_layer = create_deep_network(kerasdata, netw);
+	auto n_layer = create_deep_network(kerasdata, netw, m_max_weight);
 	m_label_pops = {netw.populations().back()};
 
 	auto pre_last_pop = netw.populations()[netw.populations().size() - 2];
