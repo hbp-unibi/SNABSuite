@@ -1,11 +1,9 @@
-language: generic
-python: 2.7.13
-sudo: required
+language: python
+os: linux
+dist: xenial
 matrix:
   include:
-    - os: linux
-      dist: trusty
-      addons:
+    - addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
@@ -29,9 +27,7 @@ matrix:
         - git commit -m "Update to latest SNABSuite master"
         - git push "https://${GITHUB_TOKEN}@${DEPLOY_ADDRESS}" master &>/dev/null
 
-    - os: linux
-      dist: trusty
-      addons:
+    - addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
@@ -43,9 +39,7 @@ matrix:
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 50
         - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 50
 
-    - os: linux
-      dist: trusty
-      addons:
+    - addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
@@ -56,9 +50,7 @@ matrix:
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 50
         - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 50
 
-    - os: linux
-      dist: trusty
-      addons:
+    - addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
@@ -69,13 +61,11 @@ matrix:
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50
         - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
 
-    - os: linux
-      dist: trusty
-      addons:
+    - addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-3.8
+            - llvm-toolchain-xenial-3.8
           packages:
             - g++-6
             - clang-3.8
@@ -84,13 +74,11 @@ matrix:
         export CXX="clang++-3.8" CC="clang-3.8"
         sudo export CXX="clang++-3.8" CC="clang-3.8"
 
-    - os: linux
-      dist: trusty
-      addons:
+    - addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-4.0
+            - llvm-toolchain-xenial-4.0
           packages:
             - g++-6
             - clang-4.0
@@ -99,9 +87,7 @@ matrix:
         export CXX="clang++-4.0" CC="clang-4.0"
         sudo export CXX="clang++-4.0" CC="clang-4.0"
 
-    - os: linux
-      dist: trusty
-      addons:
+    - addons:
         apt:
           packages:
             - doxygen

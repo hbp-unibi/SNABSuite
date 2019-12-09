@@ -15,15 +15,15 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-find_package(PythonLibs 2.7 REQUIRED )
-find_package(PythonInterp 2.7 REQUIRED)
+find_package(PythonLibs 3 REQUIRED )
+find_package(PythonInterp 3 REQUIRED)
 
 include(ExternalProject)
 ExternalProject_Add(cypress_ext
     GIT_REPOSITORY        "https://github.com/hbp-unibi/cypress/"
     GIT_TAG               master
     UPDATE_COMMAND        git pull
-    CMAKE_ARGS            -DSTATIC_LINKING=${STATIC_LINKING} -DCMAKE_INSTALL_PREFIX:path=<INSTALL_DIR> -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} -DBUILD_TEST_EXAMPLES=False
+    CMAKE_ARGS            -DSTATIC_LINKING=${STATIC_LINKING} -DCMAKE_INSTALL_PREFIX:path=<INSTALL_DIR> -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} -DBUILD_TEST_EXAMPLES=False -DBUILD_TEST_EXAMPLES=False -DPYTHON_VERSION_MAJOR=${PYTHON_VERSION_MAJOR}
     INSTALL_COMMAND 	  ""
     EXCLUDE_FROM_ALL      1
 )

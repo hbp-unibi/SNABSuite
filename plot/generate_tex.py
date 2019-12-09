@@ -18,6 +18,9 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
+from __future__ import print_function
+from builtins import str
+from builtins import range
 import json
 import os
 
@@ -195,21 +198,21 @@ if not os.path.exists("tables"):
     os.mkdir("tables")
 
 for snabname in config_array_dict:  # iterate over all SNABs
-    print "Constructing ", snabname +".tex"
+    print("Constructing ", snabname +".tex")
     # Assemble header: Platform, all array names, benchmark indicators
     param_names = gather_array_names(snabname)
     measures = gather_benchmark_measures(snabname)
     texfile = open("tables/" + snabname + ".tex", 'w')
     texfile.write("\\begin{tabular}{r")
-    for i in xrange(0, len(param_names)):
+    for i in range(0, len(param_names)):
         texfile.write(" r")
-    for i in xrange(0, len(measures)):
+    for i in range(0, len(measures)):
         texfile.write(" l")
     texfile.write("}\n\\toprule\n")
     texfile.write("Platform")
-    for i in xrange(0, len(param_names)):
+    for i in range(0, len(param_names)):
         texfile.write(" & " + param_names[i])
-    for i in xrange(0, len(measures)):
+    for i in range(0, len(measures)):
         texfile.write(" & " + measures[i])
 
     texfile.write("\n\\midrule\n")
@@ -218,7 +221,7 @@ for snabname in config_array_dict:  # iterate over all SNABs
     for backend in results_dict:
         texfile.write(backend)
         got_snab = False
-        for k in xrange(0, len(results_dict[backend])):
+        for k in range(0, len(results_dict[backend])):
             write_array_params(texfile, snabname, backend, param_names, str(k))
             got_snab = write_results(texfile, backend, str(
                 k), snabname, measures, got_snab)

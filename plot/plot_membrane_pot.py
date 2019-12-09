@@ -21,6 +21,7 @@
 """
 Plots the membrane voltage, possibility to plot spike times on top of it
 """
+from builtins import range
 import argparse
 
 parser = argparse.ArgumentParser(description='Plot membrane potential graphs')
@@ -114,7 +115,7 @@ ax = fig.add_subplot(111)
 # Read membrane potential
 results = np.genfromtxt(args.file, delimiter=',', names=None)
 data = np.zeros((results.shape[0], len(results[0])))
-for i in xrange(0, len(results)):
+for i in range(0, len(results)):
     data[i] = np.array(list(results[i]))
 
 xs = np.array(data[:, args.tc])
@@ -145,7 +146,7 @@ if args.sp is not None:
     else:
         # Convert data
         spikes = np.zeros((results2.shape[0], len(results2[0])))
-        for i in xrange(0, len(results2)):
+        for i in range(0, len(results2)):
             spikes[i] = np.array(list(results2[i]))
 
         # Plot

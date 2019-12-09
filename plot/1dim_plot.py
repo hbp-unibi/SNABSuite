@@ -20,6 +20,9 @@
 """
 Plots data from one dimensional sweeps
 """
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 import argparse
 
 parser = argparse.ArgumentParser(description='Plot one-dimensional graphs')
@@ -79,8 +82,8 @@ def plot_measure(ax, xs, ys, ys_std, color, simulator, xlabel, ylabel,
 
 
 def normalize(data, norm):
-    for i in xrange(0, len(data)):
-        data[i] = data[i] / norm
+    for i in range(0, len(data)):
+        data[i] = old_div(data[i], norm)
 
 
 def get_max(data):
@@ -99,7 +102,7 @@ for target_file in args.files:
     results = np.genfromtxt(target_file, delimiter=',', names=True)
     keys = results.dtype.names
     data = np.zeros((results.shape[0], len(keys)))
-    for i in xrange(0, len(results)):
+    for i in range(0, len(results)):
         data[i] = np.array(list(results[i]))
 
     xs = np.array(data[:, args.x])

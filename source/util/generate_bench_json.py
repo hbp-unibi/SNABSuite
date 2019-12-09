@@ -21,6 +21,9 @@
 Generate benchmarks.json for the web frontend 
 @author Michael Thies, Christoph Ostrau
 """
+from __future__ import print_function
+from builtins import str
+from builtins import range
 import sys
 import CppHeaderParser
 import re
@@ -100,11 +103,11 @@ for headername in os.listdir("../source/SNABs/"):
 
     #print("CppHeaderParser view of %s"%cppHeader)
 
-    print headername
+    print(headername)
     for classname in cppHeader.classes:
         # Every class represents a SNAB/benchmark
         clazz = cppHeader.classes[classname]
-        print 'class', clazz['name']
+        print('class', clazz['name'])
         comment = ""
         if 'doxygen' in clazz:
             comment = clazz['doxygen']
@@ -132,13 +135,13 @@ for headername in os.listdir("../source/SNABs/"):
         if length == 0:  # Special case, not a scalable benchmark
             length = 1
         set_snab = False  # Is there any viable benchmark
-        for i in xrange(0, length):
+        for i in range(0, length):
             set_task = False  # Is there any viable task
             task_dict = {}
             task_dict["name"] = bench_index[i]
             task_dict["command"] = "benchmark.py {system} "
             task_dict["target"] = []
-            for j in xrange(0, len(simulators)):
+            for j in range(0, len(simulators)):
                 if i < avail_list[j]:
                     task_dict["target"].append(web_simulators[j])
                     set_task = True
@@ -160,8 +163,8 @@ for headername in os.listdir("../source/SNABs/"):
 
         snab_dict["tasks"] = tasks
         global_json.append(snab_dict)
-        print '--------'
-    print '========'
+        print('--------')
+    print('========')
 
 # Dump the global list of benchmark description in pretty
 with open('benchmarks.json', 'w') as file:
