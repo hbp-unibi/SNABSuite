@@ -14,9 +14,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-find_package(PythonLibs 3 REQUIRED )
-find_package(PythonInterp 3 REQUIRED)
+set(PYTHON_VERSION_MAJOR 3 CACHE STRING "Python version to use, e.g. 2/3")
+find_package(PythonInterp ${PYTHON_VERSION_MAJOR} REQUIRED)
+find_package(PythonLibs ${PYTHON_VERSION_MAJOR} REQUIRED )
 
 include(ExternalProject)
 ExternalProject_Add(cypress_ext
