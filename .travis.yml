@@ -14,6 +14,12 @@ matrix:
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 50
         - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 50
         - sudo pip install CppHeaderParser
+      script:
+        - mkdir build && cd build
+        - cmake .. -DSTATIC_LINKING=FALSE -DSNAB_DEBUG=TRUE -DPYTHON_VERSION_MAJOR=2
+        - make && make test ARGS=-V
+        - cmake .. -DSTATIC_LINKING=TRUE -DSNAB_DEBUG=FALSE -DPYTHON_VERSION_MAJOR=2
+        - make && make test ARGS=-V
       after_success:
         - python ../source/util/generate_bench_json.py
         - git clone "https://${GITHUB_TOKEN}@${DEPLOY_ADDRESS}" &>/dev/null
