@@ -12,10 +12,14 @@
 		"#neurons" : [100,1000,10000]
     },
     "nmpm1" : {
-                "setup": {
-                        "synapse_loss" : true
-                },
-                "neuron_type" : "IF_cond_exp",
-                "#neurons" : [15,30,60]
+		"setup": {
+			"synapse_loss" : true,
+            "calib_path": "/wang/data/calibration/brainscales/current",
+            "digital_weight" : true,
+            "wafer": 33,
+            "hicann" : [[372],[372,360], [372,373,375,360,361,362,363]]
+		},
+        "neuron_type" : "IF_cond_exp",
+        "#neurons" : [51,103,357]
     }
 }
