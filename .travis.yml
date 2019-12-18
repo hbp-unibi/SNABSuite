@@ -19,19 +19,6 @@ matrix:
         - make && make test ARGS=-V
         - cmake .. -DSTATIC_LINKING=TRUE -DSNAB_DEBUG=FALSE -DPYTHON_VERSION_MAJOR=2
         - make && make test ARGS=-V
-      after_success:
-        - pip3 install CppHeaderParser
-        - python3 ../source/util/generate_bench_json.py
-        - git clone "https://${GITHUB_TOKEN}@${DEPLOY_ADDRESS}" &>/dev/null
-        - cd SNABSuite_deploy
-        - cp ../benchmark benchmark
-        - cp ../../source/util/benchmark.py benchmark.py
-        - cp ../benchmarks.json benchmarks.json
-        - cp -r ../../config/ ./
-        - cp ../cypress_ext-prefix/src/cypress_ext-build/libBS2CYPRESS.so ./
-        - git add *
-        - git commit -m "Update to latest SNABSuite master"
-        - git push "https://${GITHUB_TOKEN}@${DEPLOY_ADDRESS}" master &>/dev/null
 
     - addons:
         apt:
@@ -66,6 +53,19 @@ matrix:
       before_install: 
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50
         - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
+      after_success:
+        - pip3 install CppHeaderParser
+        - python3 ../source/util/generate_bench_json.py
+        - git clone "https://${GITHUB_TOKEN}@${DEPLOY_ADDRESS}" &>/dev/null
+        - cd SNABSuite_deploy
+        - cp ../benchmark benchmark
+        - cp ../../source/util/benchmark.py benchmark.py
+        - cp ../benchmarks.json benchmarks.json
+        - cp -r ../../config/ ./
+        - cp ../cypress_ext-prefix/src/cypress_ext-build/libBS2CYPRESS.so ./
+        - git add *
+        - git commit -m "Update to latest SNABSuite master"
+        - git push "https://${GITHUB_TOKEN}@${DEPLOY_ADDRESS}" master &>/dev/null
 
     - addons:
         apt:
