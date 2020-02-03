@@ -10,6 +10,21 @@ from keras.models import Sequential, model_from_json
 import json
 import numpy as np 
 
+from keras.constraints import Constraint
+from keras import backend as K
+class WeightClip(Constraint):
+    '''Clips the weights incident to each hidden unit to be inside a range
+    '''
+    def __init__(self, c=2):
+        self.c = c
+
+    def __call__(self, p):
+        return K.clip(p, -self.c, self.c)
+
+    def get_config(self):
+        return {'name': self.__class__.__name__,
+                'c': self.c}
+
 json_file = open(args.a).read()
 model = model_from_json(json_file)
 model.load_weights(args.w)

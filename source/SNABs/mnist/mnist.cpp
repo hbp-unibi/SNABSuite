@@ -16,17 +16,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cypress/cypress.hpp>  // Neural network frontend
-
 #include <cypress/backend/power/power.hpp>
+#include <cypress/cypress.hpp>  // Neural network frontend
 #include <memory>
 #include <random>
 #include <string>
 #include <vector>
 
 #include "common/neuron_parameters.hpp"
-#include "helper_functions.cpp"
 #include "mnist.hpp"
+#include "mnist_mlp.hpp"
 #include "util/spiking_utils.hpp"
 #include "util/utilities.hpp"
 
@@ -66,24 +65,37 @@ void SimpleMnist::read_config()
 	m_max_weight = m_config_file["max_weight"].get<Real>();
 	m_train_data = m_config_file["train_data"].get<bool>();
 	m_batch_parallel = m_config_file["batch_parallel"].get<bool>();
-    m_dnn_file = m_config_file["dnn_file"].get<std::string>();
-    m_scaled_image = m_config_file["scaled_image"].get<bool>();
+	m_dnn_file = m_config_file["dnn_file"].get<std::string>();
+	m_scaled_image = m_config_file["scaled_image"].get<bool>();
 }
 
 cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw)
 {
 	read_config();
-	auto spike_mnist = mnist_helper::read_data_to_spike(
-	    m_images, m_train_data, m_duration, m_max_freq, m_poisson, m_scaled_image);
+	auto kerasdata = mnist_helper::read_network(m_dnn_file, true);
+	m_mlp = std::make_shared<MNIST::MLP<>>(kerasdata, 0, m_batchsize, 0.0);
+	if (m_scaled_image) {
+		m_mlp->scale_down_images();
+	}
+	mnist_helper::SPIKING_MNIST spike_mnist;
+	if (m_train_data) {
+		spike_mnist =
+		    mnist_helper::mnist_to_spike(m_mlp->mnist_train_set(), m_duration,
+		                                 m_max_freq, m_images, m_poisson);
+	}
+	else {
+		spike_mnist =
+		    mnist_helper::mnist_to_spike(m_mlp->mnist_test_set(), m_duration,
+		                                 m_max_freq, m_images, m_poisson);
+	}
 	m_batch_data = mnist_helper::create_batches(spike_mnist, m_batchsize,
 	                                            m_duration, m_pause, false);
 
-	auto kerasdata = mnist_helper::read_network(m_dnn_file, true);
 	m_label_pops.clear();
 	if (m_batch_parallel) {
 		for (auto &i : m_batch_data) {
 			mnist_helper::create_spike_source(netw, i);
-			create_deep_network(kerasdata, netw, m_max_weight);
+			create_deep_network(netw, m_max_weight);
 			m_label_pops.emplace_back(netw.populations().back());
 		}
 	}
@@ -91,9 +103,13 @@ cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw)
 		for (auto &i : m_batch_data) {
 			m_networks.push_back(cypress::Network());
 			mnist_helper::create_spike_source(m_networks.back(), i);
-			create_deep_network(kerasdata, m_networks.back(), m_max_weight);
+			create_deep_network(m_networks.back(), m_max_weight);
 			m_label_pops.emplace_back(m_networks.back().populations().back());
 		}
+	}
+
+	for (auto &pop : m_label_pops) {
+		pop.signals().record(0);
 	}
 
 #if SNAB_DEBUG
@@ -175,225 +191,135 @@ std::vector<std::array<cypress::Real, 4>> SimpleMnist::evaluate()
 		}
 	}
 	return {std::array<cypress::Real, 4>({acc, NaN(), NaN(), NaN()}),
-	        std::array<cypress::Real, 4>(
-	            {sim_time, NaN(), NaN(), NaN()})};  // TODO add up simtimes
+	        std::array<cypress::Real, 4>({sim_time, NaN(), NaN(), NaN()})};
 }
 
-size_t SimpleMnist::create_deep_network(const Json &data, Network &netw,
-                                        Real max_weight)
+size_t SimpleMnist::create_deep_network(Network &netw, Real max_weight)
 {
 	size_t layer_id = netw.populations().size();
 	size_t counter = 0;
-	for (auto &layer : data["netw"]) {
-		if (layer["class_name"].get<std::string>() == "Dense") {
-			size_t size = layer["size"].get<size_t>();
-			auto pop = SpikingUtils::add_population(
-			    m_neuron_type_str, netw, m_neuro_params, size, "spikes");
-
-			/*auto max = mnist_helper::max_weight(layer["weights"]);
-			auto conns = mnist_helper::dense_weights_to_conn(
--			    layer["weights"], m_max_weight / max, 1.0);*/
-			auto conns = mnist_helper::dense_weights_to_conn2(layer["weights"],
-			                                                  max_weight,
-			                                                  1.0);  // TODO
-
-			netw.add_connection(
-			    netw.populations()[layer_id - 1], pop,
-			    Connector::from_list(conns),
-			    ("dense_" + std::to_string(counter)).c_str());
-			/*netw.add_connection(
-			    netw.populations()[layer_id - 1], pop,
-			    Connector::from_list(std::get<1>(conns)),
-			    ("dense_in_" + std::to_string(counter)).c_str());*/
-
-			global_logger().debug("cypress", "Dense layer detected with size " +
-			                                     std::to_string(size));
-			counter++;
+	if (m_weights_scale_factor == 0.0) {
+		if (max_weight > 0) {
+			m_weights_scale_factor = max_weight / m_mlp->max_weight();
 		}
 		else {
-			throw std::runtime_error("Unknown layer type");
+			m_weights_scale_factor = 1.0;
 		}
+	}
+
+	for (const auto &layer : m_mlp->get_weights()) {
+
+		size_t size = layer.cols();
+		auto pop = SpikingUtils::add_population(m_neuron_type_str, netw,
+		                                        m_neuro_params, size, "");
+		auto conns = mnist_helper::dense_weights_to_conn(
+		    layer, m_weights_scale_factor, 1.0);
+		netw.add_connection(netw.populations()[layer_id - 1], pop,
+		                    Connector::from_list(conns),
+		                    ("dense_" + std::to_string(counter)).c_str());
+
+		global_logger().debug("cypress", "Dense layer constructed with size " +
+		                                     std::to_string(size));
+		counter++;
 		layer_id++;
 	}
 	return counter;
 }
 
-
-std::vector<std::vector<std::vector<Real>>> all_conns_to_mat(const Json &data)
-{
-	std::vector<std::vector<std::vector<Real>>> res;
-	for (auto &layer : data["netw"]) {
-		if (layer["class_name"].get<std::string>() == "Dense") {
-            
-            res.push_back(layer["weights"].get<std::vector<std::vector<Real>>>());
-		}
-		else {
-			throw std::runtime_error("Unknown layer type");
-		}
-	}
-	return res;
-}
-
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cypress::Network &SmallMnist::build_netw(cypress::Network &netw)
-{
-	return build_netw_int(netw);
-}
-
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-cypress::Network &InTheLoopTrain::build_netw(cypress::Network &netw)
+cypress::Network &MnistITLLastLayer::build_netw(cypress::Network &netw)
 {
 	read_config();
-	m_spmnist = mnist_helper::read_data_to_spike(m_images, true, m_duration,
-	                                             m_max_freq, m_poisson, m_scaled_image);
-	return netw;
-}
 
-void InTheLoopTrain::run_netw(cypress::Network &netw)
-{
-	cypress::PowerManagementBackend pwbackend(
-	    cypress::Network::make_backend(m_backend));
-
-	auto kerasdata = mnist_helper::read_network(m_dnn_file, true);
-
-	m_batch_data = mnist_helper::create_batches(m_spmnist, m_batchsize,
-	                                            m_duration, m_pause, true);
-	auto source_n = mnist_helper::create_spike_source(netw, m_batch_data[0]);
-	auto n_layer = create_deep_network(kerasdata, netw, m_max_weight);
-	m_label_pops = {netw.populations().back()};
-
-	auto pre_last_pop = netw.populations()[netw.populations().size() - 2];
-	pre_last_pop.signals().record(0);
-	auto conn = netw.connection(
-	    "dense_" +
-	    std::to_string(n_layer - 1));  // last one is just inhibitory, dnn
-	                                   // spikey has no inhibitory connections
-                                        // TODO
-	std::vector<cypress::LocalConnection> conn_list;
-	conn.connect(conn_list);
-	//#if SNAB_DEBUG
-	std::vector<std::vector<Real>> accuracies;
-	size_t counter = 0;
-	//#endif
-	for (size_t train_run = 0; train_run < m_config_file["epochs"];
-	     train_run++) {
-		m_batch_data = mnist_helper::create_batches(m_spmnist, m_batchsize,
-		                                            m_duration, m_pause, true);
-		for (auto &i : m_batch_data) {
-			mnist_helper::update_spike_source(source_n, i);
-			netw.run(pwbackend, m_batchsize * (m_duration + m_pause));
-
-			// std::vector<std::vector<cypress::Real>> spikes;
-			// auto pop = m_label_pops[0];
-			/*for (size_t i = 0; i < pop.size(); i++) {
-			    spikes.push_back(pop[i].signals().data(0));
-			}*/
-			auto errors = mnist_helper::calculate_errors(
-			    mnist_helper::spikes_to_rates(m_label_pops[0], m_duration,
-			                                  m_pause, std::get<1>(i).size(),
-			                                  m_duration),
-			    i);
-
-			/*std::vector<std::vector<cypress::Real>> spikes_pre;
-			for (size_t i = 0; i < pre_last_pop.size(); i++) {
-			    spikes_pre.push_back(pre_last_pop[i].signals().data(0));
-			}*/
-			auto pre_rates = mnist_helper::spikes_to_rates(
-			    pre_last_pop, m_duration, m_pause, m_batchsize,
-			    false);  // TODO norm?
-			mnist_helper::perceptron_rule(
-			    errors, conn_list,
-			    m_config_file["learn_rate"].get<Real>() * m_max_weight,
-			    pre_rates, true, m_max_weight);
-			// conn.update_connector(Connector::from_list(conn_list));
-			netw.update_connection(
-			    Connector::from_list(conn_list),
-			    ("dense_" + std::to_string(n_layer - 1)).c_str());
-
-			// Calculate batch accuracy
-			auto labels = mnist_helper::spikes_to_labels(
-			    m_label_pops[0], m_duration, m_pause, m_batchsize);
-			auto &orig_labels = std::get<1>(i);
-			auto correct = mnist_helper::compare_labels(orig_labels, labels);
-			global_logger().debug(
-			    "SNABsuite", "Batch accuracy: " +
-			                     std::to_string(Real(correct) /
-			                                    Real(std::get<1>(i).size())));
-			//#if SNAB_DEBUG
-			accuracies.emplace_back(
-			    std::vector<Real>{Real(counter) / Real(m_batch_data.size()),
-			                      Real(correct) / Real(std::get<1>(i).size())});
-			counter++;
-			//#endif
-		}
-	}
-	m_batch_data = mnist_helper::create_batches(m_spmnist, m_images, m_duration,
-	                                            m_pause, true);
-	m_batchsize = m_images;
-
-	mnist_helper::update_spike_source(source_n, m_batch_data[0]);
-	netw.run(pwbackend, m_batchsize * (m_duration + m_pause));
-
-#if SNAB_DEBUG
-	std::vector<std::vector<cypress::Real>> spikes_pre;
-	for (size_t i = 0; i < pre_last_pop.size(); i++) {
-		spikes_pre.push_back(pre_last_pop[i].signals().data(0));
-	}
-	Utilities::write_vector2_to_csv(spikes_pre,
-	                                _debug_filename("spikes_pre.csv"));
-	Utilities::plot_spikes(_debug_filename("spikes_pre.csv"), m_backend);
-#endif
-
-	Utilities::write_vector2_to_csv(accuracies,
-	                                _debug_filename("accuracies.csv"));
-	Utilities::plot_1d_curve(_debug_filename("accuracies.csv"), m_backend, 0,
-	                         1);
-}
-
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-cypress::Network &InTheLoopTrain2::build_netw(cypress::Network &netw)
-{
-	read_config();
-	m_spmnist = mnist_helper::read_data_to_spike(m_images, true, m_duration,
-	                                             m_max_freq, m_poisson, m_scaled_image);
 	if (m_config_file.find("positive") != m_config_file.end()) {
 		m_positive = m_config_file["positive"].get<bool>();
 	}
 	if (m_config_file.find("norm_rate_hidden") != m_config_file.end()) {
 		m_norm_rate_hidden = m_config_file["norm_rate_hidden"].get<Real>();
 	}
-	if (m_config_file.find("m_norm_rate_last") != m_config_file.end()) {
+	if (m_config_file.find("norm_rate_last") != m_config_file.end()) {
 		m_norm_rate_last = m_config_file["norm_rate_last"].get<Real>();
 	}
+	if (m_config_file.find("loss_function") != m_config_file.end()) {
+		m_loss_function = m_config_file["loss_function"].get<std::string>();
+	}
+	bool random_init = false;
+	if (m_config_file.find("random_init") != m_config_file.end()) {
+		random_init = m_config_file["random_init"].get<bool>();
+	}
+	if (m_config_file.find("num_test_images") != m_config_file.end()) {
+		m_num_test_images = m_config_file["num_test_images"].get<size_t>();
+	}
+	// TODO ? Required -> constructor
 
+	auto kerasdata = mnist_helper::read_network(m_dnn_file, true);
+	if (m_positive) {
+		if (m_loss_function == "CatHinge")
+			m_mlp = std::make_shared<MNIST::MLP<MNIST::CatHinge, MNIST::ReLU,
+			                                    MNIST::PositiveWeights>>(
+			    kerasdata, m_config_file["epochs"].get<size_t>(), m_batchsize,
+			    m_config_file["learn_rate"].get<Real>(), random_init);
+		else if (m_loss_function == "MSE")
+			m_mlp = std::make_shared<
+			    MNIST::MLP<MNIST::MSE, MNIST::ReLU, MNIST::PositiveWeights>>(
+			    kerasdata, m_config_file["epochs"].get<size_t>(), m_batchsize,
+			    m_config_file["learn_rate"].get<Real>(), random_init);
+		else {
+			throw std::runtime_error("Unknown loss function " +
+			                         m_loss_function);
+		}
+	}
+	else {
+		if (m_loss_function == "CatHinge")
+			m_mlp = std::make_shared<
+			    MNIST::MLP<MNIST::CatHinge, MNIST::ReLU, MNIST::NoConstraint>>(
+			    kerasdata, m_config_file["epochs"].get<size_t>(), m_batchsize,
+			    m_config_file["learn_rate"].get<Real>(), random_init);
+		else if (m_loss_function == "MSE")
+			m_mlp = std::make_shared<
+			    MNIST::MLP<MNIST::MSE, MNIST::ReLU, MNIST::NoConstraint>>(
+			    kerasdata, m_config_file["epochs"].get<size_t>(), m_batchsize,
+			    m_config_file["learn_rate"].get<Real>(), random_init);
+		else {
+			throw std::runtime_error("Unknown loss function " +
+			                         m_loss_function);
+		}
+	}
+
+	if (m_scaled_image) {
+		m_mlp->scale_down_images();
+	}
+	m_spmnist = mnist_helper::mnist_to_spike(
+	    m_mlp->mnist_train_set(), m_duration, m_max_freq, m_images, m_poisson);
 	return netw;
 }
 
-void InTheLoopTrain2::run_netw(cypress::Network &netw)
+void MnistITLLastLayer::run_netw(cypress::Network &netw)
 {
 	cypress::PowerManagementBackend pwbackend(
 	    cypress::Network::make_backend(m_backend));
 
-	auto kerasdata = mnist_helper::read_network(m_dnn_file, true);
+	auto source_n = netw.create_population<SpikeSourceArray>(
+	    m_mlp->get_layer_sizes()[0], SpikeSourceArrayParameters(),
+	    SpikeSourceArraySignals(), "input_layer");
 
-	m_batch_data = mnist_helper::create_batches(m_spmnist, m_batchsize,
-	                                            m_duration, m_pause, false);
-	auto source_n = mnist_helper::create_spike_source(netw, m_batch_data[0]);
-	create_deep_network(kerasdata, netw, m_max_weight);
+	create_deep_network(netw, m_max_weight);
 	m_label_pops = {netw.populations().back()};
 
-	for (auto pop : netw.populations()) {
-		pop.signals().record(0);
+	auto pre_last_pop = netw.populations()[netw.populations().size() - 2];
+	if (m_last_layer_only) {
+		m_label_pops[0].signals().record(0);
+		pre_last_pop.signals().record(0);
+	}
+	else {
+		for (auto pop : netw.populations()) {
+			pop.signals().record(0);
+		}
 	}
 
-	auto all_weights = all_conns_to_mat(kerasdata);
-	//#if SNAB_DEBUG
 	std::vector<std::vector<Real>> accuracies;
 	size_t counter = 0;
-	//#endif
 	for (size_t train_run = 0; train_run < m_config_file["epochs"];
 	     train_run++) {
 		m_batch_data = mnist_helper::create_batches(m_spmnist, m_batchsize,
@@ -404,49 +330,72 @@ void InTheLoopTrain2::run_netw(cypress::Network &netw)
 
 			std::vector<std::vector<std::vector<Real>>> output_rates;
 			for (auto &pop : netw.populations()) {
-				if (pop.pid() != netw.populations().back().pid()) {
-					output_rates.emplace_back(mnist_helper::spikes_to_rates(
-					    pop, m_duration, m_pause, m_batchsize, m_norm_rate_hidden));
+				if (pop.signals().is_recording(0)) {
+					if (pop.pid() != netw.populations().back().pid()) {
+						output_rates.emplace_back(mnist_helper::spikes_to_rates(
+						    pop, m_duration, m_pause, m_batchsize,
+						    m_norm_rate_hidden));
+					}
+					else {
+						output_rates.emplace_back(mnist_helper::spikes_to_rates(
+						    pop, m_duration, m_pause, m_batchsize,
+						    m_norm_rate_last));
+					}
 				}
 				else {
-					output_rates.emplace_back(mnist_helper::spikes_to_rates(
-					    pop, m_duration, m_pause, m_batchsize, m_norm_rate_last));
+					output_rates.emplace_back(std::vector<std::vector<Real>>());
 				}
 			}
+			m_mlp->backward_path_2(std::get<1>(i), output_rates,
+			                       m_last_layer_only);
 
-			mnist_helper::dense_backprop(
-			    output_rates, all_weights, i,
-			    m_config_file["learn_rate"].get<Real>(), 0.0, m_positive);
-
-			mnist_helper::update_conns_from_mat(all_weights, netw, 1.0,
-			                                    m_max_weight);
+			mnist_helper::update_conns_from_mat(m_mlp->get_weights(), netw, 1.0,
+			                                    m_weights_scale_factor);
 
 			// Calculate batch accuracy
 			auto labels = mnist_helper::spikes_to_labels(
 			    m_label_pops[0], m_duration, m_pause, m_batchsize);
-			//auto &orig_labels = std::get<1>(i);
-			auto correct = mnist_helper::compare_labels(std::get<1>(i), labels);
+			m_global_correct =
+			    mnist_helper::compare_labels(std::get<1>(i), labels);
+			m_num_images = std::get<1>(i).size();
+			m_sim_time = netw.runtime().sim;
 			global_logger().debug(
-			    "SNABsuite", "Batch accuracy: " +
-			                     std::to_string(Real(correct) /
-			                                    Real(std::get<1>(i).size())));
-			//#if SNAB_DEBUG
+			    "SNABsuite",
+			    "Batch accuracy: " + std::to_string(Real(m_global_correct) /
+			                                        Real(m_num_images)));
+
 			accuracies.emplace_back(
 			    std::vector<Real>{Real(counter) / Real(m_batch_data.size()),
-			                      Real(correct) / Real(std::get<1>(i).size())});
+			                      Real(m_global_correct) / Real(m_num_images)});
 			counter++;
-			//#endif
 		}
 	}
-	m_batch_data = mnist_helper::create_batches(m_spmnist, m_images, m_duration,
-	                                            m_pause, true);
-	m_batchsize = m_images;
 
-	mnist_helper::update_spike_source(source_n, m_batch_data[0]);
-	netw.run(pwbackend, m_batchsize * (m_duration + m_pause));
+	if (m_train_data == false) {
+		m_global_correct = 0;
+		m_num_images = 0;
+		m_sim_time = 0.0;
+		auto test_data = mnist_helper::mnist_to_spike(
+		    m_mlp->mnist_test_set(), m_duration, m_max_freq, m_num_test_images,
+		    m_poisson);
+		m_batch_data = mnist_helper::create_batches(test_data, m_batchsize,
+		                                            m_duration, m_pause, true);
+		for (auto &i : m_batch_data) {
+			mnist_helper::update_spike_source(source_n, i);
+			netw.run(pwbackend, m_batchsize * (m_duration + m_pause));
+
+			auto pop = m_label_pops[0];
+			auto labels = mnist_helper::spikes_to_labels(pop, m_duration,
+			                                             m_pause, m_batchsize);
+			auto &orig_labels = std::get<1>(i);
+			auto correct = mnist_helper::compare_labels(orig_labels, labels);
+			m_global_correct += correct;
+			m_num_images += orig_labels.size();
+			m_sim_time += netw.runtime().sim;
+		}
+	}
 
 #if SNAB_DEBUG
-	auto pre_last_pop = netw.populations()[netw.populations().size() - 2];
 	std::vector<std::vector<cypress::Real>> spikes_pre;
 	for (size_t i = 0; i < pre_last_pop.size(); i++) {
 		spikes_pre.push_back(pre_last_pop[i].signals().data(0));
@@ -454,12 +403,18 @@ void InTheLoopTrain2::run_netw(cypress::Network &netw)
 	Utilities::write_vector2_to_csv(spikes_pre,
 	                                _debug_filename("spikes_pre.csv"));
 	Utilities::plot_spikes(_debug_filename("spikes_pre.csv"), m_backend);
-
+#endif
 
 	Utilities::write_vector2_to_csv(accuracies,
 	                                _debug_filename("accuracies.csv"));
 	Utilities::plot_1d_curve(_debug_filename("accuracies.csv"), m_backend, 0,
 	                         1);
-#endif
+}
+
+std::vector<std::array<cypress::Real, 4>> MnistITLLastLayer::evaluate()
+{
+	Real acc = Real(m_global_correct) / Real(m_num_images);
+	return {std::array<cypress::Real, 4>({acc, NaN(), NaN(), NaN()}),
+	        std::array<cypress::Real, 4>({m_sim_time, NaN(), NaN(), NaN()})};
 }
 }  // namespace SNAB

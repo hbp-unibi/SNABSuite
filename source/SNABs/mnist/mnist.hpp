@@ -25,6 +25,7 @@
 
 #include "common/neuron_parameters.hpp"
 #include "common/snab_base.hpp"
+#include "mnist_mlp.hpp"
 
 namespace SNAB {
 
@@ -36,7 +37,7 @@ class SimpleMnist : public SNABBase {
 public:
 	SimpleMnist(const std::string backend, size_t bench_index);
 	virtual cypress::Network &build_netw(cypress::Network &netw) override;
-	void run_netw(cypress::Network &netw) override;
+	virtual void run_netw(cypress::Network &netw) override;
 	virtual std::vector<std::array<cypress::Real, 4>> evaluate() override;
 	virtual std::shared_ptr<SNABBase> clone() override
 	{
@@ -67,6 +68,9 @@ protected:
 	
 	std::string m_dnn_file = "";
     bool m_scaled_image = false;
+    std::shared_ptr<MNIST::MLPBase> m_mlp;
+    
+    Real m_weights_scale_factor = 0.0;
 
 	/**
 	 * @brief Converts a prepared json to a network
@@ -76,8 +80,7 @@ protected:
 	 * @param netw network object in which the deep network will be created
 	 * @return number of layers
 	 */
-	size_t create_deep_network(const cypress::Json &data,
-	                           cypress::Network &netw, Real max_weight = 0.0);
+	size_t create_deep_network(cypress::Network &netw, Real max_weight = 0.0);
 
 	/**
 	 * @brief Constructor used by deriving classes
@@ -111,7 +114,7 @@ public:
 	{
 	}
 
-	cypress::Network &build_netw(cypress::Network &netw) override;
+	//cypress::Network &build_netw(cypress::Network &netw) override;
 
 	std::shared_ptr<SNABBase> clone() override
 	{
@@ -119,23 +122,24 @@ public:
 	}
 };
 
-class InTheLoopTrain : public SimpleMnist {
+class MnistITLLastLayer : public SimpleMnist {
 public:
-	InTheLoopTrain(const std::string backend, size_t bench_index)
+	MnistITLLastLayer(const std::string backend, size_t bench_index)
 	    : SimpleMnist(backend, bench_index, __func__)
 	{
 	}
 
 	virtual cypress::Network &build_netw(cypress::Network &netw) override;
-	void run_netw(cypress::Network &netw) override;
+	virtual void run_netw(cypress::Network &netw) override;
+	virtual std::vector<std::array<cypress::Real, 4>> evaluate() override;
 
 	virtual std::shared_ptr<SNABBase> clone() override
 	{
-		return std::make_shared<InTheLoopTrain>(m_backend, m_bench_index);
+		return std::make_shared<MnistITLLastLayer>(m_backend, m_bench_index);
 	}
 
 protected:
-	InTheLoopTrain(const std::string backend, size_t bench_index,
+	MnistITLLastLayer(const std::string backend, size_t bench_index,
 	               std::string name)
 	    : SimpleMnist(backend, bench_index, name)
 	{
@@ -143,24 +147,29 @@ protected:
 	std::pair<std::vector<std::vector<std::vector<Real>>>,
 	          std::vector<uint16_t>>
 	    m_spmnist;
-};
-
-class InTheLoopTrain2 : public InTheLoopTrain {
-private:
+        
     bool m_positive = false;
     Real m_norm_rate_hidden = 0.0;
     Real m_norm_rate_last = 0.0;
-public:
-	InTheLoopTrain2(const std::string backend, size_t bench_index)
-	    : InTheLoopTrain(backend, bench_index, __func__)
-	{
-	}
-    cypress::Network &build_netw(cypress::Network &netw) override;
-	void run_netw(cypress::Network &netw) override;
+    size_t m_global_correct = 0;
+	size_t m_num_images = 0;
+    Real m_sim_time = 0;
+    std::string m_loss_function = "CatHinge";
+    bool m_last_layer_only = true;
+    size_t m_num_test_images = 10000;
+};
 
+class MnistITL : public MnistITLLastLayer {
+private:
+public:
+	MnistITL(const std::string backend, size_t bench_index)
+	    : MnistITLLastLayer(backend, bench_index, __func__)
+	{
+        m_last_layer_only = false;
+	}
 	std::shared_ptr<SNABBase> clone() override
 	{
-		return std::make_shared<InTheLoopTrain2>(m_backend, m_bench_index);
+		return std::make_shared<MnistITL>(m_backend, m_bench_index);
 	}
 };
 

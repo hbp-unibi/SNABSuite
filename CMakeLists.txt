@@ -24,7 +24,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
 # Add configuration option for static linking 
 set(STATIC_LINKING TRUE CACHE BOOL "True for static linking")
 
-find_package(PythonLibs 2.7 REQUIRED )
+find_package(PythonLibs 3 REQUIRED )
 
 # Link statically
 if(STATIC_LINKING)
@@ -94,6 +94,8 @@ add_library(benchmark_library
     source/SNABs/setup_time
     source/SNABs/wta_like
     source/SNABs/mnist/mnist
+    source/SNABs/mnist/helper_functions
+    source/SNABs/mnist/mnist_mlp
 )
 target_link_libraries(benchmark_library
     ${CYPRESS_LIBRARY}
@@ -117,6 +119,15 @@ add_dependencies(sweep cypress_ext)
 target_link_libraries(sweep
     benchmark_library
 )
+
+# add_executable(mlp
+#     source/SNABs/mnist/mnist_mlp.cpp
+# )
+# add_dependencies(mlp cypress_ext)
+# 
+# target_link_libraries(mlp
+#     benchmark_library
+# )
 
 #
 # Copy Matplotlibrc to build directory

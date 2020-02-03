@@ -18,7 +18,8 @@
 
 #include <cypress/cypress.hpp>
 
-#include "SNABs/mnist/helper_functions.cpp"
+//#include "SNABs/mnist/helper_functions.cpp"
+#include "SNABs/mnist/mnist_mlp.hpp"
 #include "gtest/gtest.h"
 
 namespace mnist_helper {
@@ -1630,7 +1631,10 @@ TEST(mnist_helper, image_to_rate)
 	Real duration = 100.0;
 	Real max_freq = 10000.0;
 	auto mnist = std::get<0>(loadMnistData(500, "../t10k"));
-	auto spiking_mnist = image_to_rate(mnist, duration, max_freq, false);
+	auto spiking_mnist =
+	    image_to_rate(mnist, duration, max_freq, mnist.size(), false);
+	EXPECT_EQ(mnist.size(), spiking_mnist.size());
+	EXPECT_EQ(mnist[0].size(), spiking_mnist[0].size());
 	for (size_t image = 0; image < mnist.size(); image++) {
 		for (size_t pixel = 0; pixel < mnist[image].size(); pixel++) {
 			EXPECT_NEAR(Real(spiking_mnist[image][pixel].size()) /
@@ -1645,7 +1649,8 @@ TEST(mnist_helper, create_batch)
 	Real duration = 100.0;
 	Real max_freq = 10000.0;
 	auto mnist_data = loadMnistData(10, "../train");
-	auto spiking_mnist = mnist_to_spike(mnist_data, duration, max_freq, false);
+	auto spiking_mnist =
+	    mnist_to_spike(mnist_data, duration, max_freq, 10, false);
 	auto spiking_batch =
 	    create_batches(spiking_mnist, 10, duration, 10.0, false);
 
@@ -1695,50 +1700,127 @@ TEST(mnist_helper, compare_labels)
 	EXPECT_EQ(compare_labels(label1, label2), size_t(4));
 }
 
-TEST(mnist_helper, dense_backprop)
+using MLP = MNIST::MLP<MNIST::MSE, MNIST::ReLU>;
+TEST(MLP, mat_X_vec)
 {
-	std::vector<std::vector<std::vector<Real>>> weights(
-	    {{{0.3, 0.2}, {0.2, 0.3}}});
-	std::vector<std::vector<std::vector<Real>>> output_rates(
-	    {{{1, 0}, {0, 1}, {1, 1}}, {{0.3, 0.2}, {0.2, 0.3}, {0.5, 0.5}}});
-	MNIST_DATA data;
-	std::get<1>(data) = std::vector<uint16_t>({0, 1, 1});
-	auto weights_bck = weights;
-	Real learn_rate = 0.1;
-	dense_backprop(output_rates, weights, data, learn_rate, 0.0, false);
+	Matrix<Real> mat(2, 3);
+	mat(0, 0) = 1;
+	mat(0, 1) = 2;
+	mat(0, 2) = 3;
+	mat(1, 0) = 4;
+	mat(1, 1) = 5;
+	mat(1, 2) = 6;
+	std::vector<Real> vec({1, 2, 3});
+	auto test = MLP::mat_X_vec(mat, vec);
+	EXPECT_EQ(test.size(), size_t(2));
+	EXPECT_FLOAT_EQ(test[0], 14);
+	EXPECT_FLOAT_EQ(test[1], 32);
+	vec = {1, 2};
 
-	std::vector<std::vector<std::vector<Real>>> weight_chg(
-	    {{{-0.2, -0.3}, {0.7, -1.2}}});
-	for (size_t i = 0; i < weights[0].size(); i++) {
-		for (size_t j = 0; j < weights[0][i].size(); j++) {
-			EXPECT_FLOAT_EQ(
-			    weights[0][i][j],
-			    weights_bck[0][i][j] - weight_chg[0][i][j] * learn_rate / 3.0);
-		}
-	}
+#ifndef NDEBUG
+	ASSERT_DEATH(MLP::mat_X_vec(mat, vec), "");
+#endif
+}
 
-	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	std::vector<std::vector<std::vector<Real>>> weights1(
-	    {{{0.3, 0.2}, {0.2, 0.3}}, {{0.3, 0.2}, {0.2, 0.3}}});
-	std::vector<std::vector<std::vector<Real>>> output_rates1(
-	    {{{1, 0}, {0, 1}, {1, 1}},
-	     {{0.3, 0.2}, {0.2, 0.3}, {0.5, 0.5}},
-	     {{0.13, 0.12}, {0.12, 0.13}, {0.25, 0.25}}});
-	weights_bck = weights1;
-	std::vector<std::vector<std::vector<Real>>> weights1_chg(
-	    {{{-0.312, -0.313}, {-0.213, -0.412}},
-	     {{-0.112, -0.513}, {-0.013, -0.612}}});
+TEST(MLP, mat_trans_X_vec)
+{
+	Matrix<Real> mat(2, 3);
+	mat(0, 0) = 1;
+	mat(0, 1) = 2;
+	mat(0, 2) = 3;
+	mat(1, 0) = 4;
+	mat(1, 1) = 5;
+	mat(1, 2) = 6;
+	std::vector<Real> vec({1, 2});
+	auto test = MLP::mat_trans_X_vec(mat, vec);
+	EXPECT_EQ(test.size(), size_t(3));
+	EXPECT_FLOAT_EQ(test[0], 9);
+	EXPECT_FLOAT_EQ(test[1], 12);
+	EXPECT_FLOAT_EQ(test[2], 15);
+	vec = {1, 2, 3};
 
-	dense_backprop(output_rates1, weights1, data, learn_rate, 0.0, false);
-	for (size_t n = 0; n < weights1.size(); n++) {
-		for (size_t i = 0; i < weights1[n].size(); i++) {
-			for (size_t j = 0; j < weights1[n][i].size(); j++) {
-				EXPECT_FLOAT_EQ(weights1[n][i][j],
-				                weights_bck[n][i][j] -
-				                    weights1_chg[n][i][j] * learn_rate / 3.0);
-			}
-		}
-	}
+#ifndef NDEBUG
+	ASSERT_DEATH(MLP::mat_trans_X_vec(mat, vec), "");
+#endif
+}
+
+TEST(MLP, vec_X_vec_comp)
+{
+	std::vector<Real> vec({1, 2});
+	std::vector<Real> vec2({
+	    1,
+	    2,
+	});
+	auto test = MLP::vec_X_vec_comp(vec, vec2);
+	EXPECT_EQ(test.size(), size_t(2));
+	EXPECT_FLOAT_EQ(test[0], 1);
+	EXPECT_FLOAT_EQ(test[1], 4);
+	test = MLP::vec_X_vec_comp(vec2, vec);
+	EXPECT_EQ(test.size(), size_t(2));
+	EXPECT_FLOAT_EQ(test[0], 1);
+	EXPECT_FLOAT_EQ(test[1], 4);
+	vec = {1, 2, 3};
+
+#ifndef NDEBUG
+	ASSERT_DEATH(MLP::vec_X_vec_comp(vec2, vec), "");
+#endif
+}
+
+TEST(MLP, calc_error)
+{
+	std::vector<Real> vec({0.3, 0.8, 0.0});
+	auto test = MNIST::MSE::calc_error(1, vec);
+	EXPECT_EQ(test.size(), size_t(3));
+	EXPECT_FLOAT_EQ(test[0], 0.3);
+	EXPECT_FLOAT_EQ(test[1], -0.2);
+	EXPECT_FLOAT_EQ(test[2], 0.0);
+
+	test = MNIST::MSE::calc_error(2, vec);
+	EXPECT_EQ(test.size(), size_t(3));
+	EXPECT_FLOAT_EQ(test[0], 0.3);
+	EXPECT_FLOAT_EQ(test[1], 0.8);
+	EXPECT_FLOAT_EQ(test[2], -1.0);
+}
+
+TEST(MLP, correct)
+{
+	std::vector<Real> vec({0.3, 0.8, 0.0});
+	MLP mlp({1, 1});
+	EXPECT_FALSE(mlp.correct(0, vec));
+	EXPECT_TRUE(mlp.correct(1, vec));
+	EXPECT_FALSE(mlp.correct(2, vec));
+}
+
+TEST(MLP, ReLU)
+{
+	std::vector<Real> vec({-0.3, 0.8, 0.0});
+	auto test = MNIST::ReLU::function(vec);
+	EXPECT_FLOAT_EQ(test[0], 0.0);
+	EXPECT_FLOAT_EQ(test[1], 0.8);
+	EXPECT_FLOAT_EQ(test[2], 0.0);
+}
+
+TEST(MLP, ReLU_dev)
+{
+	std::vector<Real> vec({-0.3, 0.8, 0.0});
+	auto test = MNIST::ReLU::derivative(vec);
+	EXPECT_FLOAT_EQ(test[0], 0.0);
+	EXPECT_FLOAT_EQ(test[1], 1.0);
+	EXPECT_FLOAT_EQ(test[2], 1.0);
+}
+
+TEST(MLP, train)
+{
+	MNIST::MLP<MNIST::CatHinge, MNIST::ReLU, MNIST::PositiveWeights> mlp(
+	    {81, 100, 10}, 2, 128, 0.01);
+	mlp.scale_down_images();
+	mlp.train();
+	EXPECT_TRUE(mlp.forward_path_test() > 0.5);
+
+	MNIST::MLP<MNIST::MSE, MNIST::ReLU> mlp2({81, 100, 10}, 2, 128, 0.01);
+	mlp2.scale_down_images();
+	mlp2.train();
+	EXPECT_TRUE(mlp2.forward_path_test() > 0.5);
 }
 
 }  // namespace mnist_helper
