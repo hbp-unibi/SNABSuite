@@ -636,6 +636,7 @@ public:
 					           m_batchsize, learn_rate);
 				}
 			}
+			Constraint::constrain_weights(m_layers);
 		}
 	}
 	/**
@@ -678,6 +679,7 @@ public:
 					           learn_rate);
 				}
 			}
+			Constraint::constrain_weights(m_layers);
 		}
 	}
 
