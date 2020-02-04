@@ -39,15 +39,15 @@
             "calibIcb": false
 		},
 		"images": 10000, 
-		"batchsize" : 100,
-		"duration" : 500,
-		"max_freq": 60.0,
+		"batchsize" : 10000,
+		"duration" : 300,
+		"max_freq": 70.0,
 		"pause": 50, 
 		"poisson" : false,
-		"max_weight" : 0.006,
+		"max_weight" : 0.011,
         "train_data": false,
         "batch_parallel": false,
-        "dnn_file": "netw_spikey_std_dev.msgpack",
+        "dnn_file": "netw_spikey.msgpack",
         "scaled_image": true
     }
 }
