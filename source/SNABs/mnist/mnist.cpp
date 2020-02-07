@@ -257,12 +257,12 @@ cypress::Network &MnistITLLastLayer::build_netw(cypress::Network &netw)
 	if (m_positive) {
 		if (m_loss_function == "CatHinge")
 			m_mlp = std::make_shared<MNIST::MLP<MNIST::CatHinge, MNIST::ReLU,
-			                                    MNIST::PositiveWeights>>(
+			                                    MNIST::PositiveLimitedWeights>>(
 			    kerasdata, m_config_file["epochs"].get<size_t>(), m_batchsize,
 			    m_config_file["learn_rate"].get<Real>(), random_init);
 		else if (m_loss_function == "MSE")
-			m_mlp = std::make_shared<
-			    MNIST::MLP<MNIST::MSE, MNIST::ReLU, MNIST::PositiveWeights>>(
+			m_mlp = std::make_shared<MNIST::MLP<MNIST::MSE, MNIST::ReLU,
+			                                    MNIST::PositiveLimitedWeights>>(
 			    kerasdata, m_config_file["epochs"].get<size_t>(), m_batchsize,
 			    m_config_file["learn_rate"].get<Real>(), random_init);
 		else {

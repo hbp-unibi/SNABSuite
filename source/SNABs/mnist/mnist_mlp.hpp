@@ -137,6 +137,8 @@ public:
 	static inline void constrain_weights(std::vector<cypress::Matrix<Real>> &)
 	{
 	}
+
+	void setup(std::vector<cypress::Matrix<Real>> &) {}
 };
 
 /**
@@ -145,13 +147,41 @@ public:
  */
 class PositiveWeights {
 public:
-	static inline void constrain_weights(
-	    std::vector<cypress::Matrix<Real>> &layers)
+	void setup(std::vector<cypress::Matrix<Real>> &) {}
+	inline void constrain_weights(std::vector<cypress::Matrix<Real>> &layers)
 	{
 		for (auto &i : layers) {
 			for (auto &j : i) {
 				if (j < 0.0) {
 					j = 0.0;
+				}
+			}
+		}
+	}
+};
+
+class PositiveLimitedWeights {
+public:
+	Real m_max = 0.0;
+
+	void setup(std::vector<cypress::Matrix<Real>> &layers)
+	{
+		for (auto &layer : layers) {
+			auto w = mnist_helper::max_weight(layer);
+			if (w > m_max)
+				m_max = w;
+		}
+	}
+
+	inline void constrain_weights(std::vector<cypress::Matrix<Real>> &layers)
+	{
+		for (auto &i : layers) {
+			for (auto &j : i) {
+				if (j < 0.0) {
+					j = 0.0;
+				}
+				if (j > m_max) {
+					j = m_max;
 				}
 			}
 		}
@@ -197,7 +227,7 @@ public:
 };
 
 /**
- * @brief The standard densly connected multilayer Perceptron.
+ * @brief The standard densely connected multilayer Perceptron.
  * Template arguments provide the loss function, the activation function of
  * neurons (experimental) and a possible constraint for the weights
  *
@@ -220,6 +250,8 @@ private:
 		m_mnist_test = mnist_helper::loadMnistData(10000, path + "t10k");
 	}
 
+	Constraint m_constraint;
+
 public:
 	/**
 	 * @brief Constructor for random init
@@ -229,6 +261,8 @@ public:
 	 * @param epochs number of epochs to train
 	 * @param batchsize mini batchsize before updating the weights
 	 * @param learn_rate gradients are multiplied with this rate
+	 * @param constrain constrains the weights during training, defaults to no
+	 * constraint
 	 */
 	MLP(std::vector<size_t> layer_sizes, size_t epochs = 20,
 	    size_t batchsize = 100, Real learn_rate = 0.01)
@@ -267,6 +301,7 @@ public:
 		catch (...) {
 			load_data("../");
 		}
+		m_constraint.setup(m_layers);
 	}
 
 	/**
@@ -278,10 +313,16 @@ public:
 	 * @param batchsize mini batchsize before updating the weights
 	 * @param learn_rate gradients are multiplied with this rate
 	 * @param random Use structure from Json, initialize weights random if true
+	 * @param constrain constrains the weights during training, defaults to no
+	 * constraint
 	 */
 	MLP(Json &data, size_t epochs = 20, size_t batchsize = 100,
-	    Real learn_rate = 0.01, bool random = false)
-	    : m_epochs(epochs), m_batchsize(batchsize), learn_rate(learn_rate)
+	    Real learn_rate = 0.01, bool random = false,
+	    Constraint constraint = Constraint())
+	    : m_epochs(epochs),
+	      m_batchsize(batchsize),
+	      learn_rate(learn_rate),
+	      m_constraint(constraint)
 	{
 		int seed = std::chrono::system_clock::now().time_since_epoch().count();
 		auto rng = std::default_random_engine(seed);
@@ -319,6 +360,7 @@ public:
 
 		m_mnist = mnist_helper::loadMnistData(60000, "train");
 		m_mnist_test = mnist_helper::loadMnistData(10000, "t10k");
+		m_constraint.setup(m_layers);
 	}
 
 	/**
@@ -636,8 +678,8 @@ public:
 					           m_batchsize, learn_rate);
 				}
 			}
-			Constraint::constrain_weights(m_layers);
 		}
+		m_constraint.constrain_weights(m_layers);
 	}
 	/**
 	 * @brief Implementation of backprop, adapted for usage in SNNs
@@ -679,7 +721,7 @@ public:
 					           learn_rate);
 				}
 			}
-			Constraint::constrain_weights(m_layers);
+			m_constraint.constrain_weights(m_layers);
 		}
 	}
 
@@ -722,7 +764,7 @@ public:
 	void train(unsigned seed = 0) override
 	{
 		std::vector<size_t> indices(std::get<0>(m_mnist).size());
-		Constraint::constrain_weights(m_layers);
+		m_constraint.constrain_weights(m_layers);
 		for (size_t i = 0; i < indices.size(); i++) {
 			indices[i] = i;
 		}
@@ -740,7 +782,7 @@ public:
 				auto activations = forward_path(indices, current_idx);
 				correct += accuracy(activations, indices, current_idx);
 				backward_path(indices, current_idx, activations);
-				Constraint::constrain_weights(m_layers);
+				m_constraint.constrain_weights(m_layers);
 			}
 			cypress::global_logger().info(
 			    "MLP", "Accuracy of epoch " + std::to_string(epoch) + ": " +
