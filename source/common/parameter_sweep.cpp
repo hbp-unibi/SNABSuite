@@ -233,6 +233,9 @@ ParameterSweep::ParameterSweep(std::string backend, cypress::Json &config,
 			m_snab = i;
 		}
 	};
+	if (!m_snab) {
+		throw std::runtime_error("Unknown SNAB name!");
+	}
 	if (m_sweep_config.find("repetitions") != m_sweep_config.end()) {
 		// TODO Feature still missing
 		// m_repetitions = m_sweep_config["repetitions"];
