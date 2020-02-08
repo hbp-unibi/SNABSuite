@@ -214,25 +214,31 @@ Json read_network(std::string path, bool msgpack)
 	if (msgpack) {
 		file_in.open(path, std::ios::binary);
 		if (!file_in.good()) {
-			throw std::runtime_error("Could not open deep network file " +
-			                         path);
+			file_in.open("../" + path, std::ios::binary);
+			if (!file_in.good()) {
+				throw std::runtime_error("Could not open deep network file " +
+				                         path);
+			}
 		}
 		json = Json::from_msgpack(file_in);
 	}
 	else {
 		file_in.open(path, std::ios::binary);
 		if (!file_in.good()) {
-			throw std::runtime_error("Could not open deep network file " +
-			                         path);
+
+			file_in.open("../" + path, std::ios::binary);
+			if (!file_in.good()) {
+				throw std::runtime_error("Could not open deep network file " +
+				                         path);
+			}
 		}
 		json = Json::parse(file_in);
 	}
 	return json;
 }
 
-
-std::vector<LocalConnection> dense_weights_to_conn(const Matrix<Real> &mat, Real scale,
-                                   Real delay)
+std::vector<LocalConnection> dense_weights_to_conn(const Matrix<Real> &mat,
+                                                   Real scale, Real delay)
 {
 	std::vector<LocalConnection> conns;
 	for (size_t i = 0; i < mat.rows(); i++) {

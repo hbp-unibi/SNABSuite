@@ -120,15 +120,6 @@ target_link_libraries(sweep
     benchmark_library
 )
 
-# add_executable(mlp
-#     source/SNABs/mnist/mnist_mlp.cpp
-# )
-# add_dependencies(mlp cypress_ext)
-# 
-# target_link_libraries(mlp
-#     benchmark_library
-# )
-
 #
 # Copy Matplotlibrc to build directory
 # 
@@ -150,6 +141,7 @@ down_extract(train-labels-idx1-ubyte)
 down_extract(t10k-images-idx3-ubyte)
 down_extract(t10k-labels-idx1-ubyte)
 
+add_custom_target(link_target ALL COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/bin ${CMAKE_CURRENT_BINARY_DIR}/networks)
 #
 # Unit tests -- only enable if gtest is present
 #
