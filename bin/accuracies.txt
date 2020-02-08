@@ -1,0 +1,9 @@
+Here, we list the accuracies of the pre-trained networks provided within this repository.
+
+netw_spikey.msgpack : Trained with source/SNABs/mnist/python/mnist_dnn_spikey.py
+    Trained for 25 epochs with Adam optimizer, lr of 0.001, 
+    l2 regularization of 0.001. 
+Epoch 25/25
+60000/60000 [==============================] - 1s 20us/step - loss: 0.4017 - acc: 0.8941 - val_loss: 0.3826 - val_acc: 0.9013
+Test loss: 0.38262572689056396
+Test accuracy: 0.9013
