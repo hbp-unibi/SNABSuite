@@ -1,0 +1,9 @@
+{
+	"snab_name" : "SmallMnist",
+	"nest" : {
+		"max_freq" : [10, 150, 20]
+	},
+	"spikey" : {
+		"max_freq" : [10, 150, 20]
+	}
+}

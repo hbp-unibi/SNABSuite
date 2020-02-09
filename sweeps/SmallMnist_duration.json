@@ -1,0 +1,9 @@
+{
+	"snab_name" : "SmallMnist",
+	"nest" : {
+		"duration" : [50, 1000, 20]
+	},
+	"spikey" : {
+		"duration" : [50, 1000, 20]
+	}
+}

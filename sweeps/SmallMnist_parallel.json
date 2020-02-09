@@ -1,0 +1,13 @@
+{
+	"snab_name" : "SmallMnist",
+	"genn" : {
+        "train_data": true,
+		"images": 10000, 
+		"batchsize" : [100,10000,20]
+	},
+	"spinnaker" : {
+        "train_data": true,
+		"images": 10000, 
+		"batchsize" : [100,10000,20]
+	}
+}
