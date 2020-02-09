@@ -4,6 +4,8 @@
 		"max_freq" : [10, 150, 20]
 	},
 	"spikey" : {
-		"max_freq" : [10, 150, 20]
+		"max_freq" : [10, 150, 20],
+		"images" : 1000,
+		"batchsize" : 1000
 	}
 }

@@ -1,0 +1,10 @@
+{
+	"snab_name" : "MnistITL",
+	"spikey" : {
+		"learn_rate" : [0.0001, 0.1,25],
+		"train_data" : true,
+		"epochs": 5,
+		"images": 100,
+		"batchsize": 100
+	}
+}

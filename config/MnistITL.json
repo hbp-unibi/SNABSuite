@@ -24,7 +24,7 @@
         "batch_parallel": true,
         "learn_rate" : 0.01,
         "epochs": 5,
-        "dnn_file" : "netw_spikey.msgpack",
+        "dnn_file": "networks/netw_spikey.msgpack",
         "scaled_image": true,
         "norm_rate_hidden" : 60.0,
         "norm_rate_last" : 30.0,
@@ -36,32 +36,34 @@
     "spikey":{
 		"neuron_type" : "IfFacetsHardware1",
 		"neuron_params": {
-			"tau_m": 5.0,
-			"tau_refrac": 0.1,
-			"v_rest": -80.0,
+			"tau_m": 7.0,
+			"tau_refrac": 0.001,
+			"v_rest": -72.5,
 			"v_thresh": -55.0,
 			"v_reset": -80.0,
 			"e_rev_I": -80.0
 		},
-		"images": 500, 
+		"images": 60000, 
 		"batchsize" : 100,
-		"duration" : 100,
-		"max_freq": 80.0,
+		"duration" : 150,
+		"max_freq": 60.0,
 		"pause": 50, 
 		"poisson" : false,
 		"max_weight" : 0.015,
-        "train_data": true,
+        "train_data": false,
         "batch_parallel": false,
-        "learn_rate" : 0.002,
-        "epochs": 50,
+        "learn_rate" : 0.01,
+        "epochs": 5,
         "positive":true,
-        "dnn_file" : "netw_spikey.msgpack",
+        "dnn_file": "networks/netw_spikey.msgpack",
         "scaled_image": true,
         "setup": {
-            "mappingOffset": 192,
             "calibIcb" : true
         },
-        "norm_rate_hidden" : 5.0,
-        "norm_rate_last" : 10.0
+        "norm_rate_hidden" : 1.0,
+        "norm_rate_last" : 5.0,
+        "loss_function": "CatHinge",
+        "num_test_images": 10000,
+        "random_init": false
     }
 }
