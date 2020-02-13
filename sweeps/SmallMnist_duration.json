@@ -1,9 +1,15 @@
 {
 	"snab_name" : "SmallMnist",
 	"nest" : {
-		"duration" : [50, 1000, 20]
+		"duration" : [50, 1000, 20],
+        "train_data": true,
+                "images": 1000,
+                "batchsize" : 1000
 	},
 	"spikey" : {
-		"duration" : [50, 1000, 20]
+		"duration" : [50, 1000, 20],
+        "train_data": true,
+                "images": 1000,
+                "batchsize" : 1000
 	}
 }
