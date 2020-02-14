@@ -67,10 +67,10 @@ protected:
 	std::vector<cypress::PopulationBase> m_label_pops;  // vector of label pops
 	
 	std::string m_dnn_file = "";
-    bool m_scaled_image = false;
-    std::shared_ptr<MNIST::MLPBase> m_mlp;
-    
-    Real m_weights_scale_factor = 0.0;
+	bool m_scaled_image = false;
+	std::shared_ptr<MNIST::MLPBase> m_mlp;
+
+	Real m_weights_scale_factor = 0.0;
 
 	/**
 	 * @brief Converts a prepared json to a network
@@ -140,23 +140,23 @@ public:
 
 protected:
 	MnistITLLastLayer(const std::string backend, size_t bench_index,
-	               std::string name)
+	                  std::string name)
 	    : SimpleMnist(backend, bench_index, name)
 	{
 	}
 	std::pair<std::vector<std::vector<std::vector<Real>>>,
 	          std::vector<uint16_t>>
 	    m_spmnist;
-        
-    bool m_positive = false;
-    Real m_norm_rate_hidden = 0.0;
-    Real m_norm_rate_last = 0.0;
-    size_t m_global_correct = 0;
+
+	bool m_positive = false;
+	Real m_norm_rate_hidden = 0.0;
+	Real m_norm_rate_last = 0.0;
+	size_t m_global_correct = 0;
 	size_t m_num_images = 0;
-    Real m_sim_time = 0;
-    std::string m_loss_function = "CatHinge";
-    bool m_last_layer_only = true;
-    size_t m_num_test_images = 10000;
+	Real m_sim_time = 0;
+	std::string m_loss_function = "CatHinge";
+	bool m_last_layer_only = true;
+	size_t m_num_test_images = 10000;
 };
 
 class MnistITL : public MnistITLLastLayer {
@@ -165,7 +165,7 @@ public:
 	MnistITL(const std::string backend, size_t bench_index)
 	    : MnistITLLastLayer(backend, bench_index, __func__)
 	{
-        m_last_layer_only = false;
+		m_last_layer_only = false;
 	}
 	std::shared_ptr<SNABBase> clone() override
 	{

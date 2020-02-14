@@ -67,6 +67,7 @@ void SimpleMnist::read_config()
 	m_batch_parallel = m_config_file["batch_parallel"].get<bool>();
 	m_dnn_file = m_config_file["dnn_file"].get<std::string>();
 	m_scaled_image = m_config_file["scaled_image"].get<bool>();
+	m_weights_scale_factor = 0.0;
 }
 
 cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw)

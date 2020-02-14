@@ -273,7 +273,6 @@ void ParameterSweep::execute()
 	for (size_t i = 0; i < m_n_threads; i++) {
 		threads.emplace_back([&]() mutable {
 			size_t index, this_idx;
-			auto snab = m_snab->clone();
 			while (true) {
 				{
 					std::lock_guard<std::mutex> lock(idx_mutex);
@@ -291,8 +290,8 @@ void ParameterSweep::execute()
 				    m_jobs_done.end()) {
 					continue;
 				}
-				// Resetting the cypress::network structure in the SNAB
-				snab->reset_network();
+				// Resetting the SNAB
+				auto snab = m_snab->clone();
 				snab->set_config(m_sweep_vector[index]);
 				snab->build();
 				snab->run();
