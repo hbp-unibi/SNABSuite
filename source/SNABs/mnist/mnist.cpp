@@ -101,6 +101,7 @@ cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw)
 		}
 	}
 	else {
+        m_networks.clear();
 		for (auto &i : m_batch_data) {
 			m_networks.push_back(cypress::Network());
 			mnist_helper::create_spike_source(m_networks.back(), i);
@@ -219,7 +220,7 @@ size_t SimpleMnist::create_deep_network(Network &netw, Real max_weight)
 		                    Connector::from_list(conns),
 		                    ("dense_" + std::to_string(counter)).c_str());
 
-		global_logger().debug("cypress", "Dense layer constructed with size " +
+		global_logger().debug("SNABSuite", "Dense layer constructed with size " +
 		                                     std::to_string(size));
 		counter++;
 		layer_id++;
