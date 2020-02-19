@@ -76,7 +76,7 @@ std::vector<cypress::Json> ParameterSweep::generate_sweep_vector(
 			}
 		}
 		// Copy single values
-		else if (val.is_number() || val.is_string()) {
+		else if (val.is_number() || val.is_string() || val.is_boolean()) {
 			tar[i.key()] = val;
 		}
 	}
