@@ -7,11 +7,18 @@
 		"images": 100,
 		"batchsize": 100
 	},
+	"nmpm1" : {
+		"duration" : [50, 500,20],
+		"train_data" : true,
+		"epochs": 5,
+		"images": 100,
+		"batchsize": 100
+    },
 	"nest" : {
-                "duration" : [10, 500,20],
-                "train_data" : true,
-                "epochs": 5,
-                "images": 100,
-                "batchsize": 100
-        }
+		"duration" : [10, 500,20],
+		"train_data" : true,
+		"epochs": 5,
+		"images": 100,
+		"batchsize": 100
+    }
 }
