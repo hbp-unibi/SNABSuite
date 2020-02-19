@@ -1,10 +1,19 @@
 {
 	"snab_name" : "MnistITL",
 	"spikey" : {
-		"learn_rate" : [50, 500,20],
+		"duration" : [50, 500,20],
 		"train_data" : true,
 		"epochs": 5,
 		"images": 100,
 		"batchsize": 100
-	}
+	},
+
+        "nmpm1" : {
+                "duration" : [50, 500,20],
+                "train_data" : true,
+                "epochs": 5,
+                "images": 100,
+                "batchsize": 100
+        }
+
 }

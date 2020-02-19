@@ -70,7 +70,7 @@
 		"v_reset": -80.0,
 		"v_thresh": -60.0,
 		"tau_refrac": 0.5,
-		"tau_m": 10.0,
+		"tau_m": 15.0,
 		"cm": 0.2
 		},
 		"images": 10000, 

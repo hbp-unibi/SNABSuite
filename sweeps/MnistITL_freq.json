@@ -6,5 +6,13 @@
 		"epochs": 5,
 		"images": 100,
 		"batchsize": 100
-	}
+	},
+        "nmpm1" : {
+                "max_freq" : [10, 150,20],
+                "train_data" : true,
+                "epochs": 5,
+                "images": 100,
+                "batchsize": 100
+        }
+
 }
