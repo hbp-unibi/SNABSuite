@@ -10,12 +10,12 @@
 		"v_reset": -75.0,
 		"v_thresh": -55.0,
 		"tau_refrac": 1.0,
-		"tau_m": 7.5,
+		"tau_m": 10,
 		"cm": 0.2
 		},
 		"images": 10000, 
-		"batchsize" : 10000,
-		"duration" : 300,
+		"batchsize" : 1000,
+		"duration" : 350,
 		"max_freq": 120,
 		"pause": 50, 
 		"poisson" : false,
@@ -28,9 +28,9 @@
     "spikey":{
 		"neuron_type" : "IfFacetsHardware1",
 		"neuron_params": {
-			"tau_m": 7.0,
+			"tau_m": 10.0,
 			"tau_refrac": 0.001,
-			"v_rest": -72.5,
+			"v_rest": -75.0,
 			"v_thresh": -55.0,
 			"v_reset": -80.0,
 			"e_rev_I": -80.0
@@ -39,8 +39,8 @@
             "calibIcb": true
 		},
 		"images": 10000, 
-		"batchsize" : 10000,
-		"duration" : 600,
+		"batchsize" : 2500,
+		"duration" : 300,
 		"max_freq": 50.0,
 		"pause": 50, 
 		"poisson" : false,
