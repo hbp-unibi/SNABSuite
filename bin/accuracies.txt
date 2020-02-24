@@ -7,3 +7,16 @@ Epoch 25/25
 60000/60000 [==============================] - 1s 20us/step - loss: 0.4017 - acc: 0.8941 - val_loss: 0.3826 - val_acc: 0.9013
 Test loss: 0.38262572689056396
 Test accuracy: 0.9013
+
+
+netw_relu_100_100.msgpack : Trained with ReLU in Output Layer, Mean squared error, 784-100-100-10
+Epoch 25/25
+60000/60000 [==============================] - 2s 26us/step - loss: 0.0113 - acc: 0.9814 - val_loss: 0.0114 - val_acc: 0.9790
+Test loss: 0.01140992940068245
+Test accuracy: 0.979
+
+netw_softmax_100_100.msgpack: Trained with softmax in Output Layer, Mean squared error, 784-100-100-10
+Epoch 25/25
+60000/60000 [==============================] - 2s 28us/step - loss: 0.0570 - acc: 0.9953 - val_loss: 0.1122 - val_acc: 0.9795
+Test loss: 0.1122096147596836
+Test accuracy: 0.9795
