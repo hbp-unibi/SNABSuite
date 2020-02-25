@@ -101,7 +101,7 @@ cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw)
 		}
 	}
 	else {
-        m_networks.clear();
+		m_networks.clear();
 		for (auto &i : m_batch_data) {
 			m_networks.push_back(cypress::Network());
 			mnist_helper::create_spike_source(m_networks.back(), i);
@@ -220,8 +220,9 @@ size_t SimpleMnist::create_deep_network(Network &netw, Real max_weight)
 		                    Connector::from_list(conns),
 		                    ("dense_" + std::to_string(counter)).c_str());
 
-		global_logger().debug("SNABSuite", "Dense layer constructed with size " +
-		                                     std::to_string(size));
+		global_logger().debug(
+		    "SNABSuite",
+		    "Dense layer constructed with size " + std::to_string(size));
 		counter++;
 		layer_id++;
 	}
@@ -405,6 +406,14 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 	Utilities::write_vector2_to_csv(spikes_pre,
 	                                _debug_filename("spikes_pre.csv"));
 	Utilities::plot_spikes(_debug_filename("spikes_pre.csv"), m_backend);
+
+	spikes_pre.clear();
+	for (size_t i = 0; i < m_label_pops[0].size(); i++) {
+		spikes_pre.push_back(m_label_pops[0][i].signals().data(0));
+	}
+	Utilities::write_vector2_to_csv(spikes_pre,
+	                                _debug_filename("spikes_label.csv"));
+	Utilities::plot_spikes(_debug_filename("spikes_label.csv"), m_backend);
 #endif
 
 	Utilities::write_vector2_to_csv(accuracies,
