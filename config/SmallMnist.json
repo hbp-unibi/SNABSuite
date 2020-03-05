@@ -61,18 +61,18 @@
 			"hicann": [[[320,321,340,341,296,297,298,299],[320,321,340,341],[322,342]]]
 		},
 		"neuron_type" : "IF_cond_exp",
-		"neuron_params": {
-		"e_rev_E": 0.00,
-		"e_rev_I": -100.0,
-		"tau_syn_E": 5.0,
-		"tau_syn_I": 5.0,
-		"v_rest": -80.0,
-		"v_reset": -80.0,
-		"v_thresh": -60.0,
-		"tau_refrac": 0.5,
-		"tau_m": 15.0,
-		"cm": 0.2
-		},
+        "neuron_params": {
+            "cm": 0.2,
+            "v_reset": -70.0,
+            "v_rest": -20.0,
+            "v_thresh": -10.0,
+            "e_rev_I": -100.0,
+            "e_rev_E": 60.0,
+            "tau_m": 20.0,
+            "tau_refrac": 0.1,
+            "tau_syn_E": 5.0,
+            "tau_syn_I": 5.0
+        },
 		"images": 10000, 
 		"batchsize" : 10000,
 		"duration" : 500,
