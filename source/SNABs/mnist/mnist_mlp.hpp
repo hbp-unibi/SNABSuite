@@ -235,7 +235,7 @@ public:
 template <typename Loss = MSE, typename ActivationFunction = ReLU,
           typename Constraint = NoConstraint>
 class MLP : public MLPBase {
-private:
+protected:
 	std::vector<cypress::Matrix<Real>> m_layers;
 	std::vector<size_t> m_layer_sizes;
 	size_t m_epochs = 20;
@@ -583,7 +583,7 @@ public:
 	 * @return std::vector< std::vector< std::vector< cypress::Real > > > the
 	 * outputs of all layers, given in output[sample][layer][neuron]
 	 */
-	std::vector<std::vector<std::vector<Real>>> forward_path(
+	virtual std::vector<std::vector<std::vector<Real>>> forward_path(
 	    const std::vector<size_t> &indices, const size_t start) const override
 	{
 		auto &input = std::get<0>(m_mnist);
@@ -613,7 +613,7 @@ public:
 	 *
 	 * @return cypress::Real the accuracy on test data
 	 */
-	Real forward_path_test() const override
+	virtual Real forward_path_test() const override
 	{
 		auto &input = std::get<0>(m_mnist_test);
 		auto &labels = std::get<1>(m_mnist_test);
@@ -645,7 +645,7 @@ public:
 	 * @param last_only true for last layer only training (Perceptron learn
 	 * rule)
 	 */
-	void backward_path(
+	virtual void backward_path(
 	    const std::vector<size_t> &indices, const size_t start,
 	    const std::vector<std::vector<std::vector<Real>>> &activations,
 	    bool last_only = false) override
@@ -689,7 +689,7 @@ public:
 	 * @param last_only true for last layer only training (Perceptron learn
 	 * rule)
 	 */
-	void backward_path_2(
+	virtual void backward_path_2(
 	    const std::vector<uint16_t> &labels,
 	    const std::vector<std::vector<std::vector<Real>>> &activations,
 	    bool last_only = false) override
