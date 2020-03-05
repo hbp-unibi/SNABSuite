@@ -2,3 +2,6 @@ bin/netw_spikey.msgpack filter=lfs diff=lfs merge=lfs -text
 bin/netw_diehl.msgpack filter=lfs diff=lfs merge=lfs -text
 bin/netw_relu_100_100.msgpack filter=lfs diff=lfs merge=lfs -text
 bin/netw_softmax_100_100.msgpack filter=lfs diff=lfs merge=lfs -text
+bin/sequential_network_250.msgpack filter=lfs diff=lfs merge=lfs -text
+bin/sequential_network_60.msgpack filter=lfs diff=lfs merge=lfs -text
+bin/sequential_network_topAcc.msgpack filter=lfs diff=lfs merge=lfs -text

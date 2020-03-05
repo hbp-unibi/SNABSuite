@@ -20,3 +20,9 @@ Epoch 25/25
 60000/60000 [==============================] - 2s 28us/step - loss: 0.0570 - acc: 0.9953 - val_loss: 0.1122 - val_acc: 0.9795
 Test loss: 0.1122096147596836
 Test accuracy: 0.9795
+
+
+From Larmarck_ML
+sequential_network_60.msgpack: 
+sequential_network_250.msgpack: 97.53% (Test)
+sequential_network_topAcc.msgpack: 97.71% (Test)
