@@ -1,6 +1,6 @@
 {
 	"snab_name" : "SmallMnist",
-	"genn" : {
+	"nest" : {
         "train_data": true,
 		"images": 10000, 
 		"batchsize" : [100,10000,20]

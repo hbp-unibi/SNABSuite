@@ -1,9 +1,9 @@
 {
 	"snab_name" : "SmallMnist",
-	"genn" : {
-		"max_weight" : [0.001, 0.1, 20],
+	"nest" : {
+		"max_weight" : [0.001, 0.1, 30],
 		"neuron_params": {
-			"tau_m": [5,20,10]
+			"tau_m": [5,30,30]
 		},
         "train_data": true,
 		"images": 1000, 
