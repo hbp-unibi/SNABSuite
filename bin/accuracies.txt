@@ -24,5 +24,6 @@ Test accuracy: 0.9795
 
 From Larmarck_ML
 sequential_network_60.msgpack: 
+sequential_network_65.msgpack: 96.76
 sequential_network_250.msgpack: 97.53% (Test)
 sequential_network_topAcc.msgpack: 97.71% (Test)
