@@ -1,19 +1,25 @@
 {
-    "nest":{
+    "nest" : {
+		"invalid" : true
+    },
+    "spinnaker" : {
+		"invalid" : true
+    },
+    "genn":{
 		"neuron_type" : "IF_cond_exp",
 		"neuron_params": {
-            "e_rev_E": 0.00,
-            "e_rev_I": -130.0,
-            "tau_syn_E": 3.0,
-            "tau_syn_I": 3.0,
-            "v_rest": -65.0,
-            "v_reset": -75.0,
-            "v_thresh": -55.0,
-            "tau_refrac": 1.0,
-            "tau_m": 10,
-            "cm": 0.2
-		},
-		"images": 500, 
+                "e_rev_E": 0.00,
+                "e_rev_I": -130.0,
+                "tau_syn_E": 3.0,
+                "tau_syn_I": 3.0,
+                "v_rest": -65.0,
+                "v_reset": -75.0,
+                "v_thresh": -55.0,
+                "tau_refrac": 0.0,
+                "tau_m": 20,
+                "cm": 0.2
+                },
+		"images": 60000, 
 		"batchsize" : 100,
 		"duration" : 200,
 		"max_freq": 80,
@@ -31,6 +37,7 @@
         "positive":true,
         "loss_function": "CatHinge", 
         "num_test_images": 10000, 
+        "test_batchsize": 10000, 
         "random_init": false
     },
     "spikey":{

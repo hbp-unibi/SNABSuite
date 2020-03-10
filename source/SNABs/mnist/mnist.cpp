@@ -254,6 +254,13 @@ cypress::Network &MnistITLLastLayer::build_netw(cypress::Network &netw)
 	if (m_config_file.find("num_test_images") != m_config_file.end()) {
 		m_num_test_images = m_config_file["num_test_images"].get<size_t>();
 	}
+	if (m_config_file.find("test_batchsize") != m_config_file.end()) {
+		m_test_batchsize = m_config_file["test_batchsize"].get<size_t>();
+	}
+	else {
+		m_test_batchsize = m_batchsize;
+	}
+
 	// TODO ? Required -> constructor
 
 	auto kerasdata = mnist_helper::read_network(m_dnn_file, true);
@@ -381,15 +388,15 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 		auto test_data = mnist_helper::mnist_to_spike(
 		    m_mlp->mnist_test_set(), m_duration, m_max_freq, m_num_test_images,
 		    m_poisson);
-		m_batch_data = mnist_helper::create_batches(test_data, m_batchsize,
+		m_batch_data = mnist_helper::create_batches(test_data, m_test_batchsize,
 		                                            m_duration, m_pause, true);
 		for (auto &i : m_batch_data) {
 			mnist_helper::update_spike_source(source_n, i);
-			netw.run(pwbackend, m_batchsize * (m_duration + m_pause));
+			netw.run(pwbackend, m_test_batchsize * (m_duration + m_pause));
 
 			auto pop = m_label_pops[0];
-			auto labels = mnist_helper::spikes_to_labels(pop, m_duration,
-			                                             m_pause, m_batchsize);
+			auto labels = mnist_helper::spikes_to_labels(
+			    pop, m_duration, m_pause, m_test_batchsize);
 			auto &orig_labels = std::get<1>(i);
 			auto correct = mnist_helper::compare_labels(orig_labels, labels);
 			m_global_correct += correct;

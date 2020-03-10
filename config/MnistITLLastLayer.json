@@ -1,5 +1,11 @@
 {
-    "nest":{
+    "nest" : {
+		"invalid" : true
+    },
+    "spinnaker" : {
+		"invalid" : true
+    },
+    "genn":{
 		"neuron_type" : "IF_cond_exp",
 		"neuron_params": {
 		"e_rev_E": 0.00,

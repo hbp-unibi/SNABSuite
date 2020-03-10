@@ -65,7 +65,7 @@ protected:
 	    m_networks;  // Used for batches not run in parallel
 
 	std::vector<cypress::PopulationBase> m_label_pops;  // vector of label pops
-	
+
 	std::string m_dnn_file = "";
 	bool m_scaled_image = false;
 	std::shared_ptr<MNIST::MLPBase> m_mlp;
@@ -114,7 +114,7 @@ public:
 	{
 	}
 
-	//cypress::Network &build_netw(cypress::Network &netw) override;
+	// cypress::Network &build_netw(cypress::Network &netw) override;
 
 	std::shared_ptr<SNABBase> clone() override
 	{
@@ -149,14 +149,15 @@ protected:
 	    m_spmnist;
 
 	bool m_positive = false;
-	Real m_norm_rate_hidden = 0.0;
-	Real m_norm_rate_last = 0.0;
+	Real m_norm_rate_hidden = 1.0;
+	Real m_norm_rate_last = 1.0;
 	size_t m_global_correct = 0;
 	size_t m_num_images = 0;
 	Real m_sim_time = 0;
 	std::string m_loss_function = "CatHinge";
 	bool m_last_layer_only = true;
 	size_t m_num_test_images = 10000;
+	size_t m_test_batchsize = 0;
 };
 
 class MnistITL : public MnistITLLastLayer {
