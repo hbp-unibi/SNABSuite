@@ -72,6 +72,9 @@ protected:
 
 	Real m_weights_scale_factor = 0.0;
 
+	bool m_count_spikes = false;
+	std::vector<cypress::PopulationBase> m_all_pops;
+
 	/**
 	 * @brief Converts a prepared json to a network
 	 *

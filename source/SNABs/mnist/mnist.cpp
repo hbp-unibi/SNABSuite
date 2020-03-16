@@ -68,6 +68,9 @@ void SimpleMnist::read_config()
 	m_dnn_file = m_config_file["dnn_file"].get<std::string>();
 	m_scaled_image = m_config_file["scaled_image"].get<bool>();
 	m_weights_scale_factor = 0.0;
+	if (m_config_file.find("count_spikes") != m_config_file.end()) {
+		m_count_spikes = m_config_file["count_spikes"].get<bool>();
+	}
 }
 
 cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw)
@@ -94,10 +97,19 @@ cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw)
 
 	m_label_pops.clear();
 	if (m_batch_parallel) {
+		m_networks.clear();
+		m_all_pops.clear();
 		for (auto &i : m_batch_data) {
 			mnist_helper::create_spike_source(netw, i);
 			create_deep_network(netw, m_max_weight);
 			m_label_pops.emplace_back(netw.populations().back());
+		}
+
+		if (m_count_spikes) {
+			for (auto pop : netw.populations()) {
+				pop.signals().record(0);
+				m_all_pops.emplace_back(pop);
+			}
 		}
 	}
 	else {
@@ -107,6 +119,12 @@ cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw)
 			mnist_helper::create_spike_source(m_networks.back(), i);
 			create_deep_network(m_networks.back(), m_max_weight);
 			m_label_pops.emplace_back(m_networks.back().populations().back());
+			if (m_count_spikes) {
+				for (auto pop : m_networks.back().populations()) {
+					pop.signals().record(0);
+					m_all_pops.emplace_back(pop);
+				}
+			}
 		}
 	}
 
@@ -183,6 +201,23 @@ std::vector<std::array<cypress::Real, 4>> SimpleMnist::evaluate()
 		    _debug_filename("spikes_" + std::to_string(batch) + ".csv"),
 		    m_backend);
 #endif
+	}
+	if (m_count_spikes) {
+		size_t global_count = 0;
+		for (auto &pop : m_all_pops) {
+			size_t count = 0.0;
+			for (auto neuron : pop) {
+				count += neuron.signals().data(0).size();
+			}
+			global_count += count;
+			global_logger().info(
+			    "SNABSuite", "Pop " + std::to_string(pop.pid()) +
+			                     " with size " + std::to_string(pop.size()) +
+			                     " fired " + std::to_string(count) + " spikes");
+		}
+		global_logger().info(
+		    "SNABSuite",
+		    "Summ of all spikes: " + std::to_string(global_count) + " spikes");
 	}
 	Real acc = Real(global_correct) / Real(images);
 	Real sim_time = m_netw.runtime().sim;
@@ -318,13 +353,15 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 	m_label_pops = {netw.populations().back()};
 
 	auto pre_last_pop = netw.populations()[netw.populations().size() - 2];
-	if (m_last_layer_only) {
+	if (m_last_layer_only && !m_count_spikes) {
 		m_label_pops[0].signals().record(0);
 		pre_last_pop.signals().record(0);
 	}
 	else {
+		m_all_pops.clear();
 		for (auto pop : netw.populations()) {
 			pop.signals().record(0);
+			m_all_pops.emplace_back(pop);
 		}
 	}
 
@@ -385,6 +422,8 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 		m_global_correct = 0;
 		m_num_images = 0;
 		m_sim_time = 0.0;
+		size_t global_count = 0;
+		std::vector<size_t> local_count, pop_size, pids;
 		auto test_data = mnist_helper::mnist_to_spike(
 		    m_mlp->mnist_test_set(), m_duration, m_max_freq, m_num_test_images,
 		    m_poisson);
@@ -402,6 +441,31 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 			m_global_correct += correct;
 			m_num_images += orig_labels.size();
 			m_sim_time += netw.runtime().sim;
+			if (m_count_spikes) {
+				for (auto &pop : m_all_pops) {
+					size_t count = 0.0;
+					for (auto neuron : pop) {
+						count += neuron.signals().data(0).size();
+					}
+					global_count += count;
+					local_count.emplace_back(count);
+					pop_size.emplace_back(pop.size());
+					pids.emplace_back(pop.pid());
+				}
+			}
+		}
+
+		if (m_count_spikes) {
+			for (size_t i = 0; i < local_count.size(); i++) {
+				global_logger().info(
+				    "SNABSuite",
+				    "Pop " + std::to_string(pids[i]) + " with size " +
+				        std::to_string(pop_size[i]) + " fired " +
+				        std::to_string(local_count[i]) + " spikes");
+			}
+			global_logger().info("SNABSuite", "Summ of all spikes: " +
+			                                      std::to_string(global_count) +
+			                                      " spikes");
 		}
 	}
 
