@@ -20,11 +20,14 @@ project(SNABSuite)
 
 # Enable C++14 support
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
+# Add the local "cmake" directory to the search path
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
+
+# Include the Cypress library
+include(cypress_external)
 
 # Add configuration option for static linking 
 set(STATIC_LINKING TRUE CACHE BOOL "True for static linking")
-
-find_package(PythonLibs 3 REQUIRED )
 
 # Link statically
 if(STATIC_LINKING)
@@ -40,11 +43,6 @@ if(STATIC_LINKING)
 endif()
 
 
-# Add the local "cmake" directory to the search path
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
-
-# Include the Cypress library
-include(cypress_external)
 
 # Enable all warnings on MSVC and GCC/Clang/Intel
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")

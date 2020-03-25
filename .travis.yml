@@ -1,11 +1,9 @@
-language: generic
-python: 2.7.13
-sudo: required
+language: python
+os: linux
+dist: xenial
 matrix:
   include:
-    - os: linux
-      dist: trusty
-      addons:
+    - addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
@@ -15,23 +13,8 @@ matrix:
       before_install: 
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 50
         - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 50
-        - sudo pip install CppHeaderParser
-      after_success:
-        - python ../source/util/generate_bench_json.py
-        - git clone "https://${GITHUB_TOKEN}@${DEPLOY_ADDRESS}" &>/dev/null
-        - cd SNABSuite_deploy
-        - cp ../benchmark benchmark
-        - cp ../../source/util/benchmark.py benchmark.py
-        - cp ../benchmarks.json benchmarks.json
-        - cp -r ../../config/ ./
-        - cp ../cypress_ext-prefix/src/cypress_ext-build/libBS2CYPRESS.so ./
-        - git add *
-        - git commit -m "Update to latest SNABSuite master"
-        - git push "https://${GITHUB_TOKEN}@${DEPLOY_ADDRESS}" master &>/dev/null
 
-    - os: linux
-      dist: trusty
-      addons:
+    - addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
@@ -43,9 +26,7 @@ matrix:
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 50
         - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 50
 
-    - os: linux
-      dist: trusty
-      addons:
+    - addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
@@ -56,9 +37,7 @@ matrix:
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 50
         - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 50
 
-    - os: linux
-      dist: trusty
-      addons:
+    - addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
@@ -68,14 +47,31 @@ matrix:
       before_install: 
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50
         - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
+      script:
+        - mkdir build && cd build
+        - cmake .. -DSTATIC_LINKING=FALSE -DSNAB_DEBUG=TRUE -DPYTHON_VERSION_MAJOR=2
+        - make && make test ARGS=-V
+        - cmake .. -DSTATIC_LINKING=TRUE -DSNAB_DEBUG=FALSE -DPYTHON_VERSION_MAJOR=2
+        - make && make test ARGS=-V
+      after_success:
+        - pip3 install CppHeaderParser
+        - python3 ../source/util/generate_bench_json.py
+        - git clone "https://${GITHUB_TOKEN}@${DEPLOY_ADDRESS}" &>/dev/null
+        - cd SNABSuite_deploy
+        - cp ../benchmark benchmark
+        - cp ../../source/util/benchmark.py benchmark.py
+        - cp ../benchmarks.json benchmarks.json
+        - cp -r ../../config/ ./
+        - cp ../cypress_ext-prefix/src/cypress_ext-build/libBS2CYPRESS.so ./
+        - git add *
+        - git commit -m "Update to latest SNABSuite master"
+        - git push "https://${GITHUB_TOKEN}@${DEPLOY_ADDRESS}" master &>/dev/null
 
-    - os: linux
-      dist: trusty
-      addons:
+    - addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-3.8
+            - llvm-toolchain-xenial-3.8
           packages:
             - g++-6
             - clang-3.8
@@ -84,13 +80,11 @@ matrix:
         export CXX="clang++-3.8" CC="clang-3.8"
         sudo export CXX="clang++-3.8" CC="clang-3.8"
 
-    - os: linux
-      dist: trusty
-      addons:
+    - addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-4.0
+            - llvm-toolchain-xenial-4.0
           packages:
             - g++-6
             - clang-4.0
@@ -99,9 +93,7 @@ matrix:
         export CXX="clang++-4.0" CC="clang-4.0"
         sudo export CXX="clang++-4.0" CC="clang-4.0"
 
-    - os: linux
-      dist: trusty
-      addons:
+    - addons:
         apt:
           packages:
             - doxygen

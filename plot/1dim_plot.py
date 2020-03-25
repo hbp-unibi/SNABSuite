@@ -22,6 +22,7 @@ Plots data from one dimensional sweeps
 """
 from __future__ import division
 from builtins import range
+from past.utils import old_div
 import argparse
 
 parser = argparse.ArgumentParser(description='Plot one-dimensional graphs')
@@ -82,7 +83,7 @@ def plot_measure(ax, xs, ys, ys_std, color, simulator, xlabel, ylabel,
 
 def normalize(data, norm):
     for i in range(0, len(data)):
-        data[i] = data[i] / norm
+        data[i] = old_div(data[i], norm)
 
 
 def get_max(data):

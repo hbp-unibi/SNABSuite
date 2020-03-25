@@ -81,11 +81,12 @@
     "nmpm1" : {
 		"neuron_type" : "IF_cond_exp",
 		"setup": {
-			"calib_path": "/wang/data/calibration/brainscales/default-2017-09-26-1",
+			"calib_path": "/wang/data/calibration/brainscales/current",
 			"digital_weight" : true,
 			"neuron_size" : 4,
-			"bandwidth" : 0.1
-
+			"bandwidth": 0.1,
+			"wafer": 33,
+			"hicann" : [[372],[372,360], [372,373,375,360,361,362,363]]
 		},
 		"neuron_params_max": {
 			"e_rev_E": 0.0,
@@ -108,8 +109,8 @@
 			"cm": 0.2
 		},
 		"weight" : 6,
-		"#neurons_retr" : [8,23,53],
-		"#neurons_max" : 7,
+		"#neurons_retr" : [50, 100, 350],
+		"#neurons_max" : 10,
 		"probability" : 0.5
     }
 }

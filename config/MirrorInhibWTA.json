@@ -71,6 +71,7 @@
 		"firing_rate" : 80
 	},
 	"nmpm1" : {
+		"invalid" : true,
 		"setup": {
             "calib_path" : "/wang/data/calibration/brainscales/default-2017-09-26-1",
 			"neuron_size" : 4,

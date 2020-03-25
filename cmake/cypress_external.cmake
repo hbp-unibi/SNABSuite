@@ -14,9 +14,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-find_package(PythonLibs 3 REQUIRED )
-find_package(PythonInterp 3 REQUIRED)
+set(PYTHON_VERSION_MAJOR 3 CACHE STRING "Python version to use, e.g. 2/3")
+find_package(PythonInterp ${PYTHON_VERSION_MAJOR} REQUIRED)
+find_package(PythonLibs ${PYTHON_VERSION_MAJOR} REQUIRED )
 
 include(ExternalProject)
 set(UPDATE_CYPRESS FALSE CACHE BOOL "True for update cypress every time")
@@ -24,7 +24,7 @@ if(UPDATE_CYPRESS)
     ExternalProject_Add(cypress_ext
         GIT_REPOSITORY        "https://github.com/hbp-unibi/cypress/"
         GIT_TAG               master
-        CMAKE_ARGS            -DSTATIC_LINKING=${STATIC_LINKING} -DCMAKE_INSTALL_PREFIX:path=<INSTALL_DIR> -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} -DBUILD_TEST_EXAMPLES=False
+        CMAKE_ARGS            -DSTATIC_LINKING=${STATIC_LINKING} -DCMAKE_INSTALL_PREFIX:path=<INSTALL_DIR> -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} -DBUILD_TEST_EXAMPLES=False -DPYTHON_VERSION_MAJOR=${PYTHON_VERSION_MAJOR}
         INSTALL_COMMAND 	  ""
         UPDATE_COMMAND git pull
         EXCLUDE_FROM_ALL      TRUE
@@ -34,7 +34,7 @@ else()
     ExternalProject_Add(cypress_ext
         GIT_REPOSITORY        "https://github.com/hbp-unibi/cypress/"
         GIT_TAG               master
-        CMAKE_ARGS            -DSTATIC_LINKING=${STATIC_LINKING} -DCMAKE_INSTALL_PREFIX:path=<INSTALL_DIR> -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} -DBUILD_TEST_EXAMPLES=False
+        CMAKE_ARGS            -DSTATIC_LINKING=${STATIC_LINKING} -DCMAKE_INSTALL_PREFIX:path=<INSTALL_DIR> -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} -DBUILD_TEST_EXAMPLES=False -DPYTHON_VERSION_MAJOR=${PYTHON_VERSION_MAJOR}
         INSTALL_COMMAND 	  ""
         UPDATE_COMMAND ""
         EXCLUDE_FROM_ALL      TRUE
