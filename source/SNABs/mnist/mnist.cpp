@@ -372,6 +372,9 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 		m_batch_data = mnist_helper::create_batches(m_spmnist, m_batchsize,
 		                                            m_duration, m_pause, true);
 		for (auto &i : m_batch_data) {
+			if (std::get<1>(i).size() != m_batchsize) {
+				continue;
+			}
 			mnist_helper::update_spike_source(source_n, i);
 			netw.run(pwbackend, m_batchsize * (m_duration + m_pause));
 
