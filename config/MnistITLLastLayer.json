@@ -5,7 +5,11 @@
     "spinnaker": {
         "invalid": true
     },
+    "nmpm1": {
+        "invalid": true
+    },
     "genn": {
+        "invalid": true,
         "neuron_type": "IF_cond_exp",
         "neuron_params": {
             "e_rev_E": 0,
@@ -40,6 +44,7 @@
         "random_init": false
     },
     "spikey": {
+        "invalid": true,
         "neuron_type": "IfFacetsHardware1",
         "neuron_params": {
             "tau_m": 10,

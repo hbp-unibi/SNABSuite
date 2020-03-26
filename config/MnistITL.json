@@ -81,6 +81,7 @@
             "bandwidth": 0.3,
             "synapse_loss": false,
             "keep_mapping": true,
+            "full_list_connect":false,
             "wafer": 33,
             "hicann": [[[320,321,340,341,296,297,298,299],[320,321,340,341],[322,342]]]
         },
