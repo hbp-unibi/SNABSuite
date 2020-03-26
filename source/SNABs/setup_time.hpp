@@ -27,6 +27,10 @@
 
 namespace SNAB {
 
+/**
+ * This benchmark measures the setup time with a OneToOne Connector and compares
+ * the speedup to the same connection using a FromList connector
+ */
 class SetupTimeOneToOne : public SNABBase {
 protected:
 	// Populations to be connected
@@ -59,6 +63,10 @@ public:
 	}
 };
 
+/**
+ * This benchmark measures the setup time with a AllToAll Connector and compares
+ * the speedup to the same connection using a FromList connector
+ */
 class SetupTimeAllToAll : public SetupTimeOneToOne {
 public:
 	SetupTimeAllToAll(const std::string backend, size_t bench_index);
@@ -69,6 +77,10 @@ public:
 	}
 };
 
+/**
+ * This benchmark measures the setup time with a Random Connector and compares
+ * the speedup to the same connection using a FromList connector
+ */
 class SetupTimeRandom : public SetupTimeOneToOne {
 public:
 	SetupTimeRandom(const std::string backend, size_t bench_index);

@@ -30,7 +30,7 @@
 namespace SNAB {
 
 /**
- * @brief A simple feed-forward network with densely connected layers.
+ * A simple feed-forward network with densely connected layers.
  * This is just the base class
  */
 class MNIST_BASE : public SNABBase {
@@ -41,7 +41,7 @@ public:
 	virtual std::vector<std::array<cypress::Real, 4>> evaluate() override;
 	/*virtual std::shared_ptr<SNABBase> clone() override
 	{
-		return std::make_shared<MNIST_BASE>(m_backend, m_bench_index);
+	    return std::make_shared<MNIST_BASE>(m_backend, m_bench_index);
 	}*/
 
 protected:
@@ -110,7 +110,7 @@ protected:
 };
 
 /**
- * @brief A simple feed-forward network with densely connected layers.
+ * A simple feed-forward network with densely connected layers.
  * This network has 89x100x10 layout with images downscales by 3x3 average
  * pooling and no inhibition
  */
@@ -128,7 +128,7 @@ public:
 };
 
 /**
- * @brief A simple feed-forward network with densely connected layers.
+ * A simple feed-forward network with densely connected layers.
  * This is a network optimized by Neural Architecture Search. Layout:
  * 784x43x10x10
  */
@@ -146,7 +146,7 @@ public:
 };
 
 /**
- * @brief A simple feed-forward network with densely connected layers.
+ * A simple feed-forward network with densely connected layers.
  * This is a network optimized by Neural Architecture Search. Layout:
  * 784x52x35x32x10
  */
@@ -164,7 +164,7 @@ public:
 };
 
 /**
- * @brief A simple feed-forward network with densely connected layers.
+ * A simple feed-forward network with densely connected layers.
  * This is a network optimized by Neural Architecture Search. Layout:
  * 784x866x52x35x32x10
  */
@@ -182,7 +182,7 @@ public:
 };
 
 /**
- * @brief A simple feed-forward network with densely connected layers.
+ * A simple feed-forward network with densely connected layers.
  * This is a network taken from
  * https://github.com/dannyneil/spiking_relu_conversion Corresponding paper:
  * Diehl et al.: M. Fast-Classifying, High-Accuracy Spiking Deep Networks
@@ -200,6 +200,11 @@ public:
 		return std::make_shared<MnistDiehl>(m_backend, m_bench_index);
 	}
 };
+
+/**
+ * This class combines the MNIST benchmark with an hardware in the loop
+ * re-training to compensate device mismatch. Here, we train only the last layer
+ */
 class MnistITLLastLayer : public MNIST_BASE {
 public:
 	MnistITLLastLayer(const std::string backend, size_t bench_index)
@@ -238,6 +243,10 @@ protected:
 	size_t m_test_batchsize = 0;
 };
 
+/**
+ * This class combines the MNIST benchmark with an hardware in the loop
+ * re-training to compensate device mismatch. Here, we train all layers
+ */
 class MnistITL : public MnistITLLastLayer {
 private:
 public:

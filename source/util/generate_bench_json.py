@@ -92,11 +92,16 @@ def get_available_simulators(dictionary):
 
 
 global_json = []  # This will be written to file
-for headername in os.listdir("../source/SNABs/"):
+list_files = []
+for root, dirs, files in os.walk(os.path.abspath("../source/SNABs/")):
+    for file in files:
+        list_files.append(os.path.join(root, file))
+
+for headername in list_files:
     if not headername.endswith(".hpp"):
         continue  # Check if it is a header
     try:
-        cppHeader = CppHeaderParser.CppHeader("../source/SNABs/" + headername)
+        cppHeader = CppHeaderParser.CppHeader(headername)
     except CppHeaderParser.CppParseError as e:
         print(e)
         sys.exit(1)  # Exit with error so that travis will report an issue
@@ -107,6 +112,8 @@ for headername in os.listdir("../source/SNABs/"):
     for classname in cppHeader.classes:
         # Every class represents a SNAB/benchmark
         clazz = cppHeader.classes[classname]
+        if not os.path.exists("../config/" + clazz['name'] + ".json"):
+            continue
         print('class', clazz['name'])
         comment = ""
         if 'doxygen' in clazz:

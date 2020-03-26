@@ -64,6 +64,13 @@ public:
 	}
 };
 
+/**
+ * This benchmark is dedicated to compare response/activation functions of
+ * neurons in neuromorphic hardware to those from simulation. This being said,
+ * the simulation from NEST with a numerical timestep of 0.1ms and complex
+ * integrator is used as ground truth. Specifically, here we use rates as input
+ * to neurons
+ */
 class RateBasedWeightDependentActivation : public WeightDependentActivation {
 protected:
 	std::vector<std::vector<cypress::Real>> binned_spike_counts() override;
