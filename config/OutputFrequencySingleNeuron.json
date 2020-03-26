@@ -1,60 +1,61 @@
 {
-	"spinnaker" : {
-		"neuron_type" : "IF_cond_exp",
-		"neuron_params": {
-			"e_rev_E": 0.0,
-			"v_rest": -30.0,
-			"v_reset": -60.0,
-			"v_thresh": -64.7,
-			"tau_syn_E": 2.0,
-			"tau_refrac": 0.0,
-			"tau_m": 10,
-			"cm": 0.2
-		}
-	},
-	"spikey" : {
-		"setup" : {"calibIcb" : 1},
-		"neuron_type" : "IfFacetsHardware1",
-		"neuron_params": {
-			"tau_m": 1.0,
-			"tau_refrac": 0.00000000001,
-			"v_rest": -55.0,
-			"v_thresh": -78,
-			"v_reset": -80.0,
-			"e_rev_I": -80.0
-		}
-	},
-	"nest" : {
-		"neuron_type" : "IF_cond_exp",
-		"neuron_params": {
-			"e_rev_E": 0.0,
-			"v_rest": -30.0,
-			"v_reset": -64.8,
-			"v_thresh": -64.7,
-			"tau_syn_E": 2.0,
-			"tau_refrac": 0.1,
-			"tau_m": 1,
-			"cm": 0.2
-		}
-	},
-	"nmpm1" : {
-		"neuron_type" : "IF_cond_exp",
-		"setup": {
-			"calib_path": "/wang/data/calibration/brainscales/current",
-			"neuron_size" : 4,
-			"wafer" : 33,
-			"hicann" : 372
-		},
-		"neuron_params": {
-			"e_rev_E": 0.0,
-			"v_rest": 50.0,
-			"v_reset": -60.0,
-			"v_thresh": -100.0,
-			"tau_syn_E": 2.0,
-			"tau_refrac": 0.1,
-			"tau_m": 0.1,
-			"cm": 0.2
-		}
-	}
-
+    "spinnaker": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "v_rest": -30,
+            "v_reset": -60,
+            "v_thresh": -64.7,
+            "tau_syn_E": 2,
+            "tau_refrac": 0,
+            "tau_m": 10,
+            "cm": 0.2
+        }
+    },
+    "spikey": {
+        "setup": {
+            "calibIcb": 1
+        },
+        "neuron_type": "IfFacetsHardware1",
+        "neuron_params": {
+            "tau_m": 1,
+            "tau_refrac": 1e-11,
+            "v_rest": -55,
+            "v_thresh": -78,
+            "v_reset": -80,
+            "e_rev_I": -80
+        }
+    },
+    "nest": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "v_rest": -30,
+            "v_reset": -64.8,
+            "v_thresh": -64.7,
+            "tau_syn_E": 2,
+            "tau_refrac": 0.1,
+            "tau_m": 1,
+            "cm": 0.2
+        }
+    },
+    "nmpm1": {
+        "neuron_type": "IF_cond_exp",
+        "setup": {
+            "calib_path": "/wang/data/calibration/brainscales/current",
+            "neuron_size": 4,
+            "wafer": 33,
+            "hicann": 372
+        },
+        "neuron_params": {
+            "e_rev_E": 0,
+            "v_rest": 50,
+            "v_reset": -60,
+            "v_thresh": -100,
+            "tau_syn_E": 2,
+            "tau_refrac": 0.1,
+            "tau_m": 0.1,
+            "cm": 0.2
+        }
+    }
 }

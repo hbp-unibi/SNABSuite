@@ -1,23 +1,23 @@
 {
-	"snab_name" : "MaxInputFixedOutConnector",
-	"nest" : {
-        "#neurons" : 1000,
-		"#input_neurons" : 1000,
-		"#ConnectionsPerInput" : [0,1000,100]
+    "snab_name": "MaxInputFixedOutConnector",
+    "nest": {
+        "#neurons": 1000,
+        "#input_neurons": 1000,
+        "#ConnectionsPerInput": [0,1000,100]
     },
-	"spinnaker" : {
-        "#neurons" : 4080,
-		"#input_neurons" : 4080,
-		"#ConnectionsPerInput" : [0,4080,100]
+    "spinnaker": {
+        "#neurons": 4080,
+        "#input_neurons": 4080,
+        "#ConnectionsPerInput": [0,4080,100]
     },
-	"spikey" : {
-        "#neurons" : 384,
-		"#input_neurons" : 256,
-		"#ConnectionsPerInput" : [0,384,100]
+    "spikey": {
+        "#neurons": 384,
+        "#input_neurons": 256,
+        "#ConnectionsPerInput": [0,384,100]
     },
-    "nmpm1" : {
-        "#neurons" : 60,
-		"#input_neurons" : 60,
-		"#ConnectionsPerInput" : [1,60, 60]
+    "nmpm1": {
+        "#neurons": 60,
+        "#input_neurons": 60,
+        "#ConnectionsPerInput": [1,60,60]
     }
 }

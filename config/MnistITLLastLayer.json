@@ -1,64 +1,64 @@
 {
-    "nest" : {
-		"invalid" : true
+    "nest": {
+        "invalid": true
     },
-    "spinnaker" : {
-		"invalid" : true
+    "spinnaker": {
+        "invalid": true
     },
-    "genn":{
-		"neuron_type" : "IF_cond_exp",
-		"neuron_params": {
-		"e_rev_E": 0.00,
-		"e_rev_I": -130.0,
-		"tau_syn_E": 3.0,
-		"tau_syn_I": 3.0,
-		"v_rest": -65.0,
-		"v_reset": -75.0,
-		"v_thresh": -55.0,
-		"tau_refrac": 1.0,
-		"tau_m": 10,
-		"cm": 0.2
-		},
-		"images": 1000, 
-		"batchsize" : 100,
-		"duration" : 100,
-		"max_freq": 60,
-		"pause": 100, 
-		"poisson" : false,
-		"max_weight" : 0.02,
+    "genn": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -130,
+            "tau_syn_E": 3,
+            "tau_syn_I": 3,
+            "v_rest": -65,
+            "v_reset": -75,
+            "v_thresh": -55,
+            "tau_refrac": 1,
+            "tau_m": 10,
+            "cm": 0.2
+        },
+        "images": 1000,
+        "batchsize": 100,
+        "duration": 100,
+        "max_freq": 60,
+        "pause": 100,
+        "poisson": false,
+        "max_weight": 0.02,
         "train_data": false,
         "batch_parallel": true,
-        "learn_rate" : 0.01,
+        "learn_rate": 0.01,
         "epochs": 5,
         "dnn_file": "netw_spikey.msgpack",
         "scaled_image": true,
-        "norm_rate_hidden" : 60.0,
-        "norm_rate_last" : 30.0,
-        "positive":true,
-        "loss_function": "CatHinge", 
-        "num_test_images": 10000, 
+        "norm_rate_hidden": 60,
+        "norm_rate_last": 30,
+        "positive": true,
+        "loss_function": "CatHinge",
+        "num_test_images": 10000,
         "random_init": false
     },
-    "spikey":{
-		"neuron_type" : "IfFacetsHardware1",
-		"neuron_params": {
-			"tau_m": 10.0,
-			"tau_refrac": 1.0,
-			"v_rest": -70.0,
-			"v_thresh": -55.0,
-			"v_reset": -60.0,
-			"e_rev_I": -70.0
-		},
-		"images": 20, 
-		"batchsize" : 10,
-		"duration" : 200,
-		"max_freq": 40.9,
-		"pause": 50, 
-		"poisson" : false,
-		"max_weight" : 0.015,
+    "spikey": {
+        "neuron_type": "IfFacetsHardware1",
+        "neuron_params": {
+            "tau_m": 10,
+            "tau_refrac": 1,
+            "v_rest": -70,
+            "v_thresh": -55,
+            "v_reset": -60,
+            "e_rev_I": -70
+        },
+        "images": 20,
+        "batchsize": 10,
+        "duration": 200,
+        "max_freq": 40.9,
+        "pause": 50,
+        "poisson": false,
+        "max_weight": 0.015,
         "train_data": true,
         "batch_parallel": false,
-        "learn_rate" : 0.01,
+        "learn_rate": 0.01,
         "epochs": 50
     }
 }

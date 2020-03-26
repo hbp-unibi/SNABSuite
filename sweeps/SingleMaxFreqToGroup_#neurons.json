@@ -1,15 +1,15 @@
 {
-    "snab_name" : "SingleMaxFreqToGroup",
-    "spikey" : {
-        "#neurons" : [1, 383,100]
+    "snab_name": "SingleMaxFreqToGroup",
+    "spikey": {
+        "#neurons": [1,383,100]
     },
-    "spinnaker" : {
-        "#neurons" : [1, 4000,100]
+    "spinnaker": {
+        "#neurons": [1,4000,100]
     },
-    "nest" : {
-        "#neurons" : [1, 4000, 100]
+    "nest": {
+        "#neurons": [1,4000,100]
     },
-    "nmpm1" : {
-        "#neurons" : [1, 70 ,70]
+    "nmpm1": {
+        "#neurons": [1,70,70]
     }
 }

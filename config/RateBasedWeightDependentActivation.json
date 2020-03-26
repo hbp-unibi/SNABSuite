@@ -1,49 +1,48 @@
 {
-	"spinnaker" : {
-		"neuron_type" : "IF_cond_exp",
-		"neuron_params": {
-			"e_rev_E": 0.0,
-			"v_rest": -70.0,
-			"v_reset": -70.0,
-			"v_thresh": -65.0,
-			"tau_syn_E": 4.0,
-			"tau_refrac": 2.0,
-			"tau_m": 10,
-			"cm": 0.2
-		},
-		"weight_min": 0.01, 
-		"weight_max":0.1,
-		"step_size": 0.01, 
-		"#neurons": 10, 
-		"presentation_time": 300.0,
-		"rate" : 50,
-		"expected_output" : [[50, 163.462, 188.823, 239.493, 251.249, 262.035, 281.969, 290.118, 297.968]]
-	},
-	"spikey" : {
-		"invalid" : true
-	},
-	"nest" : {
-		"neuron_type" : "IF_cond_exp",
-		"neuron_params": {
-			"e_rev_E": 0.0,
-			"v_rest": -70.0,
-			"v_reset": -70.0,
-			"v_thresh": -65.0,
-			"tau_syn_E": 4.0,
-			"tau_refrac": 2.0,
-			"tau_m": 10,
-			"cm": 0.2
-		},
-		"weight_min": 0.01, 
-		"weight_max":0.1,
-		"step_size": 0.01, 
-		"#neurons": 10, 
-		"presentation_time": 300.0,
-		"rate" : 50,
-		"expected_output" : [[50, 163.462, 188.823, 239.493, 251.249, 262.035, 281.969, 290.118, 297.968]]
-	},
-	"nmpm1" : {
-		"invalid" : true
-	}
-
+    "spinnaker": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "v_rest": -70,
+            "v_reset": -70,
+            "v_thresh": -65,
+            "tau_syn_E": 4,
+            "tau_refrac": 2,
+            "tau_m": 10,
+            "cm": 0.2
+        },
+        "weight_min": 0.01,
+        "weight_max": 0.1,
+        "step_size": 0.01,
+        "#neurons": 10,
+        "presentation_time": 300,
+        "rate": 50,
+        "expected_output": [[50,163.462,188.823,239.493,251.249,262.035,281.969,290.118,297.968]]
+    },
+    "spikey": {
+        "invalid": true
+    },
+    "nest": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "v_rest": -70,
+            "v_reset": -70,
+            "v_thresh": -65,
+            "tau_syn_E": 4,
+            "tau_refrac": 2,
+            "tau_m": 10,
+            "cm": 0.2
+        },
+        "weight_min": 0.01,
+        "weight_max": 0.1,
+        "step_size": 0.01,
+        "#neurons": 10,
+        "presentation_time": 300,
+        "rate": 50,
+        "expected_output": [[50,163.462,188.823,239.493,251.249,262.035,281.969,290.118,297.968]]
+    },
+    "nmpm1": {
+        "invalid": true
+    }
 }

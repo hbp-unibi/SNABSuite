@@ -1,31 +1,31 @@
 {
-	"snab_name" : "OutputFrequencySingleNeuron",
-	"spinnaker" : {
-		"neuron_type" : "IF_cond_exp",
-		"neuron_params": {
-			"v_reset": [-80,-55,80],
-			"v_thresh": [-80,-55,80]
-		}
-	},
-	"spikey" : {
-		"neuron_type" : "IfFacetsHardware1",
-		"neuron_params": {
-			"v_reset": [-80,-55,80],
-			"v_thresh": [-80.0,-55,80]
-		}
-	},
-	"nest" : {
-		"neuron_type" : "IF_cond_exp",
-		"neuron_params": {
-			"v_reset": [-80,-55,80],
-			"v_thresh": [-80,-55,80]
-		}
-	},
-	"nmpm1" : {
-		"neuron_type" : "IF_cond_exp",
-		"neuron_params": {
-			"v_reset": [-100,-55,40],
-			"v_thresh": [-100,-55,40]
-		}
-	}
+    "snab_name": "OutputFrequencySingleNeuron",
+    "spinnaker": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "v_reset": [-80,-55,80],
+            "v_thresh": [-80,-55,80]
+        }
+    },
+    "spikey": {
+        "neuron_type": "IfFacetsHardware1",
+        "neuron_params": {
+            "v_reset": [-80,-55,80],
+            "v_thresh": [-80,-55,80]
+        }
+    },
+    "nest": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "v_reset": [-80,-55,80],
+            "v_thresh": [-80,-55,80]
+        }
+    },
+    "nmpm1": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "v_reset": [-100,-55,40],
+            "v_thresh": [-100,-55,40]
+        }
+    }
 }

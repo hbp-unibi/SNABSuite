@@ -1,15 +1,15 @@
 {
-    "snab_name" : "MaxInputOneToOne",
-    "spikey" : {
-        "#neurons" : [1, 256,100]
+    "snab_name": "MaxInputOneToOne",
+    "spikey": {
+        "#neurons": [1,256,100]
     },
-    "spinnaker" : {
-        "#neurons" : [1, 4000,100]
+    "spinnaker": {
+        "#neurons": [1,4000,100]
     },
-    "nest" : {
-        "#neurons" : [1, 4000, 100]
+    "nest": {
+        "#neurons": [1,4000,100]
     },
-    "nmpm1" : {
-        "#neurons" : [1, 40 ,40]
+    "nmpm1": {
+        "#neurons": [1,40,40]
     }
 }

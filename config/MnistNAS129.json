@@ -1,99 +1,99 @@
 {
-    "nest":{
-                "neuron_type" : "IF_cond_exp",
-                "neuron_params": {
-                "e_rev_E": 0.00,
-                "e_rev_I": -130.0,
-                "tau_syn_E": 3.0,
-                "tau_syn_I": 3.0,
-                "v_rest": -65.0,
-                "v_reset": -75.0,
-                "v_thresh": -55.0,
-                "tau_refrac": 0.0,
-                "tau_m": 20,
-                "cm": 0.2
-                },
-                "images": 10000, 
-                "batchsize" :  [10000,5000,834,70],
-                "duration" : 500,
-                "max_freq": 120,
-                "pause": 50, 
-                "poisson" : false,
-                "max_weight" : 0.02,
-                "train_data": false,
+    "nest": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -130,
+            "tau_syn_E": 3,
+            "tau_syn_I": 3,
+            "v_rest": -65,
+            "v_reset": -75,
+            "v_thresh": -55,
+            "tau_refrac": 0,
+            "tau_m": 20,
+            "cm": 0.2
+        },
+        "images": 10000,
+        "batchsize": [10000,5000,834,70],
+        "duration": 500,
+        "max_freq": 120,
+        "pause": 50,
+        "poisson": false,
+        "max_weight": 0.02,
+        "train_data": false,
         "batch_parallel": true,
         "count_spikes": false,
         "dnn_file": "networks/sequential_network_129.msgpack",
         "scaled_image": false,
         "setup": {
-            "timestep": 1.0,
+            "timestep": 1,
             "threads": 4
         }
     },
-    "genn":{
-                "neuron_type" : "IF_cond_exp",
-                "neuron_params": {
-                "e_rev_E": 0.00,
-                "e_rev_I": -130.0,
-                "tau_syn_E": 3.0,
-                "tau_syn_I": 3.0,
-                "v_rest": -65.0,
-                "v_reset": -75.0,
-                "v_thresh": -55.0,
-                "tau_refrac": 0.0,
-                "tau_m": 20,
-                "cm": 0.2
-                },
-                "images": 10000, 
-                "batchsize" : [10000,300],
-                "duration" : 500,
-                "max_freq": 120,
-                "pause": 50, 
-                "poisson" : false,
-                "max_weight" : 0.02,
-                "train_data": false,
+    "genn": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -130,
+            "tau_syn_E": 3,
+            "tau_syn_I": 3,
+            "v_rest": -65,
+            "v_reset": -75,
+            "v_thresh": -55,
+            "tau_refrac": 0,
+            "tau_m": 20,
+            "cm": 0.2
+        },
+        "images": 10000,
+        "batchsize": [10000,300],
+        "duration": 500,
+        "max_freq": 120,
+        "pause": 50,
+        "poisson": false,
+        "max_weight": 0.02,
+        "train_data": false,
         "batch_parallel": true,
         "count_spikes": false,
         "dnn_file": "networks/sequential_network_129.msgpack",
         "scaled_image": false,
         "setup": {
-            "timestep": 1.0
+            "timestep": 1
         }
     },
-    "spinnaker":{
-                "neuron_type" : "IF_cond_exp",
-                "neuron_params": {
-                "e_rev_E": 0.00,
-                "e_rev_I": -130.0,
-                "tau_syn_E": 3.0,
-                "tau_syn_I": 3.0,
-                "v_rest": -65.0,
-                "v_reset": -75.0,
-                "v_thresh": -55.0,
-                "tau_refrac": 0.0,
-                "tau_m": 20,
-                "cm": 0.2
-                },
-                "images": 10000, 
-                "batchsize" : [10000,5000,834,70],
-                "duration" : 500,
-                "max_freq": 120,
-                "pause": 50, 
-                "poisson" : false,
-                "max_weight" : 0.02,
-                "train_data": false,
+    "spinnaker": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -130,
+            "tau_syn_E": 3,
+            "tau_syn_I": 3,
+            "v_rest": -65,
+            "v_reset": -75,
+            "v_thresh": -55,
+            "tau_refrac": 0,
+            "tau_m": 20,
+            "cm": 0.2
+        },
+        "images": 10000,
+        "batchsize": [10000,5000,834,70],
+        "duration": 500,
+        "max_freq": 120,
+        "pause": 50,
+        "poisson": false,
+        "max_weight": 0.02,
+        "train_data": false,
         "batch_parallel": true,
         "count_spikes": false,
         "dnn_file": "networks/sequential_network_129.msgpack",
         "scaled_image": false,
         "setup": {
-            "timestep": 1.0
+            "timestep": 1
         }
     },
-    "spikey":{
+    "spikey": {
         "invalid": true
     },
-    "nmpm1":{
+    "nmpm1": {
         "invalid": true
     }
 }

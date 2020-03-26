@@ -1,32 +1,31 @@
 {
-	"snab_name" : "SingleMaxFreqToGroup",
-	"spinnaker" : {
-		"neuron_type" : "IF_cond_exp",
-		"neuron_params_group": {
-			"tau_m": [0.0,5.0,40]
-		},
-		"weight" : [0.001, 1.0, 40]
-		
-	},
-	"spikey" : {
-		"neuron_type" : "IfFacetsHardware1",
-		"neuron_params_group": {
-			"tau_m": [0.0,10.0,40]
-		},
-		"weight" : [0.001, 0.015, 40]
-	},
-	"nest" : {
-		"neuron_type" : "IF_cond_exp",
-		"neuron_params_group": {
-			"tau_m": [0.0,5.0,40]
-		},
-		"weight" : [0.001, 1.0, 40]
-	},
-	"nmpm1" : {
-		"neuron_type" : "IF_cond_exp",
-		"neuron_params_group": {
-			"tau_m": [0.0,5.0,40]
-		},
-		"weight" : [0.001, 1.0, 40]
-	}
+    "snab_name": "SingleMaxFreqToGroup",
+    "spinnaker": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params_group": {
+            "tau_m": [0,5,40]
+        },
+        "weight": [0.001,1,40]
+    },
+    "spikey": {
+        "neuron_type": "IfFacetsHardware1",
+        "neuron_params_group": {
+            "tau_m": [0,10,40]
+        },
+        "weight": [0.001,0.015,40]
+    },
+    "nest": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params_group": {
+            "tau_m": [0,5,40]
+        },
+        "weight": [0.001,1,40]
+    },
+    "nmpm1": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params_group": {
+            "tau_m": [0,5,40]
+        },
+        "weight": [0.001,1,40]
+    }
 }

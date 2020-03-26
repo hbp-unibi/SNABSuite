@@ -1,47 +1,46 @@
 {
-	"spinnaker" : {
-		"neuron_type" : "IF_cond_exp",
-		"neuron_params": {
-			"e_rev_E": 0.0,
-			"v_rest": -70.0,
-			"v_reset": -70.0,
-			"v_thresh": -68.0,
-			"tau_syn_E": 2.0,
-			"tau_refrac": 1.0,
-			"tau_m": 10,
-			"cm": 0.2
-		},
-		"weight_min": 0.0, 
-		"weight_max":0.1,
-		"step_size": 0.01, 
-		"#neurons": 50, 
-		"isi": 50.0,
-		"expected_output" : [[0, 1, 2, 3, 4, 4, 4, 5, 5, 5]]
-	},
-	"spikey" : {
-		"invalid" : true
-	},
-	"nest" : {
-		"neuron_type" : "IF_cond_exp",
-		"neuron_params": {
-			"e_rev_E": 0.0,
-			"v_rest": -70.0,
-			"v_reset": -70.0,
-			"v_thresh": -68.0,
-			"tau_syn_E": 2.0,
-			"tau_refrac": 1.0,
-			"tau_m": 10,
-			"cm": 0.2
-		},
-		"weight_min": 0.0, 
-		"weight_max":0.1,
-		"step_size": 0.01, 
-		"#neurons": 50, 
-		"isi": 50.0,
-		"expected_output" : [[0, 1, 2, 3, 4, 4, 4, 5, 5, 5]]
-	},
-	"nmpm1" : {
-		"invalid" : true
-	}
-
+    "spinnaker": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "v_rest": -70,
+            "v_reset": -70,
+            "v_thresh": -68,
+            "tau_syn_E": 2,
+            "tau_refrac": 1,
+            "tau_m": 10,
+            "cm": 0.2
+        },
+        "weight_min": 0,
+        "weight_max": 0.1,
+        "step_size": 0.01,
+        "#neurons": 50,
+        "isi": 50,
+        "expected_output": [[0,1,2,3,4,4,4,5,5,5]]
+    },
+    "spikey": {
+        "invalid": true
+    },
+    "nest": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "v_rest": -70,
+            "v_reset": -70,
+            "v_thresh": -68,
+            "tau_syn_E": 2,
+            "tau_refrac": 1,
+            "tau_m": 10,
+            "cm": 0.2
+        },
+        "weight_min": 0,
+        "weight_max": 0.1,
+        "step_size": 0.01,
+        "#neurons": 50,
+        "isi": 50,
+        "expected_output": [[0,1,2,3,4,4,4,5,5,5]]
+    },
+    "nmpm1": {
+        "invalid": true
+    }
 }

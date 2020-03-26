@@ -1,108 +1,109 @@
 {
-	"spinnaker" : {
-		"neuron_type" : "IF_cond_exp",
-		"neuron_params_max": {
-			"e_rev_E": 0.0,
-			"v_rest": -60.0,
-			"v_reset": -60.0,
-			"v_thresh": -64.7,
-			"tau_syn_E": 2.0,
-			"tau_refrac": 0.0,
-			"tau_m": 10,
-			"cm": 0.2
-		},
-		"neuron_params_retr": {
-			"e_rev_E": 0.0,
-			"v_rest": -80.0,
-			"v_reset": -80.0,
-			"v_thresh": -78,
-			"tau_syn_E": 1.0,
-			"tau_refrac": 0.0,
-			"e_rev_E": 0.0,
-			"tau_m": 1.0,
-			"cm": 0.2
-		},
-		"weight" : 0.01,
-		"#neurons" : [255,2040,8160,90000]
-	},
-	"spikey" : {
-		"setup" : {"calibIcb" : 1},
-		"neuron_type" : "IfFacetsHardware1",
-		"neuron_params_max": {
-			"tau_m": 1.0,
-			"tau_refrac": 10,
-			"v_rest": -55.0,
-			"v_thresh": -75,
-			"v_reset": -80.0,
-			"e_rev_I": -80.0
-		},
-		"neuron_params_retr": {
-			"tau_m": 2.0,
-			"tau_refrac": 2.0,
-			"v_rest": -80.0,
-			"v_thresh": -69.0,
-			"v_reset": -80.0,
-			"e_rev_I": -80.0
-		},
-		"#neurons" : [96,192],
-		"weight" : 0.015
-	},
-	"nest" : {
-		"neuron_type" : "IF_cond_exp",
-		"neuron_params_max": {
-			"e_rev_E": 0.0,
-			"v_rest": -30.0,
-			"v_reset": -64.8,
-			"v_thresh": -64.7,
-			"tau_syn_E": 2.0,
-			"tau_refrac": 0.0,
-			"tau_m": 1,
-			"cm": 0.2
-		},
-		"neuron_params_retr": {
-			"e_rev_E": 0.0,
-			"v_rest": -67.0,
-			"v_reset": -67.0,
-			"v_thresh": -65,
-			"tau_syn_E": 1.0,
-			"tau_refrac": 0.0,
-			"tau_m": 0.2,
-			"cm": 0.2
-		},
-		"weight" : 0.008,
-		"#neurons" : [100,1000,10000]
+    "spinnaker": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params_max": {
+            "e_rev_E": 0,
+            "v_rest": -60,
+            "v_reset": -60,
+            "v_thresh": -64.7,
+            "tau_syn_E": 2,
+            "tau_refrac": 0,
+            "tau_m": 10,
+            "cm": 0.2
+        },
+        "neuron_params_retr": {
+            "e_rev_E": 0,
+            "v_rest": -80,
+            "v_reset": -80,
+            "v_thresh": -78,
+            "tau_syn_E": 1,
+            "tau_refrac": 0,
+            "tau_m": 1,
+            "cm": 0.2
+        },
+        "weight": 0.01,
+        "#neurons": [255,2040,8160,90000]
     },
-    "nmpm1" : {
-		"neuron_type" : "IF_cond_exp",
-		"setup": {
-			"calib_path": "/wang/data/calibration/brainscales/current",
-			"digital_weight" : true,
-			"neuron_size" : 4,
-			"bandwidth": 0.1,
-			"wafer": 33,
-			"hicann" : [[372],[372,360], [372,373,375,360,361,362,363]]
-		},
-		"neuron_params_max": {
-			"e_rev_E": 0.0,
-			"v_rest": 50.0,
-			"v_reset": -67.0,
-			"v_thresh": -60.0,
-			"tau_syn_E": 2.0,
-			"tau_refrac": 8.1,
-			"tau_m": 0.1,
-			"cm": 0.2
-		},
-		"neuron_params_retr": {
-			"e_rev_E": 0.0,
-			"v_rest": -67.0,
-			"v_reset": -67.0,
-			"v_thresh": -60,
-			"tau_syn_E": 3.0,
-			"tau_refrac": 6.0,
-			"tau_m": 4.0,
-			"cm": 0.2
-		},
-		"weight" : 15,
-		"#neurons" : [50, 100, 350]
+    "spikey": {
+        "setup": {
+            "calibIcb": 1
+        },
+        "neuron_type": "IfFacetsHardware1",
+        "neuron_params_max": {
+            "tau_m": 1,
+            "tau_refrac": 10,
+            "v_rest": -55,
+            "v_thresh": -75,
+            "v_reset": -80,
+            "e_rev_I": -80
+        },
+        "neuron_params_retr": {
+            "tau_m": 2,
+            "tau_refrac": 2,
+            "v_rest": -80,
+            "v_thresh": -69,
+            "v_reset": -80,
+            "e_rev_I": -80
+        },
+        "#neurons": [96,192],
+        "weight": 0.015
+    },
+    "nest": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params_max": {
+            "e_rev_E": 0,
+            "v_rest": -30,
+            "v_reset": -64.8,
+            "v_thresh": -64.7,
+            "tau_syn_E": 2,
+            "tau_refrac": 0,
+            "tau_m": 1,
+            "cm": 0.2
+        },
+        "neuron_params_retr": {
+            "e_rev_E": 0,
+            "v_rest": -67,
+            "v_reset": -67,
+            "v_thresh": -65,
+            "tau_syn_E": 1,
+            "tau_refrac": 0,
+            "tau_m": 0.2,
+            "cm": 0.2
+        },
+        "weight": 0.008,
+        "#neurons": [100,1000,10000]
+    },
+    "nmpm1": {
+        "neuron_type": "IF_cond_exp",
+        "setup": {
+            "calib_path": "/wang/data/calibration/brainscales/current",
+            "digital_weight": true,
+            "neuron_size": 4,
+            "bandwidth": 0.1,
+            "wafer": 33,
+            "hicann": [[372],[372,360],[372,373,375,360,361,362,363]]
+        },
+        "neuron_params_max": {
+            "e_rev_E": 0,
+            "v_rest": 50,
+            "v_reset": -67,
+            "v_thresh": -60,
+            "tau_syn_E": 2,
+            "tau_refrac": 8.1,
+            "tau_m": 0.1,
+            "cm": 0.2
+        },
+        "neuron_params_retr": {
+            "e_rev_E": 0,
+            "v_rest": -67,
+            "v_reset": -67,
+            "v_thresh": -60,
+            "tau_syn_E": 3,
+            "tau_refrac": 6,
+            "tau_m": 4,
+            "cm": 0.2
+        },
+        "weight": 15,
+        "#neurons": [50,100,350]
     }
 }

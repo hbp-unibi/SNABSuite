@@ -1,15 +1,15 @@
 {
-    "snab_name" : "MaxInputFixedOutConnector",
-    "spikey" : {
-        "#neurons" : [96, 384,100]
+    "snab_name": "MaxInputFixedOutConnector",
+    "spikey": {
+        "#neurons": [96,384,100]
     },
-    "spinnaker" : {
-        "#neurons" : [127, 4000,100]
+    "spinnaker": {
+        "#neurons": [127,4000,100]
     },
-    "nest" : {
-        "#neurons" : [50, 4000, 100]
+    "nest": {
+        "#neurons": [50,4000,100]
     },
-    "nmpm1" : {
-        "#neurons" : [10, 40 ,41]
+    "nmpm1": {
+        "#neurons": [10,40,41]
     }
 }

@@ -1,30 +1,30 @@
 {
-	"snab_name" : "SmallMnist",
-	"nest" : {
-		"max_weight" : [0.001, 0.1, 30],
-		"neuron_params": {
-			"tau_m": [5,30,30]
-		},
+    "snab_name": "MnistSpikey",
+    "nest": {
+        "max_weight": [0.001,0.1,30],
+        "neuron_params": {
+            "tau_m": [5,30,30]
+        },
         "train_data": true,
-		"images": 1000, 
-		"batchsize" : 1000
-	},
-	"spikey" : {
-		"max_weight" : [0.001, 0.015, 15],
+        "images": 1000,
+        "batchsize": 1000
+    },
+    "spikey": {
+        "max_weight": [0.001,0.015,15],
         "train_data": true,
-		"images": 1000, 
-		"batchsize" : 1000,
-		"neuron_params": {
-			"tau_m": [5,20,10]
-		}
-	},
-	"nmpm1" : {
-		"max_weight" : [1, 15, 15],
+        "images": 1000,
+        "batchsize": 1000,
+        "neuron_params": {
+            "tau_m": [5,20,10]
+        }
+    },
+    "nmpm1": {
+        "max_weight": [1,15,15],
         "train_data": true,
-		"images": 1000, 
-		"batchsize" : 1000,
-		"neuron_params": {
-			"tau_m": [5,20,10]
-		}
-	}
+        "images": 1000,
+        "batchsize": 1000,
+        "neuron_params": {
+            "tau_m": [5,20,10]
+        }
+    }
 }
