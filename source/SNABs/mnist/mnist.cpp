@@ -38,7 +38,7 @@ MNIST_BASE::MNIST_BASE(const std::string backend, size_t bench_index)
 MNIST_BASE::MNIST_BASE(const std::string backend, size_t bench_index,
                        std::string name)
     : SNABBase(name, backend, {"accuracy", "sim_time"},
-               {"quality", "performance"}, {"accuracy", "time"}, {"", "ms"},
+               {"quality", "performance"}, {"accuracy", "time"}, {"", "s"},
                {"neuron_type", "neuron_params", "images", "batchsize",
                 "duration", "max_freq", "pause", "poisson", "max_weight",
                 "train_data", "batch_parallel", "dnn_file", "scaled_image"},

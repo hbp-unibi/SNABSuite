@@ -28,7 +28,7 @@ namespace SNAB {
 SetupTimeOneToOne::SetupTimeOneToOne(const std::string backend,
                                      size_t bench_index)
     : SNABBase(__func__, backend, {"Setup Time", "Speedup"},
-               {"performance", "quality"}, {"time", "speedup"}, {"ms", ""},
+               {"performance", "quality"}, {"time", "speedup"}, {"s", ""},
                {"#neurons", "neuron_type"}, bench_index),
       m_pop1(m_netw, 0),
       m_pop2(m_netw, 0)
@@ -92,7 +92,7 @@ SetupTimeAllToAll::SetupTimeAllToAll(const std::string backend,
                                      size_t bench_index)
     : SetupTimeOneToOne(__func__, backend, {"Setup Time", "Speedup"},
                         {"performance", "quality"}, {"time", "speedup"},
-                        {"ms", ""}, {"#neurons", "neuron_type"}, bench_index)
+                        {"s", ""}, {"#neurons", "neuron_type"}, bench_index)
 {
 }
 
@@ -117,7 +117,7 @@ void SetupTimeAllToAll::run_netw(cypress::Network &netw)
 SetupTimeRandom::SetupTimeRandom(const std::string backend, size_t bench_index)
     : SetupTimeOneToOne(__func__, backend, {"Setup Time", "Speedup"},
                         {"performance", "quality"}, {"time", "speedup"},
-                        {"ms", ""}, {"#neurons", "neuron_type"}, bench_index)
+                        {"s", ""}, {"#neurons", "neuron_type"}, bench_index)
 {
 }
 

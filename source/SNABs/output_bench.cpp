@@ -37,7 +37,7 @@ using cypress::global_logger;
 OutputFrequencySingleNeuron::OutputFrequencySingleNeuron(
     const std::string backend, size_t bench_index)
     : SNABBase(__func__, backend, {"Average frequency"}, {"quality"},
-               {"frequency"}, {"mHz"}, {"neuron_type", "neuron_params"},
+               {"frequency"}, {"kHz"}, {"neuron_type", "neuron_params"},
                bench_index),
       m_pop(m_netw, 0)
 {
@@ -124,7 +124,7 @@ OutputFrequencySingleNeuron::evaluate()
 OutputFrequencySingleNeuron2::OutputFrequencySingleNeuron2(
     const std::string backend, size_t bench_index)
     : SNABBase(__func__, backend, {"Average frequency"}, {"quality"},
-               {"frequency"}, {"mHz"},
+               {"frequency"}, {"kHz"},
                {"neuron_type", "neuron_params", "#neurons"}, bench_index),
       m_pop(m_netw, 0)
 {
@@ -223,7 +223,7 @@ OutputFrequencySingleNeuron2::evaluate()
 OutputFrequencyMultipleNeurons::OutputFrequencyMultipleNeurons(
     const std::string backend, size_t bench_index)
     : SNABBase(__func__, backend, {"Average frequency"}, {"quality"},
-               {"frequency"}, {"mHz"},
+               {"frequency"}, {"kHz"},
                {"neuron_type", "neuron_params", "#neurons"}, bench_index),
       m_pop(m_netw, 0)
 {
