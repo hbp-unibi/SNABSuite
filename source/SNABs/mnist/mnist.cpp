@@ -30,13 +30,13 @@
 #include "util/utilities.hpp"
 
 namespace SNAB {
-SimpleMnist::SimpleMnist(const std::string backend, size_t bench_index)
-    : SimpleMnist(backend, bench_index, __func__)
+MNIST_BASE::MNIST_BASE(const std::string backend, size_t bench_index)
+    : MNIST_BASE(backend, bench_index, __func__)
 {
 }
 
-SimpleMnist::SimpleMnist(const std::string backend, size_t bench_index,
-                         std::string name)
+MNIST_BASE::MNIST_BASE(const std::string backend, size_t bench_index,
+                       std::string name)
     : SNABBase(name, backend, {"accuracy", "sim_time"},
                {"quality", "performance"}, {"accuracy", "time"}, {"", "ms"},
                {"neuron_type", "neuron_params", "images", "batchsize",
@@ -46,7 +46,7 @@ SimpleMnist::SimpleMnist(const std::string backend, size_t bench_index,
 {
 }
 
-void SimpleMnist::read_config()
+void MNIST_BASE::read_config()
 {
 	m_neuron_type_str = m_config_file["neuron_type"].get<std::string>();
 
@@ -73,7 +73,7 @@ void SimpleMnist::read_config()
 	}
 }
 
-cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw)
+cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
 {
 	read_config();
 	auto kerasdata = mnist_helper::read_network(m_dnn_file, true);
@@ -140,12 +140,12 @@ cypress::Network &SimpleMnist::build_netw_int(cypress::Network &netw)
 	return netw;
 }
 
-cypress::Network &SimpleMnist::build_netw(cypress::Network &netw)
+cypress::Network &MNIST_BASE::build_netw(cypress::Network &netw)
 {
 	return build_netw_int(netw);
 }
 
-void SimpleMnist::run_netw(cypress::Network &netw)
+void MNIST_BASE::run_netw(cypress::Network &netw)
 {
 	cypress::PowerManagementBackend pwbackend(
 	    cypress::Network::make_backend(m_backend));
@@ -172,7 +172,7 @@ void SimpleMnist::run_netw(cypress::Network &netw)
 	}
 }
 
-std::vector<std::array<cypress::Real, 4>> SimpleMnist::evaluate()
+std::vector<std::array<cypress::Real, 4>> MNIST_BASE::evaluate()
 {
 	size_t global_correct(0);
 	size_t images(0);
@@ -231,7 +231,7 @@ std::vector<std::array<cypress::Real, 4>> SimpleMnist::evaluate()
 	        std::array<cypress::Real, 4>({sim_time, NaN(), NaN(), NaN()})};
 }
 
-size_t SimpleMnist::create_deep_network(Network &netw, Real max_weight)
+size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight)
 {
 	size_t layer_id = netw.populations().size();
 	size_t counter = 0;

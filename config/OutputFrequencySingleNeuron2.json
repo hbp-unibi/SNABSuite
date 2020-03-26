@@ -28,6 +28,9 @@
 		},
 		"#neurons" : [192,384]
 	},
+	"genn": {
+        "invalid" :true
+	},
 	"nest" : {
 		"neuron_type" : "IF_cond_exp",
 		"neuron_params": {

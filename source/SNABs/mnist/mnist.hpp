@@ -31,18 +31,18 @@ namespace SNAB {
 
 /**
  * @brief A simple feed-forward network with densely connected layers.
- * TODO: Network definition as soon as this is fixed.
+ * This is just the base class
  */
-class SimpleMnist : public SNABBase {
+class MNIST_BASE : public SNABBase {
 public:
-	SimpleMnist(const std::string backend, size_t bench_index);
+	MNIST_BASE(const std::string backend, size_t bench_index);
 	virtual cypress::Network &build_netw(cypress::Network &netw) override;
 	virtual void run_netw(cypress::Network &netw) override;
 	virtual std::vector<std::array<cypress::Real, 4>> evaluate() override;
-	virtual std::shared_ptr<SNABBase> clone() override
+	/*virtual std::shared_ptr<SNABBase> clone() override
 	{
-		return std::make_shared<SimpleMnist>(m_backend, m_bench_index);
-	}
+		return std::make_shared<MNIST_BASE>(m_backend, m_bench_index);
+	}*/
 
 protected:
 	NeuronParameters m_neuro_params;  // Neuron Parameters
@@ -92,8 +92,7 @@ protected:
 	 * @param bench_index benchmark index
 	 * @param name Name of the derived benchmark
 	 */
-	SimpleMnist(const std::string backend, size_t bench_index,
-	            std::string name);
+	MNIST_BASE(const std::string backend, size_t bench_index, std::string name);
 
 	/**
 	 * @brief Read config from m_config
@@ -110,25 +109,101 @@ protected:
 	cypress::Network &build_netw_int(cypress::Network &netw);
 };
 
-class SmallMnist : public SimpleMnist {
+/**
+ * @brief A simple feed-forward network with densely connected layers.
+ * This network has 89x100x10 layout with images downscales by 3x3 average
+ * pooling and no inhibition
+ */
+class MnistSpikey : public MNIST_BASE {
 public:
-	SmallMnist(const std::string backend, size_t bench_index)
-	    : SimpleMnist(backend, bench_index, __func__)
+	MnistSpikey(const std::string backend, size_t bench_index)
+	    : MNIST_BASE(backend, bench_index, __func__)
 	{
 	}
-
-	// cypress::Network &build_netw(cypress::Network &netw) override;
 
 	std::shared_ptr<SNABBase> clone() override
 	{
-		return std::make_shared<SmallMnist>(m_backend, m_bench_index);
+		return std::make_shared<MnistSpikey>(m_backend, m_bench_index);
 	}
 };
 
-class MnistITLLastLayer : public SimpleMnist {
+/**
+ * @brief A simple feed-forward network with densely connected layers.
+ * This is a network optimized by Neural Architecture Search. Layout:
+ * 784x43x10x10
+ */
+class MnistNAS63 : public MNIST_BASE {
+public:
+	MnistNAS63(const std::string backend, size_t bench_index)
+	    : MNIST_BASE(backend, bench_index, __func__)
+	{
+	}
+
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<MnistNAS63>(m_backend, m_bench_index);
+	}
+};
+
+/**
+ * @brief A simple feed-forward network with densely connected layers.
+ * This is a network optimized by Neural Architecture Search. Layout:
+ * 784x52x35x32x10
+ */
+class MnistNAS129 : public MNIST_BASE {
+public:
+	MnistNAS129(const std::string backend, size_t bench_index)
+	    : MNIST_BASE(backend, bench_index, __func__)
+	{
+	}
+
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<MnistNAS129>(m_backend, m_bench_index);
+	}
+};
+
+/**
+ * @brief A simple feed-forward network with densely connected layers.
+ * This is a network optimized by Neural Architecture Search. Layout:
+ * 784x866x52x35x32x10
+ */
+class MnistNAStop : public MNIST_BASE {
+public:
+	MnistNAStop(const std::string backend, size_t bench_index)
+	    : MNIST_BASE(backend, bench_index, __func__)
+	{
+	}
+
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<MnistNAStop>(m_backend, m_bench_index);
+	}
+};
+
+/**
+ * @brief A simple feed-forward network with densely connected layers.
+ * This is a network taken from
+ * https://github.com/dannyneil/spiking_relu_conversion Corresponding paper:
+ * Diehl et al.: M. Fast-Classifying, High-Accuracy Spiking Deep Networks
+ * Through Weight and Threshold Balancing. Layout: 784x1200x1200x10
+ */
+class MnistDiehl : public MNIST_BASE {
+public:
+	MnistDiehl(const std::string backend, size_t bench_index)
+	    : MNIST_BASE(backend, bench_index, __func__)
+	{
+	}
+
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<MnistDiehl>(m_backend, m_bench_index);
+	}
+};
+class MnistITLLastLayer : public MNIST_BASE {
 public:
 	MnistITLLastLayer(const std::string backend, size_t bench_index)
-	    : SimpleMnist(backend, bench_index, __func__)
+	    : MNIST_BASE(backend, bench_index, __func__)
 	{
 	}
 
@@ -144,7 +219,7 @@ public:
 protected:
 	MnistITLLastLayer(const std::string backend, size_t bench_index,
 	                  std::string name)
-	    : SimpleMnist(backend, bench_index, name)
+	    : MNIST_BASE(backend, bench_index, name)
 	{
 	}
 	std::pair<std::vector<std::vector<std::vector<Real>>>,
