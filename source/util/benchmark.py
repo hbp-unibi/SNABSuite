@@ -17,3 +17,9 @@ args_list.extend(arguments)
 
 import subprocess
 subprocess.check_call(args_list)
+
+import os
+for root, dirs, files in os.walk(os.path.abspath("./")):
+    for file in files:
+        if not file.endswith('.json'):
+            os.remove(os.path.join(root, file))
