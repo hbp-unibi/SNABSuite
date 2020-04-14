@@ -77,10 +77,8 @@ include_directories(source/)
 
 add_library(benchmark_library
 	source/util/read_json
-	source/util/spiking_utils
 	source/util/utilities
     source/common/benchmark
-    source/common/neuron_parameters
     source/common/parameter_sweep
 	source/common/snab_base
 	source/common/snab_registry

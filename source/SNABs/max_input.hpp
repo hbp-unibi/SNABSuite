@@ -23,7 +23,6 @@
 
 #include <cypress/cypress.hpp>
 
-#include "common/neuron_parameters.hpp"
 #include "common/snab_base.hpp"
 
 namespace SNAB {
@@ -36,7 +35,7 @@ private:
 	cypress::PopulationBase m_pop;
 	cypress::Population<cypress::SpikeSourceArray> m_pop_source;
 	size_t m_num_neurons = 0, m_num_spikes = 0;
-	NeuronParameters m_neuro_params;
+	cypress::NeuronParameter m_neuro_params;
 	cypress::Real simulation_length = 100;  // ms
 
 public:
@@ -59,7 +58,7 @@ private:
 	cypress::PopulationBase m_pop;
 	cypress::Population<cypress::SpikeSourceArray> m_pop_source;
 	size_t m_num_neurons = 0, m_num_inp_neurons = 0, m_num_spikes = 0;
-	NeuronParameters m_neuro_params;
+	cypress::NeuronParameter m_neuro_params;
 	cypress::Real simulation_length = 100;  // ms
 
 public:
@@ -82,7 +81,7 @@ protected:
 	cypress::PopulationBase m_pop;
 	cypress::Population<cypress::SpikeSourceArray> m_pop_source;
 	size_t m_num_neurons = 0, m_num_inp_neurons = 0, m_num_spikes = 0;
-	NeuronParameters m_neuro_params;
+	cypress::NeuronParameter m_neuro_params;
 	cypress::Real simulation_length = 100;  // ms
 	MaxInputFixedOutConnector(
 	    std::string name, std::string backend,

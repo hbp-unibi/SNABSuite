@@ -24,12 +24,11 @@
 
 #include <cypress/backend/power/power.hpp>  // Control of power via netw
 
-#include "common/neuron_parameters.hpp"
 #include "max_input.hpp"
-#include "util/spiking_utils.hpp"
 #include "util/utilities.hpp"
 
 namespace SNAB {
+using namespace cypress;
 
 MaxInputOneToOne::MaxInputOneToOne(const std::string backend,
                                    size_t bench_index)
@@ -50,7 +49,7 @@ cypress::Network &MaxInputOneToOne::build_netw(cypress::Network &netw)
 
 	// Get neuron neuron_parameters
 	m_neuro_params =
-	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
+	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params"]);
 	// Set up population, record voltage
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, m_neuro_params,
@@ -126,7 +125,7 @@ cypress::Network &MaxInputAllToAll::build_netw(cypress::Network &netw)
 
 	// Get neuron neuron_parameters
 	m_neuro_params =
-	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
+	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params"]);
 	// Set up population, record voltage
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, m_neuro_params,
@@ -203,7 +202,7 @@ cypress::Network &MaxInputFixedOutConnector::build_netw(cypress::Network &netw)
 
 	// Get neuron neuron_parameters
 	m_neuro_params =
-	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
+	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params"]);
 	// Set up population, record voltage
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, m_neuro_params,
@@ -296,7 +295,7 @@ cypress::Network &MaxInputFixedInConnector::build_netw(cypress::Network &netw)
 
 	// Get neuron neuron_parameters
 	m_neuro_params =
-	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
+	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params"]);
 	// Set up population, record voltage
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, m_neuro_params,

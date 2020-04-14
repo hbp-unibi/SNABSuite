@@ -21,14 +21,14 @@
 #include <string>
 #include <vector>
 
-#include "common/neuron_parameters.hpp"
 #include "util/read_json.hpp"
-#include "util/spiking_utils.hpp"
 #include "util/utilities.hpp"
 #include "wta_like.hpp"
 
 namespace SNAB {
 using cypress::global_logger;
+using cypress::NeuronParameter;
+using cypress::SpikingUtils;
 
 using namespace cypress;
 
@@ -52,7 +52,7 @@ cypress::Network &SimpleWTA::build_netw(cypress::Network &netw)
 
 	// Get neuron neuron_parameters
 	m_neuro_params =
-	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
+	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params"]);
 
 	// Get network sizes
@@ -296,7 +296,7 @@ Network &LateralInhibWTA::build_netw(cypress::Network &netw)
 
 	// Get neuron neuron_parameters
 	m_neuro_params =
-	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
+	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params"]);
 
 	// Get network sizes
@@ -465,7 +465,7 @@ Network &MirrorInhibWTA::build_netw(cypress::Network &netw)
 
 	// Get neuron neuron_parameters
 	m_neuro_params =
-	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
+	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params"]);
 
 	// Get network sizes

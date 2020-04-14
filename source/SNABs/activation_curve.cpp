@@ -24,12 +24,11 @@
 
 #include <cypress/backend/power/power.hpp>
 #include "activation_curve.hpp"
-#include "common/neuron_parameters.hpp"
-#include "util/spiking_utils.hpp"
 #include "util/utilities.hpp"
 
 namespace SNAB {
-using cypress::Real;
+using namespace cypress;
+
 WeightDependentActivation::WeightDependentActivation(const std::string backend,
                                                      size_t bench_index)
     : SNABBase(__func__, backend,
@@ -72,11 +71,11 @@ cypress::Network &WeightDependentActivation::build_netw(cypress::Network &netw)
 		m_valid = false;
 	}
 	// Get neuron neuron_parameters
-	auto neuro_params = NeuronParameters(
-	    SpikingUtils::detect_type(m_config_file["neuron_type"]),
+	auto neuro_params = NeuronParameter(
+	    cypress::SpikingUtils::detect_type(m_config_file["neuron_type"]),
 	    m_config_file["neuron_params"]);
 	// Set up population, record spikes
-	m_pop = SpikingUtils::add_population(m_config_file["neuron_type"], netw,
+	m_pop = cypress::SpikingUtils::add_population(m_config_file["neuron_type"], netw,
 	                                     neuro_params,
 	                                     m_config_file["#neurons"], "spikes");
 
@@ -291,7 +290,7 @@ cypress::Network &RateBasedWeightDependentActivation::build_netw(
 		m_valid = false;
 	}
 	// Get neuron neuron_parameters
-	auto neuro_params = NeuronParameters(
+	auto neuro_params = NeuronParameter(
 	    SpikingUtils::detect_type(m_config_file["neuron_type"]),
 	    m_config_file["neuron_params"]);
 	// Set up population, record spikes

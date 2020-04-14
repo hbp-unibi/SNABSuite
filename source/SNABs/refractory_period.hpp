@@ -37,7 +37,7 @@ private:
 	cypress::PopulationBase m_pop;
 	cypress::Real m_tolerance = 1.0;
 	cypress::Population<cypress::SpikeSourceArray> m_pop_source;
-	NeuronParameters m_neuro_params;
+	cypress::NeuronParameter m_neuro_params;
 
 public:
 	RefractoryPeriod(const std::string backend, size_t bench_index);

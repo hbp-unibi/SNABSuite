@@ -25,14 +25,12 @@
 
 #include <cypress/backend/power/power.hpp>  // Control of power via netw
 
-#include "common/neuron_parameters.hpp"
 #include "output_bench.hpp"
 #include "util/read_json.hpp"
-#include "util/spiking_utils.hpp"
 #include "util/utilities.hpp"
 
 namespace SNAB {
-using cypress::global_logger;
+using namespace cypress;
 
 OutputFrequencySingleNeuron::OutputFrequencySingleNeuron(
     const std::string backend, size_t bench_index)
@@ -50,8 +48,8 @@ cypress::Network &OutputFrequencySingleNeuron::build_netw(
 	SpikingUtils::detect_type(neuron_type_str);
 
 	// Get neuron neuron_parameters
-	NeuronParameters neuron_params =
-	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
+	NeuronParameter neuron_params =
+	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params"]);
 	// Set up population
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, neuron_params,
@@ -136,8 +134,8 @@ cypress::Network &OutputFrequencySingleNeuron2::build_netw(
 	std::string neuron_type_str = m_config_file["neuron_type"];
 
 	// Get neuron neuron_parameters
-	NeuronParameters neuron_params =
-	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
+	NeuronParameter neuron_params =
+	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params"]);
 	// Set up population
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, neuron_params,
@@ -235,8 +233,8 @@ cypress::Network &OutputFrequencyMultipleNeurons::build_netw(
 	std::string neuron_type_str = m_config_file["neuron_type"];
 
 	// Get neuron neuron_parameters
-	NeuronParameters neuron_params =
-	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
+	NeuronParameter neuron_params =
+	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params"]);
 
 	m_num_neurons = m_config_file["#neurons"];

@@ -23,14 +23,13 @@
 
 #include <cypress/backend/power/power.hpp>  // Control of power via netw
 
-#include "common/neuron_parameters.hpp"
 #include "refractory_period.hpp"
 #include "util/read_json.hpp"
-#include "util/spiking_utils.hpp"
 #include "util/utilities.hpp"
 
 namespace SNAB {
-using cypress::global_logger;
+using namespace cypress;
+
 RefractoryPeriod::RefractoryPeriod(const std::string backend,
                                    size_t bench_index)
     : SNABBase(
@@ -50,7 +49,7 @@ cypress::Network &RefractoryPeriod::build_netw(cypress::Network &netw)
 
 	// Get neuron neuron_parameters
 	m_neuro_params =
-	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
+	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params"]);
 	// Set up population, record voltage
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, m_neuro_params,

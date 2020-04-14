@@ -20,10 +20,10 @@
 
 #include <cypress/backend/power/power.hpp>  // Control of power via netw
 
-#include <util/spiking_utils.hpp>
 #include "setup_time.hpp"
 
 namespace SNAB {
+using namespace cypress;
 
 SetupTimeOneToOne::SetupTimeOneToOne(const std::string backend,
                                      size_t bench_index)
@@ -38,7 +38,7 @@ SetupTimeOneToOne::SetupTimeOneToOne(const std::string backend,
 cypress::Network &SetupTimeOneToOne::build_netw(cypress::Network &netw)
 {
 	std::string neuron_type_str = m_config_file["neuron_type"];
-	NeuronParameters params = NeuronParameters(
+	NeuronParameter params = NeuronParameter(
 	    SpikingUtils::detect_type(neuron_type_str), cypress::Json());
 	m_pop1 = SpikingUtils::add_population(neuron_type_str, netw, params,
 	                                      m_config_file["#neurons"]);

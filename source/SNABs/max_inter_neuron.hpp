@@ -26,6 +26,7 @@
 #include "common/snab_base.hpp"
 
 namespace SNAB {
+using cypress::NeuronParameter;
 /**
  * The aim of this SNAB is to measure the bandwidth between neuron populations.
  * Therefore, taking parameters from the OutputFrequency benchmarks, a single
@@ -39,7 +40,7 @@ private:
 	cypress::PopulationBase m_pop_single, m_pop_group;
 	cypress::Real m_simulation_length = 150;  // ms
 	cypress::Real m_start_time = 50;          // ms
-	NeuronParameters m_group_params;
+	NeuronParameter m_group_params;
 
 public:
 	SingleMaxFreqToGroup(const std::string backend, size_t bench_index);
@@ -63,7 +64,7 @@ protected:
 	cypress::PopulationBase m_pop_max, m_pop_retr;
 	cypress::Real m_simulation_length = 150;  // ms
 	cypress::Real m_start_time = 50;          // ms
-	NeuronParameters m_retr_params;
+	NeuronParameter m_retr_params;
 
 	/**
 	 * Constructor used by by child classes. Just hands everything to SNABBase

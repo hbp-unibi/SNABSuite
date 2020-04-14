@@ -22,7 +22,6 @@ include_directories(PRIVATE ${GTEST_INCLUDE_DIR})
 
 add_executable(SNABSuite_test_util
 	util/test_read_json.cpp
-	util/test_spiking_utils.cpp
 	util/test_utilities.cpp
 )
 target_link_libraries(SNABSuite_test_util
@@ -33,7 +32,6 @@ add_test(SNABSuite_test_util SNABSuite_test_util)
 add_dependencies(SNABSuite_test_util cypress_ext)
 
 add_executable(SNABSuite_test_common
-	common/test_neuron_parameters.cpp
 	common/test_parameter_sweep.cpp
 )
 target_link_libraries(SNABSuite_test_common

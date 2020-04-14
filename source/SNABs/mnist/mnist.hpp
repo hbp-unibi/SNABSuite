@@ -23,11 +23,11 @@
 
 #include <cypress/cypress.hpp>
 
-#include "common/neuron_parameters.hpp"
 #include "common/snab_base.hpp"
 #include "mnist_mlp.hpp"
 
 namespace SNAB {
+using namespace cypress;
 
 /**
  * A simple feed-forward network with densely connected layers.
@@ -45,7 +45,7 @@ public:
 	}*/
 
 protected:
-	NeuronParameters m_neuro_params;  // Neuron Parameters
+	NeuronParameter m_neuro_params;  // Neuron Parameters
 	std::string m_neuron_type_str;    // String containing the neuron type
 	size_t m_images, m_batchsize;  // Number of images in general and per batch
 	cypress::Real m_duration, m_max_freq,
@@ -53,7 +53,7 @@ protected:
 	              // time between two images
 	bool m_poisson,
 	    m_train_data;  // Use poisson or regular spiking, Use train or test data
-	Real m_max_weight;  // Max weight to be scaled to
+	cypress::Real m_max_weight;  // Max weight to be scaled to
 
 	std::vector<
 	    std::pair<std::vector<std::vector<Real>>, std::vector<uint16_t>>>
@@ -70,7 +70,7 @@ protected:
 	bool m_scaled_image = false;
 	std::shared_ptr<MNIST::MLPBase> m_mlp;
 
-	Real m_weights_scale_factor = 0.0;
+	cypress::Real m_weights_scale_factor = 0.0;
 
 	bool m_count_spikes = false;
 	std::vector<cypress::PopulationBase> m_all_pops;
@@ -232,11 +232,11 @@ protected:
 	    m_spmnist;
 
 	bool m_positive = false;
-	Real m_norm_rate_hidden = 1.0;
-	Real m_norm_rate_last = 1.0;
+	cypress::Real m_norm_rate_hidden = 1.0;
+	cypress::Real m_norm_rate_last = 1.0;
 	size_t m_global_correct = 0;
 	size_t m_num_images = 0;
-	Real m_sim_time = 0;
+	cypress::Real m_sim_time = 0;
 	std::string m_loss_function = "CatHinge";
 	bool m_last_layer_only = true;
 	size_t m_num_test_images = 10000;

@@ -22,7 +22,6 @@
 
 #include "gtest/gtest.h"
 
-#include "common/neuron_parameters.hpp"
 #include "util/read_json.hpp"
 
 namespace SNAB {

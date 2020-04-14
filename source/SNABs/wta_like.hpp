@@ -25,10 +25,10 @@
 
 #include <vector>
 
-#include "common/neuron_parameters.hpp"
 #include "common/snab_base.hpp"
 
 namespace SNAB {
+using namespace cypress;
 
 /**
  * SimpleWTA: A simple Winner-Takes-All network. Every population represents a
@@ -40,7 +40,7 @@ private:
 	std::vector<cypress::Population<cypress::SpikeSourcePoisson>> m_pop_source;
 	size_t m_num_neurons_pop = 0, m_num_source_neurons = 0;
 	cypress::Real m_firing_rate;
-	NeuronParameters m_neuro_params;
+	NeuronParameter m_neuro_params;
 	cypress::Real m_simulation_length = 10000;  // ms
 	cypress::Real m_bin_size = 15.0;            // ms
 
@@ -85,7 +85,7 @@ private:
 	size_t m_num_neurons_pop = 0, m_num_source_neurons = 0,
 	       m_num_inhibitory_neurons = 0;
 	cypress::Real m_firing_rate;
-	NeuronParameters m_neuro_params;
+	NeuronParameter m_neuro_params;
 	cypress::Real m_simulation_length = 10000;  // ms
 	cypress::Real m_bin_size = 15.0;            // ms
 
@@ -118,7 +118,7 @@ private:
 	size_t m_num_neurons_pop = 0, m_num_source_neurons = 0,
 	       m_num_inhibitory_neurons = 0;
 	cypress::Real m_firing_rate;
-	NeuronParameters m_neuro_params;
+	NeuronParameter m_neuro_params;
 	cypress::Real m_simulation_length = 10000;  // ms
 	cypress::Real m_bin_size = 15.0;            // ms
 

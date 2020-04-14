@@ -24,14 +24,12 @@
 
 #include <cypress/backend/power/power.hpp>  // Control of power via netw
 
-#include "common/neuron_parameters.hpp"
 #include "max_inter_neuron.hpp"
 #include "util/read_json.hpp"
-#include "util/spiking_utils.hpp"
 #include "util/utilities.hpp"
 
 namespace SNAB {
-using cypress::global_logger;
+using namespace cypress;
 
 SingleMaxFreqToGroup::SingleMaxFreqToGroup(const std::string backend,
                                            size_t bench_index)
@@ -51,10 +49,10 @@ cypress::Network &SingleMaxFreqToGroup::build_netw(cypress::Network &netw)
 	std::string neuron_type_str = m_config_file["neuron_type"];
 
 	// Get neuron neuron_parameters
-	NeuronParameters params(SpikingUtils::detect_type(neuron_type_str),
+	NeuronParameter params(SpikingUtils::detect_type(neuron_type_str),
 	                        m_config_file["neuron_params_max"]);
 	m_group_params =
-	    NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
+	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
 	                     m_config_file["neuron_params_retr"]);
 
 	// Create the single, always spiking population
@@ -151,9 +149,9 @@ cypress::Network &GroupMaxFreqToGroup::build_netw(cypress::Network &netw)
 	std::string neuron_type_str = m_config_file["neuron_type"];
 
 	// Get neuron neuron_parameters
-	NeuronParameters params(SpikingUtils::detect_type(neuron_type_str),
+	NeuronParameter params(SpikingUtils::detect_type(neuron_type_str),
 	                        m_config_file["neuron_params_max"]);
-	m_retr_params = NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
+	m_retr_params = NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
 	                                 m_config_file["neuron_params_retr"]);
 
 	// Create the always spiking population
@@ -245,9 +243,9 @@ cypress::Network &GroupMaxFreqToGroupAllToAll::build_netw(
 	std::string neuron_type_str = m_config_file["neuron_type"];
 
 	// Get neuron neuron_parameters
-	NeuronParameters params(SpikingUtils::detect_type(neuron_type_str),
+	NeuronParameter params(SpikingUtils::detect_type(neuron_type_str),
 	                        m_config_file["neuron_params_max"]);
-	m_retr_params = NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
+	m_retr_params = NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
 	                                 m_config_file["neuron_params_retr"]);
 
 	// Create the single always spiking population
@@ -283,9 +281,9 @@ cypress::Network &GroupMaxFreqToGroupProb::build_netw(
 	std::string neuron_type_str = m_config_file["neuron_type"];
 
 	// Get neuron neuron_parameters
-	NeuronParameters params(SpikingUtils::detect_type(neuron_type_str),
+	NeuronParameter params(SpikingUtils::detect_type(neuron_type_str),
 	                        m_config_file["neuron_params_max"]);
-	m_retr_params = NeuronParameters(SpikingUtils::detect_type(neuron_type_str),
+	m_retr_params = NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
 	                                 m_config_file["neuron_params_retr"]);
 
 	// Create the always spiking population

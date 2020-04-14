@@ -23,13 +23,12 @@
 #include <string>
 #include <vector>
 
-#include "common/neuron_parameters.hpp"
 #include "mnist.hpp"
 #include "mnist_mlp.hpp"
-#include "util/spiking_utils.hpp"
 #include "util/utilities.hpp"
 
 namespace SNAB {
+using namespace cypress;
 MNIST_BASE::MNIST_BASE(const std::string backend, size_t bench_index)
     : MNIST_BASE(backend, bench_index, __func__)
 {
@@ -51,7 +50,7 @@ void MNIST_BASE::read_config()
 	m_neuron_type_str = m_config_file["neuron_type"].get<std::string>();
 
 	m_neuro_params =
-	    NeuronParameters(SpikingUtils::detect_type(m_neuron_type_str),
+	    NeuronParameter(SpikingUtils::detect_type(m_neuron_type_str),
 	                     m_config_file["neuron_params"]);
 	if (m_neuron_type_str == "IF_cond_exp") {
 		m_neuro_params.set("tau_syn_I", m_neuro_params.get("tau_syn_E"));
