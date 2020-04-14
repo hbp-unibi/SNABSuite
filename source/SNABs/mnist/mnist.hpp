@@ -46,7 +46,7 @@ public:
 
 protected:
 	NeuronParameter m_neuro_params;  // Neuron Parameters
-	std::string m_neuron_type_str;    // String containing the neuron type
+	std::string m_neuron_type_str;   // String containing the neuron type
 	size_t m_images, m_batchsize;  // Number of images in general and per batch
 	cypress::Real m_duration, m_max_freq,
 	    m_pause;  // Spike data: Sample duration, Sample max freq, and pause
@@ -69,6 +69,7 @@ protected:
 	std::string m_dnn_file = "";
 	bool m_scaled_image = false;
 	std::shared_ptr<MNIST::MLPBase> m_mlp;
+	bool m_ttfs = false;
 
 	cypress::Real m_weights_scale_factor = 0.0;
 

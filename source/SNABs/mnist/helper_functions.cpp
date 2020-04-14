@@ -111,13 +111,39 @@ std::vector<std::vector<std::vector<Real>>> image_to_rate(
 	return rate_images;
 }
 
+std::vector<std::vector<std::vector<Real>>> image_to_TTFS(
+    const std::vector<std::vector<Real>> &images, const Real duration,
+    size_t num_images)
+{
+	std::vector<std::vector<std::vector<Real>>> TTFS_images;
+	for (size_t i = 0; i < num_images; i++) {
+		std::vector<std::vector<Real>> spike_image;
+		for (const auto &pixel : images[i]) {
+            if(pixel>0){
+                spike_image.emplace_back(std::vector<Real>{(1.0 - pixel) * duration});
+            }
+            else{
+                spike_image.emplace_back(std::vector<Real>{});
+            }
+		}
+		TTFS_images.emplace_back(spike_image);
+	}
+	return TTFS_images;
+}
+
 SPIKING_MNIST mnist_to_spike(const MNIST_DATA &mnist_data, const Real duration,
                              const Real max_freq, size_t num_images,
-                             bool poisson)
+                             bool poisson, bool ttfs)
 {
 	SPIKING_MNIST res;
-	std::get<0>(res) = image_to_rate(std::get<0>(mnist_data), duration,
-	                                 max_freq, num_images, poisson);
+	if (!ttfs) {
+		std::get<0>(res) = image_to_rate(std::get<0>(mnist_data), duration,
+		                                 max_freq, num_images, poisson);
+	}
+	else {
+		std::get<0>(res) =
+		    image_to_TTFS(std::get<0>(mnist_data), duration, num_images);
+	}
 	std::get<1>(res) = std::get<1>(mnist_data);
 	return res;
 }
@@ -251,31 +277,61 @@ std::vector<LocalConnection> dense_weights_to_conn(const Matrix<Real> &mat,
 }
 
 std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,
-                                       Real pause, size_t batch_size)
+                                       Real pause, size_t batch_size, bool ttfs)
 {
 	std::vector<uint16_t> res(batch_size);
-	std::vector<std::vector<uint16_t>> binned_spike_counts;
-	for (const auto &neuron : pop) {
-		binned_spike_counts.push_back(
-		    SpikingUtils::spike_time_binning<uint16_t>(
-		        -pause * 0.5, batch_size * (duration + pause) - (pause * 0.5),
-		        batch_size, neuron.signals().data(0)));
-	}
-
-	for (size_t sample = 0; sample < batch_size; sample++) {
-		uint16_t max = 0;
-		uint16_t index = std::numeric_limits<uint16_t>::max();
-		for (size_t neuron = 0; neuron < binned_spike_counts.size(); neuron++) {
-			if (binned_spike_counts[neuron][sample] > max) {
-				index = neuron;
-				max = binned_spike_counts[neuron][sample];
-			}
-			else if (binned_spike_counts[neuron][sample] == max) {
-				// Multiple neurons have the same decision
-				index = std::numeric_limits<uint16_t>::max();
-			}
+	if (!ttfs) {
+		std::vector<std::vector<uint16_t>> binned_spike_counts;
+		for (const auto &neuron : pop) {
+			binned_spike_counts.push_back(
+			    SpikingUtils::spike_time_binning<uint16_t>(
+			        -pause * 0.5,
+			        batch_size * (duration + pause) - (pause * 0.5), batch_size,
+			        neuron.signals().data(0)));
 		}
-		res[sample] = index;
+
+		for (size_t sample = 0; sample < batch_size; sample++) {
+			uint16_t max = 0;
+			uint16_t index = std::numeric_limits<uint16_t>::max();
+			for (size_t neuron = 0; neuron < binned_spike_counts.size();
+			     neuron++) {
+				if (binned_spike_counts[neuron][sample] > max) {
+					index = neuron;
+					max = binned_spike_counts[neuron][sample];
+				}
+				else if (binned_spike_counts[neuron][sample] == max) {
+					// Multiple neurons have the same decision
+					index = std::numeric_limits<uint16_t>::max();
+				}
+			}
+			res[sample] = index;
+		}
+	}
+	else {
+		std::vector<std::vector<Real>> binned_spike_times;
+		for (const auto &neuron : pop) {
+			binned_spike_times.push_back(
+			    SpikingUtils::spike_time_binning_TTFS(
+			        0.0, batch_size * (duration + pause), batch_size,
+			        neuron.signals().data(0)));
+		}
+
+		for (size_t sample = 0; sample < batch_size; sample++) {
+			Real min = std::numeric_limits<Real>::max();
+			uint16_t index = std::numeric_limits<uint16_t>::max();
+			for (size_t neuron = 0; neuron < binned_spike_times.size();
+			     neuron++) {
+				if (binned_spike_times[neuron][sample] < min) {
+					index = neuron;
+					min = binned_spike_times[neuron][sample];
+				}
+				else if (binned_spike_times[neuron][sample] == min) {
+					// Multiple neurons have the same decision
+					index = std::numeric_limits<uint16_t>::max();
+				}
+			}
+			res[sample] = index;
+		}
 	}
 	return res;
 }

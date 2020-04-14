@@ -68,6 +68,21 @@ std::vector<std::vector<std::vector<Real>>> image_to_rate(
     const Real max_freq, size_t num_images, bool poisson = true);
 
 /**
+ * @brief Converts a vector of images to a time-to-first-spike (TTFS) based
+ * representation
+ *
+ * @param images vector of images
+ * @param duration duration of the rate
+ * @param max_freq maximal rate/frequency
+ * @param num_images number of images to read in
+ * @param poisson False: regular spiking. True: poisson rates. Defaults to true.
+ * @return vector (images) of vector (pixel) of spikes
+ */
+std::vector<std::vector<std::vector<Real>>> image_to_TTFS(
+    const std::vector<std::vector<Real>> &images, const Real duration,
+    size_t num_images);
+
+/**
  * @brief Converts the full MNIST dataset to a spiking MNIST dataset
  *
  * @param mnist_data data container from loadMnistData
@@ -75,12 +90,13 @@ std::vector<std::vector<std::vector<Real>>> image_to_rate(
  * @param max_freq Maximal rate (e.g. for px = 1)
  * @param num_images number of images to read in
  * @param poisson False: regular spiking. True: poisson rates. Defaults to true.
+ * @param ttfs use time-to-first-spike encoding. Invalidates poisson.
  * @return pair, std::get<0> is a vector of spiking images, std::get<1> a vector
  * of labels
  */
 SPIKING_MNIST mnist_to_spike(const MNIST_DATA &mnist_data, const Real duration,
                              const Real max_freq, size_t num_images,
-                             bool poisson = true);
+                             bool poisson = true, bool ttfs = false);
 
 /**
  * @brief Creates batches of spikes representing the MNIST data
@@ -268,12 +284,14 @@ std::vector<LocalConnection> dense_weights_to_conn(const Matrix<Real> &mat,
  * @param duration presentation time of a sample
  * @param pause pause time in between samples
  * @param batch_size number of samples interpreted by these neurons (batch size)
+ * @param ttfs use TTFS encoding
  * @return a vector of labels, for one hot coded neurons, if two neurons had the
  * same activation or there was no activation at all,
  * std::numeric_limits<uint16_t>::max() is returned
  */
 std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,
-                                       Real pause, size_t batch_size);
+                                       Real pause, size_t batch_size,
+                                       bool ttfs = false);
 
 /**
  * @brief Converts the simulation results into values between 0 and 1

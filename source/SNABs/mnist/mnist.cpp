@@ -51,7 +51,7 @@ void MNIST_BASE::read_config()
 
 	m_neuro_params =
 	    NeuronParameter(SpikingUtils::detect_type(m_neuron_type_str),
-	                     m_config_file["neuron_params"]);
+	                    m_config_file["neuron_params"]);
 	if (m_neuron_type_str == "IF_cond_exp") {
 		m_neuro_params.set("tau_syn_I", m_neuro_params.get("tau_syn_E"));
 	}
@@ -70,6 +70,9 @@ void MNIST_BASE::read_config()
 	if (m_config_file.find("count_spikes") != m_config_file.end()) {
 		m_count_spikes = m_config_file["count_spikes"].get<bool>();
 	}
+	if (m_config_file.find("ttfs") != m_config_file.end()) {
+		m_ttfs = m_config_file["ttfs"].get<bool>();
+	}
 }
 
 cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
@@ -82,14 +85,14 @@ cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
 	}
 	mnist_helper::SPIKING_MNIST spike_mnist;
 	if (m_train_data) {
-		spike_mnist =
-		    mnist_helper::mnist_to_spike(m_mlp->mnist_train_set(), m_duration,
-		                                 m_max_freq, m_images, m_poisson);
+		spike_mnist = mnist_helper::mnist_to_spike(m_mlp->mnist_train_set(),
+		                                           m_duration, m_max_freq,
+		                                           m_images, m_poisson, m_ttfs);
 	}
 	else {
-		spike_mnist =
-		    mnist_helper::mnist_to_spike(m_mlp->mnist_test_set(), m_duration,
-		                                 m_max_freq, m_images, m_poisson);
+		spike_mnist = mnist_helper::mnist_to_spike(m_mlp->mnist_test_set(),
+		                                           m_duration, m_max_freq,
+		                                           m_images, m_poisson, m_ttfs);
 	}
 	m_batch_data = mnist_helper::create_batches(spike_mnist, m_batchsize,
 	                                            m_duration, m_pause, false);
@@ -178,7 +181,7 @@ std::vector<std::array<cypress::Real, 4>> MNIST_BASE::evaluate()
 	for (size_t batch = 0; batch < m_label_pops.size(); batch++) {
 		auto pop = m_label_pops[batch];
 		auto labels = mnist_helper::spikes_to_labels(pop, m_duration, m_pause,
-		                                             m_batchsize);
+		                                             m_batchsize, m_ttfs);
 		auto &orig_labels = std::get<1>(m_batch_data[batch]);
 		auto correct = mnist_helper::compare_labels(orig_labels, labels);
 		global_correct += correct;
