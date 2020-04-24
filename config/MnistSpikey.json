@@ -19,7 +19,7 @@
         "max_freq": 120,
         "pause": 50,
         "poisson": false,
-        "max_weight": 0.01,
+        "max_weight": 0.0135,
         "train_data": false,
         "batch_parallel": true,
         "count_spikes": false,

@@ -10,7 +10,7 @@
             "v_reset": -75,
             "v_thresh": -55,
             "tau_refrac": 0,
-            "tau_m": 20,
+            "tau_m": 20.0,
             "cm": 0.2
         },
         "images": 10000,
@@ -19,7 +19,7 @@
         "max_freq": 120,
         "pause": 50,
         "poisson": false,
-        "max_weight": 0.02,
+        "max_weight": 0.028,
         "train_data": false,
         "batch_parallel": true,
         "count_spikes": false,
