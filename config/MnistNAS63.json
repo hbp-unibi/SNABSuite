@@ -19,7 +19,7 @@
         "max_freq": 120,
         "pause": 50,
         "poisson": false,
-        "max_weight": 0.02,
+        "max_weight": 0.038,
         "train_data": false,
         "batch_parallel": true,
         "count_spikes": false,
@@ -27,7 +27,7 @@
         "scaled_image": false,
         "setup": {
             "timestep": 1,
-            "threads": 4
+            "threads": 1
         }
     },
     "genn": {
