@@ -262,5 +262,47 @@ public:
 	}
 };
 
+/**
+ * A simple feed-forward network with densely connected layers.
+ * This network has 89x100x10 layout with images downscales by 3x3 average
+ * pooling and no inhibition
+ * In contrast to MnistSpikey, use TTFS encoding
+ */
+class MnistSpikeyTTFS : public MNIST_BASE {
+public:
+	MnistSpikeyTTFS(const std::string backend, size_t bench_index)
+	    : MNIST_BASE(backend, bench_index, __func__)
+	{
+        m_ttfs = true;
+	}
+
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<MnistSpikeyTTFS>(m_backend, m_bench_index);
+	}
+};
+
+/**
+ * A simple feed-forward network with densely connected layers.
+ * This is a network taken from
+ * https://github.com/dannyneil/spiking_relu_conversion Corresponding paper:
+ * Diehl et al.: M. Fast-Classifying, High-Accuracy Spiking Deep Networks
+ * Through Weight and Threshold Balancing. Layout: 784x1200x1200x10
+ * In contrast to MnistDiehl, use TTFS encoding
+ */
+class MnistDiehlTTFS : public MNIST_BASE {
+public:
+	MnistDiehlTTFS(const std::string backend, size_t bench_index)
+	    : MNIST_BASE(backend, bench_index, __func__)
+	{
+        m_ttfs = true;
+	}
+
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<MnistDiehlTTFS>(m_backend, m_bench_index);
+	}
+};
+
 }  // namespace SNAB
 #endif

@@ -1,0 +1,159 @@
+{
+    "nest": {
+        "invalid": true,
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -130,
+            "tau_syn_E": 3,
+            "tau_syn_I": 3,
+            "v_rest": -65,
+            "v_reset": -75,
+            "v_thresh": -55,
+            "tau_refrac": 0,
+            "tau_m": 20,
+            "cm": 0.2
+        },
+        "images": 10000,
+        "batchsize": [10000,2500,500,50],
+        "duration": 500,
+        "max_freq": 120,
+        "pause": 50,
+        "poisson": false,
+        "max_weight": 0.0135,
+        "train_data": false,
+        "batch_parallel": true,
+        "count_spikes": true,
+        "dnn_file": "networks/netw_spikey.msgpack",
+        "scaled_image": true,
+        "setup": {
+            "timestep": 1,
+            "threads": 4
+        }
+    },
+    "genn": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -130,
+            "tau_syn_E": 9,
+            "tau_syn_I": 5,
+            "v_rest": -65,
+            "v_reset": -75,
+            "v_thresh": -55,
+            "tau_refrac": 20,
+            "tau_m": 8,
+            "cm": 0.2
+        },
+        "images": 1000,
+        "batchsize": [1000,100],
+        "duration": 10,
+        "max_freq": 3.5,
+        "pause": 20,
+        "poisson": false,
+        "max_weight": 0.005,
+        "train_data": true,
+        "batch_parallel": true,
+        "count_spikes": false,
+        "dnn_file": "networks/netw_spikey.msgpack",
+        "scaled_image": true,
+        "setup": {
+            "timestep": 0.1
+        }
+    },
+    "spinnaker": {
+        "invalid": true,
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -130,
+            "tau_syn_E": 3,
+            "tau_syn_I": 3,
+            "v_rest": -65,
+            "v_reset": -75,
+            "v_thresh": -55,
+            "tau_refrac": 0,
+            "tau_m": 20,
+            "cm": 0.2
+        },
+        "images": 10000,
+        "batchsize": [10000,2500,480,42],
+        "duration": 500,
+        "max_freq": 120,
+        "pause": 50,
+        "poisson": false,
+        "max_weight": 0.01,
+        "train_data": false,
+        "batch_parallel": true,
+        "count_spikes": false,
+        "dnn_file": "networks/netw_spikey.msgpack",
+        "scaled_image": true,
+        "setup": {
+            "timestep": 1
+        }
+    },
+    "spikey": {
+        "invalid": true,
+        "neuron_type": "IfFacetsHardware1",
+        "neuron_params": {
+            "tau_m": 10,
+            "tau_refrac": 0.001,
+            "v_rest": -75,
+            "v_thresh": -55,
+            "v_reset": -80,
+            "e_rev_I": -80
+        },
+        "setup": {
+            "calibIcb": true
+        },
+        "images": 10000,
+        "batchsize": 2500,
+        "duration": 300,
+        "max_freq": 50,
+        "pause": 50,
+        "poisson": false,
+        "max_weight": 0.015,
+        "train_data": false,
+        "batch_parallel": false,
+        "count_spikes": false,
+        "dnn_file": "networks/netw_spikey.msgpack",
+        "scaled_image": true
+    },
+    "nmpm1": {
+        "invalid": true,
+        "setup": {
+            "calib_path": "/wang/data/calibration/brainscales/current",
+            "neuron_size": 8,
+            "digital_weight": true,
+            "bandwidth": 0.3,
+            "synapse_loss": false,
+            "wafer": 33,
+            "hicann": [[[320,321,340,341,296,297,298,299],[320,321,340,341],[322,342]]]
+        },
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -80,
+            "tau_syn_E": 5,
+            "tau_syn_I": 5,
+            "v_rest": -40,
+            "v_reset": -65,
+            "v_thresh": -25,
+            "tau_refrac": 0.1,
+            "tau_m": 20,
+            "cm": 0.2
+        },
+        "images": 10000,
+        "batchsize": 10000,
+        "duration": 900,
+        "max_freq": 60,
+        "pause": 50,
+        "poisson": false,
+        "max_weight": 15,
+        "train_data": false,
+        "batch_parallel": false,
+        "count_spikes": true,
+        "dnn_file": "networks/netw_spikey.msgpack",
+        "scaled_image": true
+    }
+}

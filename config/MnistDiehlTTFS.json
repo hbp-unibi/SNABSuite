@@ -1,0 +1,44 @@
+{
+    "nest": {
+        "invalid": true
+    },
+    "genn": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -130,
+            "tau_syn_E": 3,
+            "tau_syn_I": 3,
+            "v_rest": -65,
+            "v_reset": -75,
+            "v_thresh": -55,
+            "tau_refrac": 20,
+            "tau_m": 15,
+            "cm": 0.2
+        },
+        "images": 5,
+        "batchsize": [5,280],
+        "duration": 10,
+        "max_freq": 3.5,
+        "pause": 10,
+        "poisson": false,
+        "max_weight": 0.022,
+        "train_data": false,
+        "batch_parallel": true,
+        "count_spikes": false,
+        "dnn_file": "networks/netw_diehl.msgpack",
+        "scaled_image": false,
+        "setup": {
+            "timestep": 0.1
+        }
+    },
+    "spinnaker": {
+        "invalid": true
+    },
+    "spikey": {
+        "invalid": true
+    },
+    "nmpm1": {
+        "invalid": true
+    }
+}
