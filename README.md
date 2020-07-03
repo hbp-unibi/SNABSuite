@@ -1,4 +1,6 @@
 # SNABSuite
+![Logo](https://raw.github.com/hbp-unibi/SNABSuite/master/snapsuit.png)
+
 ## Spiking Neural Architecture Benchmark Suite
 
 This project provides a set of basic benchmarks (SNABs) for neuromorphic simulators like NEST, the Spikey chip or the SpiNNaker system. Benchmark networks are described in the platform-agnostic Cypress framework providing a black-box approach to comparing different simulation backends. To account for hardware differences, every SNAB relies on a config file. Results are presented in a JSON-like structure.
