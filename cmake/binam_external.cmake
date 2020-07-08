@@ -32,7 +32,6 @@ include_directories(
 add_library(libcppnam
 	${cppnam_SOURCE_DIR}/src/core/binam
 	${cppnam_SOURCE_DIR}/src/core/entropy
-	${cppnam_SOURCE_DIR}/src/core/experiment
 	${cppnam_SOURCE_DIR}/src/core/parameters
 	${cppnam_SOURCE_DIR}/src/core/spiking_binam
 	${cppnam_SOURCE_DIR}/src/core/spiking_netw_basis
