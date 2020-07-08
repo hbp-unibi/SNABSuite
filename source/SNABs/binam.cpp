@@ -32,8 +32,7 @@ BiNAM::BiNAM(const std::string backend, size_t bench_index)
 {
 }
 
-BiNAM::BiNAM(const std::string backend, size_t bench_index,
-                       std::string name)
+BiNAM::BiNAM(const std::string backend, size_t bench_index, std::string name)
     : SNABBase(name, backend,
                {"Stored Information", "Relative Information", "False Postives",
                 "False Negatives"},
@@ -45,8 +44,14 @@ BiNAM::BiNAM(const std::string backend, size_t bench_index,
 }
 cypress::Network &BiNAM::build_netw(cypress::Network &netw)
 {
-	m_sp_binam = std::make_shared<nam::SpikingBinam>(m_config_file, std::cout,
-	                                                 false);
+#if SNAB_DEBUG
+	m_sp_binam =
+	    std::make_shared<nam::SpikingBinam>(m_config_file, std::cout, false);
+#else
+	std::ofstream ofs;
+	ofs.open("/dev/null");
+	m_sp_binam = std::make_shared<nam::SpikingBinam>(m_config_file, ofs, false);
+#endif
 	m_sp_binam->build(netw);
 	return netw;
 }
@@ -66,6 +71,22 @@ void BiNAM::run_netw(cypress::Network &netw)
 
 std::vector<std::array<cypress::Real, 4>> BiNAM::evaluate()
 {
+
+#if SNAB_DEBUG
+	auto pop = m_sp_binam->get_pop_output();
+	std::vector<std::vector<cypress::Real>> spikes;
+	for (size_t i = 0; i < pop.size(); i++) {
+		spikes.push_back(pop[i].signals().data(0));
+	}
+	Utilities::write_vector2_to_csv(spikes, _debug_filename("spikes_out.csv"));
+	Utilities::plot_spikes(_debug_filename("spikes_out.csv"), m_backend);
+
+	std::ofstream ofs;
+	ofs.open(_debug_filename("matrices.csv"));
+	m_sp_binam->get_BiNAM()->print(ofs);
+	ofs.close();
+
+#endif
 	auto res = m_sp_binam->evaluate_res();
 	return {
 	    std::array<Real, 4>({Real(std::get<1>(res).Info), NaN(), NaN(), NaN()}),
