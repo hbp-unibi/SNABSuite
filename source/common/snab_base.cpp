@@ -43,7 +43,7 @@ SNABBase::SNABBase(std::string name, std::string backend,
       m_indicator_units(indicator_units),
       m_bench_index(bench_index)
 {
-	m_config_file = read_config(name, m_backend);
+	m_config_file = SNAB::read_config(name, m_backend);
 	std::vector<std::string> required_parameters_vec(required_parameters);
 	bool required_params =
 	    check_json_for_parameters(required_parameters_vec, m_config_file, name);

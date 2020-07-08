@@ -29,7 +29,6 @@
 #include <string>
 #include <vector>
 
-namespace SNAB {
 using cypress::global_logger;
 /**
  * Store input form json in a map to check everything!
@@ -55,7 +54,7 @@ std::map<std::string, T> json_to_map(const cypress::Json &obj)
 template <typename T>
 std::vector<T> read_check(std::map<std::string, T> &input,
                           const std::vector<std::string> &names,
-                          const std::vector<T> &defaults)
+                          const std::vector<T> &defaults, bool = true)
 {
 	std::vector<T> res(names.size());
 	for (size_t i = 0; i < res.size(); i++) {
@@ -78,6 +77,7 @@ std::vector<T> read_check(std::map<std::string, T> &input,
 	return res;
 }
 
+namespace SNAB {
 cypress::Json read_config(const std::string &name, const std::string &backend);
 
 bool check_json_for_parameters(const std::vector<std::string> &parameters,

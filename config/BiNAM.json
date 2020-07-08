@@ -1,0 +1,79 @@
+{
+    "default": {
+        "data": {
+            "n_bits_in": [1600,10000],
+            "n_bits_out": [1600,1600],
+            "n_ones_in": 4,
+            "n_ones_out": 4,
+            "n_samples": [113648,710299]
+        },
+        "network": {
+            "params": {
+                "e_rev_E": 0,
+                "v_rest": -70,
+                "v_reset": -80,
+                "v_thresh": -57,
+                "tau_syn_E": 2,
+                "tau_refrac": 0,
+                "tau_m": 10,
+                "cm": 0.2
+            },
+            "neuron_type": "IF_cond_exp",
+            "weight": 0.01,
+            "input_burst_size": 1,
+            "time_window": 100,
+            "isi": 2,
+            "sigma_t": 2,
+            "sigma_offs": 0,
+            "p0": 0,
+            "p1": 0,
+            "output_burst_size": 1,
+            "general_offset": 100,
+            "multiplicity": 1
+        },
+        "data_generator": {
+            "seed": 1234,
+            "random": 1,
+            "balanced": 0,
+            "unique": 0
+        }
+    },
+    "spikey": {
+        "data": {
+            "n_bits_in": [128,256],
+            "n_bits_out": [192,384],
+            "n_ones_in": 4,
+            "n_ones_out": 4,
+            "n_samples": [1215,4619]
+        },
+        "network": {
+            "params": {
+                "v_rest": -70,
+                "v_reset": -80,
+                "v_thresh": -59,
+                "tau_refrac": 0,
+                "g_leak": 0.039
+            },
+            "neuron_type": "IfFacetsHardware1",
+            "weight": 0.006,
+            "input_burst_size": 1,
+            "time_window": 100,
+            "isi": 2,
+            "sigma_t": 2,
+            "sigma_offs": 0,
+            "p0": 0,
+            "p1": 0,
+            "output_burst_size": 1,
+            "general_offset": 100
+        },
+        "data_generator": {
+            "seed": 1234,
+            "random": 1,
+            "balanced": 1,
+            "unique": 1
+        }
+    },
+    "nmpm1": {
+        "invalid": true
+    }
+}

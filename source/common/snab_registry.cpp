@@ -17,22 +17,21 @@
  */
 
 #include <cypress/cypress.hpp>  // Avoid a warning
-
-#include "common/snab_registry.hpp"
-
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "SNABs/activation_curve.hpp"
+#include "SNABs/binam.hpp"
 #include "SNABs/max_input.hpp"
 #include "SNABs/max_inter_neuron.hpp"
+#include "SNABs/mnist/mnist.hpp"
 #include "SNABs/output_bench.hpp"
 #include "SNABs/refractory_period.hpp"
 #include "SNABs/setup_time.hpp"
 #include "SNABs/wta_like.hpp"
-#include "SNABs/mnist/mnist.hpp"
 #include "common/snab_base.hpp"
+#include "common/snab_registry.hpp"
 
 namespace SNAB {
 std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
@@ -77,20 +76,19 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
 	        WeightDependentActivation(backend, bench_index)),
 	    std::make_shared<RateBasedWeightDependentActivation>(
 	        RateBasedWeightDependentActivation(backend, bench_index)),
-	    std::make_shared<MnistSpikey>(
-	        MnistSpikey(backend, bench_index)),
-	    std::make_shared<MnistNAS63>(
-	        MnistNAS63(backend, bench_index)),
-	    std::make_shared<MnistNAS129>(
-	        MnistNAS129(backend, bench_index)),
-	    std::make_shared<MnistNAStop>(
-	        MnistNAStop(backend, bench_index)),
-	    std::make_shared<MnistDiehl>(
-	        MnistDiehl(backend, bench_index)),
+	    std::make_shared<MnistSpikey>(MnistSpikey(backend, bench_index)),
+	    std::make_shared<MnistNAS63>(MnistNAS63(backend, bench_index)),
+	    std::make_shared<MnistNAS129>(MnistNAS129(backend, bench_index)),
+	    std::make_shared<MnistNAStop>(MnistNAStop(backend, bench_index)),
+	    std::make_shared<MnistDiehl>(MnistDiehl(backend, bench_index)),
 	    std::make_shared<MnistITLLastLayer>(
 	        MnistITLLastLayer(backend, bench_index)),
-	    std::make_shared<MnistITL>(
-	        MnistITL(backend, bench_index)),
+	    std::make_shared<MnistITL>(MnistITL(backend, bench_index)),
+	    std::make_shared<BiNAM>(BiNAM(backend, bench_index)),
+	    std::make_shared<BiNAM_pop>(BiNAM_pop(backend, bench_index)),
+	    std::make_shared<BiNAM_burst>(BiNAM_burst(backend, bench_index)),
+	    std::make_shared<BiNAM_pop_burst>(
+	        BiNAM_pop_burst(backend, bench_index)),
 	};
 	return vec;
 }

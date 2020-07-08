@@ -71,6 +71,8 @@ enable_testing()
 
 include_directories(source/)
 
+
+include(binam_external)
 #
 # Benchmark basic libraries
 #
@@ -83,6 +85,7 @@ add_library(benchmark_library
 	source/common/snab_base
 	source/common/snab_registry
     source/SNABs/activation_curve
+    source/SNABs/binam
     source/SNABs/output_bench
     source/SNABs/refractory_period
     source/SNABs/max_input
@@ -94,6 +97,7 @@ add_library(benchmark_library
     source/SNABs/mnist/mnist_mlp
 )
 target_link_libraries(benchmark_library
+    libcppnam
     ${CYPRESS_LIBRARY}
 )
 add_dependencies(benchmark_library cypress_ext)
