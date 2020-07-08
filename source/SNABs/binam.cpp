@@ -61,7 +61,6 @@ void BiNAM::run_netw(cypress::Network &netw)
 	std::thread spiking_network([&]() mutable {
 		cypress::PowerManagementBackend pwbackend(
 		    cypress::Network::make_backend(m_backend));
-		netw.logger().min_level(cypress::LogSeverity::DEBUG);
 		netw.run(pwbackend);
 	});
 	std::thread recall([&]() mutable { m_sp_binam->recall(); });
