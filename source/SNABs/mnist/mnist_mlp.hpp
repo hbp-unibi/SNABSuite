@@ -909,8 +909,8 @@ public:
 		for (size_t i = 0; i < m_layers.size(); i++) {
 			Real current_scale_factor =
 			    m_scale_factors[i] / m_scale_factors[i + 1];
-			for (auto &i : m_layers[i]) {
-				i = i * current_scale_factor;
+			for (auto &j : m_layers[i]) {
+				j = j * current_scale_factor;
 			}
 		}
 		m_scaled_layerwise = true;
