@@ -70,6 +70,8 @@ protected:
 	bool m_scaled_image = false;
 	std::shared_ptr<MNIST::MLPBase> m_mlp;
 	bool m_ttfs = false;
+	bool m_activity_based_scaling = false;
+	std::vector<Real> m_layer_scale_factors;
 
 	cypress::Real m_weights_scale_factor = 0.0;
 
@@ -273,7 +275,7 @@ public:
 	MnistSpikeyTTFS(const std::string backend, size_t bench_index)
 	    : MNIST_BASE(backend, bench_index, __func__)
 	{
-        m_ttfs = true;
+		m_ttfs = true;
 	}
 
 	std::shared_ptr<SNABBase> clone() override
@@ -295,7 +297,7 @@ public:
 	MnistDiehlTTFS(const std::string backend, size_t bench_index)
 	    : MNIST_BASE(backend, bench_index, __func__)
 	{
-        m_ttfs = true;
+		m_ttfs = true;
 	}
 
 	std::shared_ptr<SNABBase> clone() override

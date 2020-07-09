@@ -224,6 +224,8 @@ public:
 	    const std::vector<size_t> &indices, const size_t start) = 0;
 	virtual void train(unsigned seed = 0) = 0;
 	virtual ~MLPBase() {}
+	virtual const std::vector<Real> &rescale_weights(size_t percentile,
+	                                                 bool schedule = false) = 0;
 };
 
 /**
@@ -251,6 +253,8 @@ protected:
 	}
 
 	Constraint m_constraint;
+	bool m_scaled_layerwise = false;
+	std::vector<Real> m_scale_factors;
 
 public:
 	/**
@@ -586,17 +590,34 @@ public:
 	virtual std::vector<std::vector<std::vector<Real>>> forward_path(
 	    const std::vector<size_t> &indices, const size_t start) const override
 	{
+		return forward_path(indices, start, m_batchsize);
+	}
+
+	/**
+	 * @brief Forward path of the network (--> inference)
+	 *
+	 * @param indices list of shuffled (?) indices
+	 * @param start the start index, uses images indices[start] until
+	 * indices[start +batchsize -1]
+	 * @param batchsize: number of images in that batch
+	 * @return std::vector< std::vector< std::vector< cypress::Real > > > the
+	 * outputs of all layers, given in output[sample][layer][neuron]
+	 */
+	std::vector<std::vector<std::vector<Real>>> forward_path(
+	    const std::vector<size_t> &indices, const size_t start,
+	    size_t batchsize) const
+	{
 		auto &input = std::get<0>(m_mnist);
 		std::vector<std::vector<std::vector<Real>>> res;
 		std::vector<std::vector<Real>> activations;
 		for (auto size : m_layer_sizes) {
 			activations.emplace_back(std::vector<Real>(size, 0.0));
 		}
-		for (size_t sample = 0; sample < m_batchsize; sample++) {
+		for (size_t sample = 0; sample < batchsize; sample++) {
 			res.emplace_back(activations);
 		}
 
-		for (size_t sample = 0; sample < m_batchsize; sample++) {
+		for (size_t sample = 0; sample < batchsize; sample++) {
 			if (start + sample >= indices.size())
 				break;
 			res[sample][0] = input[indices[start + sample]];
@@ -680,6 +701,7 @@ public:
 			}
 		}
 		m_constraint.constrain_weights(m_layers);
+		m_scaled_layerwise = false;
 	}
 	/**
 	 * @brief Implementation of backprop, adapted for usage in SNNs
@@ -723,6 +745,7 @@ public:
 			}
 			m_constraint.constrain_weights(m_layers);
 		}
+		m_scaled_layerwise = false;
 	}
 
 	/**
@@ -789,6 +812,113 @@ public:
 			               std::to_string(Real(correct) /
 			                              Real(std::get<1>(m_mnist).size())));
 		}
+	}
+
+	size_t get_percentile(size_t percentile, size_t layer_id, bool schedule)
+	{
+		if (!schedule) {
+			return percentile;
+		}
+		return size_t(percentile - layer_id * 0.02);
+	}
+
+	/**
+	 * @brief Measure Layer-wise activation of the network for 1000 samples of
+	 * training data. See B. Rueckauer et al.,
+	 * “Conversion of Continuous-Valued Deep Networks to Efficient Event-Driven
+	 * Networks for Image Classification,” doi: 10.3389/fnins.2017.00682 for
+	 * details.
+	 *
+	 * @param percentile If < 100 use the percentile of activation
+	 * @param schedule will decrease percentile for later layers
+	 * @return the activation values
+	 */
+	const std::vector<Real> calculate_scale_factors(size_t percentile,
+	                                                bool schedule = false) const
+	{
+		if (m_scaled_layerwise) {
+			return m_scale_factors;
+		}
+		size_t sample_size = 1000;
+		std::vector<size_t> indices(std::get<0>(m_mnist).size());
+		for (size_t i = 0; i < indices.size(); i++) {
+			indices[i] = i;
+		}
+		std::vector<Real> scale_factors(m_layer_sizes.size(), 0.0);
+		auto activations =
+		    forward_path(indices, 0, sample_size);  // sample, layer, neuron
+		for (size_t layer = 0; layer < scale_factors.size(); layer++) {
+			size_t layer_size = m_layer_sizes[layer];
+			std::vector<Real> temp_vec(sample_size * layer_size);
+			for (size_t sample = 0; sample < sample_size; sample++) {
+				for (size_t neuron = 0; neuron < layer_size; neuron++) {
+					temp_vec[sample * layer_size + neuron] =
+					    activations[sample][layer][neuron];
+				}
+			}
+			size_t test = 0;
+			if (schedule) {
+				test = std::ceil(
+				    Real(temp_vec.size() * size_t(percentile - layer * 0.02)) /
+				    100.0);
+			}
+			else {
+				test = std::ceil(Real(temp_vec.size() * percentile) / 100.0);
+			}
+			if (percentile >= 100) {
+				scale_factors[layer] =
+				    *std::max_element(temp_vec.begin(), temp_vec.end());
+			}
+			else {
+				std::nth_element(temp_vec.begin(), temp_vec.begin() + test,
+				                 temp_vec.end());
+				scale_factors[layer] = temp_vec[test] ? temp_vec[test] : 1.0;
+			}
+		}
+		return scale_factors;
+		/*
+		 * Get forward activations for train data
+		 * Take percentile p from config
+		 * if there is an activation > 0
+		 * scale factor = calculate the p th percentile of activation
+		 * else  = 1
+		 * if layer == softmax : scale factor =1
+		 * weights = weights * scale_factor_input / scale_factor_output
+		 * bias = bias / scale_factor_output
+		 * */
+	}
+
+	/**
+	 * @brief Measure Layer-wise activation of the network for 1000 samples of
+	 * training data. Rescale the weights accordingly. See B. Rueckauer et al.,
+	 * “Conversion of Continuous-Valued Deep Networks to Efficient Event-Driven
+	 * Networks for Image Classification,” doi: 10.3389/fnins.2017.00682 for
+	 * details.
+	 *
+	 * @param percentile If < 100 rescale with the percentile of activation
+	 * @param schedule will decrease percentile for later layers
+	 * @return the activation values
+	 */
+	const std::vector<Real> &rescale_weights(size_t percentile,
+	                                         bool schedule = false) override
+	{
+		if (m_scaled_layerwise) {
+			return m_scale_factors;
+		}
+		m_scale_factors = calculate_scale_factors(percentile, schedule);
+		for (size_t i = 0; i < m_layers.size(); i++) {
+			Real current_scale_factor =
+			    m_scale_factors[i] / m_scale_factors[i + 1];
+			for (auto &i : m_layers[i]) {
+				i = i * current_scale_factor;
+			}
+		}
+		m_scaled_layerwise = true;
+		return m_scale_factors;
+		/*
+		 * if layer == softmax : scale factor =1
+		 * bias = bias / m_scale_factors[i+1]
+		 */
 	}
 };
 }  // namespace MNIST

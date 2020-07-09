@@ -73,6 +73,10 @@ void MNIST_BASE::read_config()
 	if (m_config_file.find("ttfs") != m_config_file.end()) {
 		m_ttfs = m_config_file["ttfs"].get<bool>();
 	}
+	if (m_config_file.find("activity_based_scaling") != m_config_file.end()) {
+		m_activity_based_scaling =
+		    m_config_file["activity_based_scaling"].get<bool>();
+	}
 }
 
 cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
@@ -96,6 +100,16 @@ cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
 	}
 	m_batch_data = mnist_helper::create_batches(spike_mnist, m_batchsize,
 	                                            m_duration, m_pause, false);
+
+	if (m_activity_based_scaling) {
+		m_layer_scale_factors = m_mlp->rescale_weights(99);  // TODO
+		std::string message;
+		for (auto i : m_layer_scale_factors) {
+			message += std::to_string(i);
+			message += ", ";
+		}
+		global_logger().debug("SNABSuite", "SNN rescale factors: " + message);
+	}
 
 	m_label_pops.clear();
 	if (m_batch_parallel) {
@@ -237,13 +251,16 @@ size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight)
 {
 	size_t layer_id = netw.populations().size();
 	size_t counter = 0;
-	if (m_weights_scale_factor == 0.0) {
+	if (!m_activity_based_scaling && m_weights_scale_factor == 0.0) {
 		if (max_weight > 0) {
 			m_weights_scale_factor = max_weight / m_mlp->max_weight();
 		}
 		else {
 			m_weights_scale_factor = 1.0;
 		}
+	}
+	else {
+		m_weights_scale_factor = max_weight ? max_weight : 1.0;
 	}
 
 	for (const auto &layer : m_mlp->get_weights()) {
