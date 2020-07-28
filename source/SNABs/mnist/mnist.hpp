@@ -70,7 +70,7 @@ protected:
 	bool m_scaled_image = false;
 	std::shared_ptr<MNIST::MLPBase> m_mlp;
 	bool m_ttfs = false;
-	bool m_activity_based_scaling = false;
+	size_t m_activity_based_scaling = 0.0;
 	std::vector<Real> m_layer_scale_factors;
 
 	cypress::Real m_weights_scale_factor = 0.0;

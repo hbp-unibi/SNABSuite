@@ -75,7 +75,7 @@ void MNIST_BASE::read_config()
 	}
 	if (m_config_file.find("activity_based_scaling") != m_config_file.end()) {
 		m_activity_based_scaling =
-		    m_config_file["activity_based_scaling"].get<bool>();
+		    m_config_file["activity_based_scaling"].get<size_t>();
 	}
 }
 
@@ -102,7 +102,7 @@ cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
 	                                            m_duration, m_pause, false);
 
 	if (m_activity_based_scaling) {
-		m_layer_scale_factors = m_mlp->rescale_weights(99);  // TODO
+		m_layer_scale_factors = m_mlp->rescale_weights(m_activity_based_scaling);  // TODO
 		std::string message;
 		for (auto i : m_layer_scale_factors) {
 			message += std::to_string(i);
