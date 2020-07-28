@@ -312,7 +312,7 @@ std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,
 		for (const auto &neuron : pop) {
 			binned_spike_times.push_back(
 			    SpikingUtils::spike_time_binning_TTFS(
-			        0.0, batch_size * (duration + pause), batch_size,
+			        0.0, Real(batch_size) * (duration + pause), batch_size,
 			        neuron.signals().data(0)));
 		}
 
