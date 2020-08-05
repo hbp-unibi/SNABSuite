@@ -1,35 +1,32 @@
 {
     "nest": {
-        "invalid": true,
         "neuron_type": "IF_cond_exp",
         "neuron_params": {
             "e_rev_E": 0,
             "e_rev_I": -130,
-            "tau_syn_E": 3,
-            "tau_syn_I": 3,
+            "tau_syn_E": 7,
+            "tau_syn_I": 7,
             "v_rest": -65,
-            "v_reset": -75,
+            "v_reset": -65,
             "v_thresh": -55,
-            "tau_refrac": 0,
-            "tau_m": 20,
+            "tau_refrac": 10,
+            "tau_m": 11,
             "cm": 0.2
         },
         "images": 10000,
         "batchsize": [10000,2500,500,50],
-        "duration": 500,
-        "max_freq": 120,
-        "pause": 50,
+        "duration": 7,
+        "max_freq": 0.0,
+        "pause": 40,
         "poisson": false,
-        "max_weight": 0.0135,
+        "max_weight": 0.01633,
         "train_data": false,
         "batch_parallel": true,
-        "count_spikes": true,
+        "count_spikes": false,
         "dnn_file": "networks/netw_spikey.msgpack",
         "scaled_image": true,
-        "setup": {
-            "timestep": 1,
-            "threads": 4
-        }
+        "activity_based_scaling": 97,
+        "ttfs": true
     },
     "genn": {
         "neuron_type": "IF_cond_exp",

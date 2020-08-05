@@ -1,35 +1,68 @@
 {
     "nest": {
-        "invalid": true
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -130,
+            "tau_syn_E": 7,
+            "tau_syn_I": 7,
+            "v_rest": -65,
+            "v_reset": -65,
+            "v_thresh": -55,
+            "tau_refrac": 10,
+            "tau_m": 11,
+            "cm": 0.2
+        },
+        "images": 10000,
+        "batchsize": [10000,1000,100],
+        "duration": 7,
+        "max_freq": 0.0,
+        "pause": 40,
+        "poisson": false,
+        "max_weight": 0.055,
+        "train_data": false,
+        "batch_parallel": true,
+        "count_spikes": false,
+        "dnn_file": "networks/netw_diehl.msgpack",
+        "scaled_image": false,
+        "activity_based_scaling": 98,
+        "ttfs": true,
+        "setup": {
+            "timestep": 0.1,
+            "threads": 4
+        }
     },
     "genn": {
         "neuron_type": "IF_cond_exp",
         "neuron_params": {
             "e_rev_E": 0,
             "e_rev_I": -130,
-            "tau_syn_E": 3,
-            "tau_syn_I": 3,
+            "tau_syn_E": 7,
+            "tau_syn_I": 7,
             "v_rest": -65,
-            "v_reset": -75,
+            "v_reset": -65,
             "v_thresh": -55,
-            "tau_refrac": 20,
-            "tau_m": 15,
+            "tau_refrac": 10,
+            "tau_m": 11,
             "cm": 0.2
         },
-        "images": 5,
-        "batchsize": [5,280],
-        "duration": 10,
-        "max_freq": 3.5,
-        "pause": 10,
+        "images": 10000,
+        "batchsize": [10000,1000,100],
+        "duration": 7,
+        "max_freq": 0.0,
+        "pause": 40,
         "poisson": false,
-        "max_weight": 0.022,
+        "max_weight": 0.055,
         "train_data": false,
         "batch_parallel": true,
         "count_spikes": false,
         "dnn_file": "networks/netw_diehl.msgpack",
         "scaled_image": false,
+        "activity_based_scaling": 98,
+        "ttfs": true,
         "setup": {
-            "timestep": 0.1
+            "timestep": 0.1,
+            "double" : false
         }
     },
     "spinnaker": {
