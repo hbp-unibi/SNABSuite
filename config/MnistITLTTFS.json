@@ -1,0 +1,54 @@
+{
+    "nest": {
+        "invalid": true
+    },
+    "spinnaker": {
+        "invalid": true
+    },
+    "genn": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -130,
+            "tau_syn_E": 7,
+            "tau_syn_I": 7,
+            "v_rest": -65,
+            "v_reset": -65,
+            "v_thresh": -55,
+            "tau_refrac": 20,
+            "tau_m": 11,
+            "cm": 0.2
+        },
+        "images": 10000,
+        "batchsize": 100,
+        "duration": 7,
+        "max_freq": 0,
+        "pause": 60,
+        "poisson": false,
+        "max_weight": 0.02,
+        "train_data": false,
+        "batch_parallel": true,
+        "learn_rate": 0.005,
+        "epochs": 1,
+        "dnn_file": "networks/netw_spikey.msgpack",
+        "scaled_image": true,
+        "norm_rate_hidden": 1,
+        "norm_rate_last": 1,
+        "positive": true,
+        "loss_function": "CatHinge",
+        "num_test_images": 10000,
+        "test_batchsize": 10000,
+        "random_init": false,
+        "activity_based_scaling": 97,
+        "ttfs": true,
+        "setup": {
+            "timestep": 1.0
+        }
+    },
+    "spikey": {
+        "invalid" : true
+    },
+    "nmpm1": {
+        "invalid" : true
+    }
+}

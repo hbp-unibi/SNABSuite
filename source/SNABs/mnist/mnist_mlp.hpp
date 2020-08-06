@@ -914,6 +914,7 @@ public:
 			}
 		}
 		m_scaled_layerwise = true;
+		m_constraint.setup(m_layers);
 		return m_scale_factors;
 		/*
 		 * if layer == softmax : scale factor =1

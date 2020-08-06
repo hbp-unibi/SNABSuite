@@ -265,6 +265,25 @@ public:
 };
 
 /**
+ * This class combines the MNIST benchmark with an hardware in the loop
+ * re-training to compensate device mismatch. Here, we train all layers and
+ * make use of the TTFS encoding
+ */
+class MnistITLTTFS : public MnistITLLastLayer {
+private:
+public:
+	MnistITLTTFS(const std::string backend, size_t bench_index)
+	    : MnistITLLastLayer(backend, bench_index, __func__)
+	{
+		m_last_layer_only = false;
+	}
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<MnistITLTTFS>(m_backend, m_bench_index);
+	}
+};
+
+/**
  * A simple feed-forward network with densely connected layers.
  * This network has 89x100x10 layout with images downscales by 3x3 average
  * pooling and no inhibition

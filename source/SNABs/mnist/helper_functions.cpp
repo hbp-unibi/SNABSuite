@@ -119,12 +119,13 @@ std::vector<std::vector<std::vector<Real>>> image_to_TTFS(
 	for (size_t i = 0; i < num_images; i++) {
 		std::vector<std::vector<Real>> spike_image;
 		for (const auto &pixel : images[i]) {
-            if(pixel>0){
-                spike_image.emplace_back(std::vector<Real>{(1.0 - pixel) * duration});
-            }
-            else{
-                spike_image.emplace_back(std::vector<Real>{});
-            }
+			if (pixel > 0) {
+				spike_image.emplace_back(
+				    std::vector<Real>{(1.0 - pixel) * duration});
+			}
+			else {
+				spike_image.emplace_back(std::vector<Real>{});
+			}
 		}
 		TTFS_images.emplace_back(spike_image);
 	}
@@ -310,10 +311,9 @@ std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,
 	else {
 		std::vector<std::vector<Real>> binned_spike_times;
 		for (const auto &neuron : pop) {
-			binned_spike_times.push_back(
-			    SpikingUtils::spike_time_binning_TTFS(
-			        0.0, Real(batch_size) * (duration + pause), batch_size,
-			        neuron.signals().data(0)));
+			binned_spike_times.push_back(SpikingUtils::spike_time_binning_TTFS(
+			    0.0, Real(batch_size) * (duration + pause), batch_size,
+			    neuron.signals().data(0)));
 		}
 
 		for (size_t sample = 0; sample < batch_size; sample++) {
@@ -331,6 +331,61 @@ std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,
 				}
 			}
 			res[sample] = index;
+		}
+	}
+	return res;
+}
+
+std::vector<std::vector<Real>> spikes_to_rates_ttfs(const PopulationBase pop,
+                                                    Real duration, Real pause,
+                                                    size_t batch_size)
+{
+	std::vector<std::vector<Real>> binned_spike_times;
+	std::vector<std::vector<Real>> res(batch_size,
+	                                   std::vector<Real>(pop.size()));
+
+	Real new_duration = duration;
+	for (const auto &neuron : pop) {
+		binned_spike_times.push_back(SpikingUtils::spike_time_binning_TTFS(
+		    0.0, Real(batch_size) * (duration + pause), batch_size,
+		    neuron.signals().data(0)));
+	}
+	for (size_t sample = 0; sample < batch_size; sample++) {
+		Real min = std::numeric_limits<Real>::max();
+		// Real max = 0.0;
+		for (size_t neuron = 0; neuron < binned_spike_times.size(); neuron++) {
+			if (binned_spike_times[neuron][sample] < min) {
+				min = binned_spike_times[neuron][sample];
+			}
+			/*if (binned_spike_times[neuron][sample] > max &&
+			    binned_spike_times[neuron][sample] <
+			std::numeric_limits<Real>::max() -10) { max =
+			binned_spike_times[neuron][sample];
+			}*/
+		}
+		// std::cout << "Max - Min for Population " << pop.pid()<< ": "<<
+		// max-min << ", " << max << ", "<<min<<std::endl;
+		if (min == std::numeric_limits<Real>::max()) {
+			// There was no spike
+			for (size_t neuron = 0; neuron < binned_spike_times.size();
+			     neuron++) {
+				res[sample][neuron] = 0.0;
+			}
+		}
+		else {
+			for (size_t neuron = 0; neuron < binned_spike_times.size();
+			     neuron++) {
+				// Substract min --> first spike is zero, last spike might be
+				// larger then duration
+				Real tmp = binned_spike_times[neuron][sample] - min;
+				if (tmp >= new_duration) {
+					res[sample][neuron] = 0.0;
+				}
+				else {
+					res[sample][neuron] = 1.0 - (tmp / new_duration);
+					assert(res[sample][neuron] > 0);
+				}
+			}
 		}
 	}
 	return res;

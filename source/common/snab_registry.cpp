@@ -95,6 +95,8 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
 	        MnistSpikeyTTFS(backend, bench_index)),
 	    std::make_shared<MnistDiehlTTFS>(
 	        MnistDiehlTTFS(backend, bench_index)),
+	    std::make_shared<MnistITLTTFS>(
+	        MnistITLTTFS(backend, bench_index)),
 	};
 	return vec;
 }

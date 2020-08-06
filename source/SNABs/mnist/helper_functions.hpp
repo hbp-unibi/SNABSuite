@@ -310,6 +310,10 @@ std::vector<std::vector<Real>> spikes_to_rates(const PopulationBase pop,
                                                size_t batch_size,
                                                Real norm = 0.0);
 
+std::vector<std::vector<Real>> spikes_to_rates_ttfs(const PopulationBase pop,
+                                                   Real duration, Real pause,
+                                                   size_t batch_size);
+
 /**
  * @brief Compare original labels with simulation labels, return number of
  * correct labels

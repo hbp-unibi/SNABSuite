@@ -102,7 +102,8 @@ cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
 	                                            m_duration, m_pause, false);
 
 	if (m_activity_based_scaling) {
-		m_layer_scale_factors = m_mlp->rescale_weights(m_activity_based_scaling);  // TODO
+		m_layer_scale_factors =
+		    m_mlp->rescale_weights(m_activity_based_scaling);
 		std::string message;
 		for (auto i : m_layer_scale_factors) {
 			message += std::to_string(i);
@@ -216,6 +217,15 @@ std::vector<std::array<cypress::Real, 4>> MNIST_BASE::evaluate()
 		Utilities::plot_spikes(
 		    _debug_filename("spikes_" + std::to_string(batch) + ".csv"),
 		    m_backend);
+
+		spikes.clear();
+		auto pop2 = m_netw.populations()[0];
+		for (size_t i = 0; i < pop2.size(); i++) {
+			spikes.push_back(pop2[i].signals().data(0));
+		}
+		Utilities::write_vector2_to_csv(
+		    spikes,
+		    _debug_filename("spikes_input2" + std::to_string(batch) + ".csv"));
 #endif
 	}
 	if (m_count_spikes) {
@@ -354,8 +364,19 @@ cypress::Network &MnistITLLastLayer::build_netw(cypress::Network &netw)
 	if (m_scaled_image) {
 		m_mlp->scale_down_images();
 	}
-	m_spmnist = mnist_helper::mnist_to_spike(
-	    m_mlp->mnist_train_set(), m_duration, m_max_freq, m_images, m_poisson);
+	m_spmnist =
+	    mnist_helper::mnist_to_spike(m_mlp->mnist_train_set(), m_duration,
+	                                 m_max_freq, m_images, m_poisson, m_ttfs);
+	if (m_activity_based_scaling) {
+		m_layer_scale_factors =
+		    m_mlp->rescale_weights(m_activity_based_scaling);  // TODO
+		std::string message;
+		for (auto i : m_layer_scale_factors) {
+			message += std::to_string(i);
+			message += ", ";
+		}
+		global_logger().debug("SNABSuite", "SNN rescale factors: " + message);
+	}
 	return netw;
 }
 
@@ -400,15 +421,24 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 			std::vector<std::vector<std::vector<Real>>> output_rates;
 			for (auto &pop : netw.populations()) {
 				if (pop.signals().is_recording(0)) {
-					if (pop.pid() != netw.populations().back().pid()) {
-						output_rates.emplace_back(mnist_helper::spikes_to_rates(
-						    pop, m_duration, m_pause, m_batchsize,
-						    m_norm_rate_hidden));
+					if (!m_ttfs) {
+						if (pop.pid() != netw.populations().back().pid()) {
+							output_rates.emplace_back(
+							    mnist_helper::spikes_to_rates(
+							        pop, m_duration, m_pause, m_batchsize,
+							        m_norm_rate_hidden));
+						}
+						else {
+							output_rates.emplace_back(
+							    mnist_helper::spikes_to_rates(
+							        pop, m_duration, m_pause, m_batchsize,
+							        m_norm_rate_last));
+						}
 					}
 					else {
-						output_rates.emplace_back(mnist_helper::spikes_to_rates(
-						    pop, m_duration, m_pause, m_batchsize,
-						    m_norm_rate_last));
+						output_rates.emplace_back(
+						    mnist_helper::spikes_to_rates_ttfs(
+						        pop, m_duration, m_pause, m_batchsize));
 					}
 				}
 				else {
@@ -423,7 +453,7 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 
 			// Calculate batch accuracy
 			auto labels = mnist_helper::spikes_to_labels(
-			    m_label_pops[0], m_duration, m_pause, m_batchsize);
+			    m_label_pops[0], m_duration, m_pause, m_batchsize, m_ttfs);
 			m_global_correct =
 			    mnist_helper::compare_labels(std::get<1>(i), labels);
 			m_num_images = std::get<1>(i).size();
@@ -448,7 +478,7 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 		std::vector<size_t> local_count, pop_size, pids;
 		auto test_data = mnist_helper::mnist_to_spike(
 		    m_mlp->mnist_test_set(), m_duration, m_max_freq, m_num_test_images,
-		    m_poisson);
+		    m_poisson, m_ttfs);
 		m_batch_data = mnist_helper::create_batches(test_data, m_test_batchsize,
 		                                            m_duration, m_pause, true);
 		for (auto &i : m_batch_data) {
@@ -457,7 +487,7 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 
 			auto pop = m_label_pops[0];
 			auto labels = mnist_helper::spikes_to_labels(
-			    pop, m_duration, m_pause, m_test_batchsize);
+			    pop, m_duration, m_pause, m_test_batchsize, m_ttfs);
 			auto &orig_labels = std::get<1>(i);
 			auto correct = mnist_helper::compare_labels(orig_labels, labels);
 			m_global_correct += correct;
