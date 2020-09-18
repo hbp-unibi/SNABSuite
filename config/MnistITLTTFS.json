@@ -46,7 +46,42 @@
         }
     },
     "spikey": {
-        "invalid" : true
+        "neuron_type": "IfFacetsHardware1",
+        "neuron_params": {
+            "tau_m": 16.0,
+            "tau_refrac": 3,
+            "v_rest": -80,
+            "v_thresh": -68,
+            "v_reset": -80,
+            "e_rev_I": -80
+        },
+        "setup": {
+            "calibIcb": true,
+            "mappingOffset": 0
+        },
+        "images": 60000,
+        "batchsize": 500,
+        "duration": 7,
+        "max_freq": 0,
+        "pause": 100,
+        "poisson": false,
+        "max_weight": 0.0155,
+        "train_data": false,
+        "batch_parallel": false,
+        "count_spikes": false,
+        "dnn_file": "networks/netw_spikey.msgpack",
+        "scaled_image": true,
+        "activity_based_scaling": 96,
+        "ttfs": true,
+        "learn_rate": 0.005,
+        "epochs": 20,
+        "norm_rate_hidden": 1,
+        "norm_rate_last": 1,
+        "positive": true,
+        "loss_function": "CatHinge",
+        "num_test_images": 10000,
+        "test_batchsize": 10000,
+        "random_init": false
     },
     "nmpm1": {
         "invalid" : true

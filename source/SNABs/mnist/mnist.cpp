@@ -470,55 +470,61 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 		}
 	}
 
-	if (m_train_data == false) {
-		m_global_correct = 0;
-		m_num_images = 0;
-		m_sim_time = 0.0;
-		size_t global_count = 0;
-		std::vector<size_t> local_count, pop_size, pids;
-		auto test_data = mnist_helper::mnist_to_spike(
-		    m_mlp->mnist_test_set(), m_duration, m_max_freq, m_num_test_images,
-		    m_poisson, m_ttfs);
-		m_batch_data = mnist_helper::create_batches(test_data, m_test_batchsize,
-		                                            m_duration, m_pause, true);
-		for (auto &i : m_batch_data) {
-			mnist_helper::update_spike_source(source_n, i);
-			netw.run(pwbackend, m_test_batchsize * (m_duration + m_pause));
+    m_global_correct = 0;
+	m_num_images = 0;
+	m_sim_time = 0.0;
+	size_t global_count = 0;
+	std::vector<size_t> local_count, pop_size, pids;
+	mnist_helper::SPIKING_MNIST test_data;
+	if (m_train_data == false){
+		test_data = mnist_helper::mnist_to_spike(
+			m_mlp->mnist_test_set(), m_duration, m_max_freq, m_num_test_images,
+            m_poisson, m_ttfs);
+	}
+	else{
+        test_data = mnist_helper::mnist_to_spike(
+		m_mlp->mnist_train_set(), m_duration, m_max_freq, m_num_test_images,
+			m_poisson, m_ttfs);
+    }
+    m_batch_data = mnist_helper::create_batches(test_data, m_test_batchsize,
+	                                            m_duration, m_pause, true);
+	for (auto &i : m_batch_data) {
+		mnist_helper::update_spike_source(source_n, i);
+		netw.run(pwbackend, m_test_batchsize * (m_duration + m_pause));
 
-			auto pop = m_label_pops[0];
-			auto labels = mnist_helper::spikes_to_labels(
-			    pop, m_duration, m_pause, m_test_batchsize, m_ttfs);
-			auto &orig_labels = std::get<1>(i);
-			auto correct = mnist_helper::compare_labels(orig_labels, labels);
-			m_global_correct += correct;
-			m_num_images += orig_labels.size();
-			m_sim_time += netw.runtime().sim;
-			if (m_count_spikes) {
-				for (auto &pop : m_all_pops) {
-					size_t count = 0.0;
-					for (auto neuron : pop) {
-						count += neuron.signals().data(0).size();
-					}
-					global_count += count;
-					local_count.emplace_back(count);
-					pop_size.emplace_back(pop.size());
-					pids.emplace_back(pop.pid());
-				}
-			}
-		}
-
+		auto pop = m_label_pops[0];
+		auto labels = mnist_helper::spikes_to_labels(
+		    pop, m_duration, m_pause, m_test_batchsize, m_ttfs);
+		auto &orig_labels = std::get<1>(i);
+		auto correct = mnist_helper::compare_labels(orig_labels, labels);
+		m_global_correct += correct;
+		m_num_images += orig_labels.size();
+		m_sim_time += netw.runtime().sim;
 		if (m_count_spikes) {
-			for (size_t i = 0; i < local_count.size(); i++) {
-				global_logger().info(
-				    "SNABSuite",
-				    "Pop " + std::to_string(pids[i]) + " with size " +
-				        std::to_string(pop_size[i]) + " fired " +
-				        std::to_string(local_count[i]) + " spikes");
+			for (auto &pop : m_all_pops) {
+				size_t count = 0.0;
+				for (auto neuron : pop) {
+					count += neuron.signals().data(0).size();
+				}
+				global_count += count;
+				local_count.emplace_back(count);
+				pop_size.emplace_back(pop.size());
+				pids.emplace_back(pop.pid());
 			}
-			global_logger().info("SNABSuite", "Summ of all spikes: " +
-			                                      std::to_string(global_count) +
-			                                      " spikes");
 		}
+	}
+
+	if (m_count_spikes) {
+		for (size_t i = 0; i < local_count.size(); i++) {
+			global_logger().info(
+			    "SNABSuite",
+			    "Pop " + std::to_string(pids[i]) + " with size " +
+			        std::to_string(pop_size[i]) + " fired " +
+			        std::to_string(local_count[i]) + " spikes");
+		}
+		global_logger().info("SNABSuite", "Summ of all spikes: " +
+		                                      std::to_string(global_count) +
+		                                      " spikes");
 	}
 
 #if SNAB_DEBUG
