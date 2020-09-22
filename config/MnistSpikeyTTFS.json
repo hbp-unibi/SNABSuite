@@ -93,23 +93,23 @@
         }
     },
     "spikey": {
-        "invalid": true,
         "neuron_type": "IfFacetsHardware1",
         "neuron_params": {
-            "tau_m": 10,
-            "tau_refrac": 0.001,
-            "v_rest": -75,
-            "v_thresh": -55,
+            "tau_m": 13.0,
+            "tau_refrac": 3,
+            "v_rest": -80,
+            "v_thresh": -70,
             "v_reset": -80,
             "e_rev_I": -80
         },
         "setup": {
-            "calibIcb": true
+            "calibIcb": true,
+            "mappingOffset": 0
         },
         "images": 10000,
-        "batchsize": 2500,
-        "duration": 300,
-        "max_freq": 50,
+        "batchsize": 10000,
+        "duration": 11,
+        "max_freq": 0,
         "pause": 50,
         "poisson": false,
         "max_weight": 0.015,
@@ -117,7 +117,9 @@
         "batch_parallel": false,
         "count_spikes": false,
         "dnn_file": "networks/netw_spikey.msgpack",
-        "scaled_image": true
+        "scaled_image": true,
+        "activity_based_scaling": 96,
+        "ttfs": true
     },
     "nmpm1": {
         "invalid": true,
