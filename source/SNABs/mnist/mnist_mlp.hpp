@@ -128,6 +128,47 @@ public:
 	}
 };
 
+class Sigmoid {
+public:
+	static inline std::vector<Real> function(std::vector<Real> input)
+	{
+		for (auto &i : input) {
+			i = 1.0 / (1.0 + std::exp(-i));
+		}
+		return input;
+	}
+	static inline std::vector<Real> derivative(std::vector<Real> input)
+	{
+		for (auto &i : input) {
+			Real temp = std::exp(i);
+			i = temp / ((1.0 + temp) * (1.0 + temp));
+		}
+		return input;
+		// function(input) * (1.0-function(input));
+	}
+};
+
+
+class Tanh {
+public:
+	static inline std::vector<Real> function(std::vector<Real> input)
+	{
+		for (auto &i : input) {
+			i = std::tanh(i);
+		}
+		return input;
+	}
+	static inline std::vector<Real> derivative(std::vector<Real> input)
+	{
+		for (auto &i : input) {
+			Real temp = std::tanh(i);
+			i = 1.0 - temp*temp;
+		}
+		return input;
+		// function(input) * (1.0-function(input));
+	}
+};
+
 /**
  * @brief Constraint for weights in neural network: No constraint.
  *
