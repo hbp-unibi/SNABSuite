@@ -78,7 +78,8 @@ class OutputFrequencyMultipleNeurons : public SNABBase {
 private:
 	cypress::PopulationBase m_pop;
 	size_t m_num_neurons = 0;
-
+    cypress::Real m_runtime = 150.0;
+    bool m_record_spikes = true;
 public:
 	OutputFrequencyMultipleNeurons(const std::string backend,
 	                               size_t bench_index);

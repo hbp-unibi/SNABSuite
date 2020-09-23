@@ -50,7 +50,7 @@ cypress::Network &OutputFrequencySingleNeuron::build_netw(
 	// Get neuron neuron_parameters
 	NeuronParameter neuron_params =
 	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params"]);
+	                    m_config_file["neuron_params"]);
 	// Set up population
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, neuron_params,
 	                                     1, "spikes");
@@ -60,7 +60,7 @@ cypress::Network &OutputFrequencySingleNeuron::build_netw(
 void OutputFrequencySingleNeuron::run_netw(cypress::Network &netw)
 {
 	cypress::PowerManagementBackend pwbackend(
-	    cypress::Network::make_backend(m_backend));;
+	    cypress::Network::make_backend(m_backend));
 	try {
 		netw.run(pwbackend, 150.0);
 	}
@@ -136,7 +136,7 @@ cypress::Network &OutputFrequencySingleNeuron2::build_netw(
 	// Get neuron neuron_parameters
 	NeuronParameter neuron_params =
 	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params"]);
+	                    m_config_file["neuron_params"]);
 	// Set up population
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, neuron_params,
 	                                     m_config_file["#neurons"], "");
@@ -235,13 +235,25 @@ cypress::Network &OutputFrequencyMultipleNeurons::build_netw(
 	// Get neuron neuron_parameters
 	NeuronParameter neuron_params =
 	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params"]);
+	                    m_config_file["neuron_params"]);
 
 	m_num_neurons = m_config_file["#neurons"];
+	if (m_config_file.find("runtime") != m_config_file.end()) {
+		m_runtime = m_config_file["runtime"].get<Real>();
+	}
+	if (m_config_file.find("record_spikes") != m_config_file.end()) {
+		m_record_spikes = m_config_file["record_spikes"].get<bool>();
+	}
 
 	// Set up population
-	m_pop = SpikingUtils::add_population(neuron_type_str, netw, neuron_params,
-	                                     m_num_neurons, "spikes");
+	if (m_record_spikes) {
+		m_pop = SpikingUtils::add_population(
+		    neuron_type_str, netw, neuron_params, m_num_neurons, "spikes");
+	}
+	else {
+		m_pop = SpikingUtils::add_population(neuron_type_str, netw,
+		                                     neuron_params, m_num_neurons);
+	}
 	return netw;
 }
 
@@ -252,7 +264,7 @@ void OutputFrequencyMultipleNeurons::run_netw(cypress::Network &netw)
 
 	cypress::PowerManagementBackend pwbackend(
 	    cypress::Network::make_backend(m_backend));
-	netw.run(pwbackend, 150.0);
+	netw.run(pwbackend, m_runtime);
 }
 
 std::vector<std::array<cypress::Real, 4>>

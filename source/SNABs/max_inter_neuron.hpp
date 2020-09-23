@@ -65,6 +65,7 @@ protected:
 	cypress::Real m_simulation_length = 150;  // ms
 	cypress::Real m_start_time = 50;          // ms
 	NeuronParameter m_retr_params;
+	bool m_record_spikes = false;
 
 	/**
 	 * Constructor used by by child classes. Just hands everything to SNABBase
