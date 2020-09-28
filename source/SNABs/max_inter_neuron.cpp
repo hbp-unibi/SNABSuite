@@ -17,12 +17,10 @@
  */
 //#include <algorithm>  // Minimal and Maximal element
 //#include <numeric>    // std::accumulate
-#include <cypress/cypress.hpp>               // Neural network frontend
-
+#include <cypress/backend/power/power.hpp>  // Control of power via netw
+#include <cypress/cypress.hpp>              // Neural network frontend
 #include <string>
 #include <vector>
-
-#include <cypress/backend/power/power.hpp>  // Control of power via netw
 
 #include "max_inter_neuron.hpp"
 #include "util/read_json.hpp"
@@ -45,6 +43,9 @@ SingleMaxFreqToGroup::SingleMaxFreqToGroup(const std::string backend,
 cypress::Network &SingleMaxFreqToGroup::build_netw(cypress::Network &netw)
 {
 	std::string neuron_type_str = m_config_file["neuron_type"];
+	if (m_config_file.find("runtime") != m_config_file.end()) {
+		m_simulation_length = m_config_file["runtime"].get<Real>();
+	}
 
 	// Get neuron neuron_parameters
 	NeuronParameter params(SpikingUtils::detect_type(neuron_type_str),
@@ -145,6 +146,9 @@ GroupMaxFreqToGroup::GroupMaxFreqToGroup(const std::string backend,
 cypress::Network &GroupMaxFreqToGroup::build_netw(cypress::Network &netw)
 {
 	std::string neuron_type_str = m_config_file["neuron_type"];
+	if (m_config_file.find("runtime") != m_config_file.end()) {
+		m_simulation_length = m_config_file["runtime"].get<Real>();
+	}
 
 	if (m_config_file.find("record_spikes") != m_config_file.end()) {
 		m_record_spikes = m_config_file["record_spikes"].get<bool>();
@@ -248,6 +252,9 @@ cypress::Network &GroupMaxFreqToGroupAllToAll::build_netw(
     cypress::Network &netw)
 {
 	std::string neuron_type_str = m_config_file["neuron_type"];
+	if (m_config_file.find("runtime") != m_config_file.end()) {
+		m_simulation_length = m_config_file["runtime"].get<Real>();
+	}
 
 	// Get neuron neuron_parameters
 	NeuronParameter params(SpikingUtils::detect_type(neuron_type_str),
@@ -283,6 +290,9 @@ GroupMaxFreqToGroupProb::GroupMaxFreqToGroupProb(const std::string backend,
 cypress::Network &GroupMaxFreqToGroupProb::build_netw(cypress::Network &netw)
 {
 	std::string neuron_type_str = m_config_file["neuron_type"];
+	if (m_config_file.find("runtime") != m_config_file.end()) {
+		m_simulation_length = m_config_file["runtime"].get<Real>();
+	}
 
 	// Get neuron neuron_parameters
 	NeuronParameter params(SpikingUtils::detect_type(neuron_type_str),

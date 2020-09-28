@@ -15,14 +15,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <cypress/cypress.hpp>  // Neural network frontend
-
+#include <cypress/backend/power/power.hpp>  // Control of power via netw
+#include <cypress/cypress.hpp>              // Neural network frontend
 #include <memory>
 #include <random>
 #include <string>
 #include <vector>
-
-#include <cypress/backend/power/power.hpp>  // Control of power via netw
 
 #include "max_input.hpp"
 #include "util/utilities.hpp"
@@ -46,11 +44,17 @@ cypress::Network &MaxInputOneToOne::build_netw(cypress::Network &netw)
 	std::string neuron_type_str = m_config_file["neuron_type"];
 	m_num_neurons = m_config_file["#neurons"];
 	m_num_spikes = m_config_file["#spikes"];
+	if (m_config_file.find("runtime") != m_config_file.end()) {
+		simulation_length = m_config_file["runtime"].get<Real>();
+	}
+	bool record_source = false;
+	if (m_config_file.find("record_spikes") != m_config_file.end()) {
+		record_source = m_config_file["record_spikes"].get<bool>();
+	}
 
 	// Get neuron neuron_parameters
-	m_neuro_params =
-	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params"]);
+	m_neuro_params = NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
+	                                 m_config_file["neuron_params"]);
 	// Set up population, record voltage
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, m_neuro_params,
 	                                     m_num_neurons, "spikes");
@@ -59,8 +63,15 @@ cypress::Network &MaxInputOneToOne::build_netw(cypress::Network &netw)
 		spike_times.emplace_back(10.0 + cypress::Real(i) * simulation_length /
 		                                    m_num_spikes);
 	}
-	m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
-	    m_num_neurons, SpikeSourceArrayParameters(spike_times));
+	if (!record_source) {
+		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
+		    m_num_neurons, SpikeSourceArrayParameters(spike_times));
+	}
+	else {
+		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
+		    m_num_neurons, SpikeSourceArrayParameters(spike_times),
+		    SpikeSourceArraySignals().record_spikes());
+	}
 	netw.add_connection(
 	    m_pop_source, m_pop,
 	    Connector::one_to_one(cypress::Real(m_config_file["weight"])));
@@ -122,11 +133,17 @@ cypress::Network &MaxInputAllToAll::build_netw(cypress::Network &netw)
 	m_num_neurons = m_config_file["#neurons"];
 	m_num_spikes = m_config_file["#spikes"];
 	m_num_inp_neurons = m_config_file["#input_neurons"];
+	if (m_config_file.find("runtime") != m_config_file.end()) {
+		simulation_length = m_config_file["runtime"].get<Real>();
+	}
+	bool record_source = false;
+	if (m_config_file.find("record_spikes") != m_config_file.end()) {
+		record_source = m_config_file["record_spikes"].get<bool>();
+	}
 
 	// Get neuron neuron_parameters
-	m_neuro_params =
-	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params"]);
+	m_neuro_params = NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
+	                                 m_config_file["neuron_params"]);
 	// Set up population, record voltage
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, m_neuro_params,
 	                                     m_num_neurons, "spikes");
@@ -135,8 +152,15 @@ cypress::Network &MaxInputAllToAll::build_netw(cypress::Network &netw)
 		spike_times.emplace_back(10.0 + cypress::Real(i) * simulation_length /
 		                                    m_num_spikes);
 	}
-	m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
-	    m_num_inp_neurons, SpikeSourceArrayParameters(spike_times));
+	if (!record_source) {
+		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
+		    m_num_neurons, SpikeSourceArrayParameters(spike_times));
+	}
+	else {
+		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
+		    m_num_neurons, SpikeSourceArrayParameters(spike_times),
+		    SpikeSourceArraySignals().record_spikes());
+	}
 	netw.add_connection(
 	    m_pop_source, m_pop,
 	    Connector::all_to_all(cypress::Real(m_config_file["weight"])));
@@ -199,11 +223,18 @@ cypress::Network &MaxInputFixedOutConnector::build_netw(cypress::Network &netw)
 	m_num_neurons = m_config_file["#neurons"];
 	m_num_spikes = m_config_file["#spikes"];
 	m_num_inp_neurons = m_config_file["#input_neurons"];
+	if (m_config_file.find("runtime") != m_config_file.end()) {
+		simulation_length = m_config_file["runtime"].get<Real>();
+	}
+	bool record_source = false;
+	if (m_config_file.find("record_spikes") != m_config_file.end()) {
+		record_source = m_config_file["record_spikes"].get<bool>();
+	}
+
 
 	// Get neuron neuron_parameters
-	m_neuro_params =
-	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params"]);
+	m_neuro_params = NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
+	                                 m_config_file["neuron_params"]);
 	// Set up population, record voltage
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, m_neuro_params,
 	                                     m_num_neurons, "spikes");
@@ -212,8 +243,15 @@ cypress::Network &MaxInputFixedOutConnector::build_netw(cypress::Network &netw)
 		spike_times.emplace_back(10.0 + cypress::Real(i) * simulation_length /
 		                                    m_num_spikes);
 	}
-	m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
-	    m_num_inp_neurons, SpikeSourceArrayParameters(spike_times));
+	if (!record_source) {
+		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
+		    m_num_neurons, SpikeSourceArrayParameters(spike_times));
+	}
+	else {
+		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
+		    m_num_neurons, SpikeSourceArrayParameters(spike_times),
+		    SpikeSourceArraySignals().record_spikes());
+	}
 
 	netw.add_connection(
 	    m_pop_source, m_pop,
@@ -292,11 +330,18 @@ cypress::Network &MaxInputFixedInConnector::build_netw(cypress::Network &netw)
 	m_num_neurons = m_config_file["#neurons"];
 	m_num_spikes = m_config_file["#spikes"];
 	m_num_inp_neurons = m_config_file["#input_neurons"];
+	if (m_config_file.find("runtime") != m_config_file.end()) {
+		simulation_length = m_config_file["runtime"].get<Real>();
+	}
+	bool record_source = false;
+	if (m_config_file.find("record_spikes") != m_config_file.end()) {
+		record_source = m_config_file["record_spikes"].get<bool>();
+	}
+
 
 	// Get neuron neuron_parameters
-	m_neuro_params =
-	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params"]);
+	m_neuro_params = NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
+	                                 m_config_file["neuron_params"]);
 	// Set up population, record voltage
 	m_pop = SpikingUtils::add_population(neuron_type_str, netw, m_neuro_params,
 	                                     m_num_neurons, "spikes");
@@ -305,8 +350,15 @@ cypress::Network &MaxInputFixedInConnector::build_netw(cypress::Network &netw)
 		spike_times.emplace_back(10.0 + cypress::Real(i) * simulation_length /
 		                                    m_num_spikes);
 	}
-	m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
-	    m_num_inp_neurons, SpikeSourceArrayParameters(spike_times));
+	if (!record_source) {
+		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
+		    m_num_neurons, SpikeSourceArrayParameters(spike_times));
+	}
+	else {
+		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
+		    m_num_neurons, SpikeSourceArrayParameters(spike_times),
+		    SpikeSourceArraySignals().record_spikes());
+	}
 
 	netw.add_connection(
 	    m_pop_source, m_pop,

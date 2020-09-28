@@ -116,6 +116,15 @@ target_link_libraries(sweep
     benchmark_library
 )
 
+add_executable(EnergyModel
+    source/exec/energy_model.cpp
+)
+add_dependencies(EnergyModel cypress_ext)
+
+target_link_libraries(EnergyModel
+    benchmark_library
+)
+
 #
 # Copy Matplotlibrc to build directory
 # 

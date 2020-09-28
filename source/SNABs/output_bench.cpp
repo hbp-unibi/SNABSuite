@@ -15,15 +15,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <cypress/cypress.hpp>  // Neural network frontend
-
-#include <algorithm>  // Minimal and Maximal element
+#include <algorithm>                        // Minimal and Maximal element
+#include <cypress/backend/power/power.hpp>  // Control of power via netw
+#include <cypress/cypress.hpp>              // Neural network frontend
 #include <limits>
 #include <numeric>  // std::accumulate
 #include <string>
 #include <vector>
-
-#include <cypress/backend/power/power.hpp>  // Control of power via netw
 
 #include "output_bench.hpp"
 #include "util/read_json.hpp"
@@ -45,7 +43,6 @@ cypress::Network &OutputFrequencySingleNeuron::build_netw(
     cypress::Network &netw)
 {
 	std::string neuron_type_str = m_config_file["neuron_type"];
-	SpikingUtils::detect_type(neuron_type_str);
 
 	// Get neuron neuron_parameters
 	NeuronParameter neuron_params =
