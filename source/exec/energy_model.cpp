@@ -27,9 +27,7 @@
 #include "util/read_json.hpp"
 #include "util/utilities.hpp"
 
-#define TESTING  // TODO
-
-// TODO Accurate timing of NEST simulation
+//#define TESTING
 
 using namespace SNAB;
 using cypress::Json;
@@ -46,11 +44,13 @@ std::shared_ptr<SNABBase> find_snab(const std::string snab_name)
 	throw std::runtime_error("Internal Error: Snab " + snab_name + "not found");
 }
 
-auto run_snab(const std::string snab_name, const Json &config)
+auto run_snab(const std::string snab_name, const Json &config,
+              const Json &setup)
 {
 	auto snab = find_snab(snab_name)->clone();
 	auto config_tar = snab->get_config();
 	snab->set_config(cypress::join(config_tar, config));
+	snab->overwrite_backend_config(setup, false);
 	auto netw = snab->build();
 	snab->run();
 	return netw;
@@ -93,52 +93,52 @@ size_t get_number_of_neurons(cypress::Network &netw, bool sources = true)
 
 std::vector<std::string> required_parameters_vec(
     {"non_spiking", "just_spiking", "input_OneToOne", "input_AllToALL",
-     "inter_Single2All", "inter_One2One", "time_scale_factor", "bench_index",
-     "repeat"});
+     "inter_Single2All", "inter_One2One", "bench_index", "repeat", "setup"});
 
 #ifdef TESTING
-double calc_runtime(const std::string, const double, const double,
-                    const cypress::Network &)
-{
-	return 1.0;
-}
+double calc_runtime(const cypress::Network &) { return 1.0; }
 #else
-double calc_runtime(const std::string simulator, const double runtime,
-                    const double time_scale_factor,
-                    const cypress::Network &netw)
+double calc_runtime(const cypress::Network &netw)
 {
-	if (simulator == "genn" || simulator == "pynn.nest" ||
-	    simulator == "nest") {
-		return netw.runtime().sim * 1000.0;  // millisecond
-	}
-	else {
-		return runtime * time_scale_factor;
-	}
+
+	return netw.runtime().sim_pure * 1.0e3;  // millisecond
 }
 #endif
 
-cypress::Network run_STDP_network(Json config, std::string backend, bool spike)
+cypress::Network run_STDP_network(Json config, std::string backend, bool spike,
+                                  Json setup)
 {
 	std::string neuron_type_str = config["neuron_type"];
 	cypress::NeuronParameter neuron_params = cypress::NeuronParameter(
 	    cypress::SpikingUtils::detect_type(neuron_type_str),
 	    config["neuron_params"]);
 	cypress::Network netw;
+	if (config.find("setup") != config.end()) {
+		cypress::join(setup, config["setup"]);
+	}
+
+	Utilities::manipulate_backend_string(backend, setup);
 	std::vector<cypress::Real> spike_times;
 	if (spike) {
-		spike_times = config["spike_times"].get<std::vector<cypress::Real>>();
+		auto n_spikes = config["#spikes"].get<size_t>();
+		spike_times = std::vector<cypress::Real>(n_spikes);
+		cypress::Real intervall =
+		    config["runtime"].get<cypress::Real>() / double(n_spikes);
+		for (size_t i = 0; i < n_spikes; i++) {
+			spike_times[i] = 1.0 + i * 0.9 * intervall;
+		}
 	}
+
 	auto pop = cypress::SpikingUtils::add_population(
 	    neuron_type_str, netw, neuron_params, config["#neurons"].get<size_t>(),
 	    "spikes");
 	auto pop_source = netw.create_population<cypress::SpikeSourceArray>(
-	    config["#neurons"].get<size_t>(),
-	    cypress::SpikeSourceArrayParameters(spike_times),
+	    1, cypress::SpikeSourceArrayParameters(spike_times),
 	    cypress::SpikeSourceArraySignals().record_spikes());
 
 	auto synapse = cypress::SpikePairRuleAdditive();
 	netw.add_connection(pop_source, pop,
-	                    cypress::Connector::one_to_one(synapse));
+	                    cypress::Connector::all_to_all(synapse));
 
 	cypress::PowerManagementBackend pwbackend(
 	    cypress::Network::make_backend(backend));
@@ -160,15 +160,12 @@ double calculate_energy(const cypress::Network &netw, const Json &energy_model);
 void test_energy_model(const std::string config_name,
                        const std::string bench_name,
                        const std::string measure_name, Json &config,
-                       const Json &energy_model, std::string short_sim,
-                       double time_scale_factor)
+                       const Json &energy_model, const Json &setup)
 {
 	config[config_name]["record_spikes"] = true;
-	auto net = run_snab(bench_name, config[config_name]);
+	auto net = run_snab(bench_name, config[config_name], setup);
 	auto ener = calculate_energy(net, energy_model);
-	auto runtime =
-	    calc_runtime(short_sim, config[config_name]["runtime"].get<double>(),
-	                 time_scale_factor, net);
+	auto runtime = calc_runtime(net);
 	std::cout << "Comparing Values for " << measure_name << ":\nMeasured:\t"
 	          << energy_model["measured"][measure_name].get<double>() *
 	                 runtime / 1000.0
@@ -181,15 +178,14 @@ void check_energy_model(const Json &energy_model)
 	std::vector<std::string> names({"measured", "power", "energy"});
 	for (const auto &i : names) {
 		for (const auto &j : energy_model[i].items()) {
-			if (j.value() < 0) {
+			if (j.value() < 0 || j.value() != j.value()) {
 				std::cout << energy_model << std::endl;
-				throw std::runtime_error("Negative value for " + j.key() +
+				throw std::runtime_error("Negative/NaN value for " + j.key() +
 				                         " found! Invalid configuration!");
 			}
 		}
 	}
 }
-
 
 void normalize(Json &json, double norm)
 {
@@ -256,11 +252,18 @@ int main(int argc, const char *argv[])
 		    "Invalid config/Marked as invalid or incomplete!");
 	}
 
-	cypress::global_logger().min_level(cypress::LogSeverity::ERROR, 1);
+	cypress::global_logger().min_level(cypress::LogSeverity::FATAL_ERROR, 1);
 	Json energy_model = setup_energy_model();
 	size_t bench_index = config["bench_index"].get<size_t>();
-	double time_scale_factor = config["time_scale_factor"].get<double>();
 	size_t repeat = config["repeat"].get<size_t>();
+	Json setup;
+	if (config.find("setup") != config.end()) {
+		setup = config["setup"];
+	}
+	if (Utilities::split(simulator, '=').size() > 1) {
+		cypress::join(setup, Json::parse(Utilities::split(simulator, '=')[1]));
+	}
+
 	snab_vec = snab_registry(simulator, bench_index);
 
 	if (energy_config_path == "") {
@@ -287,7 +290,7 @@ int main(int argc, const char *argv[])
 			          << std::endl;
 			config["non_spiking"]["record_spikes"] = true;
 			auto net = run_snab("OutputFrequencyMultipleNeurons",
-			                    config["non_spiking"]);
+			                    config["non_spiking"], setup);
 			size_t number_of_spikes = get_number_of_spikes(net);
 			size_t number_of_neurons = get_number_of_neurons(net);
 			if (number_of_spikes > 0) {
@@ -309,7 +312,7 @@ int main(int argc, const char *argv[])
 			          << std::endl;
 			config["non_spiking"]["record_spikes"] = false;
 			net = run_snab("OutputFrequencyMultipleNeurons",
-			               config["non_spiking"]);
+			               config["non_spiking"], setup);
 			number_of_spikes = get_number_of_spikes(net);
 			number_of_neurons = get_number_of_neurons(net);
 			if (number_of_spikes > 0) {
@@ -326,7 +329,7 @@ int main(int argc, const char *argv[])
 			          << std::endl;
 			config["just_spiking"]["record_spikes"] = true;
 			net = run_snab("OutputFrequencyMultipleNeurons",
-			               config["just_spiking"]);
+			               config["just_spiking"], setup);
 			number_of_spikes = get_number_of_spikes(net);
 			number_of_neurons = get_number_of_neurons(net);
 			if (number_of_spikes == 0) {
@@ -334,9 +337,7 @@ int main(int argc, const char *argv[])
 				                         std::to_string(number_of_spikes) +
 				                         " spikes");
 			}
-			auto runtime = calc_runtime(
-			    short_sim, config["just_spiking"]["runtime"].get<double>(),
-			    time_scale_factor, net);
+			auto runtime = calc_runtime(net);
 			add(measured["full_spiking_rec"], number_from_input(5.0));
 			add(util["full_spiking_rec"]["number_of_neurons"],
 			    number_of_neurons);
@@ -348,7 +349,7 @@ int main(int argc, const char *argv[])
 			          << std::endl;
 			config["just_spiking"]["record_spikes"] = false;
 			net = run_snab("OutputFrequencyMultipleNeurons",
-			               config["just_spiking"]);
+			               config["just_spiking"], setup);
 			auto number_of_spikes2 = get_number_of_spikes(net);
 			// number_of_neurons = get_number_of_neurons(net); // Take from
 			// above
@@ -357,9 +358,7 @@ int main(int argc, const char *argv[])
 				    "just_spiking_not_recording recorded " +
 				    std::to_string(number_of_spikes2) + " spikes");
 			}
-			runtime = calc_runtime(
-			    short_sim, config["just_spiking"]["runtime"].get<double>(),
-			    time_scale_factor, net);
+			runtime = calc_runtime(net);
 			add(measured["full_spiking_non_rec"], number_from_input(4.0));
 			add(util["full_spiking_non_rec"]["number_of_neurons"],
 			    number_of_neurons);
@@ -371,7 +370,7 @@ int main(int argc, const char *argv[])
 			std::cout << "Measuring costs of input spikes one to one..."
 			          << std::endl;
 			config["input_OneToOne"]["record_spikes"] = true;
-			net = run_snab("MaxInputOneToOne", config["input_OneToOne"]);
+			net = run_snab("MaxInputOneToOne", config["input_OneToOne"], setup);
 			number_of_spikes = get_number_of_spikes(net, false);
 			if (number_of_spikes != 0) {
 				throw std::runtime_error("input_OneToOne recorded " +
@@ -380,10 +379,8 @@ int main(int argc, const char *argv[])
 			}
 			number_of_spikes = get_number_of_spikes(net);
 			number_of_neurons = get_number_of_neurons(net, false);
-			runtime = calc_runtime(
-			    short_sim, config["input_OneToOne"]["runtime"].get<double>(),
-			    time_scale_factor, net);
-			add(measured["input_O2O"], number_from_input(7.0));
+			runtime = calc_runtime(net);
+			add(measured["input_O2O"], number_from_input(50.0));
 			add(util["input_O2O"]["number_of_neurons"], number_of_neurons);
 			add(util["input_O2O"]["runtime"], runtime);
 			add(util["input_O2O"]["number_of_spikes"], number_of_spikes);
@@ -392,7 +389,7 @@ int main(int argc, const char *argv[])
 			std::cout << "Measuring costs of input spikes all to all..."
 			          << std::endl;
 			config["input_AllToALL"]["record_spikes"] = true;
-			net = run_snab("MaxInputAllToAll", config["input_AllToALL"]);
+			net = run_snab("MaxInputAllToAll", config["input_AllToALL"], setup);
 			number_of_spikes = get_number_of_spikes(net, false);
 			if (number_of_spikes != 0) {
 				throw std::runtime_error("input_AllToALL recorded " +
@@ -401,9 +398,7 @@ int main(int argc, const char *argv[])
 			}
 			number_of_spikes = get_number_of_spikes(net);
 			number_of_neurons = get_number_of_neurons(net, false);
-			runtime = calc_runtime(
-			    short_sim, config["input_AllToALL"]["runtime"].get<double>(),
-			    time_scale_factor, net);
+			runtime = calc_runtime(net);
 			add(measured["input_A2A"], number_from_input(9.0));
 			add(util["input_A2A"]["number_of_neurons"], number_of_neurons);
 			add(util["input_A2A"]["runtime"], runtime);
@@ -412,7 +407,8 @@ int main(int argc, const char *argv[])
 			// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			std::cout << "Measuring costs of spike transmission one to all..."
 			          << std::endl;
-			net = run_snab("SingleMaxFreqToGroup", config["inter_Single2All"]);
+			net = run_snab("SingleMaxFreqToGroup", config["inter_Single2All"],
+			               setup);
 			number_of_spikes = get_number_of_spikes(net, false);
 			if (number_of_spikes == 0) {
 				throw std::runtime_error("inter_Single2All recorded " +
@@ -427,9 +423,7 @@ int main(int argc, const char *argv[])
 				                         " target spikes");
 			}
 			number_of_neurons = net.populations().back().size();
-			runtime = calc_runtime(
-			    short_sim, config["inter_Single2All"]["runtime"].get<double>(),
-			    time_scale_factor, net);
+			runtime = calc_runtime(net);
 			add(measured["inter_s2A"], number_from_input(10.0));
 			add(util["inter_s2A"]["number_of_neurons"], number_of_neurons);
 			add(util["inter_s2A"]["runtime"], runtime);
@@ -439,7 +433,8 @@ int main(int argc, const char *argv[])
 			std::cout << "Measuring costs of spike transmission one to one..."
 			          << std::endl;
 			config["inter_One2One"]["record_spikes"] = true;
-			net = run_snab("GroupMaxFreqToGroup", config["inter_One2One"]);
+			net =
+			    run_snab("GroupMaxFreqToGroup", config["inter_One2One"], setup);
 			number_of_spikes = get_number_of_spikes(net, true);
 			if (number_of_spikes == 0) {
 				throw std::runtime_error("inter_One2One recorded " +
@@ -454,9 +449,7 @@ int main(int argc, const char *argv[])
 				                         " target spikes");
 			}
 			number_of_neurons = net.populations().back().size();
-			runtime = calc_runtime(
-			    short_sim, config["inter_One2One"]["runtime"].get<double>(),
-			    time_scale_factor, net);
+			runtime = calc_runtime(net);
 			add(measured["inter_O2O"], number_from_input(10.0));
 			add(util["inter_O2O"]["number_of_neurons"], number_of_neurons);
 			add(util["inter_O2O"]["runtime"], runtime);
@@ -465,20 +458,19 @@ int main(int argc, const char *argv[])
 			// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			if (config.find("stdp") != config.end()) {
 				std::cout << "Measuring costs of idle STDP..." << std::endl;
-				net = run_STDP_network(config["stdp"], simulator, false);
-				number_of_neurons = get_number_of_neurons(net, false);
+				auto net =
+				    run_STDP_network(config["stdp"], simulator, false, setup);
+				auto number_of_neurons = get_number_of_neurons(net, false);
 				add(measured["stdp_idle"], number_from_input(5.0));
 				add(util["stdp_idle"]["number_of_neurons"], number_of_neurons);
 
 				std::cout << "Measuring costs of running STDP..." << std::endl;
-				net = run_STDP_network(config["stdp"], simulator, true);
+				net = run_STDP_network(config["stdp"], simulator, true, setup);
 				number_of_neurons = get_number_of_neurons(net, false);
-				number_of_spikes = get_number_of_spikes(net, false);
+				auto number_of_spikes = get_number_of_spikes(net, false);
 				auto number_of_source_spikes =
 				    get_number_of_spikes(net, true) - number_of_spikes;
-				runtime = calc_runtime(short_sim,
-				                       config["stdp"]["runtime"].get<double>(),
-				                       time_scale_factor, net);
+				auto runtime = calc_runtime(net);
 				add(measured["stdp_spike"], number_from_input(15.0));
 				add(util["stdp_spike"]["number_of_neurons"], number_of_neurons);
 				add(util["stdp_spike"]["runtime"], runtime);
@@ -526,29 +518,28 @@ int main(int argc, const char *argv[])
 	// cypress::global_logger().min_level(cypress::LogSeverity::DEBUG, 1);
 
 	test_energy_model("non_spiking", "OutputFrequencyMultipleNeurons",
-	                  "non_spiking_rec", config, energy_model, short_sim,
-	                  time_scale_factor);
+	                  "non_spiking_rec", config, energy_model, setup);
 	test_energy_model("just_spiking", "OutputFrequencyMultipleNeurons",
-	                  "full_spiking_rec", config, energy_model, short_sim,
-	                  time_scale_factor);
+	                  "full_spiking_rec", config, energy_model, setup);
 	test_energy_model("input_OneToOne", "MaxInputOneToOne", "input_O2O", config,
-	                  energy_model, short_sim, time_scale_factor);
+	                  energy_model, setup);
 	test_energy_model("input_AllToALL", "MaxInputAllToAll", "input_A2A", config,
-	                  energy_model, short_sim, time_scale_factor);
+	                  energy_model, setup);
 	test_energy_model("inter_Single2All", "SingleMaxFreqToGroup", "inter_s2A",
-	                  config, energy_model, short_sim, time_scale_factor);
+	                  config, energy_model, setup);
 	test_energy_model("inter_One2One", "GroupMaxFreqToGroup", "inter_O2O",
-	                  config, energy_model, short_sim, time_scale_factor);
+	                  config, energy_model, setup);
 
-	auto net = run_STDP_network(config["stdp"], simulator, true);
+	auto net = run_STDP_network(config["stdp"], simulator, true, setup);
 	auto ener = calculate_energy(net, energy_model);
-	auto runtime =
-	    calc_runtime(short_sim, config["stdp"]["runtime"].get<double>(),
-	                 time_scale_factor, net);
+	auto runtime = calc_runtime(net);
 	std::cout << "Comparing Values for STDP:\nMeasured:\t"
 	          << energy_model["measured"]["stdp_spike"].get<double>() *
 	                 runtime / 1000.0
 	          << "\nCalculated:\t" << ener << std::endl;
+
+	// auto net = run_snab("MnistSpikey", Json(), setup);
+	// std::cout << calculate_energy(net, energy_model)<<std::endl;;
 }
 
 std::vector<size_t> conn_ids_source(
@@ -646,8 +637,7 @@ size_t calc_number_stdp_synapses(
 
 double calculate_energy(const cypress::Network &netw, const Json &energy_model)
 {
-	double runtime =
-	    netw.runtime().sim * 1000.0;  // TODO for NEST, BS, Spikey...
+	double runtime = netw.runtime().sim_pure * 1000.0;
 #ifdef TESTING
 	runtime = 1.0;
 #endif
@@ -711,7 +701,6 @@ double calculate_energy(const cypress::Network &netw, const Json &energy_model)
 	}
 	return energy;
 }
-
 
 Json setup_energy_model()
 {
@@ -890,8 +879,10 @@ void calculate_coefficients(Json &energy_model, size_t repeat)
 		     energy["spike"].get<double>() *
 		         util["stdp_spike"]["number_of_spikes"].get<double>() -
 		     util["stdp_spike"]["number_of_source_spikes"].get<double>() *
-		         energy["InputSpike_O2O"].get<double>()) /
-		    util["stdp_spike"]["number_of_source_spikes"].get<double>();
+		         energy["InputSpike_A2A"].get<double>() *
+		         util["stdp_spike"]["number_of_neurons"].get<double>()) /
+		    (util["stdp_spike"]["number_of_source_spikes"].get<double>() *
+		     util["stdp_spike"]["number_of_neurons"].get<double>());
 		// E per spike transmitted via STDP synapse
 	}
 }

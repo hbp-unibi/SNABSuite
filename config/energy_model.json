@@ -1,23 +1,23 @@
 {
     "genn": {
+        "setup" : {},
         "bench_index": 1,
-        "time_scale_factor": 1.0,
-        "repeat": 5,
+        "repeat": 1,
         "non_spiking" : {
             "#neurons" : 1000,
-            "runtime": 100,
+            "runtime": 300000,
             "neuron_params": {
                 "v_thresh" : 30
             }
         },
         "just_spiking" : { 
             "#neurons" : 1000,
-            "runtime": 100
+            "runtime": 100000
         },
         "input_OneToOne" : {
-            "#neurons" : 1000,
-            "runtime": 100,
-            "#spikes": 10,
+            "#neurons" : 5000,
+            "runtime": 10000,
+            "#spikes": 500,
             "neuron_params": { 
                 "v_thresh" : 30
             }
@@ -25,22 +25,22 @@
         "input_AllToALL" : {
             "#neurons" : 1000,
             "#input_neurons": 1000,
-            "runtime": 100,
+            "runtime": 50000,
+            "#spikes": 5000,
             "neuron_params": { 
                 "v_thresh" : 30
             }
         },
         "inter_Single2All" : { 
             "#neurons" : 1000,
-            "runtime": 100,
+            "runtime": 100000,
             "neuron_params_retr": {
                 "v_thresh" : 30
             }
         } ,
         "inter_One2One" : {
-            "#neurons" : 10,
-            "#neurons_retr" : 10,
-            "runtime": 100,
+            "#neurons" : 1000,
+            "runtime": 50000,
             "neuron_params_retr": {
                 "v_thresh" : 30
             }
@@ -50,9 +50,72 @@
                 "v_thresh": -60
             },
             "neuron_type": "IF_cond_exp",
-            "spike_times": [30,50,70,90,120,150,170,190,210,250,290,300,350,370,390,410,450],
-            "#neurons": 100,
-            "runtime": 500
+            "#spikes": 2500,
+            "#neurons": 1000,
+            "runtime": 50000
+        }
+    },
+    
+    "spinnaker": {
+        "setup" : {
+            "timestep": 1.0,
+            "time_scale_factor" : 1.0
+        },
+        "bench_index": 1,
+        "repeat": 1,
+        "non_spiking" : {
+            "#neurons" : 16065,
+            "runtime": 10000,
+            "neuron_params": {
+                "v_thresh" : 30
+            }
+        },
+        "just_spiking" : { 
+            "#neurons" : 16065,
+            "runtime": 10000
+        },
+        "input_OneToOne" : {
+            "#neurons" : 3060,
+            "runtime": 4000,
+            "#spikes": 80,
+            "neuron_params": { 
+                "v_thresh" : 30
+            }
+        } ,
+        "input_AllToALL" : {
+            "#neurons" : 2550,
+            "#input_neurons": 1,
+            "runtime": 4000,
+            "#spikes": 80,
+            "neuron_params": { 
+                "v_thresh" : 30
+            }
+        },
+        "inter_Single2All" : { 
+            "#neurons" : 15810,
+            "runtime": 10000,
+            "neuron_params_retr": {
+                "v_thresh" : 30
+            }
+        } ,
+        "inter_One2One" : {
+            "#neurons" : 7905,
+            "runtime": 10000,
+            "neuron_params_retr": {
+                "v_thresh" : 30
+            }
+        },
+        "stdp" : {
+            "setup" : {
+                "neurons_per_core": 200
+            },
+            "neuron_params": {
+                "v_thresh": -62
+            },
+            "neuron_type": "IF_cond_exp",
+            "#spikes":500,
+            "#neurons": 12000,
+            "runtime": 10000
         }
     }
 }
