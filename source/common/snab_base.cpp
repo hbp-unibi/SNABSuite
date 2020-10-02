@@ -16,14 +16,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cypress/cypress.hpp>
-
-#include "snab_base.hpp"
-
 #include <sys/stat.h>
+
 #include <algorithm>
+#include <cypress/cypress.hpp>
 #include <string>
 
+#include "snab_base.hpp"
 #include "util/read_json.hpp"
 #include "util/utilities.hpp"
 
@@ -44,9 +43,19 @@ SNABBase::SNABBase(std::string name, std::string backend,
       m_bench_index(bench_index)
 {
 	m_config_file = read_config(name, m_backend);
-	std::vector<std::string> required_parameters_vec(required_parameters);
-	bool required_params =
-	    check_json_for_parameters(required_parameters_vec, m_config_file, name);
+	check_config(required_parameters);
+
+	bool changed =
+	    replace_arrays_by_value(m_config_file, m_bench_index, m_snab_name);
+	if (!changed && m_bench_index != 0) {
+		m_valid = false;
+	}
+}
+
+void SNABBase::check_config(std::vector<std::string> required_parameters_vec)
+{
+	bool required_params = check_json_for_parameters(
+	    required_parameters_vec, m_config_file, m_snab_name);
 
 	// Check wether benchmark is labeled as invalid
 	if ((m_config_file.find("invalid") == m_config_file.end() ||
@@ -58,15 +67,9 @@ SNABBase::SNABBase(std::string name, std::string backend,
 		return;
 	}
 
-	bool changed = replace_arrays_by_value(m_config_file, bench_index, name);
-	if (!changed && bench_index != 0) {
-		m_valid = false;
-	}
-
 	// Check for backend related setup config
 	if (m_config_file.find("setup") != m_config_file.end()) {
 		Utilities::manipulate_backend_string(m_backend, m_config_file["setup"]);
-		m_config_file.erase("setup");
 	}
 }
 
@@ -80,9 +83,9 @@ cypress::Json SNABBase::evaluate_json()
 		temp["type"] = m_indicator_types[i];
 		temp["value"] = results[i][0];
 		temp["measure"] = m_indicator_measures[i];
-        if(m_indicator_units[i] != ""){
-            temp["units"] = m_indicator_units[i];
-        }
+		if (m_indicator_units[i] != "") {
+			temp["units"] = m_indicator_units[i];
+		}
 		if (!(results[i][1] != results[i][1])) {
 			temp["std_dev"] = results[i][1];
 		}
@@ -107,4 +110,37 @@ std::string SNABBase::_debug_filename(const std::string append) const
 	                   append);
 }
 cypress::Real NaN() { return std::numeric_limits<cypress::Real>::quiet_NaN(); }
+
+void SNABBase::set_config(cypress::Json json)
+{
+	m_config_file = json;
+	check_config();
+}
+
+void SNABBase::overwrite_backend_config(Json setup, bool delete_old)
+{
+	auto backend_vec = Utilities::split(m_backend, '=');
+	if (!delete_old) {
+		if (backend_vec.size() > 1) {
+			Json old = Json::parse(backend_vec[1]);
+			auto temp = Utilities::merge_json(old, setup);
+			m_backend = backend_vec[0];
+			Utilities::manipulate_backend_string(m_backend, temp);
+			return;
+		}
+	}
+	m_backend = backend_vec[0];
+	Utilities::manipulate_backend_string(m_backend, setup);
+}
+
+Json SNABBase::get_backend_config()
+{
+	auto backend_vec = Utilities::split(m_backend, '=');
+
+	if (backend_vec.size() > 1) {
+		return Json::parse(backend_vec[1]);
+	}
+	return Json();
+}
+
 }  // namespace SNAB

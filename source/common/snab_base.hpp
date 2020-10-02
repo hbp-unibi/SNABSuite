@@ -160,7 +160,7 @@ public:
 	 *
 	 * @param json new config
 	 */
-	void set_config(cypress::Json json) { m_config_file = json; }
+	void set_config(cypress::Json json);
 
 	/**
 	 * @brief Reset the internal cypress network, therefore deleting all old
@@ -182,6 +182,21 @@ public:
 	 * @brief Virtual method cloning the SNAB without knowing which SNAB it is
 	 */
 	virtual std::shared_ptr<SNABBase> clone() = 0;
+
+	/**
+	 * @brief Overwrites the config of the backend.
+	 *
+	 * @param setup The new configuration of the backend
+	 * @param delete_old True: Delete all old entries, False: keep entries that
+	 * are not overwritten
+	 */
+	void overwrite_backend_config(cypress::Json setup, bool delete_old = true);
+
+	/**
+	 * @brief Get the current backend configuration
+	 *
+	 */
+	cypress::Json get_backend_config();
 
 	/**
 	 * @brief Default destructor
@@ -258,6 +273,14 @@ protected:
 	std::string _debug_filename(const std::string append = std::string()) const;
 
 	const size_t m_bench_index;
+
+	/**
+	 * @brief Internal check of confid, set up of backend configuration
+	 *
+	 * @param required_parameters_vec Vector of parameters that have to be found
+	 * in the config file
+	 */
+	void check_config(std::vector<std::string> required_parameters_vec = {});
 };
 
 /**
