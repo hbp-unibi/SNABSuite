@@ -301,8 +301,19 @@ cypress::Network &GroupMaxFreqToGroupProb::build_netw(cypress::Network &netw)
 	                                m_config_file["neuron_params_retr"]);
 
 	// Create the always spiking population
-	m_pop_max = SpikingUtils::add_population(neuron_type_str, netw, params,
-	                                         m_config_file["#neurons_max"], "");
+	bool record_spikes = false;
+	if (m_config_file.find("record_spikes") != m_config_file.end()) {
+		record_spikes = m_config_file["record_spikes"].get<bool>();
+	}
+	if (record_spikes) {
+		m_pop_max = SpikingUtils::add_population(neuron_type_str, netw, params,
+		                                         m_config_file["#neurons_max"],
+		                                         "spikes");
+	}
+	else {
+		m_pop_max = SpikingUtils::add_population(
+		    neuron_type_str, netw, params, m_config_file["#neurons_max"], "");
+	}
 	// Create the group population
 	m_pop_retr =
 	    SpikingUtils::add_population(neuron_type_str, netw, m_retr_params,
