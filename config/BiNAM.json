@@ -1,11 +1,11 @@
 {
     "default": {
         "data": {
-            "n_bits_in": [1600,10000],
-            "n_bits_out": [1600,1600],
+            "n_bits_in": [250,1000,1600,10000],
+            "n_bits_out": [250,4000,1600,1600],
             "n_ones_in": 4,
             "n_ones_out": 4,
-            "n_samples": [113648,710299]
+            "n_samples": [3142,175089,113648,710299]
         },
         "network": {
             "params": {
@@ -14,21 +14,21 @@
                 "v_reset": -80,
                 "v_thresh": -57,
                 "tau_syn_E": 2,
-                "tau_refrac": 0,
+                "tau_refrac": 5.0,
                 "tau_m": 10,
                 "cm": 0.2
             },
             "neuron_type": "IF_cond_exp",
             "weight": 0.01,
             "input_burst_size": 1,
-            "time_window": 100,
+            "time_window": 60,
             "isi": 2,
             "sigma_t": 2,
             "sigma_offs": 0,
             "p0": 0,
             "p1": 0,
             "output_burst_size": 1,
-            "general_offset": 100,
+            "general_offset": 10,
             "multiplicity": 1
         },
         "data_generator": {
