@@ -46,10 +46,20 @@ for ind, layer in enumerate(netw["config"]["layers"]):
     elif(layer["class_name"] == "AveragePooling2D"):
         print("Ignoring AveragePooling2D layer")
         continue
+    elif(layer["class_name"] == "InputLayer"):
+        print("Ignoring InputLayer layer")
+        continue
     elif(layer["class_name"] == "Dense"):
         layer_dict["class_name"] = "Dense"
         layer_dict["size"] = layer["config"]["units"]
-        layer_dict["weights"] = model.layers[ind].get_weights()[0].tolist()
+        try:
+            layer_name = layer["config"]["name"]
+            for layer_2 in model.layers:
+                if layer_2.name == layer_name:
+                    layer_dict["weights"] = layer_2.get_weights()[0].tolist()
+                    break
+        except:
+            layer_dict["weights"] = model.layers[ind].get_weights()[0].tolist()
         # Weight[i][j]: i input, j output
     elif(layer["class_name"] == "Conv2D"):
         print("Conv2D", layer)
