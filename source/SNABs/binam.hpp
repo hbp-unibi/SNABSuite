@@ -29,7 +29,11 @@
 
 namespace SNAB {
 /**
- * TODO
+ * BiNAM: Binary Neural Associative Memory: Uses a pre trained BiNAM and convert
+ * it into a spiking network. This requires the fine-tuned target neuron to
+ * perform a distinction between e.g. 3 and 4 input spikes and provide a clear
+ * threshold function. Easily scalable. If false negatives appear with higher
+ * network size this implies reaching a hardware bottleneck.
  */
 class BiNAM : public SNABBase {
 protected:
@@ -55,6 +59,9 @@ public:
 	}
 };
 
+/**
+ * @brief Similar to BiNAM, but uses populations to encode single neurons.
+ */
 class BiNAM_pop : public BiNAM {
 public:
 	BiNAM_pop(const std::string backend, size_t bench_index)
@@ -66,6 +73,10 @@ public:
 		return std::make_shared<BiNAM_pop>(m_backend, m_bench_index);
 	}
 };
+
+/**
+ * @brief Similar to BiNAM, but uses a burst of spikes to encode a set bit.
+ */
 class BiNAM_burst : public BiNAM {
 public:
 	BiNAM_burst(const std::string backend, size_t bench_index)
@@ -77,6 +88,12 @@ public:
 		return std::make_shared<BiNAM_burst>(m_backend, m_bench_index);
 	}
 };
+
+/**
+ * @brief Similar to BiNAM, but uses a burst of spikes to encode a set bit and a
+ * population to encode single neurons. Thus, it is a combination of two methods
+ * described before.
+ */
 class BiNAM_pop_burst : public BiNAM {
 public:
 	BiNAM_pop_burst(const std::string backend, size_t bench_index)
