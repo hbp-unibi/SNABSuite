@@ -29,6 +29,7 @@
 #include "SNABs/output_bench.hpp"
 #include "SNABs/refractory_period.hpp"
 #include "SNABs/setup_time.hpp"
+#include "SNABs/sudoku.hpp"
 #include "SNABs/wta_like.hpp"
 #include "common/snab_base.hpp"
 #include "common/snab_registry.hpp"
@@ -89,6 +90,12 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
 	    std::make_shared<BiNAM_burst>(BiNAM_burst(backend, bench_index)),
 	    std::make_shared<BiNAM_pop_burst>(
 	        BiNAM_pop_burst(backend, bench_index)),
+	    std::make_shared<SpikingSudoku>(
+	        SpikingSudoku(backend, bench_index)),
+	    std::make_shared<SpikingSudokuSinglePop>(
+	        SpikingSudokuSinglePop(backend, bench_index)),
+	    std::make_shared<SpikingSudokuMirrorInhib>(
+	        SpikingSudokuMirrorInhib(backend, bench_index)),
 	};
 	return vec;
 }

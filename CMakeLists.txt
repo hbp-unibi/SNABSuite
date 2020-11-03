@@ -73,6 +73,7 @@ include_directories(source/)
 
 
 include(binam_external)
+include(sudoku_external)
 #
 # Benchmark basic libraries
 #
@@ -91,6 +92,7 @@ add_library(benchmark_library
     source/SNABs/max_input
     source/SNABs/max_inter_neuron
     source/SNABs/setup_time
+    source/SNABs/sudoku
     source/SNABs/wta_like
     source/SNABs/mnist/mnist
     source/SNABs/mnist/helper_functions
@@ -98,6 +100,7 @@ add_library(benchmark_library
 )
 target_link_libraries(benchmark_library
     libcppnam
+    libsudoku
     ${CYPRESS_LIBRARY}
 )
 add_dependencies(benchmark_library cypress_ext)
