@@ -33,7 +33,9 @@ typedef std::pair<std::vector<std::vector<Real>>, std::vector<uint16_t>>
 typedef std::pair<std::vector<std::vector<std::vector<Real>>>,
                   std::vector<uint16_t>>
     SPIKING_MNIST;
-
+typedef std::vector<std::vector<std::vector<std::vector<std::vector<Real>>>>>
+    CONV_TYPE;
+enum LAYER_TYPE {Dense, Conv, Pooling};
 /**
  * @brief Read in MNIST data from files
  *

@@ -62,8 +62,18 @@ for ind, layer in enumerate(netw["config"]["layers"]):
             layer_dict["weights"] = model.layers[ind].get_weights()[0].tolist()
         # Weight[i][j]: i input, j output
     elif(layer["class_name"] == "Conv2D"):
-        print("Conv2D", layer)
-        continue #TODO
+        layer_dict["class_name"] = "Conv2D"
+        layer_dict["size"] = layer["config"]["filters"]
+        try:
+            layer_name = layer["config"]["name"]
+            for layer_2 in model.layers:
+                if layer_2.name == layer_name:
+                    layer_dict["weights"] = layer_2.get_weights()[0].tolist()
+                    break
+        except:
+            layer_dict["weights"] = model.layers[ind].get_weights()[0].tolist()
+        # print("Conv2D", layer)
+        # TODO
     elif(layer["class_name"] == "MaxPooling2D"):
         print("MaxPooling2D", layer)
         continue

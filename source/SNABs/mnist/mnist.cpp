@@ -243,6 +243,7 @@ size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight)
 		}
 	}
 
+	//TODO: foreach->for mit layer type unterscheiden
 	for (const auto &layer : m_mlp->get_weights()) {
 
 		size_t size = layer.cols();
