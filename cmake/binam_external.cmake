@@ -16,38 +16,38 @@
 
 
 include(FetchContent)
-FetchContent_Declare(cppnam
+FetchContent_Declare(cppnam_rep
     GIT_REPOSITORY      "https://github.com/hbp-unibi/cppnam/"
     GIT_TAG             master
 )
-# FetchContent_MakeAvailable(cppnam)
-FetchContent_GetProperties(cppnam)
-if(NOT cppnam_POPULATED)
-    FetchContent_Populate(cppnam)
+# FetchContent_MakeAvailable(cppnam_rep)
+FetchContent_GetProperties(cppnam_rep)
+if(NOT cppnam_rep_POPULATED)
+    FetchContent_Populate(cppnam_rep)
 endif()
 include_directories(
-	${cppnam_SOURCE_DIR}/src/
+	${cppnam_rep_SOURCE_DIR}/src/
 )
 
-add_library(libcppnam
-	${cppnam_SOURCE_DIR}/src/core/binam
-	${cppnam_SOURCE_DIR}/src/core/entropy
-	${cppnam_SOURCE_DIR}/src/core/parameters
-	${cppnam_SOURCE_DIR}/src/core/spiking_binam
-	${cppnam_SOURCE_DIR}/src/core/spiking_netw_basis
-	${cppnam_SOURCE_DIR}/src/core/spiking_parameters
-	${cppnam_SOURCE_DIR}/src/core/spiking_utils
-	${cppnam_SOURCE_DIR}/src/util/binary_matrix
-	${cppnam_SOURCE_DIR}/src/util/data
-	${cppnam_SOURCE_DIR}/src/util/ncr
-	${cppnam_SOURCE_DIR}/src/util/optimisation
-	${cppnam_SOURCE_DIR}/src/util/population_count
-	${cppnam_SOURCE_DIR}/src/recurrent/rec_binam
-	${cppnam_SOURCE_DIR}/src/recurrent/spiking_rec_binam
+add_library(cppnam
+	${cppnam_rep_SOURCE_DIR}/src/core/binam
+	${cppnam_rep_SOURCE_DIR}/src/core/entropy
+	${cppnam_rep_SOURCE_DIR}/src/core/parameters
+	${cppnam_rep_SOURCE_DIR}/src/core/spiking_binam
+	${cppnam_rep_SOURCE_DIR}/src/core/spiking_netw_basis
+	${cppnam_rep_SOURCE_DIR}/src/core/spiking_parameters
+	${cppnam_rep_SOURCE_DIR}/src/core/spiking_utils
+	${cppnam_rep_SOURCE_DIR}/src/util/binary_matrix
+	${cppnam_rep_SOURCE_DIR}/src/util/data
+	${cppnam_rep_SOURCE_DIR}/src/util/ncr
+	${cppnam_rep_SOURCE_DIR}/src/util/optimisation
+	${cppnam_rep_SOURCE_DIR}/src/util/population_count
+	${cppnam_rep_SOURCE_DIR}/src/recurrent/rec_binam
+	${cppnam_rep_SOURCE_DIR}/src/recurrent/spiking_rec_binam
 )
-target_link_libraries(libcppnam
-	${CYPRESS_LIBRARY}
-	-pthread
-)
-add_dependencies(libcppnam cypress_ext)
+# target_link_libraries(cppnam
+# 	${CYPRESS_LIBRARY}
+# 	-pthread
+# )
+add_dependencies(cppnam cypress_ext)
 

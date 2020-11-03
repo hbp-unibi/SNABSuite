@@ -99,8 +99,8 @@ add_library(benchmark_library
     source/SNABs/mnist/mnist_mlp
 )
 target_link_libraries(benchmark_library
-    libcppnam
-    libsudoku
+    cppnam
+    sudoku
     ${CYPRESS_LIBRARY}
 )
 add_dependencies(benchmark_library cypress_ext)

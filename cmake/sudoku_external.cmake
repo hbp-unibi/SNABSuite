@@ -15,25 +15,25 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 include(FetchContent)
-FetchContent_Declare(sudoku
+FetchContent_Declare(sudoku_rep
     GIT_REPOSITORY      "https://github.com/hbp-unibi/SpikingSudokuSolver"
     GIT_TAG             master
 )
-FetchContent_GetProperties(sudoku)
-if(NOT sudoku_POPULATED)
-    FetchContent_Populate(sudoku)
+FetchContent_GetProperties(sudoku_rep)
+if(NOT sudoku_rep_POPULATED)
+    FetchContent_Populate(sudoku_rep)
 endif()
 include_directories(
-	${sudoku_SOURCE_DIR}/
-	${sudoku_SOURCE_DIR}/source/
+	${sudoku_rep_SOURCE_DIR}/
+	${sudoku_rep_SOURCE_DIR}/source/
 )
-add_library(libsudoku
-    ${sudoku_SOURCE_DIR}/source/utils/Sudoku
-    ${sudoku_SOURCE_DIR}/source/utils/spikingSudokuSolver
+add_library(sudoku
+    ${sudoku_rep_SOURCE_DIR}/source/utils/Sudoku
+    ${sudoku_rep_SOURCE_DIR}/source/utils/spikingSudokuSolver
 )
 
-target_link_libraries(libsudoku
-	${CYPRESS_LIBRARY}
-	-pthread
-)
-add_dependencies(libsudoku cypress_ext)
+# target_link_libraries(sudoku
+# 	${CYPRESS_LIBRARY}
+# 	-pthread
+# )
+add_dependencies(sudoku cypress_ext)
