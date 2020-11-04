@@ -204,9 +204,10 @@ public:
 	virtual const mnist_helper::MNIST_DATA &mnist_train_set() = 0;
 	virtual const mnist_helper::MNIST_DATA &mnist_test_set() = 0;
 	virtual const std::vector<cypress::Matrix<Real>> &get_weights() = 0;
-	virtual const mnist_helper::CONV_TYPE &get_filter_weights() = 0;
+	virtual const std::vector<mnist_helper::CONVOLUTION_LAYER> &get_filter_weights() = 0;
 	virtual const std::vector<size_t> &get_layer_sizes() = 0;
 	virtual const std::vector<size_t> &get_filter_sizes() = 0;
+	virtual const std::vector<mnist_helper::LAYER_TYPE> &get_layer_types() = 0;
 	virtual void scale_down_images(size_t pooling_size = 3) = 0;
 	virtual inline bool correct(const uint16_t label,
 	                            const std::vector<Real> &output) const = 0;
@@ -240,7 +241,7 @@ class MLP : public MLPBase {
 protected:
 	std::vector<cypress::Matrix<Real>> m_layers;
     std::vector<size_t> m_layer_sizes;
-	mnist_helper::CONV_TYPE m_filters;
+	std::vector<mnist_helper::CONVOLUTION_LAYER> m_filters;
 	std::vector<size_t> _m_filter_sizes;
 	std::vector<mnist_helper::LAYER_TYPE> m_layer_types;
 	size_t m_epochs = 20;
@@ -350,20 +351,30 @@ public:
 					}
 				}
                 m_layer_sizes.emplace_back(m_layers[0].rows());
-
+                m_layer_types.push_back(mnist_helper::LAYER_TYPE::Dense);
 				cypress::global_logger().debug(
 				    "MNIST", "Dense layer detected with size " +
 				                 std::to_string(weights.rows()) + " times " +
 				                 std::to_string(weights.cols()));
 			}
-                //TODO: padding?
+            //TODO: padding? mh
 			else if (layer["class_name"].get<std::string>() == "Conv2D") {
                 auto &json = layer["weights"];
-				std::vector<std::vector<Real>> _filter(json[0][0].size(), std::vector<Real>(json[0][0][0].size()));
+				size_t filter_x = json.size();
+				size_t filter_y = json[0].size();
+				size_t filter_depth = json[0][0].size();
+				size_t output = json[0][0][0].size();
+				mnist_helper::CONVOLUTION_FILTER conv_filter(
+				    filter_x,
+				    std::vector<std::vector<std::vector<Real>>>(filter_y,
+				    std::vector<std::vector<Real>>(filter_depth,
+				    std::vector<Real>(output)))
+				    );
+                size_t padding = layer["padding"] == "valid" ? 0 : 1;
+				mnist_helper::CONVOLUTION_LAYER conv = {conv_filter, layer["stride"], padding};
 				m_filters.emplace_back(
-                    std::vector<std::vector<std::vector<std::vector<Real>>>>(json.size(),
-				                                                             std::vector<std::vector<std::vector<Real>>>(json[0].size(), _filter)));
-				auto &weights = m_filters.back();
+                    );
+				auto &weights = m_filters.back().filter;
 				//auto scale = std::sqrt(2.0 / double(weights.rows()));
 				for (size_t i = 0; i < json.size(); i++){
 					for (size_t j = 0; j < json[i].size(); j++){
@@ -374,8 +385,9 @@ public:
 						}
 					}
 				}
-				// TODO: choose other filter size?
+				// TODO: choose other filter size to save? mh
 				_m_filter_sizes.emplace_back(json[0][0][0].size());
+                m_layer_types.push_back(mnist_helper::LAYER_TYPE::Conv);
 				cypress::global_logger().debug(
 				    "MNIST", "Conv layer detected with size ("+
 				        std::to_string(json.size())+","+std::to_string(json[0].size())+
@@ -475,7 +487,13 @@ public:
 		return m_layers;
 	}
 
-	const mnist_helper::CONV_TYPE &get_filter_weights() override
+	/**
+	 * @brief Return all filter weights in the form of weights[x][y][depth][filter]
+	 *
+	 * @return const mnist_helper::Conv_TYPE &
+	 */
+	 // TODO: return whole conv struct? mh
+	const std::vector<mnist_helper::CONVOLUTION_LAYER> &get_filter_weights() override
     {
 		return m_filters;
 	}
@@ -500,6 +518,10 @@ public:
 		return _m_filter_sizes;
 	}
 
+	const std::vector<mnist_helper::LAYER_TYPE> &get_layer_types() override
+    {
+		return m_layer_types;
+	}
 
 	/**
 	 * @brief Scale down the whole data set, reduces the image by a given factor

@@ -33,8 +33,14 @@ typedef std::pair<std::vector<std::vector<Real>>, std::vector<uint16_t>>
 typedef std::pair<std::vector<std::vector<std::vector<Real>>>,
                   std::vector<uint16_t>>
     SPIKING_MNIST;
-typedef std::vector<std::vector<std::vector<std::vector<std::vector<Real>>>>>
-    CONV_TYPE;
+typedef std::vector<std::vector<std::vector<std::vector<Real>>>>
+    CONVOLUTION_FILTER;
+struct CONVOLUTION_LAYER {
+    CONVOLUTION_FILTER filter;
+	size_t stride;
+	size_t padding;
+};
+typedef struct CONVOLUTION_LAYER CONVOLUTION_LAYER;
 enum LAYER_TYPE {Dense, Conv, Pooling};
 /**
  * @brief Read in MNIST data from files
@@ -262,6 +268,17 @@ Real max_weight_abs(const Matrix<T> &json)
  */
 std::vector<LocalConnection> dense_weights_to_conn(const Matrix<Real> &mat,
                                                    Real scale, Real delay);
+
+/**
+ * @brief Converts a conv layer to list of Local Connections.
+ *
+ * @param filters std::vectors of filter weights
+ * @param scale scale factor for weights
+ * @param delay synaptic delay
+ * @return vector of connections
+ */
+std::vector<LocalConnection> conv_weights_to_conn(const mnist_helper::CONVOLUTION_LAYER &filters,
+                                                  Real scale, Real delay);
 
 /**
  * @brief Converts the simulation results into label data

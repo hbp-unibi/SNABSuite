@@ -237,46 +237,6 @@ Json read_network(std::string path, bool msgpack)
 	return json;
 }
 
-std::vector<LocalConnection> conv_weights_to_conn(
-    const Matrix<Real> &mat,
-    const std::vector<std::tuple<Matrix<Real>, size_t, size_t>> &filters,
-    Real scale, Real delay)
-{
-	std::vector<LocalConnection> conns;
-//    for (auto filter : filters){
-//		auto stride = std::get<1>(filter);
-//		if (stride != 1){
-//			auto padding = std::get<2>(filter);
-//			auto output = (mat.rows() - std::get<0>(filter).rows() + padding) / stride;
-//			if (floor(output) != output){
-//				throw std::runtime_error("Incompatible input and filter size! Input size: "+
-//				                         std::to_string(mat.rows())+
-//				                         ", filter size: ("
-//				                         + std::to_string(std::get<0>(filter).rows()) +
-//				                         ", stride: " + std::to_string(stride) +
-//				                         ", padding" + std::to_string(padding) + ")");
-//			}
-//		}
-//	}
-    for (auto filter : filters){
-		//TODO: padding
-		Matrix<Real> filter_size = std::get<0>(filter);
-        size_t stride = std::get<1>(filter);
-		for (uint8_t k = 0; k < mat.rows()-filter_size.rows(); k += stride){
-			for (uint8_t m = 0; m < mat.cols()-filter_size.cols(); m += stride){
-                Real conv_value = 0;
-                for (size_t i = 0; i < filter_size.rows(); i++){
-                    for (size_t j = 0; j < filter_size.cols(); j++){
-                        conv_value += mat(i+k, j+m) * filter_size(i, j);
-                    }
-                }
-                conns.emplace_back((LocalConnection(k, m, scale * conv_value, delay)));
-            }
-        }
-	}
-	return conns;
-}
-
 std::vector<LocalConnection> dense_weights_to_conn(const Matrix<Real> &mat,
                                                    Real scale, Real delay)
 {
@@ -290,6 +250,31 @@ std::vector<LocalConnection> dense_weights_to_conn(const Matrix<Real> &mat,
 	return conns;
 }
 
+std::vector<LocalConnection> conv_weights_to_conn(
+    const mnist_helper::CONVOLUTION_LAYER &filters,
+    Real scale, Real delay)
+{
+    std::vector<LocalConnection> conns;
+	size_t stride = filters.stride;
+	size_t kernel_size_x = filters.filter.size();
+	size_t kernel_size_y = filters.filter[0].size();
+    for (const auto& filter : filters.filter){
+        //TODO: connections, how big is the input? batch input shape? mh
+        for (uint8_t k = 0; k < -kernel_size_x; k += stride){
+            for (uint8_t m = 0; m < -kernel_size_y; m += stride){
+                Real conv_value = 0;
+                for (size_t i = 0; i < kernel_size_x; i++){
+                    for (size_t j = 0; j < kernel_size_y; j++){
+						// TODO: right indices mh
+                        conv_value += filter[i+k][j+m] * filter_size(i, j);
+                    }
+                }
+                conns.emplace_back((LocalConnection(k, m, scale * conv_value, delay)));
+            }
+        }
+    }
+    return conns;
+}
 std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,
                                        Real pause, size_t batch_size)
 {
