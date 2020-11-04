@@ -373,7 +373,7 @@ public:
                 size_t padding = layer["padding"] == "valid" ? 0 : 1;
 				mnist_helper::CONVOLUTION_LAYER conv = {conv_filter, layer["stride"], padding};
 				m_filters.emplace_back(
-                    );
+                    conv);
 				auto &weights = m_filters.back().filter;
 				//auto scale = std::sqrt(2.0 / double(weights.rows()));
 				for (size_t i = 0; i < json.size(); i++){

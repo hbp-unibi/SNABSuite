@@ -258,21 +258,21 @@ std::vector<LocalConnection> conv_weights_to_conn(
 	size_t stride = filters.stride;
 	size_t kernel_size_x = filters.filter.size();
 	size_t kernel_size_y = filters.filter[0].size();
-    for (const auto& filter : filters.filter){
-        //TODO: connections, how big is the input? batch input shape? mh
-        for (uint8_t k = 0; k < -kernel_size_x; k += stride){
-            for (uint8_t m = 0; m < -kernel_size_y; m += stride){
-                Real conv_value = 0;
-                for (size_t i = 0; i < kernel_size_x; i++){
-                    for (size_t j = 0; j < kernel_size_y; j++){
-						// TODO: right indices mh
-                        conv_value += filter[i+k][j+m] * filter_size(i, j);
-                    }
-                }
-                conns.emplace_back((LocalConnection(k, m, scale * conv_value, delay)));
-            }
-        }
-    }
+//    for (const auto& filter : filters.filter){
+//        //TODO: connections, how big is the input? batch input shape? mh
+//        for (uint8_t k = 0; k < -kernel_size_x; k += stride){
+//            for (uint8_t m = 0; m < -kernel_size_y; m += stride){
+//                Real conv_value = 0;
+//                for (size_t i = 0; i < kernel_size_x; i++){
+//                    for (size_t j = 0; j < kernel_size_y; j++){
+//						// TODO: right indices mh
+//                        conv_value += filter[i+k][j+m] * filter_size(i, j);
+//                    }
+//                }
+//                conns.emplace_back((LocalConnection(k, m, scale * conv_value, delay)));
+//            }
+//        }
+//    }
     return conns;
 }
 std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,

@@ -64,7 +64,7 @@ for ind, layer in enumerate(netw["config"]["layers"]):
     elif(layer["class_name"] == "Conv2D"):
         layer_dict["class_name"] = "Conv2D"
         layer_dict["size"] = layer["config"]["filters"]
-        layer_dict["stride"] = layer["config"]["stride"][0]
+        layer_dict["stride"] = layer["config"]["strides"][0]
         layer_dict["padding"] = layer["config"]["padding"]
         try:
             layer_name = layer["config"]["name"]
