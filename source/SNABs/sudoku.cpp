@@ -41,24 +41,28 @@ bool overwrite(Sudoku &sudoku)
 }
 }  // namespace
 
-SpikingSudoku::SpikingSudoku(const std::string backend, size_t bench_index, std::string name)
+SpikingSudoku::SpikingSudoku(const std::string backend, size_t bench_index,
+                             std::string name)
     : SNABBase(name, backend, {"duration", "time_to_sol"},
                {"quality", "quality"}, {"time", "realtime"}, {"ms", "s"},
-               {"neuron_params", "sudoku", "population", "noise", "trigger", "start", "duration", 
-               "bin_size"}, bench_index)
+               {"neuron_params", "sudoku", "population", "noise", "trigger",
+                "start", "duration", "bin_size"},
+               bench_index)
 {
 }
 
 SpikingSudoku::SpikingSudoku(const std::string backend, size_t bench_index)
     : SNABBase(__func__, backend, {"duration", "time_to_sol"},
                {"quality", "quality"}, {"time", "realtime"}, {"ms", "s"},
-               {"neuron_params", "sudoku", "population", "noise", "trigger", "start", "duration", 
-               "bin_size"}, bench_index)
+               {"neuron_params", "sudoku", "population", "noise", "trigger",
+                "start", "duration", "bin_size"},
+               bench_index)
 {
 }
 
 Network &SpikingSudoku::build_netw(cypress::Network &netw)
 {
+	RNG::instance().seed(1234);
 	build_solver<spikingSudokuSolver>(netw);
 	return netw;
 }
@@ -71,7 +75,7 @@ void SpikingSudoku::run_netw(cypress::Network &netw)
 
 std::vector<std::array<cypress::Real, 4>> SpikingSudoku::evaluate()
 {
-    m_solver->run("", "", false,false,true);
+	m_solver->run("", "", false, false, true);
 	auto result = m_solver->evaluate();
 	Real duration = NaN();
 	Sudoku sudoku;
@@ -83,7 +87,6 @@ std::vector<std::array<cypress::Real, 4>> SpikingSudoku::evaluate()
 			break;
 		}
 	}
-
 	Real time_to_sol = NaN();
 	if (duration == duration) {
 		time_to_sol =
@@ -96,12 +99,14 @@ std::vector<std::array<cypress::Real, 4>> SpikingSudoku::evaluate()
 
 Network &SpikingSudokuSinglePop::build_netw(cypress::Network &netw)
 {
+	RNG::instance().seed(1234);
 	build_solver<SpikingSolverSinglePop>(netw);
 	return netw;
 }
 
 Network &SpikingSudokuMirrorInhib::build_netw(cypress::Network &netw)
 {
+	RNG::instance().seed(1234);
 	build_solver<SSolveMirrorInhib>(netw);
 	return netw;
 }
