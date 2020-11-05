@@ -66,6 +66,14 @@ for ind, layer in enumerate(netw["config"]["layers"]):
         layer_dict["size"] = layer["config"]["filters"]
         layer_dict["stride"] = layer["config"]["strides"][0]
         layer_dict["padding"] = layer["config"]["padding"]
+        if "batch_input_shape" in layer["config"]:
+            layer_dict["input_shape_x"] = layer["config"]["batch_input_shape"][1]
+            layer_dict["input_shape_y"] = layer["config"]["batch_input_shape"][2]
+            layer_dict["input_shape_z"] = layer["config"]["batch_input_shape"][3]
+        else:
+            layer_dict["input_shape_x"] = None
+            layer_dict["input_shape_y"] = None
+            layer_dict["input_shape_z"] = None
         try:
             layer_name = layer["config"]["name"]
             for layer_2 in model.layers:

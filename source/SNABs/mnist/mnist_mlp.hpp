@@ -360,20 +360,42 @@ public:
             //TODO: padding? mh
 			else if (layer["class_name"].get<std::string>() == "Conv2D") {
                 auto &json = layer["weights"];
-				size_t filter_x = json.size();
-				size_t filter_y = json[0].size();
-				size_t filter_depth = json[0][0].size();
+				size_t kernel_x = json.size();
+				size_t kernel_y = json[0].size();
+				size_t kernel_z = json[0][0].size();
 				size_t output = json[0][0][0].size();
+				size_t stride = layer["stride"];
+                size_t padding = layer["padding"] == "valid" ? 0 : 1;
+                size_t input_size_x;
+                size_t input_size_y;
+                size_t input_size_z;
+                if (!layer["input_shape_x"].empty()){
+                    input_size_x = layer["input_shape_x"];
+					input_size_x = (input_size_x - kernel_x + 2*padding)/stride +1;
+					input_size_y = layer["input_shape_y"];
+					input_size_y = (input_size_y - kernel_y + 2*padding)/stride +1;
+					input_size_z = layer["input_shape_z"];
+                } else {
+					size_t output_x_pred = m_filters.back().input_size_x;
+                    size_t output_y_pred = m_filters.back().input_size_y;
+                    input_size_x = (output_x_pred - kernel_x + 2*padding)/stride+1;
+                    input_size_y = (output_y_pred - kernel_y + 2*padding)/stride+1;
+                    input_size_z = m_filters.back().filter[0][0][0].size();
+				}
 				mnist_helper::CONVOLUTION_FILTER conv_filter(
-				    filter_x,
-				    std::vector<std::vector<std::vector<Real>>>(filter_y,
-				    std::vector<std::vector<Real>>(filter_depth,
+				    kernel_x,
+				    std::vector<std::vector<std::vector<Real>>>(kernel_y,
+				    std::vector<std::vector<Real>>(kernel_z,
 				    std::vector<Real>(output)))
 				    );
-                size_t padding = layer["padding"] == "valid" ? 0 : 1;
-				mnist_helper::CONVOLUTION_LAYER conv = {conv_filter, layer["stride"], padding};
-				m_filters.emplace_back(
-                    conv);
+				mnist_helper::CONVOLUTION_LAYER conv = {
+				    conv_filter,
+				    input_size_x,
+				    input_size_y,
+				    input_size_z,
+				    stride,
+				    padding};
+				m_filters.emplace_back(conv);
 				auto &weights = m_filters.back().filter;
 				//auto scale = std::sqrt(2.0 / double(weights.rows()));
 				for (size_t i = 0; i < json.size(); i++){

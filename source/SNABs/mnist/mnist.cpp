@@ -265,12 +265,15 @@ size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight)
 			dense_counter++;
 		} else if (layer == mnist_helper::Conv){
 			const auto &layer_weights = m_mlp->get_filter_weights()[conv_counter];
-            size_t size = layer_weights.filter[0][0].size();
+            size_t size = layer_weights.input_size_x * layer_weights.input_size_y
+			              * layer_weights.filter[0][0][0].size();
 			auto pop = SpikingUtils::add_population(m_neuron_type_str, netw,
 			                                        m_neuro_params, size, "");
 			auto conns = mnist_helper::conv_weights_to_conn(
 			    layer_weights, m_weights_scale_factor, 1.0);
-			// netw.add_connection
+			netw.add_connection(netw.populations()[layer_id -1], pop,
+			                    Connector::from_list(conns),
+                                ("conv_" + std::to_string(conv_counter)).c_str());
             global_logger().debug(
 			    "SNABSuite",
 			    "Convolution layer constructed with size " + std::to_string(size));
@@ -280,24 +283,6 @@ size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight)
 		}
         layer_id++;
 	}
-
-//	for (const auto &layer : m_mlp->get_weights()) {
-//
-//		size_t size = layer.cols();
-//		auto pop = SpikingUtils::add_population(m_neuron_type_str, netw,
-//		                                        m_neuro_params, size, "");
-//		auto conns = mnist_helper::dense_weights_to_conn(
-//		    layer, m_weights_scale_factor, 1.0);
-//		netw.add_connection(netw.populations()[layer_id - 1], pop,
-//		                    Connector::from_list(conns),
-//		                    ("dense_" + std::to_string(counter)).c_str());
-//
-//		global_logger().debug(
-//		    "SNABSuite",
-//		    "Dense layer constructed with size " + std::to_string(size));
-//		counter++;
-//		layer_id++;
-//	}
 	return dense_counter+conv_counter+pool_counter;
 }
 

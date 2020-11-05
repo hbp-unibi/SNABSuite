@@ -37,6 +37,9 @@ typedef std::vector<std::vector<std::vector<std::vector<Real>>>>
     CONVOLUTION_FILTER;
 struct CONVOLUTION_LAYER {
     CONVOLUTION_FILTER filter;
+    size_t input_size_x;
+	size_t input_size_y;
+	size_t input_size_z;
 	size_t stride;
 	size_t padding;
 };
@@ -272,12 +275,12 @@ std::vector<LocalConnection> dense_weights_to_conn(const Matrix<Real> &mat,
 /**
  * @brief Converts a conv layer to list of Local Connections.
  *
- * @param filters std::vectors of filter weights
+ * @param layer struct of convolution layer information
  * @param scale scale factor for weights
  * @param delay synaptic delay
  * @return vector of connections
  */
-std::vector<LocalConnection> conv_weights_to_conn(const mnist_helper::CONVOLUTION_LAYER &filters,
+std::vector<LocalConnection> conv_weights_to_conn(const mnist_helper::CONVOLUTION_LAYER &layer,
                                                   Real scale, Real delay);
 
 /**

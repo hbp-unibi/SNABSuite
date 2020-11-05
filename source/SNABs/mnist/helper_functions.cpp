@@ -251,28 +251,41 @@ std::vector<LocalConnection> dense_weights_to_conn(const Matrix<Real> &mat,
 }
 
 std::vector<LocalConnection> conv_weights_to_conn(
-    const mnist_helper::CONVOLUTION_LAYER &filters,
+    const mnist_helper::CONVOLUTION_LAYER &layer,
     Real scale, Real delay)
 {
     std::vector<LocalConnection> conns;
-	size_t stride = filters.stride;
-	size_t kernel_size_x = filters.filter.size();
-	size_t kernel_size_y = filters.filter[0].size();
-//    for (const auto& filter : filters.filter){
-//        //TODO: connections, how big is the input? batch input shape? mh
-//        for (uint8_t k = 0; k < -kernel_size_x; k += stride){
-//            for (uint8_t m = 0; m < -kernel_size_y; m += stride){
-//                Real conv_value = 0;
-//                for (size_t i = 0; i < kernel_size_x; i++){
-//                    for (size_t j = 0; j < kernel_size_y; j++){
-//						// TODO: right indices mh
-//                        conv_value += filter[i+k][j+m] * filter_size(i, j);
-//                    }
-//                }
-//                conns.emplace_back((LocalConnection(k, m, scale * conv_value, delay)));
-//            }
-//        }
-//    }
+	size_t stride = layer.stride;
+	size_t kernel_size_x = layer.filter.size();
+	size_t kernel_size_y = layer.filter[0].size();
+	size_t kernel_size_z = layer.filter[0][0].size();
+	// size_t input_size_x = (layer.input_size_x-kernel_size_x + layer.padding)/stride +1;
+    // size_t input_size_y = (layer.input_size_y-kernel_size_y + layer.padding)/stride +1;
+	size_t  input_size_x = layer.input_size_x;
+	size_t input_size_y = layer.input_size_y;
+	// go over each filter
+	for (size_t filter = 0; filter < layer.filter[0][0][0].size(); filter++){
+		// go over input image, with stride and no padding
+        for (size_t i = 0; i < layer.input_size_x; i += stride) {
+            for (size_t j = 0; j < layer.input_size_y; j += stride) {
+                // go over the x*y*z kernel
+                for (size_t z = 0; z < kernel_size_z; z++) {
+                    for (size_t y = 0; y < kernel_size_y; y++) {
+                        for (size_t x = 0; x < kernel_size_x; x++) {
+							conns.emplace_back((LocalConnection(
+							    z * input_size_x * input_size_y +
+							        (i + y) * input_size_x +
+							        (j + x),
+							    filter * input_size_x * input_size_y +
+							        i * input_size_x +
+							        j,
+							    scale * layer.filter[x][y][z][filter], delay)));
+						}
+                    }
+                }
+            }
+        }
+    }
     return conns;
 }
 std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,
