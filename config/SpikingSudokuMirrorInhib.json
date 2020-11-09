@@ -1,0 +1,83 @@
+{
+    "default": {
+        "neuron_params": {
+            "e_rev_I": -100,
+            "v_rest": -70,
+            "v_reset": -75,
+            "v_thresh": -60,
+            "tau_refrac": 2,
+            "tau_m": 8
+        },
+        "neuron_params_inhib": {
+            "e_rev_I": -100,
+            "v_rest": -70,
+            "v_reset": -75,
+            "v_thresh": -60,
+            "tau_refrac": 1,
+            "tau_m": 12
+        },
+        "population": {
+            "number": 2,
+            "weight_exh": 0.26,
+            "weight_exh_self": 0.035,
+            "weight_inh": -0.05,
+            "inhib_number": 1,
+            "self_exc_number": 1
+        },
+        "noise": {
+            "number": 2,
+            "weight_rand": 0.085,
+            "probability": 1,
+            "noise_rate": 80
+        },
+        "trigger": {
+            "weight": 0.9
+        },
+        "start": 0,
+        "duration": 5000,
+        "bin_size": 20,
+        "sudoku": "_deps/sudoku_rep-src/sudokus/2x2/Sudoku_0.json"
+    },
+    "nmpm1": {
+        "valid": false
+    },
+    "spikey": {
+        "neuron_params": {
+            "tau_m": 8,
+            "tau_refrac": 1,
+            "v_rest": -60,
+            "v_thresh": -55,
+            "v_reset": -70,
+            "e_rev_I": -100
+        },
+        "neuron_params_inhib": {
+            "tau_m": 12,
+            "tau_refrac": 1,
+            "v_rest": -70,
+            "v_thresh": -60,
+            "v_reset": -75,
+            "e_rev_I": -100
+        },
+        "population": {
+            "number": 3,
+            "weight_exh": 0.013,
+            "weight_exh_self": 0.001,
+            "weight_inh": -0.06,
+            "inhib_number": 1,
+            "self_exc_number": 1
+        },
+        "noise": {
+            "number": 2,
+            "weight_rand": 0.004,
+            "probability": 1,
+            "noise_rate": 80
+        },
+        "trigger": {
+            "weight": 0.015
+        },
+        "start": 0,
+        "duration": 30000,
+        "bin_size": 30,
+        "sudoku": "_deps/sudoku-src/sudokus/2x2/Sudoku_0.json"
+    }
+}

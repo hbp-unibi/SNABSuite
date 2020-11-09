@@ -15,25 +15,24 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 include(FetchContent)
-FetchContent_Declare(sudoku_rep
-    GIT_REPOSITORY      "https://github.com/hbp-unibi/SpikingSudokuSolver"
+FetchContent_Declare(slam_rep
+    GIT_REPOSITORY      "https://github.com/hbp-unibi/Spiking-Neural-Network-based-SLAM"
     GIT_TAG             master
 )
-FetchContent_GetProperties(sudoku_rep)
-if(NOT sudoku_rep_POPULATED)
-    FetchContent_Populate(sudoku_rep)
+FetchContent_GetProperties(slam_rep)
+if(NOT slam_rep_POPULATED)
+    FetchContent_Populate(slam_rep)
 endif()
 include_directories(
-	${sudoku_rep_SOURCE_DIR}/
-	${sudoku_rep_SOURCE_DIR}/source/
+	${slam_rep_SOURCE_DIR}/source/
 )
-add_library(sudoku
-    ${sudoku_rep_SOURCE_DIR}/source/utils/Sudoku
-    ${sudoku_rep_SOURCE_DIR}/source/utils/spikingSudokuSolver
+add_library(slam
+    ${slam_rep_SOURCE_DIR}/source/simulation
+    ${slam_rep_SOURCE_DIR}/source/spikingnetwork
 )
 
-# target_link_libraries(sudoku
+# target_link_libraries(slam
 # 	${CYPRESS_LIBRARY}
 # 	-pthread
 # )
-add_dependencies(sudoku cypress_ext)
+add_dependencies(slam cypress_ext)
