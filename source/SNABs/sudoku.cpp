@@ -70,7 +70,7 @@ void SpikingSudoku::run_netw(cypress::Network &netw)
 {
 	cypress::PowerManagementBackend pwbackend(
 	    cypress::Network::make_backend(m_backend));
-	netw.run(pwbackend);
+	netw.run(pwbackend, m_solver->duration());
 }
 
 std::vector<std::array<cypress::Real, 4>> SpikingSudoku::evaluate()
