@@ -42,13 +42,13 @@
         "activity_based_scaling": 97,
         "ttfs": true,
         "setup": {
-            "timestep": 1.0
+            "timestep": 1
         }
     },
     "spikey": {
         "neuron_type": "IfFacetsHardware1",
         "neuron_params": {
-            "tau_m": 16.0,
+            "tau_m": 16,
             "tau_refrac": 3,
             "v_rest": -80,
             "v_thresh": -68,
@@ -84,6 +84,6 @@
         "random_init": false
     },
     "nmpm1": {
-        "invalid" : true
+        "invalid": true
     }
 }

@@ -138,12 +138,15 @@
             }
         },
         "inter_random": {
-            "runtime": 3000,
-            "#neurons_retr": 2000,
+            "runtime": 5000,
+            "#neurons_retr": 15810,
             "#neurons_max": 50,
             "probability": 0.5,
             "neuron_params_retr": {
                 "v_thresh": 30
+            },
+            "neuron_params_max" : {
+                "tau_refrac" : 1
             }
         },
         "stdp": {

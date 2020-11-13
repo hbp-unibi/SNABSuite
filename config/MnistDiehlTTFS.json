@@ -16,7 +16,7 @@
         "images": 10000,
         "batchsize": [10000,1000,100],
         "duration": 7,
-        "max_freq": 0.0,
+        "max_freq": 0,
         "pause": 40,
         "poisson": false,
         "max_weight": 0.055,
@@ -49,7 +49,7 @@
         "images": 10000,
         "batchsize": [10000,1000,100],
         "duration": 7,
-        "max_freq": 0.0,
+        "max_freq": 0,
         "pause": 40,
         "poisson": false,
         "max_weight": 0.053,
@@ -62,7 +62,7 @@
         "ttfs": true,
         "setup": {
             "timestep": 0.1,
-            "double" : false
+            "double": false
         }
     },
     "spinnaker": {

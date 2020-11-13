@@ -19,7 +19,6 @@
 #include <cypress/backend/power/power.hpp>
 #include <cypress/cypress.hpp>
 
-//#include "common/benchmark.hpp"
 #include <common/snab_registry.hpp>
 #include <iomanip>
 

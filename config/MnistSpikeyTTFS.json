@@ -16,7 +16,7 @@
         "images": 10000,
         "batchsize": [10000,2500,500,50],
         "duration": 7,
-        "max_freq": 0.0,
+        "max_freq": 0,
         "pause": 40,
         "poisson": false,
         "max_weight": 0.01633,
@@ -45,7 +45,7 @@
         "images": 10000,
         "batchsize": [10000,1000,100],
         "duration": 7,
-        "max_freq": 0.0,
+        "max_freq": 0,
         "pause": 40,
         "poisson": false,
         "max_weight": 0.01633,
@@ -58,7 +58,7 @@
         "ttfs": true,
         "setup": {
             "timestep": 0.1,
-            "double" : false
+            "double": false
         }
     },
     "spinnaker": {
@@ -95,7 +95,7 @@
     "spikey": {
         "neuron_type": "IfFacetsHardware1",
         "neuron_params": {
-            "tau_m": 13.0,
+            "tau_m": 13,
             "tau_refrac": 3,
             "v_rest": -80,
             "v_thresh": -70,
