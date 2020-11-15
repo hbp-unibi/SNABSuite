@@ -265,8 +265,7 @@ size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight)
 			dense_counter++;
 		} else if (layer == mnist_helper::Conv){
 			const auto &layer_weights = m_mlp->get_filter_weights()[conv_counter];
-            size_t size = layer_weights.input_size_x * layer_weights.input_size_y
-			              * layer_weights.filter[0][0][0].size();
+            size_t size = layer_weights.output_sizes[0] * layer_weights.output_sizes[1] * layer_weights.output_sizes[2];
 			auto pop = SpikingUtils::add_population(m_neuron_type_str, netw,
 			                                        m_neuro_params, size, "");
 			auto conns = mnist_helper::conv_weights_to_conn(

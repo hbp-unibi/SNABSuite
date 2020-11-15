@@ -259,27 +259,21 @@ std::vector<LocalConnection> conv_weights_to_conn(
 	size_t kernel_size_x = layer.filter.size();
 	size_t kernel_size_y = layer.filter[0].size();
 	size_t kernel_size_z = layer.filter[0][0].size();
-	// size_t input_size_x = (layer.input_size_x-kernel_size_x + layer.padding)/stride +1;
-    // size_t input_size_y = (layer.input_size_y-kernel_size_y + layer.padding)/stride +1;
-	size_t  input_size_x = layer.input_size_x;
-	size_t input_size_y = layer.input_size_y;
-	// go over each filter
-	for (size_t filter = 0; filter < layer.filter[0][0][0].size(); filter++){
-		// go over input image, with stride and no padding
-        for (size_t i = 0; i < layer.input_size_x; i += stride) {
-            for (size_t j = 0; j < layer.input_size_y; j += stride) {
-                // go over the x*y*z kernel
-                for (size_t z = 0; z < kernel_size_z; z++) {
+
+    for (size_t j = 0; j < layer.output_sizes[0]; j += stride) {
+        for (size_t i = 0; i < layer.output_sizes[1]; i += stride) {
+            for (size_t filter = 0; filter < layer.output_sizes[2]; filter++){
+                for (size_t x = 0; x < kernel_size_x; x++) {
                     for (size_t y = 0; y < kernel_size_y; y++) {
-                        for (size_t x = 0; x < kernel_size_x; x++) {
-							conns.emplace_back((LocalConnection(
-							    z * input_size_x * input_size_y +
-							        (i + y) * input_size_x +
-							        (j + x),
-							    filter * input_size_x * input_size_y +
-							        i * input_size_x +
-							        j,
-							    scale * layer.filter[x][y][z][filter], delay)));
+                        for (size_t z = 0; z < kernel_size_z; z++) {
+                            conns.emplace_back((LocalConnection(
+                                (j + x) * layer.input_sizes[1] * layer.input_sizes[2] +
+                                (i + y) * layer.input_sizes[2] +
+                                z,
+                                j * layer.output_sizes[2] * layer.output_sizes[1] +
+                                i * layer.output_sizes[2] +
+                                filter,
+                                scale * layer.filter[x][y][z][filter], delay)));
 						}
                     }
                 }
@@ -288,6 +282,11 @@ std::vector<LocalConnection> conv_weights_to_conn(
     }
     return conns;
 }
+
+std::vector<LocalConnection> pool_to_conn(const mnist_helper::POOLING_LAYER &layer, Real delay){
+
+}
+
 std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,
                                        Real pause, size_t batch_size)
 {

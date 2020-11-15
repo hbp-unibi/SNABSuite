@@ -120,7 +120,7 @@ target_link_libraries(sweep
 # Copy Matplotlibrc to build directory
 # 
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/plot/matplotlibrc ${CMAKE_CURRENT_BINARY_DIR}/matplotlibrc COPYONLY)
+# configure_file(${CMAKE_CURRENT_SOURCE_DIR}/plot/matplotlibrc ${CMAKE_CURRENT_BINARY_DIR}/matplotlibrc COPYONLY)
 
 #
 # Download MNIST dataset
@@ -144,3 +144,10 @@ add_custom_target(link_target ALL COMMAND ${CMAKE_COMMAND} -E create_symlink ${C
 if(${GTEST_FOUND})
 	add_subdirectory(test)
 endif()
+
+add_executable(mnist_test
+		source/exec/mnist_test.cpp
+		)
+add_dependencies(mnist_test benchmark_library)
+target_link_libraries(mnist_test
+		benchmark_library)

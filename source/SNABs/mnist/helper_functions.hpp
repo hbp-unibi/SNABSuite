@@ -37,13 +37,19 @@ typedef std::vector<std::vector<std::vector<std::vector<Real>>>>
     CONVOLUTION_FILTER;
 struct CONVOLUTION_LAYER {
     CONVOLUTION_FILTER filter;
-    size_t input_size_x;
-	size_t input_size_y;
-	size_t input_size_z;
+	std::vector<size_t> input_sizes;
+	std::vector<size_t> output_sizes;
 	size_t stride;
 	size_t padding;
 };
 typedef struct CONVOLUTION_LAYER CONVOLUTION_LAYER;
+struct POOLING_LAYER {
+	std::vector<size_t> input_sizes;
+	std::vector<size_t> output_sizes;
+    size_t size;
+    size_t stride;
+};
+typedef struct POOLING_LAYER POOLING_LAYER;
 enum LAYER_TYPE {Dense, Conv, Pooling};
 /**
  * @brief Read in MNIST data from files
@@ -282,6 +288,15 @@ std::vector<LocalConnection> dense_weights_to_conn(const Matrix<Real> &mat,
  */
 std::vector<LocalConnection> conv_weights_to_conn(const mnist_helper::CONVOLUTION_LAYER &layer,
                                                   Real scale, Real delay);
+
+/**
+ * @brief
+ *
+ * @param layer struct of pooling layer information
+ * @param delay synaptic delay
+ * @return
+ */
+std::vector<LocalConnection> pool_to_conn(const mnist_helper::POOLING_LAYER &layer, Real delay);
 
 /**
  * @brief Converts the simulation results into label data

@@ -206,7 +206,6 @@ public:
 	virtual const std::vector<cypress::Matrix<Real>> &get_weights() = 0;
 	virtual const std::vector<mnist_helper::CONVOLUTION_LAYER> &get_filter_weights() = 0;
 	virtual const std::vector<size_t> &get_layer_sizes() = 0;
-	virtual const std::vector<size_t> &get_filter_sizes() = 0;
 	virtual const std::vector<mnist_helper::LAYER_TYPE> &get_layer_types() = 0;
 	virtual void scale_down_images(size_t pooling_size = 3) = 0;
 	virtual inline bool correct(const uint16_t label,
@@ -242,7 +241,7 @@ protected:
 	std::vector<cypress::Matrix<Real>> m_layers;
     std::vector<size_t> m_layer_sizes;
 	std::vector<mnist_helper::CONVOLUTION_LAYER> m_filters;
-	std::vector<size_t> _m_filter_sizes;
+	std::vector<mnist_helper::POOLING_LAYER> m_pools;
 	std::vector<mnist_helper::LAYER_TYPE> m_layer_types;
 	size_t m_epochs = 20;
 	size_t m_batchsize = 100;
@@ -350,6 +349,7 @@ public:
 						}
 					}
 				}
+				// TODO: save input first mh
                 m_layer_sizes.emplace_back(m_layers[0].rows());
                 m_layer_types.push_back(mnist_helper::LAYER_TYPE::Dense);
 				cypress::global_logger().debug(
@@ -366,22 +366,28 @@ public:
 				size_t output = json[0][0][0].size();
 				size_t stride = layer["stride"];
                 size_t padding = layer["padding"] == "valid" ? 0 : 1;
-                size_t input_size_x;
-                size_t input_size_y;
-                size_t input_size_z;
+				std::vector<size_t> input_sizes;
+				std::vector<size_t> output_sizes;
                 if (!layer["input_shape_x"].empty()){
-                    input_size_x = layer["input_shape_x"];
-					input_size_x = (input_size_x - kernel_x + 2*padding)/stride +1;
-					input_size_y = layer["input_shape_y"];
-					input_size_y = (input_size_y - kernel_y + 2*padding)/stride +1;
-					input_size_z = layer["input_shape_z"];
+                    input_sizes.push_back(layer["input_shape_x"]);
+                    input_sizes.push_back(layer["input_shape_y"]);
+                    input_sizes.push_back(layer["input_shape_z"]);
                 } else {
-					size_t output_x_pred = m_filters.back().input_size_x;
-                    size_t output_y_pred = m_filters.back().input_size_y;
-                    input_size_x = (output_x_pred - kernel_x + 2*padding)/stride+1;
-                    input_size_y = (output_y_pred - kernel_y + 2*padding)/stride+1;
-                    input_size_z = m_filters.back().filter[0][0][0].size();
+					if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Conv) {
+						input_sizes.push_back(m_filters.back().output_sizes[0]);
+						input_sizes.push_back(m_filters.back().output_sizes[1]);
+						input_sizes.push_back(m_filters.back().output_sizes[2]);
+					} else if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Pooling) {
+						input_sizes.push_back(m_pools.back().output_sizes[0]);
+						input_sizes.push_back(m_pools.back().output_sizes[1]);
+						input_sizes.push_back(m_pools.back().output_sizes[2]);
+					} else if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Dense) {
+						throw std::runtime_error("Conv after Dense layer not implemented!");
+					}
 				}
+				output_sizes.push_back((input_sizes[0] - kernel_x + 2*padding)/stride+1);
+				output_sizes.push_back((input_sizes[1] - kernel_x + 2*padding)/stride+1);
+				output_sizes.push_back(output);
 				mnist_helper::CONVOLUTION_FILTER conv_filter(
 				    kernel_x,
 				    std::vector<std::vector<std::vector<Real>>>(kernel_y,
@@ -390,9 +396,8 @@ public:
 				    );
 				mnist_helper::CONVOLUTION_LAYER conv = {
 				    conv_filter,
-				    input_size_x,
-				    input_size_y,
-				    input_size_z,
+				    input_sizes,
+				    output_sizes,
 				    stride,
 				    padding};
 				m_filters.emplace_back(conv);
@@ -407,13 +412,37 @@ public:
 						}
 					}
 				}
-				// TODO: choose other filter size to save? mh
-				_m_filter_sizes.emplace_back(json[0][0][0].size());
+				m_layer_sizes.emplace_back(output_sizes[0] * output_sizes[1] * output);
                 m_layer_types.push_back(mnist_helper::LAYER_TYPE::Conv);
 				cypress::global_logger().debug(
 				    "MNIST", "Conv layer detected with size ("+
 				        std::to_string(json.size())+","+std::to_string(json[0].size())+
 				        ","+std::to_string(json[0][0].size())+","+std::to_string(json[0][0][0].size())+")");
+			} else if(layer["class_name"].get<std::string>() == "MaxPooling2D"){
+				size_t size = layer["size"];
+				size_t stride = layer["stride"];
+				std::vector<size_t> input_sizes;
+				std::vector<size_t> output_sizes;
+				if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Conv){
+                    input_sizes[0] = m_filters.back().output_sizes[0];
+                    input_sizes[1] = m_filters.back().output_sizes[1];
+                    input_sizes[2] = m_filters.back().output_sizes[2];
+				} else if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Pooling){
+					input_sizes[0] = m_pools.back().output_sizes[0];
+                    input_sizes[1] = m_pools.back().output_sizes[1];
+                    input_sizes[2] = m_pools.back().output_sizes[2];
+				}
+				output_sizes.push_back((input_sizes[0] - size + 2*0)/stride+1);
+				output_sizes.push_back((input_sizes[1] - size + 2*0)/stride+1);
+				output_sizes.push_back(input_sizes[2]);
+				mnist_helper::POOLING_LAYER pool = {input_sizes, output_sizes, size, stride};
+                m_pools.emplace_back(pool);
+                m_layer_sizes.emplace_back(output_sizes[0]*output_sizes[1]*output_sizes[2]);
+				m_layer_types.emplace_back(mnist_helper::LAYER_TYPE::Pooling);
+				cypress::global_logger().debug(
+				    "MNIST", "Pooling layer detected with size (" +
+				                 std::to_string(size) + ", " + std::to_string(size) +
+				                "), stride " + std::to_string(stride));
 			}
 			else {
 				throw std::runtime_error("Unknown layer type");
@@ -528,16 +557,6 @@ public:
 	const std::vector<size_t> &get_layer_sizes() override
 	{
 		return m_layer_sizes;
-	}
-
-	/**
-	 * @brief Return the number of filters per layer
-	 *
-	 * @return const std::vector< size_t >&
-	 */
-	const std::vector<size_t> &get_filter_sizes() override
-	{
-		return _m_filter_sizes;
 	}
 
 	const std::vector<mnist_helper::LAYER_TYPE> &get_layer_types() override
