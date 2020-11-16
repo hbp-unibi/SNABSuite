@@ -14,13 +14,13 @@
         },
         "population": {
             "number": 2,
-            "weight_exh": [0.2,0.1],
-            "weight_inh": [-0.3,-0.1],
-            "fan_in_exh": [1,2],
-            "fan_in_inh": [1,2]
+            "weight_exh": [0.027,0.04],
+            "weight_inh": -0.16,
+            "fan_in_exh": 2,
+            "fan_in_inh": 2
         },
         "noise": {
-            "weight_rand": [0.34,0.03],
+            "weight_rand": [0.16,0.192],
             "noise_rate": 50
         },
         "trigger": {
@@ -28,8 +28,9 @@
             "weight": 1,
             "trigger_rate": 200
         },
+        "delay": 0.1,
         "start": 0,
-        "duration": [5000,300000],
+        "duration": [5000,10000],
         "bin_size": 20,
         "sudoku": ["_deps/sudoku_rep-src/sudokus/2x2/Sudoku_0.json","_deps/sudoku_rep-src/sudokus/3x3/Sudoku_0.json"]
     },
