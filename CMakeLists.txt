@@ -71,6 +71,10 @@ enable_testing()
 
 include_directories(source/)
 
+
+include(binam_external)
+include(sudoku_external)
+include(slam_external)
 #
 # Benchmark basic libraries
 #
@@ -83,17 +87,23 @@ add_library(benchmark_library
 	source/common/snab_base
 	source/common/snab_registry
     source/SNABs/activation_curve
+    source/SNABs/binam
     source/SNABs/output_bench
     source/SNABs/refractory_period
     source/SNABs/max_input
     source/SNABs/max_inter_neuron
     source/SNABs/setup_time
+    source/SNABs/slam
+    source/SNABs/sudoku
     source/SNABs/wta_like
     source/SNABs/mnist/mnist
     source/SNABs/mnist/helper_functions
     source/SNABs/mnist/mnist_mlp
 )
 target_link_libraries(benchmark_library
+    cppnam
+    sudoku
+    slam
     ${CYPRESS_LIBRARY}
 )
 add_dependencies(benchmark_library cypress_ext)

@@ -1,0 +1,76 @@
+{
+    "default": {
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -100,
+            "tau_syn_E": 2,
+            "tau_syn_I": 2,
+            "v_rest": -70,
+            "v_reset": -80,
+            "v_thresh": -65,
+            "tau_refrac": 2,
+            "tau_m": 10,
+            "cm": 0.2
+        },
+        "neuron_params_2": {
+            "e_rev_E": 0,
+            "e_rev_I": -100,
+            "tau_syn_E": 2.7,
+            "tau_syn_I": 4.5,
+            "v_rest": -70,
+            "v_reset": -72,
+            "v_thresh": -68,
+            "tau_refrac": 1,
+            "tau_m": 0.5,
+            "cm": 0.2
+        },
+        "neuron_params_3": {
+            "e_rev_E": 0,
+            "e_rev_I": -100,
+            "tau_syn_E": 2,
+            "tau_syn_I": 2,
+            "v_rest": -70,
+            "v_reset": -80,
+            "v_thresh": -63,
+            "tau_refrac": 3,
+            "tau_m": 10,
+            "cm": 0.2
+        },
+        "wtaParams": {
+            "synEx": 0.04,
+            "synIn": -0.02,
+            "synTrigger": 0.05
+        },
+        "stParams": {
+            "synEx": 0.033,
+            "synIn": -0.06
+        },
+        "common": {
+            "delay": 1,
+            "start": 1
+        },
+        "psParams": {
+            "weight": 0.001,
+            "delay": 1,
+            "A_minus": -0.015,
+            "A_plus": 0.015,
+            "tau_minus": 5,
+            "tau_plus": 5,
+            "w_max": 0.002,
+            "w_min": 0
+        },
+        "others": {
+            "conSynEx": 0.025,
+            "conDelay": 11,
+            "posSynEx": 0.009
+        },
+        "sim_path": "networks/slam_sim.json",
+        "scale_th": 0.25
+    },
+    "spikey": {
+        "invalid": true
+    },
+    "nmpm1": {
+        "invalid": true
+    }
+}
