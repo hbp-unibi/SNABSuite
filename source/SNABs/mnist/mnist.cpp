@@ -270,7 +270,7 @@ size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight)
 			                                        m_neuro_params, size, "");
 			auto conns = mnist_helper::conv_weights_to_conn(
 			    layer_weights, m_weights_scale_factor, 1.0);
-			netw.add_connection(netw.populations()[layer_id -1], pop,
+			netw.add_connection(netw.populations()[layer_id - 1], pop,
 			                    Connector::from_list(conns),
                                 ("conv_" + std::to_string(conv_counter)).c_str());
             global_logger().debug(
@@ -278,7 +278,22 @@ size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight)
 			    "Convolution layer constructed with size " + std::to_string(size));
 			conv_counter++;
 		} else if (layer == mnist_helper::Pooling){
-			continue;
+			auto &pool_layer = m_mlp->get_pooling_layers()[pool_counter];
+			size_t size = pool_layer.output_sizes[0] * pool_layer.output_sizes[1]
+			                * pool_layer.output_sizes[2];
+			auto pop = SpikingUtils::add_population(m_neuron_type_str, netw,
+			                                        m_neuro_params, size, "");
+			auto conns = mnist_helper::pool_to_conn(pool_layer, 1.0);
+			netw.add_connection(netw.populations()[layer_id - 1], netw.populations()[layer_id - 1],
+			                    Connector::from_list(conns[0]), "dummy_name");
+			netw.add_connection(netw.populations()[layer_id - 1], pop,
+			                    Connector::from_list(conns[1]),
+                                ("pool_" + std::to_string(pool_counter)).c_str());
+			global_logger().debug(
+			    "SNABSuite",
+			    "Pooling layer constructed with size " + std::to_string(size) +
+			    " and " + std::to_string(conns[0].size()) + " inhibitory connections");
+			pool_counter++;
 		}
         layer_id++;
 	}

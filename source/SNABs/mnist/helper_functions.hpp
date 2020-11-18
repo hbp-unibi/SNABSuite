@@ -46,7 +46,7 @@ typedef struct CONVOLUTION_LAYER CONVOLUTION_LAYER;
 struct POOLING_LAYER {
 	std::vector<size_t> input_sizes;
 	std::vector<size_t> output_sizes;
-    size_t size;
+    std::vector<size_t> size;
     size_t stride;
 };
 typedef struct POOLING_LAYER POOLING_LAYER;
@@ -294,9 +294,10 @@ std::vector<LocalConnection> conv_weights_to_conn(const mnist_helper::CONVOLUTIO
  *
  * @param layer struct of pooling layer information
  * @param delay synaptic delay
- * @return
+ * @return vector of connections. First the inhibitory connections in the previous layer,
+ * then the connections to the pooling layer
  */
-std::vector<LocalConnection> pool_to_conn(const mnist_helper::POOLING_LAYER &layer, Real delay);
+std::vector<std::vector<LocalConnection>> pool_to_conn(const mnist_helper::POOLING_LAYER &layer, Real delay);
 
 /**
  * @brief Converts the simulation results into label data

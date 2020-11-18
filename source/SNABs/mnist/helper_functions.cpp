@@ -259,19 +259,21 @@ std::vector<LocalConnection> conv_weights_to_conn(
 	size_t kernel_size_x = layer.filter.size();
 	size_t kernel_size_y = layer.filter[0].size();
 	size_t kernel_size_z = layer.filter[0][0].size();
+	size_t max_x = layer.input_sizes[0] - kernel_size_x + 1;
+    size_t max_y = layer.input_sizes[1] - kernel_size_y + 1;
 
-    for (size_t j = 0; j < layer.output_sizes[0]; j += stride) {
-        for (size_t i = 0; i < layer.output_sizes[1]; i += stride) {
+    for (size_t i = 0; i < max_x; i += stride) {
+        for (size_t j = 0; j < max_y; j += stride) {
             for (size_t filter = 0; filter < layer.output_sizes[2]; filter++){
                 for (size_t x = 0; x < kernel_size_x; x++) {
                     for (size_t y = 0; y < kernel_size_y; y++) {
                         for (size_t z = 0; z < kernel_size_z; z++) {
                             conns.emplace_back((LocalConnection(
-                                (j + x) * layer.input_sizes[1] * layer.input_sizes[2] +
-                                (i + y) * layer.input_sizes[2] +
+                                (i + x) * layer.input_sizes[1] * layer.input_sizes[2] +
+                                (j + y) * layer.input_sizes[2] +
                                 z,
-                                j * layer.output_sizes[2] * layer.output_sizes[1] +
-                                i * layer.output_sizes[2] +
+                                i * layer.output_sizes[2] * layer.output_sizes[1] +
+                                j * layer.output_sizes[2] +
                                 filter,
                                 scale * layer.filter[x][y][z][filter], delay)));
 						}
@@ -283,8 +285,49 @@ std::vector<LocalConnection> conv_weights_to_conn(
     return conns;
 }
 
-std::vector<LocalConnection> pool_to_conn(const mnist_helper::POOLING_LAYER &layer, Real delay){
-
+std::vector<std::vector<LocalConnection>> pool_to_conn
+    (const mnist_helper::POOLING_LAYER &layer, Real delay)
+{
+    std::vector<LocalConnection> inhib_conns;
+	std::vector<LocalConnection> pool_cons;
+	std::vector<std::vector<LocalConnection>> conns;
+    size_t max_x = layer.input_sizes[0]-ceil(layer.size[0]/2);
+	size_t max_y = layer.input_sizes[1]-ceil(layer.size[1]/2);
+	for (size_t i = 0; i < max_x; i += layer.stride){
+		for (size_t j = 0; j < max_y; j += layer.stride){
+			for (size_t k = 0; k < layer.input_sizes[2]; k++){
+				for (size_t x = 0; x < layer.size[0]; x++){
+					for (size_t y = 0; y < layer.size[1]; y++){
+                        for (size_t u = 0; u < layer.size[0]; u++){
+                            for (size_t v = 0; v < layer.size[1]; v++){
+								if (u != x || v != y) {
+									inhib_conns.emplace_back(LocalConnection(
+                                        (i + x) * layer.input_sizes[1] * layer.input_sizes[2] +
+									    (j + y) * layer.input_sizes[2] +
+									    k,
+									    (i + u) * layer.input_sizes[1] * layer.input_sizes[2] +
+									    (j + v) * layer.input_sizes[2] +
+									    k,
+									    -1, 0.0));
+								}
+                            }
+                        }
+						pool_cons.emplace_back(LocalConnection(
+                            (i + x) * layer.input_sizes[1] * layer.input_sizes[2] +
+                            (j + y) * layer.input_sizes[2] +
+                            k,
+                            i * layer.output_sizes[1] * layer.output_sizes[2] +
+                            j * layer.output_sizes[2] +
+                            k,
+                            1, delay));
+					}
+				}
+			}
+		}
+	}
+    conns.push_back(inhib_conns);
+    conns.push_back(pool_cons);
+	return conns;
 }
 
 std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,

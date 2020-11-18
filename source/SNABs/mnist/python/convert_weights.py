@@ -84,7 +84,7 @@ for ind, layer in enumerate(netw["config"]["layers"]):
             layer_dict["weights"] = model.layers[ind].get_weights()[0].tolist()
     elif(layer["class_name"] == "MaxPooling2D"):
         layer_dict["class_name"] = "MaxPooling2D"
-        layer_dict["size"] = layer["config"]["pool_size"][0]
+        layer_dict["size"] = layer["config"]["pool_size"]
         layer_dict["stride"] = layer["config"]["strides"][0]
     else:
         raise RuntimeError("Unknown layer type " + layer["class_name"] + "!")

@@ -205,6 +205,7 @@ public:
 	virtual const mnist_helper::MNIST_DATA &mnist_test_set() = 0;
 	virtual const std::vector<cypress::Matrix<Real>> &get_weights() = 0;
 	virtual const std::vector<mnist_helper::CONVOLUTION_LAYER> &get_filter_weights() = 0;
+	virtual const std::vector<mnist_helper::POOLING_LAYER> &get_pooling_layers() = 0;
 	virtual const std::vector<size_t> &get_layer_sizes() = 0;
 	virtual const std::vector<mnist_helper::LAYER_TYPE> &get_layer_types() = 0;
 	virtual void scale_down_images(size_t pooling_size = 3) = 0;
@@ -349,7 +350,8 @@ public:
 						}
 					}
 				}
-				// TODO: save input first mh
+				//TODO: save input first mh
+				// saved input always first input?
                 m_layer_sizes.emplace_back(m_layers[0].rows());
                 m_layer_types.push_back(mnist_helper::LAYER_TYPE::Dense);
 				cypress::global_logger().debug(
@@ -419,21 +421,21 @@ public:
 				        std::to_string(json.size())+","+std::to_string(json[0].size())+
 				        ","+std::to_string(json[0][0].size())+","+std::to_string(json[0][0][0].size())+")");
 			} else if(layer["class_name"].get<std::string>() == "MaxPooling2D"){
-				size_t size = layer["size"];
+				std::vector<size_t> size = layer["size"];
 				size_t stride = layer["stride"];
 				std::vector<size_t> input_sizes;
 				std::vector<size_t> output_sizes;
 				if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Conv){
-                    input_sizes[0] = m_filters.back().output_sizes[0];
-                    input_sizes[1] = m_filters.back().output_sizes[1];
-                    input_sizes[2] = m_filters.back().output_sizes[2];
+                    input_sizes.push_back(m_filters.back().output_sizes[0]);
+                    input_sizes.push_back(m_filters.back().output_sizes[1]);
+                    input_sizes.push_back(m_filters.back().output_sizes[2]);
 				} else if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Pooling){
-					input_sizes[0] = m_pools.back().output_sizes[0];
-                    input_sizes[1] = m_pools.back().output_sizes[1];
-                    input_sizes[2] = m_pools.back().output_sizes[2];
+					input_sizes.push_back(m_pools.back().output_sizes[0]);
+                    input_sizes.push_back(m_pools.back().output_sizes[1]);
+                    input_sizes.push_back(m_pools.back().output_sizes[2]);
 				}
-				output_sizes.push_back((input_sizes[0] - size + 2*0)/stride+1);
-				output_sizes.push_back((input_sizes[1] - size + 2*0)/stride+1);
+				output_sizes.push_back((input_sizes[0] - size[0] + 2*0)/stride+1);
+				output_sizes.push_back((input_sizes[1] - size[1] + 2*0)/stride+1);
 				output_sizes.push_back(input_sizes[2]);
 				mnist_helper::POOLING_LAYER pool = {input_sizes, output_sizes, size, stride};
                 m_pools.emplace_back(pool);
@@ -441,8 +443,8 @@ public:
 				m_layer_types.emplace_back(mnist_helper::LAYER_TYPE::Pooling);
 				cypress::global_logger().debug(
 				    "MNIST", "Pooling layer detected with size (" +
-				                 std::to_string(size) + ", " + std::to_string(size) +
-				                "), stride " + std::to_string(stride));
+				                 std::to_string(size[0]) + ", " + std::to_string(size[1]) +
+				                ") and stride " + std::to_string(stride));
 			}
 			else {
 				throw std::runtime_error("Unknown layer type");
@@ -547,6 +549,11 @@ public:
 	const std::vector<mnist_helper::CONVOLUTION_LAYER> &get_filter_weights() override
     {
 		return m_filters;
+	}
+
+	const std::vector<mnist_helper::POOLING_LAYER> &get_pooling_layers() override
+	{
+		return m_pools;
 	}
 
 	/**
