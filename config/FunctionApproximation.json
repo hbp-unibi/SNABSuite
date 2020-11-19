@@ -1,0 +1,26 @@
+{
+    "default": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -140,
+            "v_rest": -60,
+            "v_reset": -70,
+            "v_thresh": -55.0,
+            "tau_syn_E": 2,
+            "tau_syn_I": 2,
+            "tau_refrac": 5,
+            "tau_m": 20,
+            "cm": 0.2
+        },
+        "#neurons": 2,
+        "#repeat": 10,
+        "#samples_test": 20,
+        "#repeat_test": 10,
+        "weight": 0.015,
+        "bias_weight" : 0.015,
+        "bias_weight_inh" : -0.015,
+        "response_time": 50,
+        "min_spike_interval": 5
+    }
+}

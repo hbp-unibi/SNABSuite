@@ -23,6 +23,7 @@
 
 #include "SNABs/activation_curve.hpp"
 #include "SNABs/binam.hpp"
+#include "SNABs/function.hpp"
 #include "SNABs/max_input.hpp"
 #include "SNABs/max_inter_neuron.hpp"
 #include "SNABs/mnist/mnist.hpp"
@@ -106,6 +107,8 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
 	        SpikingSudokuMirrorInhib(backend, bench_index)),
 	    std::make_shared<SpikingSlam>(
 	        SpikingSlam(backend, bench_index)),
+	    std::make_shared<FunctionApproximation>(
+	        FunctionApproximation(backend, bench_index)),
 	};
 	return vec;
 }
