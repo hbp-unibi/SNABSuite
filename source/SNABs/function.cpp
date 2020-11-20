@@ -78,14 +78,16 @@ Network &FunctionApproximation::build_netw(Network &netw)
 	m_evaluator_test = nef::TuningCurveEvaluator(n_samples_test, n_repeat_test,
 	                                             min_spike_interval * 1e-3,
 	                                             response_time * 1e-3);
+	const Real larger_len = std::max(m_evaluator_train.input_spike_train_len(),
+	                                 m_evaluator_test.input_spike_train_len());
+
 	// Source Population
 	Population<SpikeSourceArray> pop_src(
 	    netw, 1, m_evaluator_train.input_spike_train(), "input");
 
 	// Bias source population
-	const Real len = m_evaluator_train.input_spike_train_len();
 	std::vector<Real> bias_spikes =
-	    spikes::constant_interval(0.0, len, min_spike_interval);
+	    spikes::constant_interval(0.0, larger_len, min_spike_interval);
 	Population<SpikeSourceArray> pop_src_bias(netw, 1, bias_spikes, "bias");
 
 	// Target population
@@ -112,6 +114,78 @@ Network &FunctionApproximation::build_netw(Network &netw)
 		                                     return (tar % 2) == 1;
 	                                     },
 	                                     exc_bias_synaptic_weight));
+
+	// Diversification of neurons
+	if (m_config_file.find("random_bias") != m_config_file.end()) {
+		Real rate = m_config_file["random_bias"]["rate"].get<Real>();
+		Real std_dev = m_config_file["random_bias"]["std_dev"].get<Real>();
+		Real weight = m_config_file["random_bias"]["weight"].get<Real>();
+		Real weight_inh =
+		    m_config_file["random_bias"]["weight_inh"].get<Real>();
+		std::vector<LocalConnection> conns, conns_inh;
+		auto &rng = RNG::instance().get();
+		std::normal_distribution<Real> distribution(weight, std_dev);
+		std::normal_distribution<Real> distribution_inh(weight_inh, std_dev);
+
+		for (size_t i = 0; i < pop_tar.size(); i++) {
+			conns.emplace_back(
+			    LocalConnection(0, i, std::max(distribution(rng), 0.0), 1.0));
+			conns_inh.emplace_back(LocalConnection(
+			    0, i, std::min(distribution_inh(rng), 0.0), 1.0));
+		}
+		std::vector<Real> bias_spikes2 =
+		    spikes::constant_frequency(0.0, larger_len, rate);
+		Population<SpikeSourceArray> pop_src_bias2(netw, 1, bias_spikes2,
+		                                           "bias_weight");
+		pop_src_bias2.connect_to(pop_tar, Connector::from_list(conns));
+		pop_src_bias2.connect_to(pop_tar, Connector::from_list(conns_inh));
+	}
+
+	if (m_config_file.find("random_bias_spikes") != m_config_file.end()) {
+		Real rate = m_config_file["random_bias_spikes"]["rate"].get<Real>();
+		Real std_dev =
+		    m_config_file["random_bias_spikes"]["std_dev"].get<Real>();
+		Real weight = m_config_file["random_bias_spikes"]["weight"].get<Real>();
+		Real weight_inh =
+		    m_config_file["random_bias_spikes"]["weight_inh"].get<Real>();
+		auto &rng = RNG::instance().get();
+		std::normal_distribution<Real> distribution(rate, std_dev);
+
+		Population<SpikeSourceConstFreq> pop_src_bias2(
+		    netw, pop_tar.size(),
+		    SpikeSourceConstFreqParameters().start(0).duration(larger_len),
+		    "bias_spike");
+		Population<SpikeSourceConstFreq> pop_src_bias2_inh(
+		    netw, pop_tar.size(),
+		    SpikeSourceConstFreqParameters().start(0).duration(larger_len),
+		    "bias_spike_inh");
+		for (size_t i = 0; i < pop_tar.size(); i++) {
+			pop_src_bias2[i].parameters().rate(
+			    std::max(distribution(rng), 0.0));
+			pop_src_bias2_inh[i].parameters().rate(
+			    std::max(distribution(rng), 0.0));
+		}
+		pop_src_bias2.connect_to(pop_tar, Connector::one_to_one(weight, 1.0));
+		pop_src_bias2_inh.connect_to(pop_tar,
+		                             Connector::one_to_one(weight_inh, 1.0));
+	}
+
+	if (m_config_file.find("random_thresh") != m_config_file.end()) {
+		auto ind = pop_tar.type().parameter_index("v_thresh");
+		if (!ind.valid()) {
+			throw std::invalid_argument(
+			    "Could not resolve index for v_thresh!");
+		}
+		Real v_thresh = pop_tar.parameters().parameters()[ind.value()];
+		Real std_dev = m_config_file["random_thresh"]["std_dev"].get<Real>();
+
+		auto &rng = RNG::instance().get();
+		std::normal_distribution<Real> distribution(v_thresh, std_dev);
+		for (auto neuron : pop_tar) {
+			neuron.parameters().set(ind.value(),
+			                        std::max(v_thresh + 2, distribution(rng)));
+		}
+	}
 	return netw;
 }
 
@@ -123,17 +197,13 @@ void FunctionApproximation::run_netw(Network &netw)
 
 	// Run the calibration network
 	PowerManagementBackend pwbackend(Network::make_backend(m_backend));
-	netw.run(pwbackend, 0.0);
+	netw.run(pwbackend, m_evaluator_train.input_spike_train_len());
 
 	// Run the test network
-	const Real len = m_evaluator_test.input_spike_train_len();
-	std::vector<Real> bias_spikes = spikes::constant_interval(
-	    0.0, len, m_config_file["min_spike_interval"].get<Real>());
-	m_netw_test.population<SpikeSourceArray>("bias").parameters().spike_times(
-	    bias_spikes);
 	m_netw_test.population<SpikeSourceArray>("input").parameters().spike_times(
 	    m_evaluator_test.input_spike_train());
-	m_netw_test.run(pwbackend, 0.0);
+
+	m_netw_test.run(pwbackend, m_evaluator_test.input_spike_train_len());
 
 	m_netw_train = netw;
 }
