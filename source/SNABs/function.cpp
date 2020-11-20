@@ -241,6 +241,32 @@ void print_response(
 	}
 	std::cout << std::endl;
 }
+
+void plot_response(
+    const std::pair<std::vector<Real>, const Matrix<Real>> &response,
+    std::string filename)
+{
+	auto &x = response.first;
+	auto &ys = response.second;
+	pyplot::figure_size(600, 400);
+	pyplot::title("Activation Curves");
+	for (size_t j = 0; j < ys.cols(); j++) {
+		std::vector<Real> y;
+		for (size_t i = 0; i < ys.rows(); i++) {
+			y.emplace_back(ys(i, j));
+		}
+		std::map<std::string, std::string> keywords;
+		if (j % 2) {
+			keywords["color"] = "blue";
+		}
+		else {
+			keywords["color"] = "red";
+		}
+		pyplot::plot(x, y, keywords);
+	}
+	pyplot::tight_layout();
+	pyplot::save(filename);
+}
 #endif
 
 /**
@@ -314,7 +340,7 @@ void plot_function(std::vector<Real> x,
 	pyplot::title("Spiking Function Approximation");
 	pyplot::named_plot("Target Function", x, target);
 	pyplot::named_plot("Approximation", x, approx);
-	// pyplot::show();
+
 	pyplot::legend();
 	pyplot::tight_layout();
 	pyplot::save(filename);
@@ -339,8 +365,10 @@ std::vector<std::array<Real, 4>> FunctionApproximation::evaluate()
 
 	std::cout << "Pre Train\n";
 	print_response(pre_train);
+	plot_response(pre_train, _debug_filename("activation_curve_train.png"));
 	std::cout << "Post Train\n";
 	print_response(post_train);
+	plot_response(post_train, _debug_filename("activation_curve_test.png"));
 #endif
 
 	// Calculate the inverse matrix if possible
