@@ -290,7 +290,7 @@ void plot_spikes(const NetworkBase &netw, std::string filename,
 	}
 	if (length > 0.0) {
 		for (auto &spike_train : spikes) {
-			if (spike_train.back() > length) {
+			if (spike_train.size() && spike_train.back() > length) {
 				auto first = std::upper_bound(spike_train.begin(),
 				                              spike_train.end(), length);
 				spike_train.erase(first, spike_train.end());
