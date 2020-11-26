@@ -26,13 +26,30 @@
 #include "mnist/mnist_mlp.hpp"
 #include "util/utilities.hpp"
 
+#define TWO_PI 6.2831853072
 namespace SNAB {
 using namespace cypress;
+namespace {
+std::vector<std::pair<std::string, std::function<Real(Real)>>> function_defs({
+    {"Linear", [](Real x) { return x; }},
+    {"Affine Linear", [](Real x) { return 10.0 + x; }},
+    {"Sinus", [](Real x) { return std::sin(x * TWO_PI); }},
+    {"Cosinus", [](Real x) { return std::cos(x * TWO_PI); }},
+    {"Exp", [](Real x) { return std::exp(x * 2.0); }},
+});
+}
 FunctionApproximation::FunctionApproximation(const std::string backend,
                                              size_t bench_index)
     : SNABBase(__func__, backend,
-               {"Average approximation error", "Total approximation error"},
-               {"quality", "quality"}, {"", ""}, {"", ""},
+               {
+                   "Average approximation error (Linear)",
+                   "Average approximation error (Affine Linear)",
+                   "Average approximation error (Sinus)",
+                   "Average approximation error (Cosinus)",
+                   "Average approximation error (Exp)",
+               },
+               {"quality", "quality", "quality", "quality", "quality"},
+               {"", "", "", "", ""}, {"", "", "", "", ""},
                {"neuron_type", "neuron_params", "#neurons", "#repeat",
                 "#samples_test", "#repeat_test", "weight", "bias_weight",
                 "bias_weight_inh", "response_time", "min_spike_interval"},
@@ -42,7 +59,6 @@ FunctionApproximation::FunctionApproximation(const std::string backend,
 
 Network &FunctionApproximation::build_netw(Network &netw)
 {
-
 	const size_t n_samples =
 	    m_config_file["#neurons"]
 	        .get<size_t>();  // Sample points on the tuning curve
@@ -393,24 +409,17 @@ std::vector<std::pair<Real, Real>> evaluate_for_function(
 	return res;
 }
 
-std::vector<std::array<Real, 4>> calculate_statistics(
+std::array<Real, 4> calculate_statistics(
     std::vector<std::pair<Real, Real>> &values)
 {
 	std::vector<Real> deviations;
 	for (auto &i : values) {
-		deviations.emplace_back(i.first - i.second);
+		deviations.emplace_back(fabs(i.first - i.second));
 	}
 	// Calculate statistics
 	Real max, min, avg, std_dev;
 	Utilities::calculate_statistics(deviations, min, max, avg, std_dev);
-
-	Real total = 0.0;
-	for (auto &i : deviations) {
-		total += fabs(i);
-	}
-
-	return {std::array<Real, 4>({avg, std_dev, min, max}),
-	        std::array<Real, 4>({total, NaN(), NaN(), NaN()})};
+	return std::array<Real, 4>({avg, std_dev, min, max});
 }
 
 #if SNAB_DEBUG
@@ -474,13 +483,17 @@ std::vector<std::array<Real, 4>> FunctionApproximation::evaluate()
 	        "Could not calculate inverse matrix: " + std::string(er.what()));
 	    return {std::array<cypress::Real, 4>({0, 0, 0, 0}),
 	            std::array<cypress::Real, 4>({0, 0, 0, 0})};
-	}
-	// Define the function to be approximated*/
-	auto function = [](Real x) { return x; };
-	auto res = evaluate_for_function(function, pre_train, post_train);
+	}*/
+	std::vector<std::array<Real, 4>> ret;
+	for (auto function : function_defs) {
+		auto res =
+		    evaluate_for_function(function.second, pre_train, post_train);
 #if SNAB_DEBUG
-	plot_function(post_train.first, res, _debug_filename("function.png"));
+		plot_function(post_train.first, res,
+		              _debug_filename("function_" + function.first + ".png"));
 #endif
-	return calculate_statistics(res);
+		ret.emplace_back(calculate_statistics(res));
+	}
+	return ret;
 }
 }  // namespace SNAB
