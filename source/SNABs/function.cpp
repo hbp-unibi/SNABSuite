@@ -174,18 +174,23 @@ Network &FunctionApproximation::build_netw(Network &netw)
 
 	if (m_config_file.find("random_thresh") != m_config_file.end()) {
 		auto ind = pop_tar.type().parameter_index("v_thresh");
-		if (!ind.valid()) {
+		auto ind2 = pop_tar.type().parameter_index("v_rest");
+		if (!ind.valid() || !ind2.valid()) {
 			throw std::invalid_argument(
-			    "Could not resolve index for v_thresh!");
+			    "Could not resolve index for v_thresh or v_rest!");
 		}
-		Real v_thresh = pop_tar.parameters().parameters()[ind.value()];
+		Real v_rest = pop_tar.parameters().parameters()[ind2.value()];
+		Real mean = m_config_file["random_thresh"]["mean"].get<Real>();
 		Real std_dev = m_config_file["random_thresh"]["std_dev"].get<Real>();
 
 		auto &rng = RNG::instance().get();
-		std::normal_distribution<Real> distribution(v_thresh, std_dev);
+		std::normal_distribution<Real> distribution(mean, std_dev);
 		for (auto neuron : pop_tar) {
-			neuron.parameters().set(ind.value(),
-			                        std::max(v_thresh + 2, distribution(rng)));
+			auto tmp = distribution(rng);
+			while (tmp <= v_rest) {
+				tmp = distribution(rng);
+			}
+			neuron.parameters().set(ind.value(), tmp);
 		}
 	}
 	return netw;

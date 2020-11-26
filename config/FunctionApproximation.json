@@ -9,18 +9,37 @@
             "v_thresh": -55.0,
             "tau_syn_E": 2,
             "tau_syn_I": 2,
-            "tau_refrac": 5,
+            "tau_refrac": 2,
             "tau_m": 20,
             "cm": 0.2
         },
-        "#neurons": 2,
+        "#neurons": 10,
         "#repeat": 10,
-        "#samples_test": 20,
-        "#repeat_test": 10,
-        "weight": 0.015,
-        "bias_weight" : 0.015,
-        "bias_weight_inh" : -0.015,
-        "response_time": 50,
-        "min_spike_interval": 5
+        "#samples_test": 50,
+        "#repeat_test": 1,
+        "weight": 0.035,
+        "bias_weight" : 0.035,
+        "bias_weight_inh" : -0.032,
+        "response_time": 100,
+        "min_spike_interval": 5,
+        "random_bias_test":{
+            "rate": 100,
+            "weight": 0.010,
+            "weight_inh": -0.010,
+            "std_dev": 0.015
+        },
+        "random_bias_spikes_test":{
+            "rate": 100,
+            "weight": 0.0015,
+            "weight_inh": -0.015,
+            "std_dev": 100
+        },
+        "random_thresh_test": { 
+            "mean" : -50.0,
+            "std_dev": 10
+        },
+        "setup":{
+            "timestep": 1.0
+        }
     }
 }
