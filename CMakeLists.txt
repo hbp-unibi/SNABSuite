@@ -75,6 +75,7 @@ include_directories(source/)
 include(binam_external)
 include(sudoku_external)
 include(slam_external)
+include(eigen_external)
 #
 # Benchmark basic libraries
 #

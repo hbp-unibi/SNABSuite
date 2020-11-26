@@ -15,7 +15,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+//#define EIGEN_DEFAULT_DENSE_INDEX_TYPE size_t
+#include <Eigen/Dense>
 #include <cypress/backend/power/power.hpp>  // Control of power via netw
 #include <cypress/cypress.hpp>              // Neural network frontend
 #include <cypress/nef.hpp>
@@ -192,7 +193,7 @@ Network &FunctionApproximation::build_netw(Network &netw)
 void FunctionApproximation::run_netw(Network &netw)
 {
 	// Debug logger, may be ignored in the future
-	netw.logger().min_level(DEBUG, 0);
+	netw.logger().min_level(ERROR, 0);
 	m_netw_test = netw.clone();
 
 	// Run the calibration network
@@ -209,7 +210,8 @@ void FunctionApproximation::run_netw(Network &netw)
 }
 
 namespace {
-
+using EMatrix = Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic>;
+using EVector = Eigen::Matrix<Real, Eigen::Dynamic, 1>;
 /**
  * @brief Returns the response of the population encoded in values [0,1]
  *
@@ -221,12 +223,12 @@ namespace {
  * y values/responses of the neurons; mat(i,j) is the response of the j-th
  * neuron to input vec[i].
  */
-std::pair<std::vector<Real>, Matrix<Real>> get_responses(
+std::pair<std::vector<Real>, EMatrix> get_responses(
     PopulationBase &pop_tar, nef::TuningCurveEvaluator &eval, size_t n_samples)
 {
 	size_t n_neurons = pop_tar.size();
-	Matrix<Real> result(n_samples, n_neurons);
-	std::vector<Real> x_values(n_samples, 0.0);
+	std::pair<std::vector<Real>, EMatrix> ret(std::vector<Real>(n_samples, 0.0),
+	                                          EMatrix(n_samples, n_neurons));
 	for (auto neuron : pop_tar) {
 		// Calculate the tuning curve for this neuron in the population
 		std::vector<std::pair<Real, Real>> res =
@@ -234,16 +236,16 @@ std::pair<std::vector<Real>, Matrix<Real>> get_responses(
 
 		// Write the results to the result matrix
 		for (size_t i = 0; i < res.size(); i++) {
-			result(i, neuron.nid()) = res[i].second;
+			ret.second(i, neuron.nid()) = res[i].second;
 		}
 		if (neuron.nid() == 0) {
 			for (size_t i = 0; i < res.size(); i++) {
-				x_values[i] = res[i].first;
+				ret.first[i] = res[i].first;
 			}
 		}
 	}
 
-	return std::pair<std::vector<Real>, Matrix<Real>>(x_values, result);
+	return ret;
 }
 
 /**
@@ -255,12 +257,12 @@ std::pair<std::vector<Real>, Matrix<Real>> get_responses(
  * @param row calculates network answer for x[row]
  * @return cypress::Real the function value approximated by the network
  */
-Real inline get_function_value_from_result(const std::vector<Real> &coeff,
-                                           const Matrix<Real> &response,
+Real inline get_function_value_from_result(const EVector &coeff,
+                                           const EMatrix &response,
                                            const size_t &row)
 {
 	Real res = 0.0;
-	for (size_t i = 0; i < response.cols(); i++) {
+	for (ptrdiff_t i = 0; i < response.cols(); i++) {
 		res += coeff[i] * response(row, i);
 	}
 	return res;
@@ -296,15 +298,14 @@ void plot_spikes(const NetworkBase &netw, std::string filename,
  *
  * @param response result of get_responses
  */
-void print_response(
-    const std::pair<std::vector<Real>, const Matrix<Real>> &response)
+void print_response(const std::pair<std::vector<Real>, const EMatrix> &response)
 {
 	auto &x = response.first;
 	auto &ys = response.second;
 	std::cout << "x\tys\n";
-	for (size_t i = 0; i < ys.rows(); i++) {
+	for (ptrdiff_t i = 0; i < ys.rows(); i++) {
 		std::cout << x[i] << "\t";
-		for (size_t j = 0; j < ys.cols() - 1; j++) {
+		for (ptrdiff_t j = 0; j < ys.cols() - 1; j++) {
 			std::cout << ys(i, j) << ", ";
 		}
 		std::cout << ys(i, ys.cols() - 1) << std::endl;
@@ -312,17 +313,16 @@ void print_response(
 	std::cout << std::endl;
 }
 
-void plot_response(
-    const std::pair<std::vector<Real>, const Matrix<Real>> &response,
-    std::string filename)
+void plot_response(const std::pair<std::vector<Real>, const EMatrix> &response,
+                   std::string filename)
 {
 	auto &x = response.first;
 	auto &ys = response.second;
 	pyplot::figure_size(600, 400);
 	pyplot::title("Activation Curves");
-	for (size_t j = 0; j < ys.cols(); j++) {
+	for (ptrdiff_t j = 0; j < ys.cols(); j++) {
 		std::vector<Real> y;
-		for (size_t i = 0; i < ys.rows(); i++) {
+		for (ptrdiff_t i = 0; i < ys.rows(); i++) {
 			y.emplace_back(ys(i, j));
 		}
 		std::map<std::string, std::string> keywords;
@@ -352,17 +352,17 @@ void plot_response(
  */
 template <typename Func>
 std::vector<std::pair<Real, Real>> evaluate_for_function(
-    const Func &f, const Matrix<Real> &inverse,
-    const std::vector<Real> &pre_train_x,
-    const std::pair<std::vector<Real>, const Matrix<Real>> &post_train)
+    const Func &f, const std::pair<std::vector<Real>, const EMatrix> &pre_train,
+    const std::pair<std::vector<Real>, const EMatrix> &post_train)
 {
 
 	// Calculate the coefficients of the approximation
-	std::vector<Real> function_values;
-	for (const auto &i : pre_train_x) {
-		function_values.emplace_back(f(i));
+	EVector function_values(pre_train.first.size());
+	for (size_t i = 0; i < pre_train.first.size(); i++) {
+		function_values[i] = f(pre_train.first[i]);
 	}
-	auto coeff = MNIST::MLP<>::mat_X_vec(inverse, function_values);
+	EVector coeff =
+	    pre_train.second.colPivHouseholderQr().solve(function_values);
 
 	// Calculate target value and network response value
 	std::vector<std::pair<Real, Real>> res;
@@ -442,21 +442,20 @@ std::vector<std::array<Real, 4>> FunctionApproximation::evaluate()
 #endif
 
 	// Calculate the inverse matrix if possible
-	Matrix<Real> inverse;
+	/*Matrix<Real> inverse;
 	try {
-		inverse = pre_train.second.inverse();
+	    inverse = pre_train.second.inverse();
 	}
 	catch (std::invalid_argument &er) {
-		global_logger().error(
-		    "SNABSuite",
-		    "Could not calculate inverse matrix: " + std::string(er.what()));
-		return {std::array<cypress::Real, 4>({0, 0, 0, 0}),
-		        std::array<cypress::Real, 4>({0, 0, 0, 0})};
+	    global_logger().error(
+	        "SNABSuite",
+	        "Could not calculate inverse matrix: " + std::string(er.what()));
+	    return {std::array<cypress::Real, 4>({0, 0, 0, 0}),
+	            std::array<cypress::Real, 4>({0, 0, 0, 0})};
 	}
-	// Define the function to be approximated
+	// Define the function to be approximated*/
 	auto function = [](Real x) { return x; };
-	auto res =
-	    evaluate_for_function(function, inverse, pre_train.first, post_train);
+	auto res = evaluate_for_function(function, pre_train, post_train);
 #if SNAB_DEBUG
 	plot_function(post_train.first, res, _debug_filename("function.png"));
 #endif
