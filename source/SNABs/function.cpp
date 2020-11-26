@@ -17,6 +17,7 @@
  */
 //#define EIGEN_DEFAULT_DENSE_INDEX_TYPE size_t
 #include <Eigen/Dense>
+#include <algorithm>
 #include <cypress/backend/power/power.hpp>  // Control of power via netw
 #include <cypress/cypress.hpp>              // Neural network frontend
 #include <cypress/nef.hpp>
@@ -277,7 +278,7 @@ Real inline get_function_value_from_result(const EVector &coeff,
  * @param backend the name of the backend
  */
 void plot_spikes(const NetworkBase &netw, std::string filename,
-                 std::string backend)
+                 std::string backend, Real length = 0.0)
 {
 	std::vector<std::vector<cypress::Real>> spikes;
 	spikes.emplace_back(netw.populations("input")[0].parameters().parameters());
@@ -287,6 +288,16 @@ void plot_spikes(const NetworkBase &netw, std::string filename,
 	for (const auto &i : pop_tar) {
 		spikes.push_back(i.signals().data(0));
 	}
+	if (length > 0.0) {
+		for (auto &spike_train : spikes) {
+			if (spike_train.back() > length) {
+				auto first = std::upper_bound(spike_train.begin(),
+				                              spike_train.end(), length);
+				spike_train.erase(first, spike_train.end());
+			}
+		}
+	}
+
 	Utilities::write_vector2_to_csv(spikes, filename);
 
 	// Trigger plots
@@ -334,6 +345,8 @@ void plot_response(const std::pair<std::vector<Real>, const EMatrix> &response,
 		}
 		pyplot::plot(x, y, keywords);
 	}
+	pyplot::xlabel("Encoded x-values");
+	pyplot::ylabel("Decoded y-values");
 	pyplot::tight_layout();
 	pyplot::save(filename);
 }
@@ -410,6 +423,8 @@ void plot_function(std::vector<Real> x,
 	pyplot::title("Spiking Function Approximation");
 	pyplot::named_plot("Target Function", x, target);
 	pyplot::named_plot("Approximation", x, approx);
+	pyplot::xlabel("Encoded x-values");
+	pyplot::ylabel("Decoded y-values");
 
 	pyplot::legend();
 	pyplot::tight_layout();
@@ -430,8 +445,10 @@ std::vector<std::array<Real, 4>> FunctionApproximation::evaluate()
 	auto post_train = get_responses(pop_tar, m_evaluator_test, n_samples_test);
 
 #if SNAB_DEBUG
-	plot_spikes(m_netw_train, _debug_filename("spikes_train.csv"), m_backend);
-	plot_spikes(m_netw_test, _debug_filename("spikes_test.csv"), m_backend);
+	plot_spikes(m_netw_train, _debug_filename("spikes_train.csv"), m_backend,
+	            m_evaluator_train.input_spike_train_len());
+	plot_spikes(m_netw_test, _debug_filename("spikes_test.csv"), m_backend,
+	            m_evaluator_test.input_spike_train_len());
 
 	std::cout << "Pre Train\n";
 	print_response(pre_train);
