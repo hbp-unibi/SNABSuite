@@ -16,13 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 //#define EIGEN_DEFAULT_DENSE_INDEX_TYPE size_t
+#include "function.hpp"
+
 #include <Eigen/Dense>
 #include <algorithm>
 #include <cypress/backend/power/power.hpp>  // Control of power via netw
 #include <cypress/cypress.hpp>              // Neural network frontend
 #include <cypress/nef.hpp>
 
-#include "function.hpp"
 #include "mnist/mnist_mlp.hpp"
 #include "util/utilities.hpp"
 
@@ -140,52 +141,59 @@ Network &FunctionApproximation::build_netw(Network &netw)
 		Real weight = m_config_file["random_bias"]["weight"].get<Real>();
 		Real weight_inh =
 		    m_config_file["random_bias"]["weight_inh"].get<Real>();
-		std::vector<LocalConnection> conns, conns_inh;
-		auto &rng = RNG::instance().get();
-		std::normal_distribution<Real> distribution(weight, std_dev);
-		std::normal_distribution<Real> distribution_inh(weight_inh, std_dev);
+		if (rate != 0.0) {
+			std::vector<LocalConnection> conns, conns_inh;
+			auto &rng = RNG::instance().get();
+			std::normal_distribution<Real> distribution(weight, std_dev);
+			std::normal_distribution<Real> distribution_inh(weight_inh,
+			                                                std_dev);
 
-		for (size_t i = 0; i < pop_tar.size(); i++) {
-			conns.emplace_back(
-			    LocalConnection(0, i, std::max(distribution(rng), 0.0), 1.0));
-			conns_inh.emplace_back(LocalConnection(
-			    0, i, std::min(distribution_inh(rng), 0.0), 1.0));
+			for (size_t i = 0; i < pop_tar.size(); i++) {
+				conns.emplace_back(LocalConnection(
+				    0, i, std::max(distribution(rng), 0.0), 1.0));
+				conns_inh.emplace_back(LocalConnection(
+				    0, i, std::min(distribution_inh(rng), 0.0), 1.0));
+			}
+			std::vector<Real> bias_spikes2 =
+			    spikes::constant_frequency(0.0, larger_len, rate);
+			Population<SpikeSourceArray> pop_src_bias2(netw, 1, bias_spikes2,
+			                                           "bias_weight");
+			pop_src_bias2.connect_to(pop_tar, Connector::from_list(conns));
+			pop_src_bias2.connect_to(pop_tar, Connector::from_list(conns_inh));
 		}
-		std::vector<Real> bias_spikes2 =
-		    spikes::constant_frequency(0.0, larger_len, rate);
-		Population<SpikeSourceArray> pop_src_bias2(netw, 1, bias_spikes2,
-		                                           "bias_weight");
-		pop_src_bias2.connect_to(pop_tar, Connector::from_list(conns));
-		pop_src_bias2.connect_to(pop_tar, Connector::from_list(conns_inh));
 	}
 
 	if (m_config_file.find("random_bias_spikes") != m_config_file.end()) {
 		Real rate = m_config_file["random_bias_spikes"]["rate"].get<Real>();
-		Real std_dev =
-		    m_config_file["random_bias_spikes"]["std_dev"].get<Real>();
-		Real weight = m_config_file["random_bias_spikes"]["weight"].get<Real>();
-		Real weight_inh =
-		    m_config_file["random_bias_spikes"]["weight_inh"].get<Real>();
-		auto &rng = RNG::instance().get();
-		std::normal_distribution<Real> distribution(rate, std_dev);
+		if (rate != 0.0) {
+			Real std_dev =
+			    m_config_file["random_bias_spikes"]["std_dev"].get<Real>();
+			Real weight =
+			    m_config_file["random_bias_spikes"]["weight"].get<Real>();
+			Real weight_inh =
+			    m_config_file["random_bias_spikes"]["weight_inh"].get<Real>();
+			auto &rng = RNG::instance().get();
+			std::normal_distribution<Real> distribution(rate, std_dev);
 
-		Population<SpikeSourceConstFreq> pop_src_bias2(
-		    netw, pop_tar.size(),
-		    SpikeSourceConstFreqParameters().start(0).duration(larger_len),
-		    "bias_spike");
-		Population<SpikeSourceConstFreq> pop_src_bias2_inh(
-		    netw, pop_tar.size(),
-		    SpikeSourceConstFreqParameters().start(0).duration(larger_len),
-		    "bias_spike_inh");
-		for (size_t i = 0; i < pop_tar.size(); i++) {
-			pop_src_bias2[i].parameters().rate(
-			    std::max(distribution(rng), 0.0));
-			pop_src_bias2_inh[i].parameters().rate(
-			    std::max(distribution(rng), 0.0));
+			Population<SpikeSourceConstFreq> pop_src_bias2(
+			    netw, pop_tar.size(),
+			    SpikeSourceConstFreqParameters().start(0).duration(larger_len),
+			    "bias_spike");
+			Population<SpikeSourceConstFreq> pop_src_bias2_inh(
+			    netw, pop_tar.size(),
+			    SpikeSourceConstFreqParameters().start(0).duration(larger_len),
+			    "bias_spike_inh");
+			for (size_t i = 0; i < pop_tar.size(); i++) {
+				pop_src_bias2[i].parameters().rate(
+				    std::max(distribution(rng), 0.0));
+				pop_src_bias2_inh[i].parameters().rate(
+				    std::max(distribution(rng), 0.0));
+			}
+			pop_src_bias2.connect_to(pop_tar,
+			                         Connector::one_to_one(weight, 1.0));
+			pop_src_bias2_inh.connect_to(
+			    pop_tar, Connector::one_to_one(weight_inh, 1.0));
 		}
-		pop_src_bias2.connect_to(pop_tar, Connector::one_to_one(weight, 1.0));
-		pop_src_bias2_inh.connect_to(pop_tar,
-		                             Connector::one_to_one(weight_inh, 1.0));
 	}
 
 	if (m_config_file.find("random_thresh") != m_config_file.end()) {
@@ -198,15 +206,16 @@ Network &FunctionApproximation::build_netw(Network &netw)
 		Real v_rest = pop_tar.parameters().parameters()[ind2.value()];
 		Real mean = m_config_file["random_thresh"]["mean"].get<Real>();
 		Real std_dev = m_config_file["random_thresh"]["std_dev"].get<Real>();
-
-		auto &rng = RNG::instance().get();
-		std::normal_distribution<Real> distribution(mean, std_dev);
-		for (auto neuron : pop_tar) {
-			auto tmp = distribution(rng);
-			while (tmp <= v_rest) {
-				tmp = distribution(rng);
+		if (!(mean == pop_tar.parameters()[ind.value()] && std_dev == 0.0)) {
+			auto &rng = RNG::instance().get();
+			std::normal_distribution<Real> distribution(mean, std_dev);
+			for (auto neuron : pop_tar) {
+				auto tmp = distribution(rng);
+				while (tmp <= v_rest) {
+					tmp = distribution(rng);
+				}
+				neuron.parameters().set(ind.value(), tmp);
 			}
-			neuron.parameters().set(ind.value(), tmp);
 		}
 	}
 	return netw;
