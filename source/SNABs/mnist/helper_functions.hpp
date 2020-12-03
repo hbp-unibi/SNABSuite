@@ -293,11 +293,15 @@ std::vector<LocalConnection> conv_weights_to_conn(const mnist_helper::CONVOLUTIO
  * @brief
  *
  * @param layer struct of pooling layer information
+ * @param max_pool_weight scale factor for pooling weights
+ * @param pool_inhib_weight scale factor for cross inhibitory weights
  * @param delay synaptic delay
  * @return vector of connections. First the inhibitory connections in the previous layer,
  * then the connections to the pooling layer
  */
-std::vector<std::vector<LocalConnection>> pool_to_conn(const mnist_helper::POOLING_LAYER &layer, Real delay);
+std::vector<std::vector<LocalConnection>> pool_to_conn(
+    const mnist_helper::POOLING_LAYER &layer,Real max_pool_weight,
+    Real pool_inhib_weight, Real delay);
 
 /**
  * @brief Converts the simulation results into label data
@@ -312,6 +316,9 @@ std::vector<std::vector<LocalConnection>> pool_to_conn(const mnist_helper::POOLI
  */
 std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,
                                        Real pause, size_t batch_size);
+
+void conv_spikes_per_kernel(const PopulationBase pop,
+                            Real duration, Real pause, size_t batch_size, Real norm = 0.0);
 
 /**
  * @brief Converts the simulation results into values between 0 and 1

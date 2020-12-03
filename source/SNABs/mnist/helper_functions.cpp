@@ -285,8 +285,9 @@ std::vector<LocalConnection> conv_weights_to_conn(
     return conns;
 }
 
-std::vector<std::vector<LocalConnection>> pool_to_conn
-    (const mnist_helper::POOLING_LAYER &layer, Real delay)
+std::vector<std::vector<LocalConnection>> pool_to_conn(
+    const mnist_helper::POOLING_LAYER &layer, Real max_pool_weight,
+    Real pool_inhib_weight, Real delay)
 {
     std::vector<LocalConnection> inhib_conns;
 	std::vector<LocalConnection> pool_cons;
@@ -308,7 +309,7 @@ std::vector<std::vector<LocalConnection>> pool_to_conn
 									    (i + u) * layer.input_sizes[1] * layer.input_sizes[2] +
 									    (j + v) * layer.input_sizes[2] +
 									    k,
-									    -1, 0.0));
+									    pool_inhib_weight, 0.0));
 								}
                             }
                         }
@@ -319,7 +320,7 @@ std::vector<std::vector<LocalConnection>> pool_to_conn
                             i * layer.output_sizes[1] * layer.output_sizes[2] +
                             j * layer.output_sizes[2] +
                             k,
-                            1, delay));
+                            max_pool_weight, delay));
 					}
 				}
 			}
@@ -358,6 +359,31 @@ std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,
 		res[sample] = index;
 	}
 	return res;
+}
+
+void conv_spikes_per_kernel(const PopulationBase pop,
+                            Real duration, Real pause, size_t batch_size, Real norm)
+{
+    auto res = spikes_to_rates(pop, duration, pause, batch_size, norm);
+    std::ofstream file;
+	file.open("debug/conv_layer_results.csv");
+	file << "Neuron1,Neuron2,Neuron3,Neuron4,max,sum\n";
+	double neur1, neur2, neur3, neur4;
+	for (size_t sam = 0; sam < res.size(); sam++) {
+		for (size_t x = 0; x < 25; x+=2) {
+			for (size_t y = 0; y < 25; y+=2) {
+				for (size_t fil = 0; fil < 32; fil++) {
+                    neur1 = res[sam][x*26*32 +y*32 +fil];
+                    neur2 = res[sam][x*26*32 +(y+1)*32 +fil];
+                    neur3 = res[sam][(x+1)*26*32 +y*32 +fil];
+                    neur4 = res[sam][(x+1)*26*32 +(y+1)*32 +fil];
+					file << neur1<<","<<neur2<<","<<neur3<<","<<neur4<<","
+					     <<std::max({neur1,neur2, neur3, neur4})<<","
+					     <<neur1+neur2+neur3+neur4<<"\n";
+				}
+			}
+		}
+	}
 }
 
 std::vector<std::vector<Real>> spikes_to_rates(const PopulationBase pop,

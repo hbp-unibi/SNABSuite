@@ -62,6 +62,9 @@ void MNIST_BASE::read_config()
 	m_pause = m_config_file["pause"].get<Real>();
 	m_poisson = m_config_file["poisson"].get<bool>();
 	m_max_weight = m_config_file["max_weight"].get<Real>();
+	m_conv_max_weight = m_config_file["conv_max_weight"].get<Real>();
+	m_max_pool_weight = m_config_file["max_pool_weight"].empty() ? 0.1 : m_config_file["max_pool_weight"].get<Real>();
+	m_pool_inhib_weight = m_config_file["pool_inhib_weight"].empty() ? -0.1 : m_config_file["pool_inhib_weight"].get<Real>();
 	m_train_data = m_config_file["train_data"].get<bool>();
 	m_batch_parallel = m_config_file["batch_parallel"].get<bool>();
 	m_dnn_file = m_config_file["dnn_file"].get<std::string>();
@@ -100,7 +103,8 @@ cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
 		m_all_pops.clear();
 		for (auto &i : m_batch_data) {
 			mnist_helper::create_spike_source(netw, i);
-			create_deep_network(netw, m_max_weight);
+			create_deep_network(netw, m_max_weight, m_conv_max_weight,
+			                    m_max_pool_weight, m_pool_inhib_weight);
 			m_label_pops.emplace_back(netw.populations().back());
 		}
 
@@ -116,7 +120,8 @@ cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
 		for (auto &i : m_batch_data) {
 			m_networks.push_back(cypress::Network());
 			mnist_helper::create_spike_source(m_networks.back(), i);
-			create_deep_network(m_networks.back(), m_max_weight);
+			create_deep_network(m_networks.back(), m_max_weight, m_conv_max_weight,
+			                    m_max_pool_weight, m_pool_inhib_weight);
 			m_label_pops.emplace_back(m_networks.back().populations().back());
 			if (m_count_spikes) {
 				for (auto pop : m_networks.back().populations()) {
@@ -185,20 +190,36 @@ std::vector<std::array<cypress::Real, 4>> MNIST_BASE::evaluate()
 		images += orig_labels.size();
 
 #if SNAB_DEBUG
-		std::cout << "Target\t Infer" << std::endl;
-		for (size_t i = 0; i < orig_labels.size(); i++) {
-			std::cout << orig_labels[i] << "\t" << labels[i] << std::endl;
-		}
-		std::vector<std::vector<cypress::Real>> spikes;
-		for (size_t i = 0; i < pop.size(); i++) {
-			spikes.push_back(pop[i].signals().data(0));
-		}
-		Utilities::write_vector2_to_csv(
-		    spikes,
-		    _debug_filename("spikes_" + std::to_string(batch) + ".csv"));
-		Utilities::plot_spikes(
-		    _debug_filename("spikes_" + std::to_string(batch) + ".csv"),
-		    m_backend);
+        std::cout << "Target\t Infer" << std::endl;
+        for (size_t i = 0; i < orig_labels.size(); i++) {
+            std::cout << orig_labels[i] << "\t" << labels[i] << std::endl;
+        }
+        if (m_count_spikes) {
+            for (auto &pop : m_all_pops) {
+                std::vector<std::vector<cypress::Real>> spikes;
+                for (size_t i = 0; i < pop.size(); i++) {
+                    spikes.push_back(pop[i].signals().data(0));
+                }
+                std::string file = "spikes_pop" + std::to_string(pop.pid()) +
+                                   "_batch" + std::to_string(batch) + ".csv";
+                Utilities::write_vector2_to_csv(spikes, _debug_filename(file));
+                Utilities::plot_spikes(_debug_filename(file), m_backend);
+            }
+        }
+        else {
+            std::vector<std::vector<cypress::Real>> spikes;
+            for (size_t i = 0; i < pop.size(); i++) {
+                spikes.push_back(pop[i].signals().data(0));
+            }
+            Utilities::write_vector2_to_csv(
+                spikes,
+                _debug_filename("spikes_" + std::to_string(batch) + ".csv"));
+            Utilities::plot_spikes(
+                _debug_filename("spikes_" + std::to_string(batch) + ".csv"),
+                m_backend);
+        }
+        auto pop2 = m_label_pops[0].network().populations()[1];
+        mnist_helper::conv_spikes_per_kernel(pop2, m_duration, m_pause, m_batchsize);
 #endif
 	}
 	if (m_count_spikes) {
@@ -230,7 +251,8 @@ std::vector<std::array<cypress::Real, 4>> MNIST_BASE::evaluate()
 	        std::array<cypress::Real, 4>({sim_time, NaN(), NaN(), NaN()})};
 }
 
-size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight)
+size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight, Real conv_max_weight,
+                                       Real max_pool_weight, Real pool_inhib_weight)
 {
 	size_t layer_id = netw.populations().size();
 	// size_t counter = 0;
@@ -240,6 +262,11 @@ size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight)
 		}
 		else {
 			m_weights_scale_factor = 1.0;
+		}
+		if (conv_max_weight > 0){
+            m_conv_weights_scale_factor = conv_max_weight / m_mlp->conv_max_weight();
+		} else {
+			m_conv_weights_scale_factor = 1.0;
 		}
 	}
 
@@ -269,7 +296,7 @@ size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight)
 			auto pop = SpikingUtils::add_population(m_neuron_type_str, netw,
 			                                        m_neuro_params, size, "");
 			auto conns = mnist_helper::conv_weights_to_conn(
-			    layer_weights, m_weights_scale_factor, 1.0);
+			    layer_weights, m_conv_weights_scale_factor, 1.0);
 			netw.add_connection(netw.populations()[layer_id - 1], pop,
 			                    Connector::from_list(conns),
                                 ("conv_" + std::to_string(conv_counter)).c_str());
@@ -283,9 +310,12 @@ size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight)
 			                * pool_layer.output_sizes[2];
 			auto pop = SpikingUtils::add_population(m_neuron_type_str, netw,
 			                                        m_neuro_params, size, "");
-			auto conns = mnist_helper::pool_to_conn(pool_layer, 1.0);
-			netw.add_connection(netw.populations()[layer_id - 1], netw.populations()[layer_id - 1],
-			                    Connector::from_list(conns[0]), "dummy_name");
+			auto conns = mnist_helper::pool_to_conn(pool_layer, max_pool_weight,
+			                                        pool_inhib_weight, 1.0);
+			netw.add_connection(netw.populations()[layer_id - 1],
+			                    netw.populations()[layer_id - 1],
+			                    Connector::from_list(conns[0]),
+			                    "dummy_name");
 			netw.add_connection(netw.populations()[layer_id - 1], pop,
 			                    Connector::from_list(conns[1]),
                                 ("pool_" + std::to_string(pool_counter)).c_str());
@@ -385,7 +415,8 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 	    m_mlp->get_layer_sizes()[0], SpikeSourceArrayParameters(),
 	    SpikeSourceArraySignals(), "input_layer");
 
-	create_deep_network(netw, m_max_weight);
+	create_deep_network(netw, m_max_weight, m_conv_max_weight,
+	                    m_max_pool_weight, m_pool_inhib_weight);
 	m_label_pops = {netw.populations().back()};
 
 	auto pre_last_pop = netw.populations()[netw.populations().size() - 2];
