@@ -74,7 +74,9 @@ def prettyfy(filename):
     with open(filename) as file:
         data = json.load(file)
     with open(filename, 'w') as file:
-        file.write(to_json(data))
+        #temp = to_json(data)
+        temp = json.dumps(data, indent=INDENT)
+        file.write(temp)
     
 for i in list_files:
     print(i)
