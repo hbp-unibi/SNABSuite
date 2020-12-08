@@ -63,7 +63,7 @@ void MNIST_BASE::read_config()
 	m_poisson = m_config_file["poisson"].get<bool>();
 	m_max_weight = m_config_file["max_weight"].get<Real>();
 	m_conv_max_weight = m_config_file["conv_max_weight"].get<Real>();
-	m_max_pool_weight = m_config_file["max_pool_weight"].empty() ? 0.1 : m_config_file["max_pool_weight"].get<Real>();
+	m_max_pool_weight = m_config_file["max_pool_weight"].empty() ? 0.1 : m_config_file["pool_max_weight"].get<Real>();
 	m_pool_inhib_weight = m_config_file["pool_inhib_weight"].empty() ? -0.1 : m_config_file["pool_inhib_weight"].get<Real>();
 	m_train_data = m_config_file["train_data"].get<bool>();
 	m_batch_parallel = m_config_file["batch_parallel"].get<bool>();

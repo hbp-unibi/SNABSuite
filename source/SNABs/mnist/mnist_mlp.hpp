@@ -428,14 +428,22 @@ public:
 				std::vector<size_t> output_sizes;
 				//TODO: look if empty mlayertypes or not mh
 				// first layer? mh
-				if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Conv){
-                    input_sizes.push_back(m_filters.back().output_sizes[0]);
-                    input_sizes.push_back(m_filters.back().output_sizes[1]);
-                    input_sizes.push_back(m_filters.back().output_sizes[2]);
-				} else if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Pooling){
-					input_sizes.push_back(m_pools.back().output_sizes[0]);
-                    input_sizes.push_back(m_pools.back().output_sizes[1]);
-                    input_sizes.push_back(m_pools.back().output_sizes[2]);
+				if (m_layer_types.empty()){
+					input_sizes.push_back(layer["input_shape_x"]);
+                    input_sizes.push_back(layer["input_shape_y"]);
+                    input_sizes.push_back(layer["input_shape_z"]);
+				} else {
+                    if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Conv){
+                        input_sizes.push_back(m_filters.back().output_sizes[0]);
+                        input_sizes.push_back(m_filters.back().output_sizes[1]);
+                        input_sizes.push_back(m_filters.back().output_sizes[2]);
+                    } else if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Pooling){
+                        input_sizes.push_back(m_pools.back().output_sizes[0]);
+                        input_sizes.push_back(m_pools.back().output_sizes[1]);
+                        input_sizes.push_back(m_pools.back().output_sizes[2]);
+                    } else if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Dense){
+						throw std::runtime_error("Pooling after Dense not implemented!");
+					}
 				}
 				output_sizes.push_back((input_sizes[0] - size[0] + 2*0)/stride+1);
 				output_sizes.push_back((input_sizes[1] - size[1] + 2*0)/stride+1);

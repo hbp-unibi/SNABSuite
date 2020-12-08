@@ -31,6 +31,7 @@ model.load_weights(args.w)
 netw = json.loads(json_file)
 
 data = {}
+input_shape = []
 if netw["keras_version"][0] != "2":
     print("Warning: script was written for Keras 2.3.0")
 
@@ -47,7 +48,10 @@ for ind, layer in enumerate(netw["config"]["layers"]):
         print("Ignoring AveragePooling2D layer")
         continue
     elif(layer["class_name"] == "InputLayer"):
-        print("Ignoring InputLayer layer")
+        input_shape.append(layer["config"]["batch_input_shape"][1])
+        input_shape.append(layer["config"]["batch_input_shape"][2])
+        input_shape.append(layer["config"]["batch_input_shape"][3])
+        # print("Ignoring InputLayer layer")
         continue
     elif(layer["class_name"] == "Dense"):
         layer_dict["class_name"] = "Dense"
@@ -86,10 +90,10 @@ for ind, layer in enumerate(netw["config"]["layers"]):
         layer_dict["class_name"] = "MaxPooling2D"
         layer_dict["size"] = layer["config"]["pool_size"]
         layer_dict["stride"] = layer["config"]["strides"][0]
-        if "batch_input_shape" in layer["config"]:
-            layer_dict["input_shape_x"] = layer["config"]["batch_input_shape"][1]
-            layer_dict["input_shape_y"] = layer["config"]["batch_input_shape"][2]
-            layer_dict["input_shape_z"] = layer["config"]["batch_input_shape"][3]
+        if not data["netw"]:
+            layer_dict["input_shape_x"] = input_shape[0]
+            layer_dict["input_shape_y"] = input_shape[1]
+            layer_dict["input_shape_z"] = input_shape[2]
         else:
             layer_dict["input_shape_x"] = None
             layer_dict["input_shape_y"] = None
