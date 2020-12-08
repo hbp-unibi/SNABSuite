@@ -377,9 +377,12 @@ void conv_spikes_per_kernel(const PopulationBase pop,
                     neur2 = res[sam][x*26*32 +(y+1)*32 +fil];
                     neur3 = res[sam][(x+1)*26*32 +y*32 +fil];
                     neur4 = res[sam][(x+1)*26*32 +(y+1)*32 +fil];
-					file << neur1<<","<<neur2<<","<<neur3<<","<<neur4<<","
-					     <<std::max({neur1,neur2, neur3, neur4})<<","
-					     <<neur1+neur2+neur3+neur4<<"\n";
+					if (neur1 != 0 || neur2 != 0 || neur3 != 0 || neur4 != 0) {
+						file << neur1 << "," << neur2 << "," << neur3 << ","
+						     << neur4 << ","
+						     << std::max({neur1, neur2, neur3, neur4}) << ","
+						     << neur1 + neur2 + neur3 + neur4 << "\n";
+					}
 				}
 			}
 		}

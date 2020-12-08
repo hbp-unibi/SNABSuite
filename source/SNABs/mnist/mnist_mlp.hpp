@@ -426,6 +426,8 @@ public:
 				size_t stride = layer["stride"];
 				std::vector<size_t> input_sizes;
 				std::vector<size_t> output_sizes;
+				//TODO: look if empty mlayertypes or not mh
+				// first layer? mh
 				if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Conv){
                     input_sizes.push_back(m_filters.back().output_sizes[0]);
                     input_sizes.push_back(m_filters.back().output_sizes[1]);

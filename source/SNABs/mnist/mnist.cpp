@@ -219,7 +219,7 @@ std::vector<std::array<cypress::Real, 4>> MNIST_BASE::evaluate()
                 m_backend);
         }
         auto pop2 = m_label_pops[0].network().populations()[1];
-        mnist_helper::conv_spikes_per_kernel(pop2, m_duration, m_pause, m_batchsize);
+        mnist_helper::conv_spikes_per_kernel(pop2, m_duration, m_pause, m_batchsize, 60);
 #endif
 	}
 	if (m_count_spikes) {
