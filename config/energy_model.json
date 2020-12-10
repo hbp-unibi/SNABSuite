@@ -82,6 +82,7 @@
             "timestep": 1,
             "time_scale_factor": 1
         },
+        "um25c": "/dev/rfcomm0",
         "bench_index": 2,
         "repeat": 1,
         "non_spiking": {
@@ -114,8 +115,8 @@
         },
         "input_random": {
             "#neurons": 3060,
-            "#input_neurons": 1000,
-            "#ConnectionsPerInput": 500,
+            "#input_neurons": 510,
+            "#ConnectionsPerOutput": 255,
             "runtime": 4000,
             "#spikes": 80,
             "neuron_params": {
