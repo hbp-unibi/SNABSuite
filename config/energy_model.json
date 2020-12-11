@@ -105,20 +105,20 @@
             }
         },
         "input_AllToALL": {
-            "#neurons": 2550,
-            "#input_neurons": 1,
-            "runtime": 4000,
-            "#spikes": 80,
+            "#neurons": 12000,
+            "#input_neurons": 30,
+            "runtime": 10000,
+            "#spikes": 100,
             "neuron_params": {
                 "v_thresh": 30
             }
         },
         "input_random": {
-            "#neurons": 3060,
-            "#input_neurons": 510,
-            "#ConnectionsPerOutput": 255,
-            "runtime": 4000,
-            "#spikes": 80,
+            "#neurons": 12000,
+            "#input_neurons": 30,
+            "#ConnectionsPerInput": 255,
+            "runtime": 10000,
+            "#spikes": 100,
             "neuron_params": {
                 "v_thresh": 30
             },
