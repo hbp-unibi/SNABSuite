@@ -154,11 +154,11 @@ cypress::Network &MaxInputAllToAll::build_netw(cypress::Network &netw)
 	}
 	if (!record_source) {
 		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
-		    m_num_neurons, SpikeSourceArrayParameters(spike_times));
+		    m_num_inp_neurons, SpikeSourceArrayParameters(spike_times));
 	}
 	else {
 		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
-		    m_num_neurons, SpikeSourceArrayParameters(spike_times),
+		    m_num_inp_neurons, SpikeSourceArrayParameters(spike_times),
 		    SpikeSourceArraySignals().record_spikes());
 	}
 	netw.add_connection(
@@ -245,11 +245,11 @@ cypress::Network &MaxInputFixedOutConnector::build_netw(cypress::Network &netw)
 	}
 	if (!record_source) {
 		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
-		    m_num_neurons, SpikeSourceArrayParameters(spike_times));
+		    m_num_inp_neurons, SpikeSourceArrayParameters(spike_times));
 	}
 	else {
 		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
-		    m_num_neurons, SpikeSourceArrayParameters(spike_times),
+		    m_num_inp_neurons, SpikeSourceArrayParameters(spike_times),
 		    SpikeSourceArraySignals().record_spikes());
 	}
 
@@ -352,11 +352,11 @@ cypress::Network &MaxInputFixedInConnector::build_netw(cypress::Network &netw)
 	}
 	if (!record_source) {
 		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
-		    m_num_neurons, SpikeSourceArrayParameters(spike_times));
+		    m_num_inp_neurons, SpikeSourceArrayParameters(spike_times));
 	}
 	else {
 		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
-		    m_num_neurons, SpikeSourceArrayParameters(spike_times),
+		    m_num_inp_neurons, SpikeSourceArrayParameters(spike_times),
 		    SpikeSourceArraySignals().record_spikes());
 	}
 
