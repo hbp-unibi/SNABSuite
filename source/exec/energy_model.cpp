@@ -170,13 +170,19 @@ void test_energy_model(const std::string config_name,
 {
 	config[config_name]["record_spikes"] = true;
 	auto net = run_snab(bench_name, config[config_name], setup);
-	auto ener = Energy::calculate_energy(net, energy_model);
 	auto runtime = calc_runtime(net);
-	std::cout << "Comparing Values for " << measure_name << ":\nMeasured:\t"
-	          << energy_model["measured"][measure_name].get<double>() *
-	                 runtime / 1000.0
-	          << "\nCalculated:\t" << std::setprecision(15) << ener
-	          << std::endl;
+#ifdef TESTING
+	auto rt = net.runtime();
+	rt.sim_pure = runtime * 1e-3;
+	net.runtime(rt);
+#endif
+	auto ener = Energy::calculate_energy(net, energy_model);
+	std::cout
+	    << "Comparing Values for " << measure_name << ":\nMeasured:\t"
+	    << energy_model["measured"][measure_name + "_avg"][0].get<double>() *
+	           runtime / 1000.0
+	    << "\nCalculated:\t" << std::setprecision(15) << ener.first << " +- "
+	    << ener.second << std::endl;
 }
 
 /**
@@ -186,7 +192,7 @@ void test_energy_model(const std::string config_name,
  */
 void check_energy_model(const Json &energy_model)
 {
-	std::vector<std::string> names({"measured", "power", "energy"});
+	std::vector<std::string> names({"power", "energy"});
 	for (const auto &i : names) {
 		for (const auto &j : energy_model[i].items()) {
 			if (j.value() < 0 || j.value() != j.value()) {
@@ -241,7 +247,7 @@ double number_from_input(double x, std::shared_ptr<Energy::Multimeter> &,
 }
 #endif
 
-inline void add(Json &json, double value) { json = json.get<double>() + value; }
+inline void add(Json &json, double value) { json.emplace_back(value); }
 
 int main(int argc, const char *argv[])
 {
@@ -316,7 +322,8 @@ int main(int argc, const char *argv[])
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
-			        std::to_string(measured["pre_boot"].get<double>() * 20.0));
+			        std::to_string(measured["pre_boot"].back().get<double>() *
+			                       20.0));
 		}
 		else {
 			std::cout
@@ -356,8 +363,9 @@ int main(int argc, const char *argv[])
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
-			        std::to_string(measured["non_spiking_rec"].get<double>() *
-			                       net.runtime().sim_pure));
+			        std::to_string(
+			            measured["non_spiking_rec"].back().get<double>() *
+			            net.runtime().sim_pure));
 
 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			std::cout << "Measuring idle power..." << std::endl;
@@ -370,7 +378,8 @@ int main(int argc, const char *argv[])
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
-			        std::to_string(measured["idle"].get<double>() * 20.0));
+			        std::to_string(measured["idle"].back().get<double>() *
+			                       20.0));
 
 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			if (multi) {
@@ -398,7 +407,7 @@ int main(int argc, const char *argv[])
 			    "EnergyModel",
 			    "Calculated energy: " +
 			        std::to_string(
-			            measured["non_spiking_non_rec"].get<double>() *
+			            measured["non_spiking_non_rec"].back().get<double>() *
 			            net.runtime().sim_pure));
 
 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -428,8 +437,9 @@ int main(int argc, const char *argv[])
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
-			        std::to_string(measured["full_spiking_rec"].get<double>() *
-			                       net.runtime().sim_pure));
+			        std::to_string(
+			            measured["full_spiking_rec"].back().get<double>() *
+			            net.runtime().sim_pure));
 
 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			if (multi) {
@@ -461,7 +471,7 @@ int main(int argc, const char *argv[])
 			    "EnergyModel",
 			    "Calculated energy: " +
 			        std::to_string(
-			            measured["full_spiking_non_rec"].get<double>() *
+			            measured["full_spiking_non_rec"].back().get<double>() *
 			            net.runtime().sim_pure));
 
 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -489,7 +499,7 @@ int main(int argc, const char *argv[])
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
-			        std::to_string(measured["input_O2O"].get<double>() *
+			        std::to_string(measured["input_O2O"].back().get<double>() *
 			                       net.runtime().sim_pure));
 
 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -517,7 +527,7 @@ int main(int argc, const char *argv[])
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
-			        std::to_string(measured["input_A2A"].get<double>() *
+			        std::to_string(measured["input_A2A"].back().get<double>() *
 			                       net.runtime().sim_pure));
 
 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -527,7 +537,7 @@ int main(int argc, const char *argv[])
 			}
 			std::cout << "Measuring costs of input spikes random" << std::endl;
 			config["input_random"]["record_spikes"] = true;
-			net = run_snab("MaxInputFixedInConnector", config["input_random"],
+			net = run_snab("MaxInputFixedOutConnector", config["input_random"],
 			               setup);
 			number_of_spikes = Energy::get_number_of_spikes(net, false);
 			if (number_of_spikes != 0) {
@@ -543,12 +553,13 @@ int main(int argc, const char *argv[])
 			add(util["input_random"]["runtime"], runtime);
 			add(util["input_random"]["number_of_spikes"], number_of_spikes);
 			add(util["input_random"]["fan_out"],
-			    config["input_random"]["#ConnectionsPerOutput"].get<double>());
+			    config["input_random"]["#ConnectionsPerInput"].get<double>());
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
-			        std::to_string(measured["input_random"].get<double>() *
-			                       net.runtime().sim_pure));
+			        std::to_string(
+			            measured["input_random"].back().get<double>() *
+			            net.runtime().sim_pure));
 
 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			if (multi) {
@@ -581,7 +592,7 @@ int main(int argc, const char *argv[])
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
-			        std::to_string(measured["inter_s2A"].get<double>() *
+			        std::to_string(measured["inter_s2A"].back().get<double>() *
 			                       net.runtime().sim_pure));
 
 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -616,7 +627,7 @@ int main(int argc, const char *argv[])
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
-			        std::to_string(measured["inter_O2O"].get<double>() *
+			        std::to_string(measured["inter_O2O"].back().get<double>() *
 			                       net.runtime().sim_pure));
 
 			// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -654,8 +665,9 @@ int main(int argc, const char *argv[])
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
-			        std::to_string(measured["inter_random"].get<double>() *
-			                       net.runtime().sim_pure));
+			        std::to_string(
+			            measured["inter_random"].back().get<double>() *
+			            net.runtime().sim_pure));
 
 			// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			if (config.find("stdp") != config.end()) {
@@ -695,7 +707,7 @@ int main(int argc, const char *argv[])
 		// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		//                         INPUT/OUTPUT
 		// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-		Energy::calculate_coefficients(energy_model, repeat);
+		Energy::calculate_coefficients(energy_model);
 		check_energy_model(energy_model);
 		{
 			std::ofstream file;
@@ -747,12 +759,18 @@ int main(int argc, const char *argv[])
 	                  config, energy_model, setup);
 
 	auto net = run_STDP_network(config["stdp"], simulator, true, setup);
-	auto ener = Energy::calculate_energy(net, energy_model);
 	auto runtime = calc_runtime(net);
+#ifdef TESTING
+	auto rt = net.runtime();
+	rt.sim_pure = runtime * 1e-3;
+	net.runtime(rt);
+#endif
+	auto ener = Energy::calculate_energy(net, energy_model);
 	std::cout << "Comparing Values for STDP:\nMeasured:\t"
-	          << energy_model["measured"]["stdp_spike"].get<double>() *
+	          << energy_model["measured"]["stdp_spike_avg"][0].get<double>() *
 	                 runtime / 1000.0
-	          << "\nCalculated:\t" << ener << std::endl;
+	          << "\nCalculated:\t" << ener.first << " +- " << ener.second
+	          << std::endl;
 
 	// auto net = run_snab("MnistSpikey", Json(), setup);
 	// std::cout << calculate_energy(net, energy_model)<<std::endl;

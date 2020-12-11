@@ -96,9 +96,8 @@ Json setup_energy_model();
  * been performed
  *
  * @param energy_model Json containing measurements
- * @param repeat number of repetitions
  */
-void calculate_coefficients(Json &energy_model, size_t repeat);
+void calculate_coefficients(cypress::Json &energy_model);
 
 /**
  * @brief Go through a network after simulation, and approximate the energy
@@ -106,7 +105,7 @@ void calculate_coefficients(Json &energy_model, size_t repeat);
  *
  * @param netw The network object after simulation
  * @param energy_model Json object containing coefficients of the energy model
- * @return double the amount of energy used in Joule
+ * @return the amount of energy used in Joule + its error estimated
  */
-double calculate_energy(const cypress::Network &netw, const Json &energy_model);
+std::pair<double, double> calculate_energy(const cypress::Network &netw, const Json &energy_model);
 }
