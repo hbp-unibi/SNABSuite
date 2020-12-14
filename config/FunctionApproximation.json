@@ -13,23 +13,23 @@
             "tau_m": 20,
             "cm": 0.2
         },
-        "#neurons": 10,
+        "#neurons": 20,
         "#repeat": 10,
-        "#samples_test": 50,
+        "#samples_test": 100,
         "#repeat_test": 1,
-        "weight": 0.035,
-        "bias_weight" : 0.035,
-        "bias_weight_inh" : -0.032,
-        "response_time": 100,
-        "min_spike_interval": 5,
-        "random_bias_test":{
-            "rate": 100,
+        "weight": 0.02375,
+        "bias_weight" : 0.015,
+        "bias_weight_inh" : -0.041,
+        "response_time": 1000,
+        "min_spike_interval": 2,
+        "random_bias":{
+            "rate": 200,
             "weight": 0.010,
             "weight_inh": -0.010,
             "std_dev": 0.015
         },
-        "random_bias_spikes_test":{
-            "rate": 100,
+        "random_bias_spikes":{
+            "rate": 150,
             "weight": 0.0015,
             "weight_inh": -0.015,
             "std_dev": 100
