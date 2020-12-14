@@ -20,7 +20,7 @@
         "weight": 0.02375,
         "bias_weight" : 0.015,
         "bias_weight_inh" : -0.041,
-        "response_time": 1000,
+        "response_time": 100,
         "min_spike_interval": 2,
         "random_bias":{
             "rate": 200,
