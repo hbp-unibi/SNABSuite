@@ -87,6 +87,7 @@ add_library(benchmark_library
     source/common/parameter_sweep
 	source/common/snab_base
 	source/common/snab_registry
+    source/energy/energy_utils
     source/SNABs/activation_curve
     source/SNABs/binam
     source/SNABs/function
