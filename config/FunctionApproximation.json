@@ -41,5 +41,29 @@
         "setup":{
             "timestep": 1.0
         }
+    },
+    "spikey": {
+        "neuron_type": "IfFacetsHardware1",
+        "neuron_params": {
+            "tau_m": 10,
+            "tau_refrac": 1,
+            "v_rest": -75,
+            "v_thresh": -55,
+            "v_reset": -80,
+            "e_rev_I": -80
+        },
+        "#neurons": 50,
+        "#repeat": 10,
+        "#samples_test": 100,
+        "#repeat_test": 1,
+        "weight": 0.015,
+        "bias_weight" : 0.015,
+        "bias_weight_inh" : -0.06,
+        "response_time": 300,
+        "min_spike_interval": 10,
+        "separate_inh":true,
+        "setup": {
+            "calibIcb": false
+        }
     }
 }

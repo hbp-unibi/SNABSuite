@@ -120,12 +120,23 @@ Network &FunctionApproximation::build_netw(Network &netw)
 		                                return (tar % 2) == 0;
 	                                },
 	                                exc_synaptic_weight));
-	pop_src.connect_to(pop_tar, Connector::functor(
-	                                [](NeuronIndex, NeuronIndex tar) {
-		                                return (tar % 2) == 1;
-	                                },
-	                                inh_synaptic_weight));
-
+	if (m_config_file.find("separate_inh") != m_config_file.end() &&
+	    m_config_file["separate_inh"].get<bool>()) {
+		Population<SpikeSourceArray> pop_src2(
+		    netw, 1, m_evaluator_train.input_spike_train(), "input");
+		pop_src2.connect_to(pop_tar, Connector::functor(
+		                                 [](NeuronIndex, NeuronIndex tar) {
+			                                 return (tar % 2) == 1;
+		                                 },
+		                                 inh_synaptic_weight));
+	}
+	else {
+		pop_src.connect_to(pop_tar, Connector::functor(
+		                                [](NeuronIndex, NeuronIndex tar) {
+			                                return (tar % 2) == 1;
+		                                },
+		                                inh_synaptic_weight));
+	}
 	// Connect the bias spike source to every second target neuron
 	pop_src_bias.connect_to(pop_tar, Connector::functor(
 	                                     [](NeuronIndex, NeuronIndex tar) {
@@ -223,8 +234,9 @@ void FunctionApproximation::run_netw(Network &netw)
 	netw.run(pwbackend, m_evaluator_train.input_spike_train_len());
 
 	// Run the test network
-	m_netw_test.population<SpikeSourceArray>("input").parameters().spike_times(
-	    m_evaluator_test.input_spike_train());
+	for (auto &pop : m_netw_test.populations<SpikeSourceArray>("input")) {
+		pop.parameters().spike_times(m_evaluator_test.input_spike_train());
+	}
 
 	m_netw_test.run(pwbackend, m_evaluator_test.input_spike_train_len());
 
