@@ -84,7 +84,7 @@
         },
         "um25c": "/dev/rfcomm0",
         "bench_index": 2,
-        "repeat": 1,
+        "repeat": 10,
         "non_spiking": {
             "#neurons": 16065,
             "runtime": 10000,
@@ -97,9 +97,11 @@
             "runtime": 10000
         },
         "input_OneToOne": {
-            "#neurons": 3060,
-            "runtime": 4000,
-            "#spikes": 80,
+            "#neurons": 5000,
+            "runtime": 10000,
+            "#spikes": 230,
+            "poisson":true,
+            "weight": 0.0001,
             "neuron_params": {
                 "v_thresh": 30
             }
@@ -107,8 +109,10 @@
         "input_AllToALL": {
             "#neurons": 12000,
             "#input_neurons": 30,
-            "runtime": 10000,
-            "#spikes": 100,
+            "runtime": 20000,
+            "#spikes": 4500,
+            "poisson":true,
+            "weight": 0.0001,
             "neuron_params": {
                 "v_thresh": 30
             }
@@ -117,31 +121,35 @@
             "#neurons": 12000,
             "#input_neurons": 30,
             "#ConnectionsPerInput": 255,
-            "runtime": 10000,
-            "#spikes": 100,
+            "runtime": 20000,
+            "#spikes": 20000,
+            "poisson":true,
+            "weight": 0.0001,
             "neuron_params": {
                 "v_thresh": 30
-            },
-            "weight": 0.0005
+            }
         },
         "inter_Single2All": {
             "#neurons": 15810,
-            "runtime": 10000,
+            "runtime": 20000,
             "neuron_params_retr": {
                 "v_thresh": 30
             }
         },
         "inter_One2One": {
             "#neurons": 7905,
-            "runtime": 10000,
+            "runtime": 20000,
             "neuron_params_retr": {
                 "v_thresh": 30
+            },
+            "neuron_params_max" : {
+                "tau_refrac" : 3
             }
         },
         "inter_random": {
-            "runtime": 5000,
+            "runtime": 20000,
             "#neurons_retr": 15810,
-            "#neurons_max": 50,
+            "#neurons_max": 18,
             "probability": 0.5,
             "neuron_params_retr": {
                 "v_thresh": 30
@@ -160,7 +168,7 @@
             "neuron_type": "IF_cond_exp",
             "#spikes": 500,
             "#neurons": 12000,
-            "runtime": 10000
+            "runtime": 20000
         }
     }
 }
