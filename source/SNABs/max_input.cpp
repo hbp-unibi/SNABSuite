@@ -15,6 +15,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "max_input.hpp"
+
 #include <cypress/backend/power/power.hpp>  // Control of power via netw
 #include <cypress/cypress.hpp>              // Neural network frontend
 #include <memory>
@@ -22,7 +24,6 @@
 #include <string>
 #include <vector>
 
-#include "max_input.hpp"
 #include "util/utilities.hpp"
 
 namespace SNAB {
@@ -51,6 +52,10 @@ cypress::Network &MaxInputOneToOne::build_netw(cypress::Network &netw)
 	if (m_config_file.find("record_spikes") != m_config_file.end()) {
 		record_source = m_config_file["record_spikes"].get<bool>();
 	}
+	bool poisson = false;
+	if (m_config_file.find("poisson") != m_config_file.end()) {
+		poisson = m_config_file["poisson"].get<bool>();
+	}
 
 	// Get neuron neuron_parameters
 	m_neuro_params = NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
@@ -71,6 +76,13 @@ cypress::Network &MaxInputOneToOne::build_netw(cypress::Network &netw)
 		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
 		    m_num_neurons, SpikeSourceArrayParameters(spike_times),
 		    SpikeSourceArraySignals().record_spikes());
+	}
+	if (poisson) {
+		for (auto neuron : m_pop_source) {
+			neuron.parameters().spike_times(cypress::spikes::poisson(
+			    10.0, simulation_length,
+			    1000.0 * double(m_num_spikes) / simulation_length));
+		}
 	}
 	netw.add_connection(
 	    m_pop_source, m_pop,
@@ -140,6 +152,10 @@ cypress::Network &MaxInputAllToAll::build_netw(cypress::Network &netw)
 	if (m_config_file.find("record_spikes") != m_config_file.end()) {
 		record_source = m_config_file["record_spikes"].get<bool>();
 	}
+	bool poisson = false;
+	if (m_config_file.find("poisson") != m_config_file.end()) {
+		poisson = m_config_file["poisson"].get<bool>();
+	}
 
 	// Get neuron neuron_parameters
 	m_neuro_params = NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
@@ -160,6 +176,13 @@ cypress::Network &MaxInputAllToAll::build_netw(cypress::Network &netw)
 		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
 		    m_num_inp_neurons, SpikeSourceArrayParameters(spike_times),
 		    SpikeSourceArraySignals().record_spikes());
+	}
+	if (poisson) {
+		for (auto neuron : m_pop_source) {
+			neuron.parameters().spike_times(cypress::spikes::poisson(
+			    10.0, simulation_length,
+			    1000.0 * double(m_num_spikes) / simulation_length));
+		}
 	}
 	netw.add_connection(
 	    m_pop_source, m_pop,
@@ -230,7 +253,10 @@ cypress::Network &MaxInputFixedOutConnector::build_netw(cypress::Network &netw)
 	if (m_config_file.find("record_spikes") != m_config_file.end()) {
 		record_source = m_config_file["record_spikes"].get<bool>();
 	}
-
+	bool poisson = false;
+	if (m_config_file.find("poisson") != m_config_file.end()) {
+		poisson = m_config_file["poisson"].get<bool>();
+	}
 
 	// Get neuron neuron_parameters
 	m_neuro_params = NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
@@ -251,6 +277,13 @@ cypress::Network &MaxInputFixedOutConnector::build_netw(cypress::Network &netw)
 		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
 		    m_num_inp_neurons, SpikeSourceArrayParameters(spike_times),
 		    SpikeSourceArraySignals().record_spikes());
+	}
+	if (poisson) {
+		for (auto neuron : m_pop_source) {
+			neuron.parameters().spike_times(cypress::spikes::poisson(
+			    10.0, simulation_length,
+			    1000.0 * double(m_num_spikes) / simulation_length));
+		}
 	}
 
 	netw.add_connection(
@@ -337,7 +370,10 @@ cypress::Network &MaxInputFixedInConnector::build_netw(cypress::Network &netw)
 	if (m_config_file.find("record_spikes") != m_config_file.end()) {
 		record_source = m_config_file["record_spikes"].get<bool>();
 	}
-
+	bool poisson = false;
+	if (m_config_file.find("poisson") != m_config_file.end()) {
+		poisson = m_config_file["poisson"].get<bool>();
+	}
 
 	// Get neuron neuron_parameters
 	m_neuro_params = NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
@@ -358,6 +394,13 @@ cypress::Network &MaxInputFixedInConnector::build_netw(cypress::Network &netw)
 		m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
 		    m_num_inp_neurons, SpikeSourceArrayParameters(spike_times),
 		    SpikeSourceArraySignals().record_spikes());
+	}
+	if (poisson) {
+		for (auto neuron : m_pop_source) {
+			neuron.parameters().spike_times(cypress::spikes::poisson(
+			    10.0, simulation_length,
+			    1000.0 * double(m_num_spikes) / simulation_length));
+		}
 	}
 
 	netw.add_connection(
