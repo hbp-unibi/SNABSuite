@@ -45,7 +45,7 @@ from dim_labels import *
 
 def histogram_plot(data, xlabel, title="", bins='auto', normed=False):
     fig = plt.figure()
-    if bins is not "auto":
+    if bins != "auto":
         plt.hist(data, bins=int(bins), density=normed, color='black',
              histtype="bar", rwidth=0.95)
     else:
@@ -67,11 +67,11 @@ for target_file in args.files:
     #import data
     results = np.recfromtxt(target_file, delimiter=',', loose=True)
     xlabel = DIM_LABELS[target_file.split(".csv")[0].split("_")[-1]]
-    if args.t is "":
+    if args.t == "":
         title = target_file.split("/")[-1].split("_")[0]
     else:
         title = args.t
-    if args.s is not "":
+    if args.s != "":
         title = title + " for " + SIMULATOR_LABELS[args.s]
 
     fig = histogram_plot(results, xlabel, title, bins=args.b, normed=args.n)
