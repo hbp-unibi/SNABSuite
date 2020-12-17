@@ -170,5 +170,105 @@
             "#neurons": 12000,
             "runtime": 20000
         }
+    },
+    "spikey": {
+        "um25c": "/dev/rfcomm0",
+        "strict_check" : false,
+        "bench_index": 1,
+        "repeat": 1,
+        "setup": {},
+        "non_spiking": {
+            "runtime": 6000000,
+            "neuron_params": {
+                "v_thresh": -55,
+                "v_rest": -80,
+                "tau_refrac": 1.0,
+                "tau_m": 7
+            }
+        },
+        "just_spiking": {
+            "runtime": 1500000,
+            "neuron_params": {
+                "tau_refrac":1,
+                "tau_m": 7
+            }
+        },
+        "input_OneToOne": {
+            "runtime": 1500000,
+            "#spikes": 230000,
+            "poisson":true,
+            "weight": 0.001,
+            "neuron_params": {
+                "v_rest": -80,
+                "v_reset": -80
+            }
+        },
+        "input_AllToALL": {
+            "#input_neurons": 192,
+            "runtime": 1500000,
+            "#spikes": 230000,
+            "poisson":true,
+            "weight": 0.001,
+            "neuron_params": {
+                "v_rest": -80,
+                "v_reset": -80
+            }
+        },
+        "input_random": {
+            "runtime": 1500000,
+            "#spikes": 230000,
+            "poisson":true,
+            "weight": 0.001,
+            "neuron_params": {
+                "v_rest": -80,
+                "v_reset": -80
+            }
+        },
+        "inter_Single2All": {
+            "runtime": 1500000,
+            "neuron_params_retr": {
+                "v_thresh": -55,
+                "v_rest": -80,
+                "v_reset": -80,
+                "tau_refrac" : 10
+            },
+            "neuron_params_max" : {
+                "tau_refrac" : 10
+            }
+        },
+        "inter_One2One": {
+            "runtime": 1500000,
+            "neuron_params_retr": {
+                "v_thresh": -55,
+                "v_rest": -80,
+                "v_reset": -80,
+                "tau_refrac" : 10
+            },
+            "neuron_params_max" : {
+                "tau_refrac" : 10
+            }
+        },
+        "inter_random": {
+            "runtime": 1500000,
+            "probability": 0.5,
+            "neuron_params_retr": {
+                "v_thresh": -55,
+                "v_rest": -80,
+                "v_reset": -80,
+                "tau_refrac" : 10
+            },
+            "neuron_params_max" : {
+                "tau_refrac" : 10
+            }
+        },
+        "stdp": {
+            "neuron_params": {
+                "v_thresh": -62
+            },
+            "neuron_type": "IfFacetsHardware1",
+            "#spikes": 230000,
+            "#neurons": 384,
+            "runtime": 1500000
+        }
     }
 }

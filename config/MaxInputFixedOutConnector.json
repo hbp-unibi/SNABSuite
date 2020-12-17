@@ -46,7 +46,7 @@
             "v_rest": -63,
             "v_thresh": -55,
             "v_reset": -65,
-            "e_rev_I": 0
+            "e_rev_I": -80
         },
         "#neurons": [192,384],
         "#input_neurons": [192,256],

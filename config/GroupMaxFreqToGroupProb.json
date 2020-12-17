@@ -47,9 +47,9 @@
             "v_reset": -80,
             "e_rev_I": -80
         },
-        "#neurons_retr": [192],
+        "#neurons_retr": [96,192],
         "weight": 0.015,
-        "#neurons_max": 192,
+        "#neurons_max": [96,192],
         "probability": 0.5
     },
     "nest": {
