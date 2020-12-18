@@ -298,10 +298,12 @@ int main(int argc, const char *argv[])
 	snab_vec = snab_registry(simulator, bench_index);
 
 	std::shared_ptr<Energy::Multimeter> multi;
+#ifndef TESTING
 	if (config.find("um25c") != config.end()) {
 		multi = std::make_shared<Energy::Multimeter>(
 		    config["um25c"].get<std::string>());
 	}
+#endif
 
 	if (energy_config_path == "") {
 		if (config.find("stdp") != config.end()) {
