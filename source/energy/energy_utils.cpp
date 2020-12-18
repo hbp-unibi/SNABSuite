@@ -1,8 +1,7 @@
 
-#include "energy_utils.hpp"
-
 #include <cypress/cypress.hpp>
 
+#include "energy_utils.hpp"
 #include "util/utilities.hpp"
 
 namespace Energy {
@@ -176,25 +175,31 @@ Json setup_energy_model()
 	util["input_O2O"]["number_of_neurons"] = std::vector<double>();
 	util["input_O2O"]["runtime"] = std::vector<double>();
 	util["input_O2O"]["number_of_spikes"] = std::vector<double>();
+	util["input_O2O"]["number_of_spikes_tar"] = std::vector<double>();
 
 	util["input_A2A"]["number_of_neurons"] = std::vector<double>();
 	util["input_A2A"]["runtime"] = std::vector<double>();
 	util["input_A2A"]["number_of_spikes"] = std::vector<double>();
+	util["input_A2A"]["number_of_spikes_tar"] = std::vector<double>();
 
 	util["input_random"]["number_of_neurons"] = std::vector<double>();
 	util["input_random"]["runtime"] = std::vector<double>();
 	util["input_random"]["number_of_spikes"] = std::vector<double>();
 	util["input_random"]["fan_out"] = std::vector<double>();
+	util["input_random"]["number_of_spikes_tar"] = std::vector<double>();
 
 	util["inter_s2A"]["number_of_neurons"] = std::vector<double>();
 	util["inter_s2A"]["runtime"] = std::vector<double>();
 	util["inter_s2A"]["number_of_spikes"] = std::vector<double>();
+	util["inter_s2A"]["number_of_spikes_tar"] = std::vector<double>();
 	util["inter_O2O"]["number_of_neurons"] = std::vector<double>();
 	util["inter_O2O"]["runtime"] = std::vector<double>();
 	util["inter_O2O"]["number_of_spikes"] = std::vector<double>();
+	util["inter_O2O"]["number_of_spikes_tar"] = std::vector<double>();
 	util["inter_random"]["number_of_neurons"] = std::vector<double>();
 	util["inter_random"]["runtime"] = std::vector<double>();
 	util["inter_random"]["number_of_spikes"] = std::vector<double>();
+	util["inter_random"]["number_of_spikes_tar"] = std::vector<double>();
 	util["inter_random"]["connections"] = std::vector<double>();
 
 	util["stdp_idle"]["number_of_neurons"] = std::vector<double>();
@@ -361,6 +366,11 @@ void calculate_coefficients(Json &energy_model)
 	error_dividend = error_multiply(dividend, error_dividend,
 	                                util["input_O2O"]["runtime_avg"]);
 	dividend *= util["input_O2O"]["runtime_avg"][0].get<double>();
+	dividend -= util["input_O2O"]["number_of_spikes_tar_avg"][0].get<double>() *
+	            energy["spike"][0].get<double>();
+	error_dividend +=
+	    util["input_O2O"]["number_of_spikes_tar_avg"][1].get<double>() *
+	    energy["spike"][1].get<double>();
 	val = dividend / util["input_O2O"]["number_of_spikes_avg"][0].get<double>();
 	error = error_devide(dividend, error_dividend,
 	                     util["input_O2O"]["number_of_spikes_avg"]);
@@ -380,6 +390,11 @@ void calculate_coefficients(Json &energy_model)
 	error_dividend = error_multiply(dividend, error_dividend,
 	                                util["input_A2A"]["runtime_avg"]);
 	dividend *= util["input_A2A"]["runtime_avg"][0].get<double>();
+	dividend -= util["input_A2A"]["number_of_spikes_tar_avg"][0].get<double>() *
+	            energy["spike"][0].get<double>();
+	error_dividend +=
+	    util["input_A2A"]["number_of_spikes_tar_avg"][1].get<double>() *
+	    energy["spike"][1].get<double>();
 	double divisor =
 	    util["input_A2A"]["number_of_spikes_avg"][0].get<double>() *
 	    util["input_A2A"]["number_of_neurons_avg"][0].get<double>();
@@ -404,6 +419,12 @@ void calculate_coefficients(Json &energy_model)
 	error_dividend = error_multiply(dividend, error_dividend,
 	                                util["input_random"]["runtime_avg"]);
 	dividend *= util["input_random"]["runtime_avg"][0].get<double>();
+	dividend -=
+	    util["input_random"]["number_of_spikes_tar_avg"][0].get<double>() *
+	    energy["spike"][0].get<double>();
+	error_dividend +=
+	    util["input_random"]["number_of_spikes_tar_avg"][1].get<double>() *
+	    energy["spike"][1].get<double>();
 	divisor = util["input_random"]["number_of_spikes_avg"][0].get<double>() *
 	          util["input_random"]["fan_out_avg"][0].get<double>();
 	error_divisor = error_multiply(util["input_random"]["number_of_spikes_avg"],
@@ -432,6 +453,11 @@ void calculate_coefficients(Json &energy_model)
 	            util["inter_s2A"]["number_of_spikes_avg"][0].get<double>();
 	error_dividend += error_multiply(energy["spike"],
 	                                 util["inter_s2A"]["number_of_spikes_avg"]);
+	dividend -= util["inter_s2A"]["number_of_spikes_tar_avg"][0].get<double>() *
+	            energy["spike"][0].get<double>();
+	error_dividend +=
+	    util["inter_s2A"]["number_of_spikes_tar_avg"][1].get<double>() *
+	    energy["spike"][1].get<double>();
 	divisor = (util["inter_s2A"]["number_of_spikes_avg"][0].get<double>() *
 	           util["inter_s2A"]["number_of_neurons_avg"][0].get<double>());
 	error_divisor = error_multiply(util["inter_s2A"]["number_of_spikes_avg"],
@@ -461,6 +487,11 @@ void calculate_coefficients(Json &energy_model)
 	            util["inter_O2O"]["number_of_spikes_avg"][0].get<double>();
 	error_dividend += error_multiply(energy["spike"],
 	                                 util["inter_O2O"]["number_of_spikes_avg"]);
+	dividend -= util["inter_O2O"]["number_of_spikes_tar_avg"][0].get<double>() *
+	            energy["spike"][0].get<double>();
+	error_dividend +=
+	    util["inter_O2O"]["number_of_spikes_tar_avg"][1].get<double>() *
+	    energy["spike"][1].get<double>();
 	divisor = (util["inter_O2O"]["number_of_spikes_avg"][0].get<double>());
 	error_divisor = util["inter_O2O"]["number_of_spikes_avg"][1].get<double>();
 	val = dividend / divisor;
@@ -484,6 +515,12 @@ void calculate_coefficients(Json &energy_model)
 	            util["inter_random"]["number_of_spikes_avg"][0].get<double>();
 	error_dividend += error_multiply(
 	    energy["spike"], util["inter_random"]["number_of_spikes_avg"]);
+	dividend -=
+	    util["inter_random"]["number_of_spikes_tar_avg"][0].get<double>() *
+	    energy["spike"][0].get<double>();
+	error_dividend +=
+	    util["inter_random"]["number_of_spikes_tar_avg"][1].get<double>() *
+	    energy["spike"][1].get<double>();
 	divisor = (util["inter_random"]["number_of_spikes_avg"][0].get<double>() *
 	           util["inter_random"]["connections_avg"][0].get<double>());
 	error_divisor = error_multiply(util["inter_random"]["number_of_spikes_avg"],

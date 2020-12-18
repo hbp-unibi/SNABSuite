@@ -305,6 +305,11 @@ int main(int argc, const char *argv[])
 	}
 #endif
 
+	bool strict_check = true;
+	if (config.find("strict_check") != config.end()) {
+		strict_check = config["strict_check"].get<bool>();
+	}
+
 	if (energy_config_path == "") {
 		if (config.find("stdp") != config.end()) {
 			energy_model["stdp"] = true;
@@ -354,9 +359,17 @@ int main(int argc, const char *argv[])
 			size_t number_of_spikes = Energy::get_number_of_spikes(net);
 			size_t number_of_neurons = Energy::get_number_of_neurons(net);
 			if (number_of_spikes > 0) {
-				throw std::runtime_error("non_spiking recorded " +
-				                         std::to_string(number_of_spikes) +
-				                         " spikes");
+				if (strict_check) {
+					throw std::runtime_error("non_spiking recorded " +
+					                         std::to_string(number_of_spikes) +
+					                         " spikes");
+				}
+				else {
+					global_logger().info("EnergyModel",
+					                     "non_spiking recorded " +
+					                         std::to_string(number_of_spikes) +
+					                         " spikes");
+				}
 			}
 			add(measured["non_spiking_rec"],
 			    number_from_input(3.0, multi, true));
@@ -485,13 +498,18 @@ int main(int argc, const char *argv[])
 			          << std::endl;
 			config["input_OneToOne"]["record_spikes"] = true;
 			net = run_snab("MaxInputOneToOne", config["input_OneToOne"], setup);
-			number_of_spikes = Energy::get_number_of_spikes(net, false);
-			if (number_of_spikes != 0) {
-				throw std::runtime_error("input_OneToOne recorded " +
-				                         std::to_string(number_of_spikes) +
-				                         " spikes");
+			number_of_spikes2 = Energy::get_number_of_spikes(net, false);
+			if (number_of_spikes2 != 0) {
+				if (strict_check) {
+					throw std::runtime_error("input_OneToOne recorded " +
+					                         std::to_string(number_of_spikes2) +
+					                         " spikes");
+				}
+				add(util["input_O2O"]["number_of_spikes_tar"],
+				    number_of_spikes2);
 			}
-			number_of_spikes = Energy::get_number_of_spikes(net);
+			number_of_spikes =
+			    Energy::get_number_of_spikes(net) - number_of_spikes2;
 			number_of_neurons = Energy::get_number_of_neurons(net, false);
 			runtime = calc_runtime(net);
 			add(measured["input_O2O"], number_from_input(50.0, multi, true));
@@ -515,9 +533,13 @@ int main(int argc, const char *argv[])
 			net = run_snab("MaxInputAllToAll", config["input_AllToALL"], setup);
 			number_of_spikes = Energy::get_number_of_spikes(net, false);
 			if (number_of_spikes != 0) {
-				throw std::runtime_error("input_AllToALL recorded " +
-				                         std::to_string(number_of_spikes) +
-				                         " spikes");
+				if (strict_check) {
+					throw std::runtime_error("input_AllToALL recorded " +
+					                         std::to_string(number_of_spikes) +
+					                         " spikes");
+				}
+				add(util["input_A2A"]["number_of_spikes_tar"],
+				    number_of_spikes2);
 			}
 			number_of_spikes = Energy::get_number_of_spikes(net);
 			number_of_neurons = Energy::get_number_of_neurons(net, false);
@@ -543,9 +565,13 @@ int main(int argc, const char *argv[])
 			               setup);
 			number_of_spikes = Energy::get_number_of_spikes(net, false);
 			if (number_of_spikes != 0) {
-				throw std::runtime_error("input_random recorded " +
-				                         std::to_string(number_of_spikes) +
-				                         " spikes");
+				if (strict_check) {
+					throw std::runtime_error("input_random recorded " +
+					                         std::to_string(number_of_spikes) +
+					                         " spikes");
+				}
+				add(util["input_random"]["number_of_spikes_tar"],
+				    number_of_spikes2);
 			}
 			number_of_spikes = Energy::get_number_of_spikes(net);
 			number_of_neurons = Energy::get_number_of_neurons(net, false);
@@ -581,9 +607,13 @@ int main(int argc, const char *argv[])
 			size_t number_of_spikes_tar =
 			    Energy::get_number_of_spikes_pop(net.populations().back());
 			if (number_of_spikes_tar != 0) {
-				throw std::runtime_error("inter_Single2All recorded " +
-				                         std::to_string(number_of_spikes) +
-				                         " target spikes");
+				if (strict_check) {
+					throw std::runtime_error("inter_Single2All recorded " +
+					                         std::to_string(number_of_spikes) +
+					                         " target spikes");
+				}
+				add(util["inter_s2A"]["number_of_spikes_tar"],
+				    number_of_spikes2);
 			}
 			number_of_neurons = net.populations().back().size();
 			runtime = calc_runtime(net);
@@ -616,9 +646,13 @@ int main(int argc, const char *argv[])
 			number_of_spikes_tar =
 			    Energy::get_number_of_spikes_pop(net.populations().back());
 			if (number_of_spikes_tar != 0) {
-				throw std::runtime_error("inter_One2One recorded " +
-				                         std::to_string(number_of_spikes) +
-				                         " target spikes");
+				if (strict_check) {
+					throw std::runtime_error("inter_One2One recorded " +
+					                         std::to_string(number_of_spikes) +
+					                         " target spikes");
+				}
+				add(util["inter_O2O"]["number_of_spikes_tar"],
+				    number_of_spikes2);
 			}
 			number_of_neurons = net.populations().back().size();
 			runtime = calc_runtime(net);
@@ -651,9 +685,13 @@ int main(int argc, const char *argv[])
 			number_of_spikes_tar =
 			    Energy::get_number_of_spikes_pop(net.populations().back());
 			if (number_of_spikes_tar != 0) {
-				throw std::runtime_error("inter_random recorded " +
-				                         std::to_string(number_of_spikes) +
-				                         " target spikes");
+				if (strict_check) {
+					throw std::runtime_error("inter_random recorded " +
+					                         std::to_string(number_of_spikes) +
+					                         " target spikes");
+				}
+				add(util["inter_random"]["number_of_spikes_tar"],
+				    number_of_spikes2);
 			}
 			number_of_neurons = Energy::get_number_of_neurons(net, false);
 			runtime = calc_runtime(net);
