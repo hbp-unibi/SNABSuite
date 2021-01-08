@@ -40,6 +40,18 @@
 #include <utility>
 
 namespace Energy {
+
+class MeasureDevice {
+public:
+	// Time, millivolts, milliamps, milliwatts
+	typedef std::tuple<std::chrono::time_point<std::chrono::steady_clock>,
+	                   double, double, double>
+	    data;
+	virtual data get_data_sample_timed() = 0;
+
+	virtual ~MeasureDevice() {}
+};
+
 /**
  * @brief Class for reading data from UM25C, a usbmeter measuring voltage and
  * current used by an usb device. To make use of this class, the user has to
@@ -56,7 +68,7 @@ namespace Energy {
  * rights to access. If not, contact your admin.
  *
  */
-class um25c {
+class um25c : public MeasureDevice {
 private:
 	int m_pointer;
 	struct termios m_old_termios;
@@ -251,9 +263,16 @@ public:
 	}
 	typedef std::pair<UMC, std::chrono::steady_clock::time_point> timed_record;
 
-	timed_record get_data_sample_timed()
+	timed_record _get_data_sample_timed()
 	{
 		return {get_data_sample(), std::chrono::steady_clock::now()};
+	}
+
+	data get_data_sample_timed() override
+	{
+		auto rec = get_data_sample();
+		return {std::chrono::steady_clock::now(), double(rec.millivolts),
+		        double(rec.tenths_milliamps * 10), double(rec.milliwatts)};
 	}
 
 	~um25c()
