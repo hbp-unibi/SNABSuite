@@ -172,10 +172,12 @@
         }
     },
     "spikey": {
-        "um25c": "/dev/rfcomm0",
+        "fluke_28x": "/dev/ttyUSB0",
+        "fluke_28x_v": 5,
+        "threshhold": false,
         "strict_check" : false,
         "bench_index": 1,
-        "repeat": 1,
+        "repeat": 50,
         "setup": {},
         "non_spiking": {
             "runtime": 6000000,
@@ -267,8 +269,9 @@
         },
         "stdp": {
             "neuron_params": {
-                "v_thresh": -62
+                "v_thresh": -60
             },
+            "weight": 0.006,
             "neuron_type": "IfFacetsHardware1",
             "#spikes": 230000,
             "#neurons": 384,
