@@ -236,10 +236,10 @@
                 "v_thresh": -55,
                 "v_rest": -80,
                 "v_reset": -80,
-                "tau_refrac" : 10
+                "tau_refrac" : 5
             },
             "neuron_params_max" : {
-                "tau_refrac" : 10
+                "tau_refrac" : 0.1
             }
         },
         "inter_One2One": {
@@ -271,9 +271,9 @@
             "neuron_params": {
                 "v_thresh": -60
             },
-            "weight": 0.006,
+            "weight": 0.007,
             "neuron_type": "IfFacetsHardware1",
-            "#spikes": 230000,
+            "#spikes": 500000,
             "#neurons": 384,
             "runtime": 1500000
         }
