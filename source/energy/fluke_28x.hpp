@@ -20,10 +20,11 @@ private:
 	int m_pointer;
 	struct termios m_old_termios;
 	std::string m_unit = "ADC";  // "VDC"
-    double m_voltage = 0.0;
+	double m_voltage = 0.0;
 
 public:
-	fluke_28x(std::string port = "/dev/ttyUSB0", double voltage = 5.0) : m_voltage(voltage) 
+	fluke_28x(std::string port = "/dev/ttyUSB0", double voltage = 5.0)
+	    : m_voltage(voltage)
 	{
 		m_pointer = open(port.c_str(), O_RDWR | O_NOCTTY);
 		if (m_pointer < 0) {
@@ -32,6 +33,9 @@ public:
 
 		tcgetattr(m_pointer, &m_old_termios);
 		struct termios new_tio = m_old_termios;
+		new_tio.c_iflag = 0;
+		new_tio.c_oflag = 0;
+		new_tio.c_lflag = 0;
 		new_tio.c_cc[VMIN] = 1;
 		new_tio.c_cc[VTIME] = 0;
 		cfsetspeed(&new_tio, B115200);
@@ -92,7 +96,6 @@ public:
 		while (true) {
 			auto val = read();
 			if (!isnan(val)) {
-                std::cout << m_voltage * 1e3 << ", " << double(val * 1e3) << ", "<< double(m_voltage * 1e3 * val) << std::endl;
 				return {std::chrono::steady_clock::now(), m_voltage * 1e3,
 				        double(val * 1e3), double(m_voltage * 1e3 * val)};
 			}
