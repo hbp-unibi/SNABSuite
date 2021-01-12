@@ -36,7 +36,7 @@ using namespace SNAB;
 using cypress::Json;
 
 /**
- * To make measurements on spikey, use a fluke_28x! You need to manipulate 
+ * To make measurements on spikey, use a fluke_28x! You need to manipulate
  * deb-pynn/src/hardware/spikey/pyhal/pyhal_config_s1v2.py:1466
  * Before `myLogger.info('Trigger network emulation.')`:
             import time as time_lib
@@ -153,11 +153,11 @@ cypress::Network run_STDP_network(Json config, std::string backend, bool spike,
 			spike_times[i] = 1.0 + i * 0.9 * intervall;
 		}
 	}
-	else{
-        // TODO only spikey!
-        spike_times.push_back(50.0);
-        spike_times.push_back(1500000 - 50.0);
-    }
+	else {
+		// TODO only spikey!
+		spike_times.push_back(50.0);
+		spike_times.push_back(1500000 - 50.0);
+	}
 
 	auto pop = cypress::SpikingUtils::add_population(
 	    neuron_type_str, netw, neuron_params, config["#neurons"].get<size_t>(),
@@ -167,9 +167,9 @@ cypress::Network run_STDP_network(Json config, std::string backend, bool spike,
 	    cypress::SpikeSourceArraySignals().record_spikes());
 
 	auto synapse = cypress::SpikePairRuleAdditive();
-    if(config.find("weight")!= config.end()){
-        synapse.weight(config["weight"].get<double>());
-    }
+	if (config.find("weight") != config.end()) {
+		synapse.weight(config["weight"].get<double>());
+	}
 	netw.add_connection(pop_source, pop,
 	                    cypress::Connector::all_to_all(synapse));
 
@@ -177,11 +177,11 @@ cypress::Network run_STDP_network(Json config, std::string backend, bool spike,
 	    cypress::Network::make_backend(backend));
 	netw.run(pwbackend, config["runtime"].get<cypress::Real>());
 	if (spike) {
-        size_t spikes = 0;
+		size_t spikes = 0;
 		for (const auto &neuron : pop) {
-            spikes +=neuron.signals().data(0).size() ;
+			spikes += neuron.signals().data(0).size();
 		}
-        if (spikes < 50) {
+		if (spikes < 50) {
 			throw std::runtime_error(
 			    "Wrong configuration of STDP benchmark: found no  spikes!");
 		}
@@ -263,7 +263,6 @@ double number_from_input(double, std::shared_ptr<Energy::Multimeter> &multi,
 			    "Measured energy: " +
 			        std::to_string(multi->calculate_energy_last(thresh) /
 			                       1000.0));
-            std::cout << "THRESH "<< thresh <<std::endl;
 			return multi->average_power_draw_last(thresh) / 1000.0;
 		}
 		global_logger().info(
@@ -333,8 +332,8 @@ int main(int argc, const char *argv[])
 	}
 
 	snab_vec = snab_registry(simulator, bench_index);
-    
-    bool threshhold = true;
+
+	bool threshhold = true;
 	std::shared_ptr<Energy::Multimeter> multi;
 #ifndef TESTING
 	if (config.find("um25c") != config.end()) {
@@ -347,8 +346,7 @@ int main(int argc, const char *argv[])
 		    config["fluke_28x_v"].get<double>());
 	}
 	if (config.find("threshhold") != config.end()) {
-		threshhold=
-		    config["threshhold"].get<bool>();
+		threshhold = config["threshhold"].get<bool>();
 	}
 #endif
 
@@ -394,7 +392,7 @@ int main(int argc, const char *argv[])
 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			if (multi) {
 				sleep(2);
-                multi->set_block(true);
+				multi->set_block(true);
 				multi->start_recording();
 			}
 			std::cout << "Measuring costs of running idle neurons that are "
@@ -433,7 +431,7 @@ int main(int argc, const char *argv[])
 			std::cout << "Measuring idle power..." << std::endl;
 			if (multi) {
 				sleep(2);
-                multi->set_block(false);
+				multi->set_block(false);
 				multi->start_recording();
 				sleep(20);
 			}
@@ -447,7 +445,7 @@ int main(int argc, const char *argv[])
 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			if (multi) {
 				sleep(2);
-                multi->set_block(true);
+				multi->set_block(true);
 				multi->start_recording();
 			}
 			std::cout << "Measuring costs of running idle neurons that are NOT "
@@ -547,21 +545,23 @@ int main(int argc, const char *argv[])
 			          << std::endl;
 			config["input_OneToOne"]["record_spikes"] = true;
 			net = run_snab("MaxInputOneToOne", config["input_OneToOne"], setup);
-			number_of_spikes2 = Energy::get_number_of_spikes(net, false);
-			if (number_of_spikes2 != 0) {
+			auto number_of_spikes_tar =
+			    Energy::get_number_of_spikes(net, false);
+			if (number_of_spikes_tar != 0) {
 				if (strict_check) {
-					throw std::runtime_error("input_OneToOne recorded " +
-					                         std::to_string(number_of_spikes2) +
-					                         " spikes");
+					throw std::runtime_error(
+					    "input_OneToOne recorded " +
+					    std::to_string(number_of_spikes_tar) + " spikes");
 				}
 				add(util["input_O2O"]["number_of_spikes_tar"],
-				    number_of_spikes2);
+				    number_of_spikes_tar);
 			}
 			number_of_spikes =
-			    Energy::get_number_of_spikes(net) - number_of_spikes2;
+			    Energy::get_number_of_spikes(net) - number_of_spikes_tar;
 			number_of_neurons = Energy::get_number_of_neurons(net, false);
 			runtime = calc_runtime(net);
-			add(measured["input_O2O"], number_from_input(50.0, multi, threshhold));
+			add(measured["input_O2O"],
+			    number_from_input(50.0, multi, threshhold));
 			add(util["input_O2O"]["number_of_neurons"], number_of_neurons);
 			add(util["input_O2O"]["runtime"], runtime);
 			add(util["input_O2O"]["number_of_spikes"], number_of_spikes);
@@ -580,20 +580,22 @@ int main(int argc, const char *argv[])
 			          << std::endl;
 			config["input_AllToALL"]["record_spikes"] = true;
 			net = run_snab("MaxInputAllToAll", config["input_AllToALL"], setup);
-			number_of_spikes = Energy::get_number_of_spikes(net, false);
-			if (number_of_spikes != 0) {
+			number_of_spikes_tar = Energy::get_number_of_spikes(net, false);
+			if (number_of_spikes_tar != 0) {
 				if (strict_check) {
-					throw std::runtime_error("input_AllToALL recorded " +
-					                         std::to_string(number_of_spikes) +
-					                         " spikes");
+					throw std::runtime_error(
+					    "input_AllToALL recorded " +
+					    std::to_string(number_of_spikes_tar) + " spikes");
 				}
 				add(util["input_A2A"]["number_of_spikes_tar"],
-				    number_of_spikes2);
+				    number_of_spikes_tar);
 			}
-			number_of_spikes = Energy::get_number_of_spikes(net);
+			number_of_spikes =
+			    Energy::get_number_of_spikes(net) - number_of_spikes_tar;
 			number_of_neurons = Energy::get_number_of_neurons(net, false);
 			runtime = calc_runtime(net);
-			add(measured["input_A2A"], number_from_input(9.0, multi, threshhold));
+			add(measured["input_A2A"],
+			    number_from_input(9.0, multi, threshhold));
 			add(util["input_A2A"]["number_of_neurons"], number_of_neurons);
 			add(util["input_A2A"]["runtime"], runtime);
 			add(util["input_A2A"]["number_of_spikes"], number_of_spikes);
@@ -612,20 +614,22 @@ int main(int argc, const char *argv[])
 			config["input_random"]["record_spikes"] = true;
 			net = run_snab("MaxInputFixedOutConnector", config["input_random"],
 			               setup);
-			number_of_spikes = Energy::get_number_of_spikes(net, false);
-			if (number_of_spikes != 0) {
+			number_of_spikes_tar = Energy::get_number_of_spikes(net, false);
+			if (number_of_spikes_tar != 0) {
 				if (strict_check) {
-					throw std::runtime_error("input_random recorded " +
-					                         std::to_string(number_of_spikes) +
-					                         " spikes");
+					throw std::runtime_error(
+					    "input_random recorded " +
+					    std::to_string(number_of_spikes_tar) + " spikes");
 				}
 				add(util["input_random"]["number_of_spikes_tar"],
-				    number_of_spikes2);
+				    number_of_spikes_tar);
 			}
-			number_of_spikes = Energy::get_number_of_spikes(net);
+			number_of_spikes =
+			    Energy::get_number_of_spikes(net) - number_of_spikes_tar;
 			number_of_neurons = Energy::get_number_of_neurons(net, false);
 			runtime = calc_runtime(net);
-			add(measured["input_random"], number_from_input(9.0, multi, threshhold));
+			add(measured["input_random"],
+			    number_from_input(9.0, multi, threshhold));
 			add(util["input_random"]["number_of_neurons"], number_of_neurons);
 			add(util["input_random"]["runtime"], runtime);
 			add(util["input_random"]["number_of_spikes"], number_of_spikes);
@@ -653,23 +657,26 @@ int main(int argc, const char *argv[])
 				                         std::to_string(number_of_spikes) +
 				                         " spikes");
 			}
-			size_t number_of_spikes_tar =
+			number_of_spikes_tar =
 			    Energy::get_number_of_spikes_pop(net.populations().back());
 			if (number_of_spikes_tar != 0) {
 				if (strict_check) {
-					throw std::runtime_error("inter_Single2All recorded " +
-					                         std::to_string(number_of_spikes) +
-					                         " target spikes");
+					throw std::runtime_error(
+					    "inter_Single2All recorded " +
+					    std::to_string(number_of_spikes_tar) +
+					    " target spikes");
 				}
 				add(util["inter_s2A"]["number_of_spikes_tar"],
-				    number_of_spikes2);
+				    number_of_spikes_tar);
 			}
 			number_of_neurons = net.populations().back().size();
 			runtime = calc_runtime(net);
-			add(measured["inter_s2A"], number_from_input(10.0, multi, threshhold));
+			add(measured["inter_s2A"],
+			    number_from_input(10.0, multi, threshhold));
 			add(util["inter_s2A"]["number_of_neurons"], number_of_neurons);
 			add(util["inter_s2A"]["runtime"], runtime);
-			add(util["inter_s2A"]["number_of_spikes"], number_of_spikes);
+			add(util["inter_s2A"]["number_of_spikes"],
+			    number_of_spikes - number_of_spikes_tar);
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
@@ -696,19 +703,22 @@ int main(int argc, const char *argv[])
 			    Energy::get_number_of_spikes_pop(net.populations().back());
 			if (number_of_spikes_tar != 0) {
 				if (strict_check) {
-					throw std::runtime_error("inter_One2One recorded " +
-					                         std::to_string(number_of_spikes) +
-					                         " target spikes");
+					throw std::runtime_error(
+					    "inter_One2One recorded " +
+					    std::to_string(number_of_spikes_tar) +
+					    " target spikes");
 				}
 				add(util["inter_O2O"]["number_of_spikes_tar"],
-				    number_of_spikes2);
+				    number_of_spikes_tar);
 			}
 			number_of_neurons = net.populations().back().size();
 			runtime = calc_runtime(net);
-			add(measured["inter_O2O"], number_from_input(10.0, multi, threshhold));
+			add(measured["inter_O2O"],
+			    number_from_input(10.0, multi, threshhold));
 			add(util["inter_O2O"]["number_of_neurons"], number_of_neurons);
 			add(util["inter_O2O"]["runtime"], runtime);
-			add(util["inter_O2O"]["number_of_spikes"], number_of_spikes);
+			add(util["inter_O2O"]["number_of_spikes"],
+			    number_of_spikes - number_of_spikes_tar);
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
@@ -735,19 +745,22 @@ int main(int argc, const char *argv[])
 			    Energy::get_number_of_spikes_pop(net.populations().back());
 			if (number_of_spikes_tar != 0) {
 				if (strict_check) {
-					throw std::runtime_error("inter_random recorded " +
-					                         std::to_string(number_of_spikes) +
-					                         " target spikes");
+					throw std::runtime_error(
+					    "inter_random recorded " +
+					    std::to_string(number_of_spikes_tar) +
+					    " target spikes");
 				}
 				add(util["inter_random"]["number_of_spikes_tar"],
-				    number_of_spikes2);
+				    number_of_spikes_tar);
 			}
 			number_of_neurons = Energy::get_number_of_neurons(net, false);
 			runtime = calc_runtime(net);
-			add(measured["inter_random"], number_from_input(10.0, multi, threshhold));
+			add(measured["inter_random"],
+			    number_from_input(10.0, multi, threshhold));
 			add(util["inter_random"]["number_of_neurons"], number_of_neurons);
 			add(util["inter_random"]["runtime"], runtime);
-			add(util["inter_random"]["number_of_spikes"], number_of_spikes);
+			add(util["inter_random"]["number_of_spikes"],
+			    number_of_spikes - number_of_spikes_tar);
 			add(util["inter_random"]["connections"],
 			    double(net.populations().back().size()) *
 			        config["inter_random"]["probability"].get<double>());
@@ -762,7 +775,7 @@ int main(int argc, const char *argv[])
 			if (config.find("stdp") != config.end()) {
 				if (multi) {
 					sleep(2);
-                    multi->set_block(true);
+					multi->set_block(true);
 					multi->start_recording();
 				}
 				std::cout << "Measuring costs of idle STDP..." << std::endl;
@@ -770,7 +783,8 @@ int main(int argc, const char *argv[])
 				    run_STDP_network(config["stdp"], simulator, false, setup);
 				auto number_of_neurons =
 				    Energy::get_number_of_neurons(net, false);
-				add(measured["stdp_idle"], number_from_input(5.0, multi, threshhold));
+				add(measured["stdp_idle"],
+				    number_from_input(5.0, multi, threshhold));
 				add(util["stdp_idle"]["number_of_neurons"], number_of_neurons);
 
 				std::cout << "Measuring costs of running STDP..." << std::endl;
