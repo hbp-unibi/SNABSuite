@@ -177,8 +177,10 @@
         "threshhold": false,
         "strict_check" : false,
         "bench_index": 1,
-        "repeat": 50,
-        "setup": {},
+        "repeat": 20,
+        "setup": {
+            "calibIcb": 1
+        },
         "non_spiking": {
             "runtime": 6000000,
             "neuron_params": {
@@ -207,14 +209,16 @@
             }
         },
         "input_AllToALL": {
-            "#input_neurons": 64,
+            "#input_neurons": 32,
             "runtime": 1500000,
             "#spikes": 230000,
             "poisson":true,
             "weight": 0.001,
             "neuron_params": {
                 "v_rest": -80,
-                "v_reset": -80
+                "v_reset": -80,
+                "v_thresh": -55,
+                "tau_refrac": 5
             }
         },
         "input_random": {
