@@ -334,6 +334,7 @@ int main(int argc, const char *argv[])
 	snab_vec = snab_registry(simulator, bench_index);
 
 	bool threshhold = true;
+	bool block = false;
 	std::shared_ptr<Energy::Multimeter> multi;
 #ifndef TESTING
 	if (config.find("um25c") != config.end()) {
@@ -341,6 +342,7 @@ int main(int argc, const char *argv[])
 		    config["um25c"].get<std::string>());
 	}
 	if (config.find("fluke_28x") != config.end()) {
+		block = true;
 		multi = std::make_shared<Energy::Multimeter>(
 		    config["fluke_28x"].get<std::string>(),
 		    config["fluke_28x_v"].get<double>());
@@ -392,7 +394,7 @@ int main(int argc, const char *argv[])
 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			if (multi) {
 				sleep(2);
-				multi->set_block(true);
+				multi->set_block(block);
 				multi->start_recording();
 			}
 			std::cout << "Measuring costs of running idle neurons that are "
@@ -445,7 +447,7 @@ int main(int argc, const char *argv[])
 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			if (multi) {
 				sleep(2);
-				multi->set_block(true);
+				multi->set_block(block);
 				multi->start_recording();
 			}
 			std::cout << "Measuring costs of running idle neurons that are NOT "
@@ -775,7 +777,7 @@ int main(int argc, const char *argv[])
 			if (config.find("stdp") != config.end()) {
 				if (multi) {
 					sleep(2);
-					multi->set_block(true);
+					multi->set_block(block);
 					multi->start_recording();
 				}
 				std::cout << "Measuring costs of idle STDP..." << std::endl;
