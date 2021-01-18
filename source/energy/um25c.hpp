@@ -271,8 +271,10 @@ public:
 	data get_data_sample_timed() override
 	{
 		auto rec = get_data_sample();
-		return {std::chrono::steady_clock::now(), double(rec.millivolts),
-		        double(rec.tenths_milliamps * 10), double(rec.milliwatts)};
+		return std::make_tuple<
+		    std::chrono::time_point<std::chrono::steady_clock>, double, double,
+		    double>(std::chrono::steady_clock::now(), double(rec.millivolts),
+		            double(rec.tenths_milliamps * 10), double(rec.milliwatts));
 	}
 
 	~um25c()

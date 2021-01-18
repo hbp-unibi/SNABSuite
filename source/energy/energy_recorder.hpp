@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <atomic>
 #include <string>
+#include <system_error>
 #include <thread>
 #include <tuple>
 #include <vector>
@@ -37,13 +38,13 @@ private:
 	std::vector<timed_record> m_data;
 
 	bool m_block = false;
-    std::string file_name = "sync_lock";
+	std::string file_name = "sync_lock";
 
 	void priv_continuos_record()
 	{
 		if (m_block) {
-            remove(file_name.c_str());
-            remove((file_name + "2").c_str());
+			remove(file_name.c_str());
+			remove((file_name + "2").c_str());
 			if (mkfifo(file_name.c_str(), 0666) != 0) {
 				throw std::system_error(errno, std::system_category());
 			}
@@ -58,12 +59,12 @@ private:
 		}
 		while (m_record) {
 			m_data.emplace_back(m_device->get_data_sample_timed());
-            if(m_block){
-                if(std::ifstream(file_name + "2").good()){
-                    remove((file_name + "2").c_str());
-                    break;
-                }
-            }
+			if (m_block) {
+				if (std::ifstream(file_name + "2").good()) {
+					remove((file_name + "2").c_str());
+					break;
+				}
+			}
 		}
 	}
 
@@ -128,10 +129,10 @@ public:
 		check_size(rec.size());
 		std::vector<data> res(rec.size());
 		for (size_t i = 1; i < rec.size(); i++) {
-			res[i] = {std::chrono::duration<double, std::micro>(
+			res[i] = std::make_tuple(std::chrono::duration<double, std::micro>(
 			              std::get<0>(rec[i]) - std::get<0>(rec[i - 1])),
 			          std::get<1>(rec[i]), std::get<2>(rec[i]),
-			          std::get<3>(rec[i])};
+			          std::get<3>(rec[i]));
 		}
 		return res;
 	}

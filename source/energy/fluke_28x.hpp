@@ -95,9 +95,12 @@ public:
 		write();
 		while (true) {
 			auto val = read();
-			if (!isnan(val)) {
-				return {std::chrono::steady_clock::now(), m_voltage * 1e3,
-				        double(val * 1e3), double(m_voltage * 1e3 * val)};
+			if (!std::isnan(val)) {
+				return std::make_tuple<
+				    std::chrono::time_point<std::chrono::steady_clock>, double,
+				    double, double>(std::chrono::steady_clock::now(),
+				                    m_voltage * 1e3, double(val * 1e3),
+				                    double(m_voltage * 1e3 * val));
 			}
 		}
 	}
