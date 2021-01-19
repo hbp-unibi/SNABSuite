@@ -1,10 +1,19 @@
 {
   "snab_name" : "MnistNAStop",
   "genn" : {
-    "max_weight": [0.002, 0.01, 5],
-    "conv_max_weight": [0.005, 0.015, 5],
-    "pool_max_weight": [0.05, 0.15, 5],
-    "pool_inhib_weight": [-0.2, -0.05, 5],
+    "max_weight": [0.001, 0.01, 8],
+    "conv_max_weight": [0.0005, 0.01, 8],
+    "pool_max_weight": [0.001, 0.5, 10],
+    "pool_inhib_weight": [-0.3, -0.005, 10],
+    "images": 10,
+    "batchsize": 10,
+    "dnn_file": "source/SNABs/mnist/python/cnn_pool.out.msgpack"
+  },
+  "genn2" : {
+    "max_weight": [0.001, 0.005, 5],
+    "conv_max_weight": [0.001, 0.005, 5],
+    "pool_max_weight": [0.001, 0.3, 8],
+    "pool_inhib_weight": [-0.05, -0.005, 5],
     "images": 10,
     "batchsize": 10,
     "dnn_file": "source/SNABs/mnist/python/cnn_pool.out.msgpack"

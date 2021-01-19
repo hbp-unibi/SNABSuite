@@ -1,10 +1,10 @@
 {
   "snab_name" : "MnistNAStop",
   "genn" : {
-    "max_weight": [0.005, 0.0175, 15],
-    "conv_max_weight" : [0.010, 0.0225, 15],
-    "images": 10,
-    "batchsize": 10,
-    "dnn_file": "source/SNABs/mnist/python/cnn2.out.msgpack"
+    "max_weight": [0.0015, 0.05, 10],
+    "conv_max_weight" : [0.001, 0.005, 10],
+    "images": 25,
+    "batchsize": 25,
+    "dnn_file": "source/SNABs/mnist/python/cnn.out.msgpack"
   }
 }

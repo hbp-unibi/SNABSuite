@@ -47,10 +47,10 @@ y_train = keras.utils.to_categorical(y_train, num_classes)
 y_test = keras.utils.to_categorical(y_test, num_classes)
 
 model = Sequential()
-# model.add(Conv2D(32, kernel_size=(3, 3),
-#                 activation='relu',
-#                 input_shape=input_shape, use_bias=False))
-# model.add(Conv2D(32, (3, 3), activation='relu', use_bias=False))
+model.add(Conv2D(16, kernel_size=(3, 3),
+                activation='relu',
+                input_shape=input_shape, use_bias=False))
+# model.add(Conv2D(16, (3, 3), activation='relu', use_bias=False))
 # model.add(Conv2D(64, (5, 5), activation='relu', use_bias=False))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 # model.add(Dropout(0.25))
