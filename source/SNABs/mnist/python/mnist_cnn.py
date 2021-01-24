@@ -48,8 +48,8 @@ y_test = keras.utils.to_categorical(y_test, num_classes)
 
 model = Sequential()
 model.add(Conv2D(16, kernel_size=(3, 3),
-                activation='relu',
-                input_shape=input_shape, use_bias=False))
+                 activation='relu',
+                 input_shape=input_shape, use_bias=False))
 # model.add(Conv2D(16, (3, 3), activation='relu', use_bias=False))
 # model.add(Conv2D(64, (5, 5), activation='relu', use_bias=False))
 model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -61,8 +61,8 @@ model.add(Dense(num_classes, activation='softmax', use_bias=False))
 # model.add(Dense(num_classes, activation='relu'))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
-             optimizer=keras.optimizers.Adadelta(),
-             metrics=['accuracy'])
+              optimizer=keras.optimizers.Adadelta(),
+              metrics=['accuracy'])
 # model.compile(loss='categorical_hinge',
 #               optimizer=keras.optimizers.Adadelta(),
 #               metrics=['accuracy'])

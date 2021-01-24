@@ -287,7 +287,7 @@ std::vector<LocalConnection> conv_weights_to_conn(
 
 std::vector<std::vector<LocalConnection>> pool_to_conn(
     const mnist_helper::POOLING_LAYER &layer, Real max_pool_weight,
-    Real pool_inhib_weight, Real delay)
+    Real pool_inhib_weight, Real delay, Real pool_delay)
 {
     std::vector<LocalConnection> inhib_conns;
 	std::vector<LocalConnection> pool_cons;
@@ -309,7 +309,7 @@ std::vector<std::vector<LocalConnection>> pool_to_conn(
 									    (i + u) * layer.input_sizes[1] * layer.input_sizes[2] +
 									    (j + v) * layer.input_sizes[2] +
 									    k,
-									    pool_inhib_weight, 0.0));
+									    pool_inhib_weight, pool_delay));
 								}
                             }
                         }
@@ -317,8 +317,8 @@ std::vector<std::vector<LocalConnection>> pool_to_conn(
                             (i + x) * layer.input_sizes[1] * layer.input_sizes[2] +
                             (j + y) * layer.input_sizes[2] +
                             k,
-                            i * layer.output_sizes[1] * layer.output_sizes[2] +
-                            j * layer.output_sizes[2] +
+                            i/layer.stride * layer.output_sizes[1] * layer.output_sizes[2] +
+                            j/layer.stride * layer.output_sizes[2] +
                             k,
                             max_pool_weight, delay));
 					}

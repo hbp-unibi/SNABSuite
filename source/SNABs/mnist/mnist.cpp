@@ -65,6 +65,7 @@ void MNIST_BASE::read_config()
 	m_conv_max_weight = m_config_file["conv_max_weight"].get<Real>();
 	m_max_pool_weight = m_config_file["max_pool_weight"].empty() ? 0.1 : m_config_file["pool_max_weight"].get<Real>();
 	m_pool_inhib_weight = m_config_file["pool_inhib_weight"].empty() ? -0.1 : m_config_file["pool_inhib_weight"].get<Real>();
+	m_pool_delay = m_config_file["pool_delay"].empty() ? 0.3 : m_config_file["pool_delay"].get<Real>();
 	m_train_data = m_config_file["train_data"].get<bool>();
 	m_batch_parallel = m_config_file["batch_parallel"].get<bool>();
 	m_dnn_file = m_config_file["dnn_file"].get<std::string>();
@@ -311,7 +312,7 @@ size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight, Real conv
 			auto pop = SpikingUtils::add_population(m_neuron_type_str, netw,
 			                                        m_neuro_params, size, "");
 			auto conns = mnist_helper::pool_to_conn(pool_layer, max_pool_weight,
-			                                        pool_inhib_weight, 1.0);
+			                                        pool_inhib_weight, 1.0, m_pool_delay);
 			netw.add_connection(netw.populations()[layer_id - 1],
 			                    netw.populations()[layer_id - 1],
 			                    Connector::from_list(conns[0]),

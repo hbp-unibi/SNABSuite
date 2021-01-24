@@ -301,7 +301,7 @@ std::vector<LocalConnection> conv_weights_to_conn(const mnist_helper::CONVOLUTIO
  */
 std::vector<std::vector<LocalConnection>> pool_to_conn(
     const mnist_helper::POOLING_LAYER &layer,Real max_pool_weight,
-    Real pool_inhib_weight, Real delay);
+    Real pool_inhib_weight, Real delay, Real pool_delay);
 
 /**
  * @brief Converts the simulation results into label data

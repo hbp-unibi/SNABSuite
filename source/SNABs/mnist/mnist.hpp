@@ -57,6 +57,7 @@ protected:
 	cypress::Real m_conv_max_weight;
 	cypress::Real m_max_pool_weight;
 	cypress::Real m_pool_inhib_weight;
+	cypress::Real m_pool_delay;
 
 	std::vector<
 	    std::pair<std::vector<std::vector<Real>>, std::vector<uint16_t>>>
