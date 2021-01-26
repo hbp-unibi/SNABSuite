@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "fluke_28x.hpp"
+#include "nvidia-smi.hpp"
 #include "um25c.hpp"
 
 namespace Energy {
@@ -69,9 +70,13 @@ private:
 	}
 
 public:
-	Multimeter(std::string port = "/dev/rfcomm0", double fluke_v = 0.0)
+	Multimeter(std::string port = "/dev/rfcomm0", double fluke_v = 0.0,
+	           bool nvidia = false)
 	{
-		if (fluke_v > 0.0) {
+		if (nvidia) {
+			m_device = std::make_shared<nvidiasmi>();
+		}
+		else if (fluke_v > 0.0) {
 			m_device = std::make_shared<fluke_28x>(port, fluke_v);
 		}
 		else {
@@ -129,10 +134,10 @@ public:
 		check_size(rec.size());
 		std::vector<data> res(rec.size());
 		for (size_t i = 1; i < rec.size(); i++) {
-			res[i] = std::make_tuple(std::chrono::duration<double, std::micro>(
-			              std::get<0>(rec[i]) - std::get<0>(rec[i - 1])),
-			          std::get<1>(rec[i]), std::get<2>(rec[i]),
-			          std::get<3>(rec[i]));
+			res[i] = std::make_tuple(
+			    std::chrono::duration<double, std::micro>(
+			        std::get<0>(rec[i]) - std::get<0>(rec[i - 1])),
+			    std::get<1>(rec[i]), std::get<2>(rec[i]), std::get<3>(rec[i]));
 		}
 		return res;
 	}
