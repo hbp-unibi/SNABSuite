@@ -235,7 +235,7 @@ public:
 	static double average_power_draw(const std::vector<timed_record> &rec,
 	                                 uint32_t milliamps_thresh = 0.0)
 	{
-		uint32_t res = 0.0;
+		double res = 0.0;
 		size_t counter = 0;
 		// milliamps_thresh = milliamps_thresh * 10.0;
 		for (size_t i = 0; i < rec.size(); i++) {
@@ -254,7 +254,7 @@ public:
 	static double average_power_draw_last(const std::vector<timed_record> &rec,
 	                                      uint32_t milliamps_thresh)
 	{
-		std::vector<uint32_t> res({0});
+		std::vector<double> res({0});
 		std::vector<size_t> counter({0});
 		// milliamps_thresh = milliamps_thresh * 10.0;
 		for (size_t i = 0; i < rec.size(); i++) {
@@ -294,7 +294,7 @@ public:
 	static double average_current(const std::vector<timed_record> &rec,
 	                              uint32_t milliamps_thresh = 0.0)
 	{
-		uint32_t res = 0.0;
+		double res = 0.0;
 		size_t counter = 0;
 		// milliamps_thresh = milliamps_thresh * 10;
 		for (size_t i = 0; i < rec.size(); i++) {
