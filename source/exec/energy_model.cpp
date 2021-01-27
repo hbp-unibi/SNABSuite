@@ -248,7 +248,7 @@ void check_energy_model(const Json &energy_model)
  * @return entered value
  */
 double number_from_input(double, std::shared_ptr<Energy::Multimeter> &multi,
-                         bool threshhold)
+                         double threshhold)
 {
 	double temp;
 	if (multi) {
@@ -257,7 +257,7 @@ double number_from_input(double, std::shared_ptr<Energy::Multimeter> &multi,
 		double thresh = 0.0;
 		if (threshhold) {
 			auto min = multi->min_current();
-			thresh = min + ((multi->max_current() - min) * 0.7);
+			thresh = min + ((multi->max_current() - min) * threshhold);
 			global_logger().info(
 			    "EnergyModel",
 			    "Measured energy: " +
@@ -333,7 +333,7 @@ int main(int argc, const char *argv[])
 
 	snab_vec = snab_registry(simulator, bench_index);
 
-	bool threshhold = true;
+	double threshhold = 0.0;
 	bool block = false;
 	std::shared_ptr<Energy::Multimeter> multi;
 #ifndef TESTING
@@ -348,7 +348,7 @@ int main(int argc, const char *argv[])
 		    config["fluke_28x_v"].get<double>());
 	}
 	if (config.find("threshhold") != config.end()) {
-		threshhold = config["threshhold"].get<bool>();
+		threshhold = config["threshhold"].get<double>();
 	}
 #endif
 
@@ -384,7 +384,7 @@ int main(int argc, const char *argv[])
 			    << "Please power cycle the device!\n"
 			    << "Now measure the average power consumption over at least "
 			       "10 sec.\n";
-			measured["pre_boot"] = number_from_input(1.0, multi, false);
+			measured["pre_boot"] = number_from_input(1.0, multi, 0.0);
 			// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			std::cout
 			    << "In the following, please measure during the simulation!"
