@@ -16,8 +16,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cypress/cypress.hpp>
 #include "util/read_json.hpp"
+
+#include <cypress/cypress.hpp>
 
 #include "util/utilities.hpp"
 
@@ -49,6 +50,9 @@ cypress::Json read_config(const std::string &name, const std::string &backend)
 		std::string simulator =
 		    Utilities::split(Utilities::split(backend, '=')[0], '.').back();
 		if (config.find(simulator) == config.end()) {
+			if (backend == "genn_gpu") {
+				return read_config(name, "genn");
+			}
 			global_logger().warn("SNABSuite",
 			                     "Could not find any config for " + simulator +
 			                         " in the config file of " + name + "! ");
