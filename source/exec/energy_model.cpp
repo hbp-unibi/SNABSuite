@@ -341,11 +341,17 @@ int main(int argc, const char *argv[])
 		multi = std::make_shared<Energy::Multimeter>(
 		    config["um25c"].get<std::string>());
 	}
-	if (config.find("fluke_28x") != config.end()) {
+	else if (config.find("fluke_28x") != config.end()) {
 		block = true;
 		multi = std::make_shared<Energy::Multimeter>(
 		    config["fluke_28x"].get<std::string>(),
 		    config["fluke_28x_v"].get<double>());
+	}
+	else if (config["setup"].find("gpu") != config["setup"].end() ||
+	         short_sim == "genn_gpu") {
+		if (short_sim == "genn_gpu" || config["setup"]["gpu"].get<bool>()) {
+			multi = std::make_shared<Energy::Multimeter>("", 0, true);
+		}
 	}
 	if (config.find("threshhold") != config.end()) {
 		threshhold = config["threshhold"].get<double>();
