@@ -33,18 +33,17 @@ public:
 			result += buffer.data();
 		}
 		result = SNAB::Utilities::split(result, '\n')[1];
-		std::cout << result << std::endl;
 		return std::stod(result);
 	}
 
 	virtual data get_data_sample_timed() override
 	{
-		auto val = read();
+		auto val = read() * 1.e3;  // milliwatt
 		// Assume general 12V supply lane
 		return std::make_tuple<
 		    std::chrono::time_point<std::chrono::steady_clock>, double, double,
-		    double>(std::chrono::steady_clock::now(), 12.0 * 1e3,
-		            12 / val * 1.e3, val * 1.e3);
+		    double>(std::chrono::steady_clock::now(), 12.0 * 1.e3, val / 12.0,
+		            val * 1.e3);
 	}
 };
 }  // namespace Energy
