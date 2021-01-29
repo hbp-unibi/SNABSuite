@@ -154,9 +154,10 @@ cypress::Network run_STDP_network(Json config, std::string backend, bool spike,
 		}
 	}
 	else {
-		// TODO only spikey!
-		spike_times.push_back(50.0);
-		spike_times.push_back(1500000 - 50.0);
+		if (backend == "spikey") {
+			spike_times.push_back(50.0);
+			spike_times.push_back(1500000 - 50.0);
+		}
 	}
 
 	auto pop = cypress::SpikingUtils::add_population(
@@ -212,7 +213,8 @@ void test_energy_model(const std::string config_name,
 	rt.sim_pure = runtime * 1e-3;
 	net.runtime(rt);
 #endif
-	auto ener = Energy::calculate_energy(net, energy_model);
+	auto ener = Energy::calculate_energy(net, energy_model,
+	                                     config[config_name]["runtime"]);
 	std::cout
 	    << "Comparing Values for " << measure_name << ":\nMeasured:\t"
 	    << energy_model["measured"][measure_name + "_avg"][0].get<double>() *
@@ -335,6 +337,7 @@ int main(int argc, const char *argv[])
 
 	double threshhold = 0.0;
 	bool block = false;
+	bool runtime_normalized = false;
 	std::shared_ptr<Energy::Multimeter> multi;
 #ifndef TESTING
 	if (config.find("um25c") != config.end()) {
@@ -350,11 +353,16 @@ int main(int argc, const char *argv[])
 	else if (config["setup"].find("gpu") != config["setup"].end() ||
 	         short_sim == "genn_gpu") {
 		if (short_sim == "genn_gpu" || config["setup"]["gpu"].get<bool>()) {
+			block = true;
 			multi = std::make_shared<Energy::Multimeter>("", 0, true);
 		}
 	}
 	if (config.find("threshhold") != config.end()) {
 		threshhold = config["threshhold"].get<double>();
+	}
+	if (config.find("runtime_normalized") != config.end()) {
+		runtime_normalized = config["runtime_normalized"].get<bool>();
+		energy_model["runtime_normalized"] = runtime_normalized;
 	}
 #endif
 
@@ -371,8 +379,9 @@ int main(int argc, const char *argv[])
 		Json &util = energy_model["util"];
 
 		if (multi) {
+			int t_sleep = 20;
 			multi->start_recording();
-			sleep(20);
+			sleep(t_sleep);
 			multi->stop_recording();
 			measured["pre_boot"] = multi->average_power_draw() / 1000.0;
 			global_logger().info(
@@ -383,7 +392,7 @@ int main(int argc, const char *argv[])
 			    "EnergyModel",
 			    "Calculated energy: " +
 			        std::to_string(measured["pre_boot"].back().get<double>() *
-			                       20.0));
+			                       double(t_sleep)));
 		}
 		else {
 			std::cout
@@ -428,6 +437,9 @@ int main(int argc, const char *argv[])
 			    number_from_input(3.0, multi, threshhold));
 			add(util["non_spiking_rec"]["number_of_neurons"],
 			    number_of_neurons);
+			add(util["non_spiking_rec"]["runtime"], calc_runtime(net));
+			util["non_spiking_rec"]["bioruntime"] =
+			    config["non_spiking"]["runtime"].get<double>();
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
@@ -441,7 +453,7 @@ int main(int argc, const char *argv[])
 				sleep(2);
 				multi->set_block(false);
 				multi->start_recording();
-				sleep(20);
+				sleep(20.0);
 			}
 			add(measured["idle"], number_from_input(1.0, multi, false));
 			global_logger().info(
@@ -473,6 +485,9 @@ int main(int argc, const char *argv[])
 			    number_from_input(2.0, multi, threshhold));
 			add(util["non_spiking_non_rec"]["number_of_neurons"],
 			    number_of_neurons);
+			add(util["non_spiking_non_rec"]["runtime"], calc_runtime(net));
+			util["non_spiking_non_rec"]["bioruntime"] =
+			    config["non_spiking"]["runtime"].get<double>();
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
@@ -504,6 +519,8 @@ int main(int argc, const char *argv[])
 			    number_of_neurons);
 			add(util["full_spiking_rec"]["runtime"], runtime);
 			add(util["full_spiking_rec"]["number_of_spikes"], number_of_spikes);
+			util["full_spiking_rec"]["bioruntime"] =
+			    config["just_spiking"]["runtime"].get<double>();
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
@@ -537,6 +554,8 @@ int main(int argc, const char *argv[])
 			add(util["full_spiking_non_rec"]["runtime"], runtime);
 			add(util["full_spiking_non_rec"]["number_of_spikes"],
 			    number_of_spikes);
+			util["full_spiking_non_rec"]["bioruntime"] =
+			    config["just_spiking"]["runtime"].get<double>();
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
@@ -573,6 +592,8 @@ int main(int argc, const char *argv[])
 			add(util["input_O2O"]["number_of_neurons"], number_of_neurons);
 			add(util["input_O2O"]["runtime"], runtime);
 			add(util["input_O2O"]["number_of_spikes"], number_of_spikes);
+			util["input_O2O"]["bioruntime"] =
+			    config["input_OneToOne"]["runtime"].get<double>();
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
@@ -607,6 +628,8 @@ int main(int argc, const char *argv[])
 			add(util["input_A2A"]["number_of_neurons"], number_of_neurons);
 			add(util["input_A2A"]["runtime"], runtime);
 			add(util["input_A2A"]["number_of_spikes"], number_of_spikes);
+			util["input_A2A"]["bioruntime"] =
+			    config["input_AllToALL"]["runtime"].get<double>();
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
@@ -643,6 +666,8 @@ int main(int argc, const char *argv[])
 			add(util["input_random"]["number_of_spikes"], number_of_spikes);
 			add(util["input_random"]["fan_out"],
 			    config["input_random"]["#ConnectionsPerInput"].get<double>());
+			util["input_random"]["bioruntime"] =
+			    config["input_random"]["runtime"].get<double>();
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
@@ -685,6 +710,8 @@ int main(int argc, const char *argv[])
 			add(util["inter_s2A"]["runtime"], runtime);
 			add(util["inter_s2A"]["number_of_spikes"],
 			    number_of_spikes - number_of_spikes_tar);
+			util["inter_s2A"]["bioruntime"] =
+			    config["inter_Single2All"]["runtime"].get<double>();
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
@@ -727,6 +754,8 @@ int main(int argc, const char *argv[])
 			add(util["inter_O2O"]["runtime"], runtime);
 			add(util["inter_O2O"]["number_of_spikes"],
 			    number_of_spikes - number_of_spikes_tar);
+			util["inter_O2O"]["bioruntime"] =
+			    config["inter_One2One"]["runtime"].get<double>();
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
@@ -772,6 +801,8 @@ int main(int argc, const char *argv[])
 			add(util["inter_random"]["connections"],
 			    double(net.populations().back().size()) *
 			        config["inter_random"]["probability"].get<double>());
+			util["inter_random"]["bioruntime"] =
+			    config["inter_random"]["runtime"].get<double>();
 			global_logger().info(
 			    "EnergyModel",
 			    "Calculated energy: " +
@@ -794,6 +825,9 @@ int main(int argc, const char *argv[])
 				add(measured["stdp_idle"],
 				    number_from_input(5.0, multi, threshhold));
 				add(util["stdp_idle"]["number_of_neurons"], number_of_neurons);
+				add(util["stdp_idle"]["runtime"], calc_runtime(net));
+				util["stdp_idle"]["bioruntime"] =
+				    config["stdp"]["runtime"].get<double>();
 
 				std::cout << "Measuring costs of running STDP..." << std::endl;
 				if (multi) {
@@ -814,6 +848,9 @@ int main(int argc, const char *argv[])
 				add(util["stdp_spike"]["number_of_spikes"], number_of_spikes);
 				add(util["stdp_spike"]["number_of_source_spikes"],
 				    number_of_source_spikes);
+				add(util["stdp_spike"]["runtime"], calc_runtime(net));
+				util["stdp_spike"]["bioruntime"] =
+				    config["stdp"]["runtime"].get<double>();
 			}
 		}
 		// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -877,7 +914,8 @@ int main(int argc, const char *argv[])
 	rt.sim_pure = runtime * 1e-3;
 	net.runtime(rt);
 #endif
-	auto ener = Energy::calculate_energy(net, energy_model);
+	auto ener =
+	    Energy::calculate_energy(net, energy_model, config["stdp"]["runtime"]);
 	std::cout << "Comparing Values for STDP:\nMeasured:\t"
 	          << energy_model["measured"]["stdp_spike_avg"][0].get<double>() *
 	                 runtime / 1000.0

@@ -105,7 +105,8 @@ void calculate_coefficients(cypress::Json &energy_model);
  *
  * @param netw The network object after simulation
  * @param energy_model Json object containing coefficients of the energy model
+ * @param bioruntime duration of the simulation in ms
  * @return the amount of energy used in Joule + its error estimated
  */
-std::pair<double, double> calculate_energy(const cypress::Network &netw, const Json &energy_model);
+std::pair<double, double> calculate_energy(const cypress::Network &netw, const Json &energy_model, double bioruntime);
 }

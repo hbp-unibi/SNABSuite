@@ -1,4 +1,97 @@
 {
+    "genn_gpu": {
+        "setup": {
+            "timestep":1,
+            "recording_buffer_size":500000
+        },
+        "runtime_normalized": true,
+        "bench_index": 1,
+        "repeat": 3,
+        "non_spiking": {
+            "#neurons": 100000,
+            "runtime": 400000,
+            "neuron_params": {
+                "v_thresh": 30,
+                "tau_refrac" : 30
+            }
+        },
+        "just_spiking": {
+            "#neurons": 100000,
+            "runtime": 400000,
+            "neuron_params": {
+                "tau_refrac" : 30
+            }
+        },
+        "input_OneToOne": {
+            "#neurons": 100000,
+            "runtime": 10000,
+            "#spikes": 50,
+            "neuron_params": {
+                "v_thresh": 30
+            }
+        },
+        "input_AllToALL": {
+            "#neurons": 100000,
+            "#input_neurons": 1000,
+            "runtime": 80000,
+            "#spikes": 5000,
+            "neuron_params": {
+                "v_thresh": 30
+            }
+        },
+        "input_random": {
+            "#neurons": 50000,F
+            "#input_neurons": 1000,
+            "#ConnectionsPerInput": 500,
+            "runtime": 40000,
+            "#spikes": 5000,
+            "neuron_params": {
+                "v_thresh": 30
+            },
+            "weight": 0.0005
+        },
+        "inter_Single2All": {
+            "#neurons": 100000,
+            "runtime": 100000,
+            "neuron_params_retr": {
+                "v_thresh": 30
+            },
+            "neuron_params_max" : {
+                "tau_refrac": 10
+            }
+        },
+        "inter_One2One": {
+            "#neurons": 25000,
+            "runtime": 10000,
+            "neuron_params_retr": {
+                "v_thresh": 30
+            },
+            "neuron_params_max" : { 
+                "tau_refrac": 20
+            }
+        },
+        "inter_random": {
+            "runtime": 50000,
+            "#neurons_retr": 25000,
+            "#neurons_max": 500,
+            "probability": 0.5,
+            "neuron_params_retr": {
+                "v_thresh": 30
+            },
+            "neuron_params_max" : {
+                "tau_refrac": 10
+            }
+        },
+        "stdp": {
+            "neuron_params": {
+                "v_thresh": -62
+            },
+            "neuron_type": "IF_cond_exp",
+            "#spikes": 50,
+            "#neurons": 100000,
+            "runtime": 100000
+        }
+    },
     "genn": {
         "setup": {
 
@@ -85,6 +178,7 @@
         "um25c": "/dev/rfcomm0",
         "bench_index": 2,
         "repeat": 10,
+        "threshhold": 0.7,
         "non_spiking": {
             "#neurons": 16065,
             "runtime": 10000,
@@ -174,7 +268,7 @@
     "spikey": {
         "fluke_28x": "/dev/ttyUSB0",
         "fluke_28x_v": 5,
-        "threshhold": false,
+        "threshhold": 0.0,
         "strict_check" : false,
         "bench_index": 1,
         "repeat": 20,
