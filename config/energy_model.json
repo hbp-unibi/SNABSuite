@@ -6,7 +6,7 @@
         },
         "runtime_normalized": true,
         "bench_index": 1,
-        "repeat": 3,
+        "repeat": 50,
         "non_spiking": {
             "#neurons": 100000,
             "runtime": 400000,
@@ -40,7 +40,7 @@
             }
         },
         "input_random": {
-            "#neurons": 50000,F
+            "#neurons": 50000,
             "#input_neurons": 1000,
             "#ConnectionsPerInput": 500,
             "runtime": 40000,
@@ -94,7 +94,6 @@
     },
     "genn": {
         "setup": {
-
         },
         "bench_index": 1,
         "repeat": 1,
@@ -177,7 +176,7 @@
         },
         "um25c": "/dev/rfcomm0",
         "bench_index": 2,
-        "repeat": 10,
+        "repeat": 20,
         "threshhold": 0.7,
         "non_spiking": {
             "#neurons": 16065,
