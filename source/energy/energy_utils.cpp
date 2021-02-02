@@ -532,7 +532,6 @@ void calc_coef_norm(Json &energy_model)
 	error_dividend = error_multiply(dividend, error_dividend,
 	                                util["inter_random"]["runtime_avg"]);
 	dividend *= util["inter_random"]["runtime_avg"][0].get<double>();
-	dividend *= util["inter_random"]["runtime_avg"][0].get<double>();
 	dividend -= energy["idle_recorded_neurons_ms"][0].get<double>() *
 	            util["inter_random"]["number_of_neurons_avg"][0].get<double>() *
 	            util["inter_random"]["bioruntime"].get<double>();
@@ -643,12 +642,13 @@ void calculate_coefficients(Json &energy_model)
 	calculate_statistics(measured);
 	calculate_statistics(util);
 
-	power["pre_boot"] =
-	    measured["pre_boot"].get<double>() / 1000.0;  // Joule per millisecond
+	power["pre_boot"] = measured["pre_boot"].get<double>() /
+	                    1000.0;  // Watt to kWatt (multiply with runtime in ms)
 
-	power["idle"] = {measured["idle_avg"][0].get<double>() / 1000.0,
-	                 measured["idle_avg"][1].get<double>() /
-	                     1000.0};  // Joule per microsecond
+	power["idle"] = {
+	    measured["idle_avg"][0].get<double>() / 1000.0,
+	    measured["idle_avg"][1].get<double>() /
+	        1000.0};  // Watt to kWatt (multiply with runtime in ms)
 
 	if (energy_model.find("runtime_normalized") != energy_model.end() &&
 	    energy_model["runtime_normalized"].get<bool>()) {

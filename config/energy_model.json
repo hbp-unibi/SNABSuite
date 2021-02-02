@@ -6,7 +6,7 @@
         },
         "runtime_normalized": true,
         "bench_index": 1,
-        "repeat": 50,
+        "repeat": 20,
         "non_spiking": {
             "#neurons": 100000,
             "runtime": 400000,
@@ -94,30 +94,36 @@
     },
     "genn": {
         "setup": {
+            "timestep":1,
+            "recording_buffer_size":500000
         },
         "bench_index": 1,
-        "repeat": 1,
+        "runtime_normalized": true,
+        "repeat": 20,
         "non_spiking": {
-            "#neurons": 1000,
-            "runtime": 300000,
+            "#neurons": 50000,
+            "runtime": 60000,
             "neuron_params": {
                 "v_thresh": 30
             }
         },
         "just_spiking": {
-            "#neurons": 1000,
-            "runtime": 100000
+            "#neurons": 50000,
+            "runtime": 30000,
+            "neuron_params": {
+                "tau_refrac" : 5
+            }
         },
         "input_OneToOne": {
-            "#neurons": 5000,
-            "runtime": 10000,
-            "#spikes": 500,
+            "#neurons": 50000,
+            "runtime": 50000,
+            "#spikes": 5000,
             "neuron_params": {
                 "v_thresh": 30
             }
         },
         "input_AllToALL": {
-            "#neurons": 1000,
+            "#neurons": 50000,
             "#input_neurons": 1000,
             "runtime": 50000,
             "#spikes": 5000,
@@ -126,9 +132,9 @@
             }
         },
         "input_random": {
-            "#neurons": 1000,
-            "#input_neurons": 1000,
-            "#ConnectionsPerInput": 500,
+            "#neurons": 50000,
+            "#input_neurons": 500,
+            "#ConnectionsPerInput": 100,
             "runtime": 50000,
             "#spikes": 5000,
             "neuron_params": {
@@ -137,26 +143,29 @@
             "weight": 0.0005
         },
         "inter_Single2All": {
-            "#neurons": 1000,
-            "runtime": 100000,
-            "neuron_params_retr": {
-                "v_thresh": 30
-            }
-        },
-        "inter_One2One": {
-            "#neurons": 1000,
+            "#neurons": 50000,
             "runtime": 50000,
             "neuron_params_retr": {
                 "v_thresh": 30
             }
         },
+        "inter_One2One": {
+            "#neurons": 50000,
+            "runtime": 10000,
+            "neuron_params_retr": {
+                "v_thresh": 30
+            }
+        },
         "inter_random": {
-            "runtime": 5000,
-            "#neurons_retr": 1000,
+            "runtime": 10000,
+            "#neurons_retr": 50000,
             "#neurons_max": 100,
             "probability": 0.5,
             "neuron_params_retr": {
                 "v_thresh": 30
+            },
+            "neuron_params_max": {
+                "tau_refrac" : 5
             }
         },
         "stdp": {
@@ -164,9 +173,9 @@
                 "v_thresh": -60
             },
             "neuron_type": "IF_cond_exp",
-            "#spikes": 2500,
-            "#neurons": 1000,
-            "runtime": 50000
+            "#spikes": 10000,
+            "#neurons": 50000,
+            "runtime": 30000
         }
     },
     "spinnaker": {
