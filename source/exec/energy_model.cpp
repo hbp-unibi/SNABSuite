@@ -60,6 +60,9 @@ using cypress::Json;
     }
  * after waitPbFinished()
     std::ofstream("sync_lock2").close();
+
+ * For GeNN: use the same code as for Spikey and STDP just before and after the
+ big for loop in cypress/backend/genn/genn.cpp
  */
 
 std::vector<std::shared_ptr<SNABBase>> snab_vec;
@@ -285,6 +288,69 @@ double number_from_input(double x, std::shared_ptr<Energy::Multimeter> &,
 }
 #endif
 
+void sweep_neurons_runtime(Json &config, Json &setup, std::string short_sim,
+                           std::shared_ptr<Energy::Multimeter> &multi,
+                           bool block, double threshhold)
+{
+	config["non_spiking"]["record_spikes"] = false;
+	auto net = run_snab("OutputFrequencyMultipleNeurons", config["non_spiking"],
+	                    setup);
+	size_t neurons_start = config["non_spiking"]["#neurons"].get<size_t>();
+	double runtime_start = config["non_spiking"]["runtime"].get<double>();
+	std::ofstream file;
+	file.open(short_sim + "_sweep_neurons.csv", std::ofstream::out);
+	if (!file.good()) {
+		throw std::runtime_error("Could not open " + short_sim +
+		                         "_sweep_neurons.csv"
+		                         " to write results");
+	}
+	file << "#neurons, runtime, average power draw" << std::endl;
+	for (size_t n_neurons = neurons_start / 2;
+	     n_neurons <= 10 * neurons_start / 2; n_neurons += neurons_start / 2) {
+		if (multi) {
+			sleep(2);
+			multi->set_block(block);
+			multi->start_recording();
+		}
+		config["non_spiking"]["#neurons"] = n_neurons;
+		auto net = run_snab("OutputFrequencyMultipleNeurons",
+		                    config["non_spiking"], setup);
+		file << n_neurons << ", " << net.runtime().sim_pure;
+		if (multi) {
+			file << ", " << number_from_input(3.0, multi, threshhold);
+		}
+		file << std::endl;
+	}
+	file.close();
+	config["non_spiking"]["#neurons"] = neurons_start;
+
+	file.open(short_sim + "_sweep_runtime.csv", std::ofstream::out);
+	if (!file.good()) {
+		throw std::runtime_error("Could not open " + short_sim +
+		                         "_sweep_runtime.csv"
+		                         " to write results");
+	}
+	file << "#bio_runtime, runtime" << std::endl;
+	for (size_t runtime = runtime_start / 2; runtime <= 10 * runtime_start / 2;
+	     runtime += runtime_start / 2) {
+		if (multi) {
+			sleep(2);
+			multi->set_block(block);
+			multi->start_recording();
+		}
+		config["non_spiking"]["runtime"] = runtime;
+		auto net = run_snab("OutputFrequencyMultipleNeurons",
+		                    config["non_spiking"], setup);
+		file << runtime << ", " << net.runtime().sim_pure;
+		if (multi) {
+			file << ", " << number_from_input(3.0, multi, threshhold);
+		}
+		file << std::endl;
+	}
+	file.close();
+	exit(0);
+}
+
 inline void add(Json &json, double value) { json.emplace_back(value); }
 
 int main(int argc, const char *argv[])
@@ -365,6 +431,7 @@ int main(int argc, const char *argv[])
 		energy_model["runtime_normalized"] = runtime_normalized;
 	}
 #endif
+	// sweep_neurons_runtime(config, setup, short_sim, multi, block, threshhold);
 
 	bool strict_check = true;
 	if (config.find("strict_check") != config.end()) {
