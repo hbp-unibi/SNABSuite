@@ -293,8 +293,6 @@ void sweep_neurons_runtime(Json &config, Json &setup, std::string short_sim,
                            bool block, double threshhold)
 {
 	config["non_spiking"]["record_spikes"] = false;
-	auto net = run_snab("OutputFrequencyMultipleNeurons", config["non_spiking"],
-	                    setup);
 	size_t neurons_start = config["non_spiking"]["#neurons"].get<size_t>();
 	double runtime_start = config["non_spiking"]["runtime"].get<double>();
 	std::ofstream file;
