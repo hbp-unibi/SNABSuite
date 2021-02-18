@@ -402,6 +402,7 @@ int main(int argc, const char *argv[])
 	double threshhold = 0.0;
 	bool block = false;
 	bool runtime_normalized = false;
+	bool single_neuron_as_idle = false;
 	std::shared_ptr<Energy::Multimeter> multi;
 #ifndef TESTING
 	if (config.find("um25c") != config.end()) {
@@ -428,8 +429,12 @@ int main(int argc, const char *argv[])
 		runtime_normalized = config["runtime_normalized"].get<bool>();
 		energy_model["runtime_normalized"] = runtime_normalized;
 	}
+	if (config.find("single_neuron_as_idle") != config.end()) {
+		single_neuron_as_idle = config["single_neuron_as_idle"].get<bool>();
+	}
 #endif
-	// sweep_neurons_runtime(config, setup, short_sim, multi, block, threshhold);
+	// sweep_neurons_runtime(config, setup, short_sim, multi, block,
+	// threshhold);
 
 	bool strict_check = true;
 	if (config.find("strict_check") != config.end()) {
@@ -514,11 +519,28 @@ int main(int argc, const char *argv[])
 
 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			std::cout << "Measuring idle power..." << std::endl;
-			if (multi) {
-				sleep(2);
-				multi->set_block(false);
-				multi->start_recording();
-				sleep(20.0);
+			if (!single_neuron_as_idle) {
+				if (multi) {
+					sleep(2);
+					multi->set_block(false);
+					multi->start_recording();
+					sleep(20.0);
+				}
+			}
+			else {
+				size_t neurons_start =
+				    config["non_spiking"]["#neurons"].get<size_t>();
+				config["non_spiking"]["#neurons"] = 1;
+
+				if (multi) {
+					sleep(2);
+					multi->set_block(block);
+					multi->start_recording();
+				}
+				config["non_spiking"]["record_spikes"] = false;
+				net = run_snab("OutputFrequencyMultipleNeurons",
+				               config["non_spiking"], setup);
+				config["non_spiking"]["#neurons"] = neurons_start;
 			}
 			add(measured["idle"], number_from_input(1.0, multi, false));
 			global_logger().info(
