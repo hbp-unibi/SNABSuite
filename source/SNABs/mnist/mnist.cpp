@@ -116,9 +116,9 @@ cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
 	}
 
 	m_label_pops.clear();
+	m_networks.clear();
+	m_all_pops.clear();
 	if (m_batch_parallel) {
-		m_networks.clear();
-		m_all_pops.clear();
 		for (auto &i : m_batch_data) {
 			mnist_helper::create_spike_source(netw, i);
 			create_deep_network(netw, m_max_weight);
@@ -133,7 +133,6 @@ cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
 		}
 	}
 	else {
-		m_networks.clear();
 		for (auto &i : m_batch_data) {
 			m_networks.push_back(cypress::Network());
 			mnist_helper::create_spike_source(m_networks.back(), i);
@@ -222,13 +221,25 @@ std::vector<std::array<cypress::Real, 4>> MNIST_BASE::evaluate()
 		    m_backend);
 
 		spikes.clear();
-		auto pop2 = m_netw.populations()[0];
-		for (size_t i = 0; i < pop2.size(); i++) {
-			spikes.push_back(pop2[i].signals().data(0));
+
+		if (m_batch_parallel && batch == 0) {
+			auto pop2 = m_netw.populations()[0];
+			for (size_t i = 0; i < pop2.size(); i++) {
+				spikes.push_back(pop2[i].signals().data(0));
+			}
+			Utilities::write_vector2_to_csv(
+			    spikes, _debug_filename("spikes_input_" +
+			                            std::to_string(batch) + ".csv"));
 		}
-		Utilities::write_vector2_to_csv(
-		    spikes,
-		    _debug_filename("spikes_input2" + std::to_string(batch) + ".csv"));
+		else if (!m_batch_parallel) {
+			auto pop2 = m_networks[batch].populations()[0];
+			for (size_t i = 0; i < pop2.size(); i++) {
+				spikes.push_back(pop2[i].signals().data(0));
+			}
+			Utilities::write_vector2_to_csv(
+			    spikes, _debug_filename("spikes_input_" +
+			                            std::to_string(batch) + ".csv"));
+		}
 #endif
 	}
 	if (m_count_spikes) {
