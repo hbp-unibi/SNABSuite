@@ -58,14 +58,12 @@ cypress::Network &BiNAM::build_netw(cypress::Network &netw)
 
 void BiNAM::run_netw(cypress::Network &netw)
 {
-	std::thread spiking_network([&]() mutable {
-		cypress::PowerManagementBackend pwbackend(
-		    cypress::Network::make_backend(m_backend));
-		netw.run(pwbackend);
-	});
+
 	std::thread recall([&]() mutable { m_sp_binam->recall(); });
+	cypress::PowerManagementBackend pwbackend(
+	    cypress::Network::make_backend(m_backend));
+	netw.run(pwbackend);
 	recall.join();
-	spiking_network.join();
 }
 
 std::vector<std::array<cypress::Real, 4>> BiNAM::evaluate()
