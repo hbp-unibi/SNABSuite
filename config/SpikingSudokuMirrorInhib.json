@@ -38,6 +38,50 @@
         "bin_size": 20,
         "sudoku": "_deps/sudoku_rep-src/sudokus/2x2/Sudoku_0.json"
     },
+    "spinnaker": {
+        "setup": {
+            "timestep": 0.1,
+            "time_scale_factor": 30,
+            "neurons_per_core": 200
+        },
+        "neuron_params": {
+            "e_rev_I": -100,
+            "v_rest": -70,
+            "v_reset": -75,
+            "v_thresh": -60,
+            "tau_refrac": 2,
+            "tau_m": 8
+        },
+        "neuron_params_inhib": {
+            "e_rev_I": -100,
+            "v_rest": -70,
+            "v_reset": -75,
+            "v_thresh": -60,
+            "tau_refrac": 1,
+            "tau_m": 12
+        },
+        "population": {
+            "number": 2,
+            "weight_exh": 0.26,
+            "weight_exh_self": 0.035,
+            "weight_inh": -0.05,
+            "inhib_number": 1,
+            "self_exc_number": 1
+        },
+        "noise": {
+            "number": 2,
+            "weight_rand": 0.085,
+            "probability": 1,
+            "noise_rate": 80
+        },
+        "trigger": {
+            "weight": 0.9
+        },
+        "start": 0,
+        "duration": 5000,
+        "bin_size": 20,
+        "sudoku": "_deps/sudoku_rep-src/sudokus/2x2/Sudoku_0.json"
+    },
     "nmpm1": {
         "valid": false
     },

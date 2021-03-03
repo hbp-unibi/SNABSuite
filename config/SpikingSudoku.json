@@ -14,19 +14,13 @@
         },
         "population": {
             "number": 2,
-            "weight_exh": [
-                0.027,
-                0.04
-            ],
+            "weight_exh": [0.027,0.04],
             "weight_inh": -0.16,
             "fan_in_exh": 2,
             "fan_in_inh": 2
         },
         "noise": {
-            "weight_rand": [
-                0.16,
-                0.192
-            ],
+            "weight_rand": [0.16,0.192],
             "noise_rate": 50
         },
         "trigger": {
@@ -36,20 +30,53 @@
         },
         "delay": 0.1,
         "start": 0,
-        "duration": [
-            5000,
-            10000
-        ],
+        "duration": [5000,10000],
         "bin_size": 20,
-        "sudoku": [
-            "_deps/sudoku_rep-src/sudokus/2x2/Sudoku_0.json",
-            "_deps/sudoku_rep-src/sudokus/3x3/Sudoku_0.json"
-        ]
+        "sudoku": ["_deps/sudoku_rep-src/sudokus/2x2/Sudoku_0.json","_deps/sudoku_rep-src/sudokus/3x3/Sudoku_0.json"]
+    },
+    "spinnaker":{
+        "invalid":[true,true,true,false],
+        "setup": {
+            "timestep": 0.1
+        },
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -100,
+            "tau_syn_E": 2,
+            "tau_syn_I": 2,
+            "v_rest": -70,
+            "v_reset": -75,
+            "v_thresh": -60,
+            "tau_refrac": 2,
+            "tau_m": 10,
+            "cm": 0.2
+        },
+        "population": {
+            "number": 2,
+            "weight_exh": [0,0,0,0.027],
+            "weight_inh": -0.16,
+            "fan_in_exh": 2,
+            "fan_in_inh": 2
+        },
+        "noise": {
+            "weight_rand": [0,0,0,0.16],
+            "noise_rate": 50
+        },
+        "trigger": {
+            "number": 2,
+            "weight": 1,
+            "trigger_rate": 200
+        },
+        "delay": 0.1,
+        "start": 0,
+        "duration": [0,0,0,5000],
+        "bin_size": 20,
+        "sudoku": ["","","","_deps/sudoku_rep-src/sudokus/2x2/Sudoku_0.json"]
     },
     "nmpm1": {
-        "valid": false
+        "invalid": true
     },
     "spikey": {
-        "valid": false
+        "invalid": true
     }
 }
