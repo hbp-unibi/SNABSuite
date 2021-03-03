@@ -1,5 +1,51 @@
 {
-    "default": {
+    "nest": {
+        "data": {
+            "n_bits_in": [
+                25,
+                100,
+                200
+            ],
+            "n_bits_out": [
+                25,
+                100,
+                200
+            ],
+            "n_ones_in": 4,
+            "n_ones_out": 4
+        },
+        "network": {
+            "params": {
+                "e_rev_E": 0,
+                "v_rest": -70,
+                "v_reset": -80,
+                "v_thresh": -64.7,
+                "tau_syn_E": 2,
+                "tau_refrac": 0,
+                "tau_m": 10,
+                "cm": 0.2
+            },
+            "neuron_type": "IF_cond_exp",
+            "weight": 0.001,
+            "input_burst_size": 1,
+            "time_window": 100,
+            "isi": 2,
+            "sigma_t": 2,
+            "sigma_offs": 0,
+            "p0": 0,
+            "p1": 0,
+            "output_burst_size": 1,
+            "general_offset": 100,
+            "multiplicity": 4
+        },
+        "data_generator": {
+            "seed": 1234,
+            "random": 1,
+            "balanced": 1,
+            "unique": 1
+        }
+    },
+    "spinnaker": {
         "data": {
             "n_bits_in": [
                 400,
