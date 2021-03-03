@@ -16,13 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "snab_base.hpp"
+
 #include <sys/stat.h>
 
 #include <algorithm>
 #include <cypress/cypress.hpp>
 #include <string>
 
-#include "snab_base.hpp"
 #include "util/read_json.hpp"
 #include "util/utilities.hpp"
 
@@ -54,16 +55,18 @@ SNABBase::SNABBase(std::string name, std::string backend,
 
 void SNABBase::check_config(std::vector<std::string> required_parameters_vec)
 {
-	bool required_params = check_json_for_parameters(
-	    required_parameters_vec, m_config_file, m_snab_name);
-
 	// Check wether benchmark is labeled as invalid
-	if ((m_config_file.find("invalid") == m_config_file.end() ||
-	     bool(m_config_file["invalid"]) == false) &&
-	    required_params) {
+	if (!((m_config_file.find("invalid") == m_config_file.end() ||
+	       bool(m_config_file["invalid"]) == false))) {
+		m_valid = false;
+		return;
+	}
+	if (check_json_for_parameters(required_parameters_vec, m_config_file,
+	                              m_snab_name)) {
 		m_valid = true;
 	}
 	else {
+		m_valid = false;
 		return;
 	}
 

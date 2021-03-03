@@ -1,11 +1,20 @@
 {
     "default": {
         "data": {
-            "n_bits_in": [1600,10000],
-            "n_bits_out": [1600,1600],
+            "n_bits_in": [
+                1600,
+                10000
+            ],
+            "n_bits_out": [
+                1600,
+                1600
+            ],
             "n_ones_in": 4,
             "n_ones_out": 4,
-            "n_samples": [113648,710299]
+            "n_samples": [
+                113648,
+                710299
+            ]
         },
         "network": {
             "params": {
@@ -40,11 +49,20 @@
     },
     "spikey": {
         "data": {
-            "n_bits_in": [128,256],
-            "n_bits_out": [192,384],
+            "n_bits_in": [
+                128,
+                256
+            ],
+            "n_bits_out": [
+                192,
+                384
+            ],
             "n_ones_in": 4,
             "n_ones_out": 4,
-            "n_samples": [1215,4619]
+            "n_samples": [
+                1215,
+                4619
+            ]
         },
         "network": {
             "params": {

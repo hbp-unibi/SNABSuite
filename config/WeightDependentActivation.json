@@ -16,7 +16,20 @@
         "step_size": 0.01,
         "#neurons": 50,
         "isi": 50,
-        "expected_output": [[0,1,2,3,4,4,4,5,5,5]]
+        "expected_output": [
+            [
+                0,
+                1,
+                2,
+                3,
+                4,
+                4,
+                4,
+                5,
+                5,
+                5
+            ]
+        ]
     },
     "spikey": {
         "invalid": true
@@ -38,7 +51,20 @@
         "step_size": 0.01,
         "#neurons": 50,
         "isi": 50,
-        "expected_output": [[0,1,2,3,4,4,4,5,5,5]]
+        "expected_output": [
+            [
+                0,
+                1,
+                2,
+                3,
+                4,
+                4,
+                4,
+                5,
+                5,
+                5
+            ]
+        ]
     },
     "nmpm1": {
         "invalid": true

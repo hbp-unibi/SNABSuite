@@ -14,7 +14,12 @@
             "cm": 0.2
         },
         "images": 10000,
-        "batchsize": [10000,5000,834,70],
+        "batchsize": [
+            10000,
+            5000,
+            834,
+            70
+        ],
         "duration": 500,
         "max_freq": 120,
         "pause": 50,
@@ -45,7 +50,10 @@
             "cm": 0.2
         },
         "images": 10000,
-        "batchsize": [10000,200],
+        "batchsize": [
+            10000,
+            200
+        ],
         "duration": 500,
         "max_freq": 120,
         "pause": 50,
@@ -75,7 +83,12 @@
             "cm": 0.2
         },
         "images": 10000,
-        "batchsize": [10000,5000,834,70],
+        "batchsize": [
+            10000,
+            5000,
+            834,
+            70
+        ],
         "duration": 500,
         "max_freq": 120,
         "pause": 50,
