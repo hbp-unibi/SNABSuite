@@ -18,27 +18,27 @@
         "#samples_test": 100,
         "#repeat_test": 1,
         "weight": 0.02375,
-        "bias_weight" : 0.015,
-        "bias_weight_inh" : -0.041,
+        "bias_weight": 0.015,
+        "bias_weight_inh": -0.041,
         "response_time": 100,
         "min_spike_interval": 2,
-        "random_bias":{
+        "random_bias": {
             "rate": 200,
-            "weight": 0.010,
-            "weight_inh": -0.010,
+            "weight": 0.01,
+            "weight_inh": -0.01,
             "std_dev": 0.015
         },
-        "random_bias_spikes":{
+        "random_bias_spikes": {
             "rate": 150,
             "weight": 0.0015,
             "weight_inh": -0.015,
             "std_dev": 100
         },
-        "random_thresh_test": { 
-            "mean" : -50.0,
+        "random_thresh_test": {
+            "mean": -50.0,
             "std_dev": 10
         },
-        "setup":{
+        "setup": {
             "timestep": 1.0
         }
     },
@@ -57,11 +57,11 @@
         "#samples_test": 100,
         "#repeat_test": 1,
         "weight": 0.015,
-        "bias_weight" : 0.015,
-        "bias_weight_inh" : -0.06,
+        "bias_weight": 0.015,
+        "bias_weight_inh": -0.06,
         "response_time": 300,
         "min_spike_interval": 10,
-        "separate_inh":true,
+        "separate_inh": true,
         "setup": {
             "calibIcb": false
         }

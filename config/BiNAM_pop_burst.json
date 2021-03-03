@@ -1,11 +1,20 @@
 {
     "default": {
         "data": {
-            "n_bits_in": [400,2500],
-            "n_bits_out": [400,400],
+            "n_bits_in": [
+                400,
+                2500
+            ],
+            "n_bits_out": [
+                400,
+                400
+            ],
             "n_ones_in": 4,
             "n_ones_out": 4,
-            "n_samples": [7499,46866]
+            "n_samples": [
+                7499,
+                46866
+            ]
         },
         "network": {
             "params": {
@@ -40,11 +49,20 @@
     },
     "spikey": {
         "data": {
-            "n_bits_in": [32,64],
-            "n_bits_out": [48,96],
+            "n_bits_in": [
+                32,
+                64
+            ],
+            "n_bits_out": [
+                48,
+                96
+            ],
             "n_ones_in": 4,
             "n_ones_out": 4,
-            "n_samples": [88,324]
+            "n_samples": [
+                88,
+                324
+            ]
         },
         "network": {
             "params": {
@@ -52,7 +70,7 @@
                 "v_reset": -80,
                 "v_thresh": -55,
                 "tau_refrac": 0,
-                "g_leak": 0.040
+                "g_leak": 0.04
             },
             "neuron_type": "IfFacetsHardware1",
             "weight": 0.003,
@@ -65,7 +83,7 @@
             "p1": 0,
             "output_burst_size": 1,
             "general_offset": 100,
-            "multiplicity" : 4
+            "multiplicity": 4
         },
         "data_generator": {
             "seed": 1234,

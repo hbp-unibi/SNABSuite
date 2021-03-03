@@ -1,4 +1,29 @@
 {
+    "genn": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -80,
+            "v_rest": -70,
+            "v_reset": -80,
+            "v_thresh": -60,
+            "tau_syn_E": 2,
+            "tau_refrac": 1,
+            "tau_m": 1,
+            "cm": 0.2
+        },
+        "num_neurons_pop": 10,
+        "num_source_neurons": 10,
+        "num_inhibitory_neurons": 10,
+        "weight_inp": 0.011,
+        "weight_self": 0.0068,
+        "weight_to_inh": 0.005,
+        "weight_from_inh": -0.005,
+        "prob_inp": 0.8,
+        "prob_self": 0.8,
+        "prob_to_inh": 0.8,
+        "firing_rate": 80
+    },
     "nest": {
         "neuron_type": "IF_cond_exp",
         "neuron_params": {

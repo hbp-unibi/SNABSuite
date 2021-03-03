@@ -1,8 +1,8 @@
 {
     "genn_gpu": {
         "setup": {
-            "timestep":1,
-            "recording_buffer_size":500000
+            "timestep": 1,
+            "recording_buffer_size": 500000
         },
         "runtime_normalized": true,
         "bench_index": 1,
@@ -12,14 +12,14 @@
             "runtime": 400000,
             "neuron_params": {
                 "v_thresh": 30,
-                "tau_refrac" : 30
+                "tau_refrac": 30
             }
         },
         "just_spiking": {
             "#neurons": 100000,
             "runtime": 400000,
             "neuron_params": {
-                "tau_refrac" : 30
+                "tau_refrac": 30
             }
         },
         "input_OneToOne": {
@@ -56,7 +56,7 @@
             "neuron_params_retr": {
                 "v_thresh": 30
             },
-            "neuron_params_max" : {
+            "neuron_params_max": {
                 "tau_refrac": 10
             }
         },
@@ -66,7 +66,7 @@
             "neuron_params_retr": {
                 "v_thresh": 30
             },
-            "neuron_params_max" : { 
+            "neuron_params_max": {
                 "tau_refrac": 20
             }
         },
@@ -78,7 +78,7 @@
             "neuron_params_retr": {
                 "v_thresh": 30
             },
-            "neuron_params_max" : {
+            "neuron_params_max": {
                 "tau_refrac": 10
             }
         },
@@ -94,8 +94,8 @@
     },
     "genn": {
         "setup": {
-            "timestep":1,
-            "recording_buffer_size":500000
+            "timestep": 1,
+            "recording_buffer_size": 500000
         },
         "bench_index": 1,
         "runtime_normalized": true,
@@ -111,7 +111,7 @@
             "#neurons": 50000,
             "runtime": 30000,
             "neuron_params": {
-                "tau_refrac" : 5
+                "tau_refrac": 5
             }
         },
         "input_OneToOne": {
@@ -165,7 +165,7 @@
                 "v_thresh": 30
             },
             "neuron_params_max": {
-                "tau_refrac" : 5
+                "tau_refrac": 5
             }
         },
         "stdp": {
@@ -202,7 +202,7 @@
             "#neurons": 5000,
             "runtime": 10000,
             "#spikes": 230,
-            "poisson":true,
+            "poisson": true,
             "weight": 0.0001,
             "neuron_params": {
                 "v_thresh": 30
@@ -213,7 +213,7 @@
             "#input_neurons": 30,
             "runtime": 20000,
             "#spikes": 4500,
-            "poisson":true,
+            "poisson": true,
             "weight": 0.0001,
             "neuron_params": {
                 "v_thresh": 30
@@ -225,7 +225,7 @@
             "#ConnectionsPerInput": 255,
             "runtime": 20000,
             "#spikes": 20000,
-            "poisson":true,
+            "poisson": true,
             "weight": 0.0001,
             "neuron_params": {
                 "v_thresh": 30
@@ -244,8 +244,8 @@
             "neuron_params_retr": {
                 "v_thresh": 30
             },
-            "neuron_params_max" : {
-                "tau_refrac" : 3
+            "neuron_params_max": {
+                "tau_refrac": 3
             }
         },
         "inter_random": {
@@ -256,8 +256,8 @@
             "neuron_params_retr": {
                 "v_thresh": 30
             },
-            "neuron_params_max" : {
-                "tau_refrac" : 1
+            "neuron_params_max": {
+                "tau_refrac": 1
             }
         },
         "stdp": {
@@ -277,7 +277,7 @@
         "fluke_28x": "/dev/ttyUSB0",
         "fluke_28x_v": 5,
         "threshhold": 0.0,
-        "strict_check" : false,
+        "strict_check": false,
         "bench_index": 1,
         "repeat": 20,
         "setup": {
@@ -295,7 +295,7 @@
         "just_spiking": {
             "runtime": 1500000,
             "neuron_params": {
-                "tau_refrac":1,
+                "tau_refrac": 1,
                 "tau_m": 7
             }
         },
@@ -303,7 +303,7 @@
             "#neurons": 96,
             "runtime": 1500000,
             "#spikes": 230000,
-            "poisson":true,
+            "poisson": true,
             "weight": 0.001,
             "neuron_params": {
                 "v_rest": -80,
@@ -314,7 +314,7 @@
             "#input_neurons": 32,
             "runtime": 1500000,
             "#spikes": 230000,
-            "poisson":true,
+            "poisson": true,
             "weight": 0.001,
             "neuron_params": {
                 "v_rest": -80,
@@ -326,9 +326,9 @@
         "input_random": {
             "runtime": 1500000,
             "#spikes": 230000,
-            "poisson":true,
+            "poisson": true,
             "weight": 0.001,
-            "#ConnectionsPerInput" : 32,
+            "#ConnectionsPerInput": 32,
             "#neurons": 192,
             "#input_neurons": 66,
             "neuron_params": {
@@ -342,10 +342,10 @@
                 "v_thresh": -55,
                 "v_rest": -80,
                 "v_reset": -80,
-                "tau_refrac" : 5
+                "tau_refrac": 5
             },
-            "neuron_params_max" : {
-                "tau_refrac" : 0.1
+            "neuron_params_max": {
+                "tau_refrac": 0.1
             }
         },
         "inter_One2One": {
@@ -354,10 +354,10 @@
                 "v_thresh": -55,
                 "v_rest": -80,
                 "v_reset": -80,
-                "tau_refrac" : 10
+                "tau_refrac": 10
             },
-            "neuron_params_max" : {
-                "tau_refrac" : 10
+            "neuron_params_max": {
+                "tau_refrac": 10
             }
         },
         "inter_random": {
@@ -367,10 +367,10 @@
                 "v_thresh": -55,
                 "v_rest": -80,
                 "v_reset": -80,
-                "tau_refrac" : 10
+                "tau_refrac": 10
             },
-            "neuron_params_max" : {
-                "tau_refrac" : 10
+            "neuron_params_max": {
+                "tau_refrac": 10
             }
         },
         "stdp": {

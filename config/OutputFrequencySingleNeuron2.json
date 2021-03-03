@@ -12,7 +12,12 @@
             "tau_m": 10,
             "cm": 0.2
         },
-        "#neurons": [255,4080,16320,189700]
+        "#neurons": [
+            255,
+            4080,
+            16320,
+            189700
+        ]
     },
     "spikey": {
         "invalid": true,
@@ -28,7 +33,10 @@
             "v_reset": -80,
             "e_rev_I": -80
         },
-        "#neurons": [192,384]
+        "#neurons": [
+            192,
+            384
+        ]
     },
     "genn": {
         "invalid": true
@@ -45,7 +53,11 @@
             "tau_m": 1,
             "cm": 0.2
         },
-        "#neurons": [100,1000,10000]
+        "#neurons": [
+            100,
+            1000,
+            10000
+        ]
     },
     "nmpm1": {
         "neuron_type": "IF_cond_exp",
@@ -53,7 +65,24 @@
             "calib_path": "/wang/data/calibration/brainscales/current",
             "neuron_size": 4,
             "wafer": 33,
-            "hicann": [[372],[372,360],[372,373,375,360,361,362,363]]
+            "hicann": [
+                [
+                    372
+                ],
+                [
+                    372,
+                    360
+                ],
+                [
+                    372,
+                    373,
+                    375,
+                    360,
+                    361,
+                    362,
+                    363
+                ]
+            ]
         },
         "neuron_params": {
             "e_rev_E": 0,
@@ -65,6 +94,10 @@
             "tau_m": 0.1,
             "cm": 0.2
         },
-        "#neurons": [103,206,721]
+        "#neurons": [
+            103,
+            206,
+            721
+        ]
     }
 }

@@ -1,4 +1,17 @@
 {
+    "genn": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "v_rest": -30,
+            "v_reset": -60,
+            "v_thresh": -64.7,
+            "tau_syn_E": 2,
+            "tau_refrac": 0,
+            "tau_m": 10,
+            "cm": 0.2
+        }
+    },
     "spinnaker": {
         "neuron_type": "IF_cond_exp",
         "neuron_params": {

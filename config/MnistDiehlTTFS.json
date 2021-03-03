@@ -14,7 +14,11 @@
             "cm": 0.2
         },
         "images": 10000,
-        "batchsize": [10000,1000,100],
+        "batchsize": [
+            10000,
+            1000,
+            100
+        ],
         "duration": 7,
         "max_freq": 0,
         "pause": 40,
@@ -47,7 +51,11 @@
             "cm": 0.2
         },
         "images": 10000,
-        "batchsize": [10000,1000,100],
+        "batchsize": [
+            10000,
+            1000,
+            100
+        ],
         "duration": 7,
         "max_freq": 0,
         "pause": 40,
