@@ -10,11 +10,7 @@
                 400
             ],
             "n_ones_in": 4,
-            "n_ones_out": 4,
-            "n_samples": [
-                7499,
-                46866
-            ]
+            "n_ones_out": 4
         },
         "network": {
             "params": {
@@ -58,11 +54,7 @@
                 96
             ],
             "n_ones_in": 4,
-            "n_ones_out": 4,
-            "n_samples": [
-                88,
-                324
-            ]
+            "n_ones_out": 4
         },
         "network": {
             "params": {

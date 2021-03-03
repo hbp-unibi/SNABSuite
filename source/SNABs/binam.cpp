@@ -44,6 +44,16 @@ BiNAM::BiNAM(const std::string backend, size_t bench_index, std::string name)
 }
 cypress::Network &BiNAM::build_netw(cypress::Network &netw)
 {
+	if (m_config_file["data"].count("n_samples") == 0) {
+		auto params = nam::DataParameters(m_config_file["data"]);
+		m_config_file["data"]["n_samples"] = params.samples();
+		global_logger().info(
+		    "SNABSuite",
+		    "Train BiNAM using " +
+		        std::to_string(
+		            m_config_file["data"]["n_samples"].get<size_t>()) +
+		        " Samples.");
+	}
 #if SNAB_DEBUG
 	m_sp_binam =
 	    std::make_shared<nam::SpikingBinam>(m_config_file, std::cout, false);
