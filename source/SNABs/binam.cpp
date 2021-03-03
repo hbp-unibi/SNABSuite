@@ -37,9 +37,9 @@ BiNAM::BiNAM(const std::string backend, size_t bench_index, std::string name)
                {"Stored Information", "Relative Information", "False Postives",
                 "False Negatives"},
                {"quality", "qualtiv", "quality", "quality"},
-               {"bits?", "", "", ""}, {"bits?", "", "", ""},
-               {"network", "data", "data_generator"},
-               bench_index)  // TODO
+               {"Information", "Information normed", "", ""},
+               {"bits", "", "", ""}, {"network", "data", "data_generator"},
+               bench_index)
 {
 }
 cypress::Network &BiNAM::build_netw(cypress::Network &netw)
