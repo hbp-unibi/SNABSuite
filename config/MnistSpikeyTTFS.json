@@ -62,7 +62,6 @@
         }
     },
     "spinnaker": {
-        "invalid": true,
         "neuron_type": "IF_cond_exp",
         "neuron_params": {
             "e_rev_E": 0,
@@ -72,7 +71,7 @@
             "v_rest": -65,
             "v_reset": -75,
             "v_thresh": -55,
-            "tau_refrac": 0,
+            "tau_refrac":10,
             "tau_m": 20,
             "cm": 0.2
         },
@@ -90,13 +89,15 @@
         "scaled_image": true,
         "setup": {
             "timestep": 1
-        }
+        },
+        "activity_based_scaling": 97,
+        "ttfs": true
     },
     "spikey": {
         "neuron_type": "IfFacetsHardware1",
         "neuron_params": {
-            "tau_m": 13,
-            "tau_refrac": 3,
+            "tau_m": 19,
+            "tau_refrac": 10,
             "v_rest": -80,
             "v_thresh": -70,
             "v_reset": -80,
@@ -107,18 +108,18 @@
             "mappingOffset": 0
         },
         "images": 10000,
-        "batchsize": 10000,
-        "duration": 11,
+        "batchsize": 300,
+        "duration": 13,
         "max_freq": 0,
-        "pause": 50,
+        "pause": 40,
         "poisson": false,
-        "max_weight": 0.015,
+        "max_weight": 0.016,
         "train_data": false,
         "batch_parallel": false,
         "count_spikes": false,
         "dnn_file": "networks/netw_spikey.msgpack",
         "scaled_image": true,
-        "activity_based_scaling": 96,
+        "activity_based_scaling": 99,
         "ttfs": true
     },
     "nmpm1": {
