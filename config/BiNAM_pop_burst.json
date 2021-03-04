@@ -36,7 +36,12 @@
             "p1": 0,
             "output_burst_size": 1,
             "general_offset": 100,
-            "multiplicity": 4
+            "multiplicity": 4,
+            "n_samples_recall": [
+                0,
+                500,
+                1000
+            ]
         },
         "data_generator": {
             "seed": 1234,

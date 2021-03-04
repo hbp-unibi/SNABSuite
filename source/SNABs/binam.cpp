@@ -34,10 +34,10 @@ BiNAM::BiNAM(const std::string backend, size_t bench_index)
 
 BiNAM::BiNAM(const std::string backend, size_t bench_index, std::string name)
     : SNABBase(name, backend,
-               {"Stored Information", "Relative Information", "False Postives",
-                "False Negatives"},
+               {"Stored Information per sample", "Relative Information",
+                "Normed False Positives", "Normed False Negatives"},
                {"quality", "qualtiv", "quality", "quality"},
-               {"Information", "Information normed", "", ""},
+               {"Information", "Information normed", "fp", "fn"},
                {"bits", "", "", ""}, {"network", "data", "data_generator"},
                bench_index)
 {
@@ -92,15 +92,34 @@ std::vector<std::array<cypress::Real, 4>> BiNAM::evaluate()
 	ofs.open(_debug_filename("matrices.csv"));
 	m_sp_binam->get_BiNAM()->print(ofs);
 	ofs.close();
-
 #endif
+
+	auto rec_samples = Real(
+	    m_config_file["data"]["n_samples"].get<size_t>());  // Samples to train
+	if (m_config_file["network"].count("n_samples_recall") > 0) {
+		size_t tmp = m_config_file["network"]["n_samples_recall"].get<size_t>();
+		if (tmp > 0)
+			rec_samples = tmp;
+	}
 	auto res = m_sp_binam->evaluate_res();
-	return {
-	    std::array<Real, 4>({Real(std::get<1>(res).Info), NaN(), NaN(), NaN()}),
-	    std::array<Real, 4>({std::get<1>(res).Info / std::get<0>(res).Info,
-	                         NaN(), NaN(), NaN()}),
-	    std::array<Real, 4>({std::get<1>(res).fp, NaN(), NaN(), NaN()}),
-	    std::array<Real, 4>({std::get<1>(res).fn, NaN(), NaN(), NaN()})};
+	Real d = m_config_file["data"]["n_ones_out"].get<size_t>();
+	Real n = m_config_file["data"]["n_bits_out"].get<size_t>();
+	Real norm_fp = 0, norm_fn = 0;
+	if (std::get<1>(res).fp <= std::get<0>(res).fp) {
+		norm_fp = (std::get<1>(res).fp / std::get<0>(res).fp) - 1.0;
+	}
+	else {
+		norm_fp = (std::get<1>(res).fp - std::get<0>(res).fp) / rec_samples /
+		          (n - d - (std::get<0>(res).fp / rec_samples));
+	}
+	norm_fn = std::get<1>(res).fn / rec_samples / d;
+
+	return {std::array<Real, 4>({Real(std::get<1>(res).Info) / rec_samples,
+	                             NaN(), NaN(), NaN()}),
+	        std::array<Real, 4>({std::get<1>(res).Info / std::get<0>(res).Info,
+	                             NaN(), NaN(), NaN()}),
+	        std::array<Real, 4>({norm_fp, NaN(), NaN(), NaN()}),
+	        std::array<Real, 4>({norm_fn, NaN(), NaN(), NaN()})};
 }
 
 }  // namespace SNAB
