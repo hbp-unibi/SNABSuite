@@ -83,7 +83,7 @@
         "sudoku": "_deps/sudoku_rep-src/sudokus/2x2/Sudoku_0.json"
     },
     "nmpm1": {
-        "valid": false
+        "invalid": true
     },
     "spikey": {
         "neuron_params": {
@@ -122,6 +122,6 @@
         "start": 0,
         "duration": 30000,
         "bin_size": 30,
-        "sudoku": "_deps/sudoku-src/sudokus/2x2/Sudoku_0.json"
+        "sudoku": "_deps/sudoku_rep-src/sudokus/2x2/Sudoku_0.json"
     }
 }

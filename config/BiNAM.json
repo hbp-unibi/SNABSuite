@@ -54,15 +54,15 @@
         "data": {
             "n_bits_in": [
                 250,
-                1000,
-                1600,
-                10000
+                4000,
+                4000,
+                1000
             ],
             "n_bits_out": [
                 250,
                 4000,
-                1600,
-                1600
+                15810,
+                180000
             ],
             "n_ones_in": 4,
             "n_ones_out": 4
@@ -89,7 +89,13 @@
             "p1": 0,
             "output_burst_size": 1,
             "general_offset": 10,
-            "multiplicity": 1
+            "multiplicity": 1,
+            "n_samples_recall": [
+                250,
+                500,
+                500,
+                500
+            ]
         },
         "data_generator": {
             "seed": 1234,

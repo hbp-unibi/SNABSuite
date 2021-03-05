@@ -97,9 +97,9 @@
         ]
     },
     "nmpm1": {
-        "valid": false
+        "invalid": true
     },
     "spikey": {
-        "valid": false
+        "invalid": true
     }
 }

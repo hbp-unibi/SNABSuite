@@ -53,12 +53,16 @@
     "spinnaker": {
         "data": {
             "n_bits_in": [
-                400,
-                2500
+                62,
+                1000,
+                1000,
+                1000
             ],
             "n_bits_out": [
+                62,
                 400,
-                400
+                3950,
+                45000
             ],
             "n_ones_in": 4,
             "n_ones_out": 4
@@ -85,7 +89,13 @@
             "p1": 0,
             "output_burst_size": 1,
             "general_offset": 100,
-            "multiplicity": 4
+            "multiplicity": 4,
+            "n_samples_recall": [
+                0,
+                250,
+                500,
+                500
+            ]
         },
         "data_generator": {
             "seed": 1234,
