@@ -275,12 +275,14 @@ size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight)
 {
 	size_t layer_id = netw.populations().size();
 	size_t counter = 0;
-	if (!m_activity_based_scaling && m_weights_scale_factor == 0.0) {
-		if (max_weight > 0) {
-			m_weights_scale_factor = max_weight / m_mlp->max_weight();
-		}
-		else {
-			m_weights_scale_factor = 1.0;
+	if (!m_activity_based_scaling) {
+		if (m_weights_scale_factor == 0.0) {
+			if (max_weight > 0) {
+				m_weights_scale_factor = max_weight / m_mlp->max_weight();
+			}
+			else {
+				m_weights_scale_factor = 1.0;
+			}
 		}
 	}
 	else {
