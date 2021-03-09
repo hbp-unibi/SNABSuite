@@ -1,0 +1,78 @@
+{
+    "nest": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -130,
+            "tau_syn_E": 3,
+            "tau_syn_I": 3,
+            "v_rest": -65,
+            "v_reset": -75,
+            "v_thresh": -55,
+            "tau_refrac": 0,
+            "tau_m": 20,
+            "cm": 0.2
+        },
+        "weight": 0.02, 
+        "rate_max": 300,
+        "steps": 50,
+        "#neurons": 100, 
+        "presentation_time": 500, 
+        "#source_neurons": 1
+    },
+    "genn": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -130,
+            "tau_syn_E": 3,
+            "tau_syn_I": 3,
+            "v_rest": -65,
+            "v_reset": -75,
+            "v_thresh": -55,
+            "tau_refrac": 0,
+            "tau_m": 20,
+            "cm": 0.2
+        },
+        "setup": {
+            "timestep": 1
+        },
+        "weight": 0.02, 
+        "rate_max": 300,
+        "steps": 50,
+        "#neurons": 100, 
+        "presentation_time": 500, 
+        "#source_neurons": 1
+    },
+    "spinnaker": {
+        "invalid": true,
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -130,
+            "tau_syn_E": 3,
+            "tau_syn_I": 3,
+            "v_rest": -65,
+            "v_reset": -75,
+            "v_thresh": -55,
+            "tau_refrac": 0,
+            "tau_m": 20,
+            "cm": 0.2
+        },
+        "weight": 0.015,
+        "setup": {
+            "timestep": 1
+        },
+        "rate_max": 300,
+        "steps": 50,
+        "#neurons": 100, 
+        "presentation_time": 500, 
+        "#source_neurons": 1
+    },
+    "spikey": {
+        "invalid": true
+    },
+    "nmpm1": {
+        "invalid": true
+    }
+}

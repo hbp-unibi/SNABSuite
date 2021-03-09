@@ -79,6 +79,8 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
 	        WeightDependentActivation(backend, bench_index)),
 	    std::make_shared<RateBasedWeightDependentActivation>(
 	        RateBasedWeightDependentActivation(backend, bench_index)),
+	    std::make_shared<ReluSimilarity>(
+	        ReluSimilarity(backend, bench_index)),
 	    std::make_shared<MnistSpikey>(MnistSpikey(backend, bench_index)),
 	    std::make_shared<MnistNAS63>(MnistNAS63(backend, bench_index)),
 	    std::make_shared<MnistNAS129>(MnistNAS129(backend, bench_index)),

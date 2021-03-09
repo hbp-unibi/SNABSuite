@@ -87,5 +87,24 @@ public:
 	}
 };
 
+class ReluSimilarity : public SNABBase {
+protected:
+	cypress::PopulationBase m_pop;
+	cypress::Population<cypress::SpikeSourceArray> m_pop_source;
+	cypress::Real m_offset = 10.0;  // ms; gobal offset
+	cypress::Real m_stepsize = 0.0;
+	cypress::Real rate_min = 0;
+
+public:
+	ReluSimilarity(const std::string backend, size_t bench_index);
+	cypress::Network &build_netw(cypress::Network &netw) override;
+	void run_netw(cypress::Network &netw) override;
+	std::vector<std::array<cypress::Real, 4>> evaluate() override;
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<ReluSimilarity>(m_backend, m_bench_index);
+	}
+};
+
 }  // namespace SNAB
 #endif /* SNABSUITE_SNABS_ACTIVATION_CURVE_HPP */

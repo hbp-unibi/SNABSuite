@@ -15,14 +15,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <cypress/backend/power/power.hpp>
 #include <cypress/cypress.hpp>  // Neural network frontend
-
 #include <memory>
 #include <random>
 #include <string>
 #include <vector>
 
-#include <cypress/backend/power/power.hpp>
 #include "activation_curve.hpp"
 #include "util/utilities.hpp"
 
@@ -75,9 +74,9 @@ cypress::Network &WeightDependentActivation::build_netw(cypress::Network &netw)
 	    cypress::SpikingUtils::detect_type(m_config_file["neuron_type"]),
 	    m_config_file["neuron_params"]);
 	// Set up population, record spikes
-	m_pop = cypress::SpikingUtils::add_population(m_config_file["neuron_type"], netw,
-	                                     neuro_params,
-	                                     m_config_file["#neurons"], "spikes");
+	m_pop = cypress::SpikingUtils::add_population(
+	    m_config_file["neuron_type"], netw, neuro_params,
+	    m_config_file["#neurons"], "spikes");
 
 	m_num_steps = size_t((Real(m_config_file["weight_max"]) -
 	                      Real(m_config_file["weight_min"])) /
@@ -264,9 +263,9 @@ namespace {
 std::vector<Real> spike_rate(Real t_begin, Real t_end, Real freq)
 {
 	Real intervall = 1000.0 / freq;  // convert freq from Hz
-	Real num_spikes = (t_end - t_begin) * freq / 1000.0;
+	size_t num_spikes = (t_end - t_begin) * freq / 1000.0;
 
-	std::vector<Real> spikes(num_spikes, 0);
+	std::vector<Real> spikes(num_spikes, 0.0);
 	for (size_t i = 0; i < num_spikes; i++) {
 		spikes[i] = t_begin + i * intervall;
 	}
@@ -290,9 +289,9 @@ cypress::Network &RateBasedWeightDependentActivation::build_netw(
 		m_valid = false;
 	}
 	// Get neuron neuron_parameters
-	auto neuro_params = NeuronParameter(
-	    SpikingUtils::detect_type(m_config_file["neuron_type"]),
-	    m_config_file["neuron_params"]);
+	auto neuro_params =
+	    NeuronParameter(SpikingUtils::detect_type(m_config_file["neuron_type"]),
+	                    m_config_file["neuron_params"]);
 	// Set up population, record spikes
 	m_pop = SpikingUtils::add_population(m_config_file["neuron_type"], netw,
 	                                     neuro_params,
@@ -392,6 +391,143 @@ void RateBasedWeightDependentActivation::run_netw(cypress::Network &netw)
 	netw.run(pwbackend,
 	         m_offset + num_neurons_per_cycle * (m_num_steps + 1) *
 	                        Real(m_config_file["presentation_time"]));
+}
+
+ReluSimilarity::ReluSimilarity(const std::string backend, size_t bench_index)
+    : SNABBase(__func__, backend,
+               {"Average deviation", "Average standard deviation",
+                "Maximum deviation", "Minimum deviation"},
+               {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
+               {"", "", "", ""},
+               {"neuron_type", "neuron_params", "weight", "rate_max", "steps",
+                "#neurons", "presentation_time", "#source_neurons"},  // TODO
+               bench_index),
+      m_pop(m_netw, 0),
+      m_pop_source(m_netw, 0)
+{
+}
+
+Network &ReluSimilarity::build_netw(Network &netw)
+{
+	netw = Network();
+	// Get neuron neuron_parameters
+	auto neuro_params =
+	    NeuronParameter(SpikingUtils::detect_type(m_config_file["neuron_type"]),
+	                    m_config_file["neuron_params"]);
+	// Set up population, record spikes
+	m_pop = SpikingUtils::add_population(m_config_file["neuron_type"], netw,
+	                                     neuro_params,
+	                                     m_config_file["#neurons"], "spikes");
+
+	m_pop_source = netw.create_population<cypress::SpikeSourceArray>(
+	    m_config_file["#source_neurons"]);
+	netw.add_connection(
+	    m_pop_source, m_pop,
+	    Connector::all_to_all(Real(m_config_file["weight"]), 1.0));
+
+	std::vector<Real> spike_times;
+	Real presentation_time = m_config_file["presentation_time"].get<Real>();
+	Real rate_max = m_config_file["rate_max"].get<Real>();
+	size_t steps = m_config_file["steps"].get<size_t>();
+	m_stepsize = (rate_max - rate_min) / Real(steps - 1);
+
+	for (size_t step = 0; step < steps; step++) {
+		Real start = m_offset + step * presentation_time;
+		std::vector<Real> tmp = spike_rate(start, start + presentation_time,
+		                                   rate_min + (step * m_stepsize));
+		if (tmp.size()) {
+			spike_times.insert(spike_times.end(), tmp.begin(), tmp.end());
+		}
+	}
+	m_pop_source.parameters().spike_times(spike_times);
+	return netw;
+}
+
+void ReluSimilarity::run_netw(cypress::Network &netw)
+{
+	// PowerManagementBackend to use trigger network plug
+	cypress::PowerManagementBackend pwbackend(
+	    cypress::Network::make_backend(m_backend));
+	netw.run(pwbackend);
+}
+
+std::vector<std::array<cypress::Real, 4>> ReluSimilarity::evaluate()
+{
+	size_t steps = m_config_file["steps"].get<size_t>();
+	std::vector<std::vector<Real>> binned_spike_freq(
+	    m_pop.size(), std::vector<Real>(steps, 0.0));
+
+	Real presentation_time = Real(m_config_file["presentation_time"]);
+
+	for (size_t step = 0; step < steps; step++) {
+		for (size_t i = 0; i < m_pop.size(); i++) {
+			Real start = m_offset + step * presentation_time;
+			Real stop = start + presentation_time;
+			start = stop - 0.8 * presentation_time;
+			stop = stop - 10;
+
+			auto temp = spike_to_freq(get_spikes_in_intervall(
+			    start, stop, m_pop[i].signals().data(0)));
+			if (temp.size() > 0) {
+				binned_spike_freq[i][step] =
+				    1000.0 * std::accumulate(temp.begin(), temp.end(), 0.0) /
+				    Real(temp.size());
+			}
+		}
+	}
+
+	// Calculate average bin values
+	std::vector<Real> max(steps, 0), min(steps, 0), avg(steps, 0),
+	    std_dev(steps, 0);
+
+	for (size_t i = 0; i < steps; i++) {
+		std::vector<Real> bins(m_pop.size(), 0);
+		for (size_t j = 0; j < m_pop.size(); j++) {
+			bins[j] = Real(binned_spike_freq[j][i]);
+		}
+		Utilities::calculate_statistics(bins, min[i], max[i], avg[i],
+		                                std_dev[i]);
+	}
+
+#if SNAB_DEBUG
+	// Write all possible data to file
+	Utilities::write_vector2_to_csv(binned_spike_freq,
+	                                _debug_filename("spike_freqs.csv"));
+	Utilities::write_vector_to_csv(avg, _debug_filename("avg.csv"));
+	Utilities::write_vector_to_csv(min, _debug_filename("min.csv"));
+	Utilities::write_vector_to_csv(max, _debug_filename("max.csv"));
+	Utilities::write_vector_to_csv(std_dev, _debug_filename("std_dev.csv"));
+
+	// Prepare 1D plots
+	std::vector<std::vector<Real>> plot_data(steps, std::vector<Real>(6, 0));
+	for (size_t i = 0; i < steps; i++) {
+		plot_data[i][0] = Real(rate_min + i * m_stepsize);
+		plot_data[i][1] = avg[i];
+		plot_data[i][2] = std_dev[i];
+		plot_data[i][3] = min[i];
+		plot_data[i][4] = max[i];
+		plot_data[i][5] = avg[i] - Real(rate_min + i * m_stepsize);
+	}
+	Utilities::write_vector2_to_csv(
+	    plot_data, _debug_filename("plot.csv"),
+	    "#input freq,Average_Frequency_of_neurons,Standard deviation,Minimum "
+	    "freq,Maximum freq,freq deviation, ");
+
+	// Trigger plots
+	Utilities::plot_1d_curve(_debug_filename("plot.csv"), m_backend, 0, 1, 2);
+#endif
+	Real avg_ = 0, std_dev_ = 0, min_ = 0, max_ = 0;
+	for (size_t i = 0; i < steps; i++) {
+		avg_ += fabs(avg[i] - Real(rate_min + i * m_stepsize));
+		std_dev_ += std_dev[i];
+		min_ += min[i] - Real(rate_min + i * m_stepsize);
+		max_ += max[i] - Real(rate_min + i * m_stepsize);
+	}
+	avg_ /= Real(steps);
+	std_dev_ /= Real(steps);
+	min_ /= Real(steps);
+	max_ /= Real(steps);
+	return {std::array<Real, 4>({avg_, std_dev_, min_, max_})};
 }
 
 }  // namespace SNAB
