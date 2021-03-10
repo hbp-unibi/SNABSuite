@@ -36,8 +36,9 @@ MNIST_BASE::MNIST_BASE(const std::string backend, size_t bench_index)
 
 MNIST_BASE::MNIST_BASE(const std::string backend, size_t bench_index,
                        std::string name)
-    : SNABBase(name, backend, {"accuracy", "sim_time"},
-               {"quality", "performance"}, {"accuracy", "time"}, {"", "s"},
+    : SNABBase(name, backend, {"accuracy", "sim_time", "response time"},
+               {"quality", "performance", "performance"},
+               {"accuracy", "time", "time"}, {"", "s", "ms"},
                {"neuron_type", "neuron_params", "images", "batchsize",
                 "duration", "max_freq", "pause", "poisson", "max_weight",
                 "train_data", "batch_parallel", "dnn_file", "scaled_image"},
@@ -190,6 +191,39 @@ void MNIST_BASE::run_netw(cypress::Network &netw)
 		    "Wrong parameter setting or backend error! Simulation broke down");
 	}
 }
+namespace {
+std::vector<Real> TTFS_response_time(
+    const std::vector<PopulationBase> &label_pops, size_t batch_size,
+    Real duration, Real pause)
+{
+
+	std::vector<Real> time_to_sol;
+	for (const auto &pop : label_pops) {
+
+		std::vector<std::vector<Real>> binned_spike_times;
+		for (const auto &neuron : pop) {
+			binned_spike_times.push_back(SpikingUtils::spike_time_binning_TTFS(
+			    0.0, Real(batch_size) * (duration + pause), batch_size,
+			    neuron.signals().data(0)));
+		}
+
+		for (size_t sample = 0; sample < batch_size; sample++) {
+			Real min = std::numeric_limits<Real>::max();
+			for (size_t neuron = 0; neuron < binned_spike_times.size();
+			     neuron++) {
+				if (binned_spike_times[neuron][sample] < min) {
+					min = binned_spike_times[neuron][sample];
+				}
+			}
+			if (min < std::numeric_limits<Real>::max()) {
+				min -= Real(sample) * (duration + pause);
+				time_to_sol.emplace_back(min);
+			}
+		}
+	}
+	return time_to_sol;
+}
+}  // namespace
 
 std::vector<std::array<cypress::Real, 4>> MNIST_BASE::evaluate()
 {
@@ -267,8 +301,19 @@ std::vector<std::array<cypress::Real, 4>> MNIST_BASE::evaluate()
 			sim_time += pop.network().runtime().sim;
 		}
 	}
+	if (m_ttfs) {
+		std::vector<Real> time_to_sol =
+		    TTFS_response_time(m_label_pops, m_batchsize, m_duration, m_pause);
+		Real max, min, avg, std_dev;
+		Utilities::calculate_statistics(time_to_sol, min, max, avg, std_dev);
+
+		return {std::array<cypress::Real, 4>({acc, NaN(), NaN(), NaN()}),
+		        std::array<cypress::Real, 4>({sim_time, NaN(), NaN(), NaN()}),
+		        std::array<cypress::Real, 4>({avg, std_dev, min, max})};
+	}
 	return {std::array<cypress::Real, 4>({acc, NaN(), NaN(), NaN()}),
-	        std::array<cypress::Real, 4>({sim_time, NaN(), NaN(), NaN()})};
+	        std::array<cypress::Real, 4>({sim_time, NaN(), NaN(), NaN()}),
+	        std::array<cypress::Real, 4>({m_duration, NaN(), NaN(), NaN()})};
 }
 
 size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight)
