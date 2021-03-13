@@ -22,7 +22,6 @@
 #define SNABSUITE_COMMON_BENCHMARK_HPP
 
 #include <cypress/cypress.hpp>
-
 #include <fstream>
 #include <string>
 
@@ -65,12 +64,13 @@ private:
 		       "T" + convert_time(Tm->tm_hour) + ":" +
 		       convert_time(Tm->tm_min) + ":" + convert_time(Tm->tm_sec);
 	}
-	
+
 	/**
-     * Convert bench index to task string
-     */
-	std::vector<std::string> bench_index_str{"Single Core/Smallest Network", "Single Chip",
-               "Small System", "Large System"};
+	 * Convert bench index to task string
+	 */
+	std::vector<std::string> bench_index_str{"Single Core/Smallest Network",
+	                                         "Single Chip", "Small System",
+	                                         "Large System"};
 
 public:
 	/**
@@ -82,16 +82,19 @@ public:
 	    : m_backend(backend)
 	{
 		auto snab_vec = snab_registry(m_backend, bench_index);
-		for (auto i : snab_vec) {
+		for (auto &i : snab_vec) {
 			if (i->valid() &&
 			    (benchmark == "all" || benchmark == i->snab_name())) {
-				global_logger().info("SNABSuite", "Executing " + i->snab_name());
+				global_logger().info("SNABSuite",
+				                     "Executing " + i->snab_name());
 				i->build();
 				i->run();
 				results.push_back({{"model", i->snab_name()},
 				                   {"timestamp", timestamp()},
-                                   {"task",  bench_index_str[bench_index]},
+				                   {"task", bench_index_str[bench_index]},
 				                   {"results", i->evaluate_json()}});
+				// Clear memory
+				i.reset();
 			}
 		}
 		std::cout << results.dump(4) << std::endl;
@@ -100,16 +103,16 @@ public:
 			file.open(
 			    (backend + "_" + std::to_string(bench_index) + ".json").c_str(),
 			    std::fstream::out);
-            if (results.size() > 1){
-                file << results.dump(4) << std::endl;
-            }
-            else{
-                file << results[0].dump(4) << std::endl;
-            }
+			if (results.size() > 1) {
+				file << results.dump(4) << std::endl;
+			}
+			else {
+				file << results[0].dump(4) << std::endl;
+			}
 			file.close();
 		}
 	};
 };
-}
+}  // namespace SNAB
 
 #endif /* SNABSUITE_COMMON_BENCHMARK_HPP */
