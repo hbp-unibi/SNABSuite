@@ -44,6 +44,8 @@ public:
 	    return std::make_shared<MNIST_BASE>(m_backend, m_bench_index);
 	}*/
 
+	virtual ~MNIST_BASE() = default;
+
 protected:
 	NeuronParameter m_neuro_params;  // Neuron Parameters
 	std::string m_neuron_type_str;   // String containing the neuron type
@@ -55,8 +57,7 @@ protected:
 	    m_train_data;  // Use poisson or regular spiking, Use train or test data
 	cypress::Real m_max_weight;  // Max weight to be scaled to
 
-	std::vector<
-	    std::pair<std::vector<std::vector<Real>>, std::vector<uint16_t>>>
+	std::vector<mnist_helper::MNIST_DATA>
 	    m_batch_data;  // Spiking data for the network
 
 	bool m_batch_parallel = true;  // Run batches parallel (in one network)
@@ -128,6 +129,7 @@ public:
 	{
 		return std::make_shared<MnistSpikey>(m_backend, m_bench_index);
 	}
+	~MnistSpikey() override = default;
 };
 
 /**
@@ -146,6 +148,7 @@ public:
 	{
 		return std::make_shared<MnistNAS63>(m_backend, m_bench_index);
 	}
+	~MnistNAS63() override = default;
 };
 
 /**
@@ -164,6 +167,7 @@ public:
 	{
 		return std::make_shared<MnistNAS129>(m_backend, m_bench_index);
 	}
+	~MnistNAS129() override = default;
 };
 
 /**
@@ -182,6 +186,7 @@ public:
 	{
 		return std::make_shared<MnistNAStop>(m_backend, m_bench_index);
 	}
+	~MnistNAStop() override = default;
 };
 
 /**
@@ -202,6 +207,7 @@ public:
 	{
 		return std::make_shared<MnistDiehl>(m_backend, m_bench_index);
 	}
+	~MnistDiehl() override = default;
 };
 
 /**
@@ -230,9 +236,7 @@ protected:
 	    : MNIST_BASE(backend, bench_index, name)
 	{
 	}
-	std::pair<std::vector<std::vector<std::vector<Real>>>,
-	          std::vector<uint16_t>>
-	    m_spmnist;
+	mnist_helper::SPIKING_MNIST m_spmnist;
 
 	bool m_positive = false;
 	cypress::Real m_norm_rate_hidden = 1.0;

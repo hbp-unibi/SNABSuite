@@ -264,7 +264,7 @@ public:
 	    const std::vector<std::vector<std::vector<Real>>> &activations,
 	    const std::vector<size_t> &indices, const size_t start) = 0;
 	virtual void train(unsigned seed = 0) = 0;
-	virtual ~MLPBase() {}
+	virtual ~MLPBase() = default;
 	virtual const std::vector<Real> &rescale_weights(size_t percentile,
 	                                                 bool schedule = false) = 0;
 };
@@ -407,6 +407,8 @@ public:
 		m_mnist_test = mnist_helper::loadMnistData(10000, "t10k");
 		m_constraint.setup(m_layers);
 	}
+
+	~MLP() override = default;
 
 	/**
 	 * @brief Return the largest weight in the network
