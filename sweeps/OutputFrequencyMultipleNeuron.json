@@ -1,15 +1,17 @@
 {
     "snab_name": "OutputFrequencyMultipleNeurons",
-    "spinnaker": {
-        "#neurons": [1,4000,60]
-    },
-    "spikey": {
-        "#neurons": [1,384,60]
-    },
-    "nest": {
-        "#neurons": [1,4000,60]
-    },
-    "nmpm1": {
-        "#neurons": [1,85,40]
+    "config": {
+        "spinnaker": {
+            "#neurons": [1,4000,60]
+        },
+        "spikey": {
+            "#neurons": [1,384,60]
+        },
+        "nest": {
+            "#neurons": [1,4000,60]
+        },
+        "nmpm1": {
+            "#neurons": [1,85,40]
+        }
     }
 }

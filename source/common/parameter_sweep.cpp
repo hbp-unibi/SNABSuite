@@ -225,7 +225,7 @@ ParameterSweep::ParameterSweep(std::string backend, cypress::Json &config,
     : m_backend(backend)
 {
 	std::string snab_name = config["snab_name"];
-	m_sweep_config = extract_backend(config, m_backend);
+	m_sweep_config = extract_backend(config["config"], m_backend);
 	// Get the correct SNAB
 	auto snab_vec = snab_registry(m_backend, bench_index);
 	for (auto i : snab_vec) {
