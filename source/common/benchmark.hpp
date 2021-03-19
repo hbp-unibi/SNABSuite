@@ -22,7 +22,6 @@
 #define SNABSUITE_COMMON_BENCHMARK_HPP
 
 #include <cypress/cypress.hpp>
-
 #include <fstream>
 #include <string>
 
@@ -65,12 +64,34 @@ private:
 		       "T" + convert_time(Tm->tm_hour) + ":" +
 		       convert_time(Tm->tm_min) + ":" + convert_time(Tm->tm_sec);
 	}
-	
+
 	/**
-     * Convert bench index to task string
-     */
-	std::vector<std::string> bench_index_str{"Single Core/Smallest Network", "Single Chip",
-               "Small System", "Large System"};
+	 * Convert bench index to task string
+	 */
+	std::vector<std::string> bench_index_str{"Single Core/Smallest Network",
+	                                         "Single Chip", "Small System",
+	                                         "Large System"};
+
+	/**
+	 * Check if benchmark should be repeated + averaged
+	 */
+	size_t check_for_repeat(const cypress::Json &config)
+	{
+		if (config.count("repeat") > 0) {
+			size_t rep = config["repeat"].get<size_t>();
+			if (rep) {
+                // Zero = do not repeat = 1
+				return rep;
+			}
+		}
+		return 1;
+	}
+
+	/**
+	 * When repeating, merge results from several runs
+	 */
+	cypress::Json merge_repeat_results(
+	    const std::vector<cypress::Json> &results);
 
 public:
 	/**
@@ -85,13 +106,30 @@ public:
 		for (auto i : snab_vec) {
 			if (i->valid() &&
 			    (benchmark == "all" || benchmark == i->snab_name())) {
-				global_logger().info("SNABSuite", "Executing " + i->snab_name());
-				i->build();
-				i->run();
-				results.push_back({{"model", i->snab_name()},
-				                   {"timestamp", timestamp()},
-                                   {"task",  bench_index_str[bench_index]},
-				                   {"results", i->evaluate_json()}});
+				global_logger().info("SNABSuite",
+				                     "Executing " + i->snab_name());
+				size_t repeat = check_for_repeat(i->get_config());
+				if (repeat == 1) {
+					i->build();
+					i->run();
+					results.push_back({{"model", i->snab_name()},
+					                   {"timestamp", timestamp()},
+					                   {"task", bench_index_str[bench_index]},
+					                   {"results", i->evaluate_json()}});
+				}
+				else {
+					std::vector<cypress::Json> repeat_results;
+					i->build();
+					for (size_t j = 0; j < repeat; j++) {
+						i->run();
+						repeat_results.push_back(i->evaluate_json());
+					}
+					results.push_back(
+					    {{"model", i->snab_name()},
+					     {"timestamp", timestamp()},
+					     {"task", bench_index_str[bench_index]},
+					     {"results", merge_repeat_results(repeat_results)}});
+				}
 			}
 		}
 		std::cout << results.dump(4) << std::endl;
@@ -100,16 +138,16 @@ public:
 			file.open(
 			    (backend + "_" + std::to_string(bench_index) + ".json").c_str(),
 			    std::fstream::out);
-            if (results.size() > 1){
-                file << results.dump(4) << std::endl;
-            }
-            else{
-                file << results[0].dump(4) << std::endl;
-            }
+			if (results.size() > 1) {
+				file << results.dump(4) << std::endl;
+			}
+			else {
+				file << results[0].dump(4) << std::endl;
+			}
 			file.close();
 		}
 	};
 };
-}
+}  // namespace SNAB
 
 #endif /* SNABSUITE_COMMON_BENCHMARK_HPP */
