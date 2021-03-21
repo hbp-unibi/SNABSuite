@@ -44,13 +44,14 @@ SNABBase::SNABBase(std::string name, std::string backend,
       m_bench_index(bench_index)
 {
 	m_config_file = read_config(name, m_backend);
-	check_config(required_parameters);
 
 	bool changed =
 	    replace_arrays_by_value(m_config_file, m_bench_index, m_snab_name);
 	if (!changed && m_bench_index != 0) {
 		m_valid = false;
+		return;
 	}
+	check_config(required_parameters);
 }
 
 void SNABBase::check_config(std::vector<std::string> required_parameters_vec)

@@ -3,23 +3,29 @@
         "neuron_type": "IF_cond_exp",
         "neuron_params": {
             "e_rev_E": 0,
+            "e_rev_I": -140,
             "v_rest": -70,
             "v_reset": -80,
             "v_thresh": -60,
             "tau_syn_E": 2,
+            "tau_syn_I": 2,
             "tau_refrac": 1,
             "tau_m": 1,
             "cm": 0.2
         },
+        "delay": 1,
         "num_neurons_pop": 10,
         "num_source_neurons": 10,
-        "weight_inp": 0.01,
-        "weight_self": 0.007,
-        "weight_inh": -0.01,
-        "prob_inp": 0.8,
-        "prob_self": 0.75,
+        "weight_inp": 0.014,
+        "weight_self": 0.005,
+        "weight_inh": -0.009,
+        "prob_inp": 0.5,
+        "prob_self": 0.8,
         "prob_inh": 0.8,
-        "firing_rate": 80
+        "firing_rate": 80,
+        "setup": { 
+            "timestep": 1
+        }
     },
     "nest": {
         "neuron_type": "IF_cond_exp",
@@ -47,23 +53,29 @@
         "neuron_type": "IF_cond_exp",
         "neuron_params": {
             "e_rev_E": 0,
+            "e_rev_I": -140,
             "v_rest": -70,
             "v_reset": -80,
             "v_thresh": -60,
             "tau_syn_E": 2,
+            "tau_syn_I": 2,
             "tau_refrac": 1,
             "tau_m": 1,
             "cm": 0.2
         },
+        "delay": 1,
         "num_neurons_pop": 10,
         "num_source_neurons": 10,
-        "weight_inp": 0.01,
-        "weight_self": 0.01,
-        "weight_inh": -0.011,
-        "prob_inp": 0.8,
-        "prob_self": 0.75,
+        "weight_inp": 0.016,
+        "weight_self": 0.007,
+        "weight_inh": -0.009,
+        "prob_inp": 0.5,
+        "prob_self": 0.8,
         "prob_inh": 0.8,
-        "firing_rate": 80
+        "firing_rate": 80,
+        "setup": { 
+            "timestep": 1
+        }
     },
     "spikey": {
         "invalid": true

@@ -56,13 +56,13 @@
                 250,
                 4000,
                 4000,
-                1000
+		50
             ],
             "n_bits_out": [
                 250,
                 4000,
                 15810,
-                180000
+		180000
             ],
             "n_ones_in": 4,
             "n_ones_out": 4
@@ -94,7 +94,7 @@
                 250,
                 500,
                 500,
-                500
+		500
             ]
         },
         "data_generator": {
@@ -140,8 +140,8 @@
         "data_generator": {
             "seed": 1234,
             "random": 1,
-            "balanced": 1,
-            "unique": 1
+            "balanced": 0,
+            "unique": 0
         }
     },
     "nmpm1": {

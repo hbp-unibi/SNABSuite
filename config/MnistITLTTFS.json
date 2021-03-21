@@ -6,6 +6,7 @@
         "invalid": true
     },
     "genn": {
+	"invalid" : true,
         "neuron_type": "IF_cond_exp",
         "neuron_params": {
             "e_rev_E": 0,
@@ -46,12 +47,13 @@
         }
     },
     "spikey": {
+	"invalid":true,
         "neuron_type": "IfFacetsHardware1",
         "neuron_params": {
-            "tau_m": 16,
-            "tau_refrac": 3,
+            "tau_m": 19,
+            "tau_refrac": 10,
             "v_rest": -80,
-            "v_thresh": -68,
+            "v_thresh": -70,
             "v_reset": -80,
             "e_rev_I": -80
         },
@@ -60,10 +62,10 @@
             "mappingOffset": 0
         },
         "images": 60000,
-        "batchsize": 500,
-        "duration": 7,
+        "batchsize": 300,
+        "duration": 13,
         "max_freq": 0,
-        "pause": 100,
+        "pause": 40,
         "poisson": false,
         "max_weight": 0.0155,
         "train_data": false,
@@ -71,16 +73,16 @@
         "count_spikes": false,
         "dnn_file": "networks/netw_spikey.msgpack",
         "scaled_image": true,
-        "activity_based_scaling": 96,
+        "activity_based_scaling": 99,
         "ttfs": true,
-        "learn_rate": 0.005,
+        "learn_rate": 0.0001,
         "epochs": 20,
         "norm_rate_hidden": 1,
         "norm_rate_last": 1,
         "positive": true,
         "loss_function": "CatHinge",
         "num_test_images": 10000,
-        "test_batchsize": 10000,
+        "test_batchsize": 300,
         "random_init": false
     },
     "nmpm1": {

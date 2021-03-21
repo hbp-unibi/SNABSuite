@@ -29,12 +29,15 @@
                 290.118,
                 297.968
             ]
-        ]
+        ],
+	"setup": {
+		"timestep":0.1
+	}
     },
     "spikey": {
         "invalid": true
     },
-    "nest": {
+    "default": {
         "neuron_type": "IF_cond_exp",
         "neuron_params": {
             "e_rev_E": 0,

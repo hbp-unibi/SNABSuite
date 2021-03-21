@@ -111,6 +111,33 @@ std::vector<std::array<cypress::Real, 4>> RefractoryPeriod::evaluate()
 				started = false;
 			}
 		}
+		if(starts.size() == 0){
+			for(auto spike : spike_time){
+				// Gather start and end points of the refractory periods by running
+		                // through the voltage trace
+				Real v_reset_new = 100;
+                		for (size_t i = 0; i < voltage.rows(); i++) {
+                	        	if (!started && voltage(i, 0) >= spike) {
+                        	        	started = true;
+                                		starts.emplace_back(voltage(i, 0));
+						v_reset_new = voltage(i,1) + m_tolerance;
+                        		}
+                        		else if (started && voltage(i, 1) > v_reset_new) {
+                                		// Compatibility workaround for analog hardware:
+	                                	// When outside of refractory domain, check wheter this is
+        	                        	// caused by fluctuations > m_tolerance
+                	               		if (i < voltage.rows() - 2 && (voltage(i + 1, 1) < v_reset_new ||
+                                                               voltage(i + 2, 1) < v_reset_new)) {
+                        	                	continue;
+                                		}
+                                		ends.emplace_back(voltage(i - 1, 0));
+	                                	started = false;
+						break;
+
+        	                	}
+                		}
+			}
+		}
 	}
 
 	// Calculate periods

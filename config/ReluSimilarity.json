@@ -45,7 +45,6 @@
         "#source_neurons": 1
     },
     "spinnaker": {
-        "invalid": true,
         "neuron_type": "IF_cond_exp",
         "neuron_params": {
             "e_rev_E": 0,
@@ -59,18 +58,40 @@
             "tau_m": 20,
             "cm": 0.2
         },
-        "weight": 0.015,
+        "weight": 0.02,
         "setup": {
             "timestep": 1
         },
         "rate_max": 300,
         "steps": 50,
-        "#neurons": 100, 
+        "#neurons": [
+            255,
+            3825,
+            15810,
+            60000
+        ],
         "presentation_time": 500, 
         "#source_neurons": 1
     },
     "spikey": {
-        "invalid": true
+        "neuron_type": "IfFacetsHardware1",
+        "neuron_params": {
+            "tau_m": 10,
+            "tau_refrac": 0.001,
+            "v_rest": -75,
+            "v_thresh": -60,
+            "v_reset": -80,
+            "e_rev_I": -80
+        },
+        "setup": {
+            "calibIcb": true
+        },
+        "weight": 0.015,
+        "rate_max": 150,
+        "steps": 50,
+        "#neurons": [192,384], 
+        "presentation_time": 500, 
+        "#source_neurons": 1
     },
     "nmpm1": {
         "invalid": true

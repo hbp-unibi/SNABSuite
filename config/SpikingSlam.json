@@ -65,7 +65,10 @@
             "posSynEx": 0.009
         },
         "sim_path": "networks/slam_sim.json",
-        "scale_th": 0.25
+        "scale_th": 0.25,
+	"setup": {
+		"timestep": 0.1
+	}
     },
     "spikey": {
         "invalid": true

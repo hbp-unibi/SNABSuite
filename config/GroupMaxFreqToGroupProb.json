@@ -38,7 +38,7 @@
             "v_reset": -60,
             "v_thresh": -64.7,
             "tau_syn_E": 2,
-            "tau_refrac": 0,
+            "tau_refrac": 10,
             "tau_m": 10,
             "cm": 0.2
         },
@@ -48,18 +48,18 @@
             "v_reset": -80,
             "v_thresh": -78,
             "tau_syn_E": 1,
-            "tau_refrac": 0,
+            "tau_refrac": 10,
             "tau_m": 1,
             "cm": 0.2
         },
-        "weight": 7.8e-05,
+        "weight": 0.001,
         "#neurons_retr": [
             255,
-            3825,
-            16065,
-            189000
+            3570,
+            15810,
+            180000
         ],
-        "#neurons_max": 255,
+        "#neurons_max": 40,
         "probability": 0.5
     },
     "spikey": {

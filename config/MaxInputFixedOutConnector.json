@@ -44,19 +44,22 @@
         "#neurons": [
             255,
             3825,
-            15810
+            15810,
+	    185000
         ],
         "#input_neurons": [
             255,
             255,
-            255
+            255,
+	    255
         ],
         "weight": 0.03,
         "#spikes": 1,
         "#ConnectionsPerInput": [
             1,
             8,
-            30
+            30,
+	    30
         ]
     },
     "spikey": {

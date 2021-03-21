@@ -47,6 +47,7 @@ SimpleWTA::SimpleWTA(const std::string backend, size_t bench_index)
 
 cypress::Network &SimpleWTA::build_netw(cypress::Network &netw)
 {
+	RNG::instance().seed(1234);
 	std::string neuron_type_str = m_config_file["neuron_type"];
 	SpikingUtils::detect_type(neuron_type_str);
 
@@ -291,6 +292,7 @@ LateralInhibWTA::LateralInhibWTA(const std::string backend, size_t bench_index)
 
 Network &LateralInhibWTA::build_netw(cypress::Network &netw)
 {
+        RNG::instance().seed(1234);
 	std::string neuron_type_str = m_config_file["neuron_type"];
 	SpikingUtils::detect_type(neuron_type_str);
 
@@ -460,6 +462,7 @@ MirrorInhibWTA::MirrorInhibWTA(const std::string backend, size_t bench_index)
 
 Network &MirrorInhibWTA::build_netw(cypress::Network &netw)
 {
+        RNG::instance().seed(1234);
 	std::string neuron_type_str = m_config_file["neuron_type"];
 	SpikingUtils::detect_type(neuron_type_str);
 

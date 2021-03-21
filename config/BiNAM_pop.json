@@ -46,8 +46,8 @@
         "data_generator": {
             "seed": 1234,
             "random": 1,
-            "balanced": 1,
-            "unique": 1
+            "balanced": 0,
+            "unique": 0
         }
     },
     "spinnaker": {
@@ -56,7 +56,7 @@
                 62,
                 1000,
                 1000,
-                1000
+                500
             ],
             "n_bits_out": [
                 62,
@@ -100,8 +100,8 @@
         "data_generator": {
             "seed": 1234,
             "random": 1,
-            "balanced": 1,
-            "unique": 1
+            "balanced": 0,
+            "unique": 0
         }
     },
     "spikey": {
@@ -141,8 +141,8 @@
         "data_generator": {
             "seed": 1234,
             "random": 1,
-            "balanced": 1,
-            "unique": 1
+            "balanced": 0,
+            "unique": 0
         }
     },
     "nmpm1": {

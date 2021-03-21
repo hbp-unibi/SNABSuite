@@ -60,7 +60,7 @@
         "train_data": false,
         "batch_parallel": false,
         "learn_rate": 0.02,
-        "epochs": 5,
+        "epochs": 2,
         "positive": true,
         "dnn_file": "networks/netw_spikey.msgpack",
         "scaled_image": true,
