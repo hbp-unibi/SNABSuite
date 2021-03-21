@@ -4,7 +4,7 @@
         "#neurons": [1,383,100]
     },
     "spinnaker": {
-        "#neurons": [1,4000,100]
+        "#neurons": [1,15810,100]
     },
     "nest": {
         "#neurons": [1,4000,100]

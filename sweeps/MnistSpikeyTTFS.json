@@ -1,0 +1,14 @@
+{
+    "snab_name": "MnistSpikeyTTFS",
+    "nest": {
+        "max_weight": [0.016,0.0171, 10],
+        "pause": 40,
+        "train_data": true,
+        "images": 500,
+        "batchsize": 500,
+        "ttfs": true,
+        "activity_based_scaling": 97
+    }
+
+}
+

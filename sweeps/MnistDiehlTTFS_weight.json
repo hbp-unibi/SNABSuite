@@ -1,0 +1,10 @@
+{
+    "snab_name": "MnistDiehlTTFS",
+    "spinnaker": {
+        "train_data": true,
+        "images": 4000,
+        "batchsize": 1000,
+	"max_weight": [0.045,0.055,5]
+    }
+}
+
