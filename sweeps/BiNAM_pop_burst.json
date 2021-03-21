@@ -1,11 +1,29 @@
 {
     "snab_name": "BiNAM_pop_burst",
-    "spikey": {
-        "weight": [0.001,0.015,15],
-	"sigma_t": [0,5,5],
-	"params":{
-		"v_thresh": [ -65.0, -55.0, 10],
-		"g_leak": [0.01,0.04,10]
-	}
+    "config": {
+        "spikey": {
+            "weight": [
+                0.001,
+                0.015,
+                15
+            ],
+            "sigma_t": [
+                0,
+                5,
+                5
+            ],
+            "params": {
+                "v_thresh": [
+                    -65.0,
+                    -55.0,
+                    10
+                ],
+                "g_leak": [
+                    0.01,
+                    0.04,
+                    10
+                ]
+            }
+        }
     }
 }

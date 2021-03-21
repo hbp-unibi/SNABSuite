@@ -2,16 +2,32 @@
     "snab_name": "GroupMaxFreqToGroup",
     "config": {
         "spikey": {
-            "#neurons": [1,192,100]
+            "#neurons": [
+                1,
+                192,
+                100
+            ]
         },
         "spinnaker": {
-            "#neurons": [1,7905,100]
+            "#neurons": [
+                1,
+                7905,
+                100
+            ]
         },
         "nest": {
-            "#neurons": [1,4000,100]
+            "#neurons": [
+                1,
+                4000,
+                100
+            ]
         },
         "nmpm1": {
-            "#neurons": [1,60,60]
+            "#neurons": [
+                1,
+                60,
+                60
+            ]
         }
     }
 }

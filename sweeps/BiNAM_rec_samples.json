@@ -1,0 +1,14 @@
+{
+    "snab_name": "BiNAM",
+    "config": {
+        "genn": {
+            "network": {
+                "n_samples_recall": [
+                    0,
+                    11570,
+                    100
+                ]
+            }
+        }
+    }
+}

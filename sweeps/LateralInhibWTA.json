@@ -1,8 +1,22 @@
 {
     "snab_name": "LateralInhibWTA",
-    "spikey": {
-        "weight_inp": [0.001,0.015,15],
-	"weight_self": [0.001,0.01,10],
-	"weight_lat_inh":[-0.06, -0.004, 15]
+    "config": {
+        "spikey": {
+            "weight_inp": [
+                0.001,
+                0.015,
+                15
+            ],
+            "weight_self": [
+                0.001,
+                0.01,
+                10
+            ],
+            "weight_lat_inh": [
+                -0.06,
+                -0.004,
+                15
+            ]
+        }
     }
 }

@@ -2,13 +2,25 @@
     "snab_name": "MaxInputFixedOutConnector",
     "config": {
         "nest": {
-            "#ConnectionsPerInput": [0,1600,320]
+            "#ConnectionsPerInput": [
+                0,
+                1600,
+                320
+            ]
         },
         "spinnaker": {
-            "#ConnectionsPerInput": [0,1600,320]
+            "#ConnectionsPerInput": [
+                0,
+                1600,
+                320
+            ]
         },
         "spikey": {
-            "#ConnectionsPerInput": [0,384,385]
+            "#ConnectionsPerInput": [
+                0,
+                384,
+                385
+            ]
         }
     }
 }

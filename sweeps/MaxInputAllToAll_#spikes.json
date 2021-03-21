@@ -2,16 +2,32 @@
     "snab_name": "MaxInputAllToAll",
     "config": {
         "spikey": {
-            "#spikes": [1,100,50]
+            "#spikes": [
+                1,
+                100,
+                50
+            ]
         },
         "spinnaker": {
-            "#spikes": [1,100,50]
+            "#spikes": [
+                1,
+                100,
+                50
+            ]
         },
         "nest": {
-            "#spikes": [1,100,50]
+            "#spikes": [
+                1,
+                100,
+                50
+            ]
         },
         "nmpm1": {
-            "#spikes": [1,70,50]
+            "#spikes": [
+                1,
+                70,
+                50
+            ]
         }
     }
 }

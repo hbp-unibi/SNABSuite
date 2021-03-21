@@ -2,16 +2,32 @@
     "snab_name": "GroupMaxFreqToGroupProb",
     "config": {
         "spikey": {
-            "probability": [0.01,1,100]
+            "probability": [
+                0.01,
+                1,
+                100
+            ]
         },
         "spinnaker": {
-            "probability": [0,1,100]
+            "probability": [
+                0,
+                1,
+                100
+            ]
         },
         "nest": {
-            "probability": [0,1,100]
+            "probability": [
+                0,
+                1,
+                100
+            ]
         },
         "nmpm1": {
-            "probability": [0,1,100]
+            "probability": [
+                0,
+                1,
+                100
+            ]
         }
     }
 }

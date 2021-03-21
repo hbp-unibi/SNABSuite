@@ -80,7 +80,7 @@
             "v_rest": -65,
             "v_reset": -65,
             "v_thresh": -55,
-            "tau_refrac":10,
+            "tau_refrac": 10,
             "tau_m": 11,
             "cm": 0.2
         },

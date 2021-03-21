@@ -30,9 +30,9 @@
                 297.968
             ]
         ],
-	"setup": {
-		"timestep":0.1
-	}
+        "setup": {
+            "timestep": 0.1
+        }
     },
     "spikey": {
         "invalid": true

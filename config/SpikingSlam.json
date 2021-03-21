@@ -66,9 +66,9 @@
         },
         "sim_path": "networks/slam_sim.json",
         "scale_th": 0.25,
-	"setup": {
-		"timestep": 0.1
-	}
+        "setup": {
+            "timestep": 0.1
+        }
     },
     "spikey": {
         "invalid": true

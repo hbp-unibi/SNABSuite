@@ -23,7 +23,7 @@
         "prob_self": 0.8,
         "prob_inh": 0.8,
         "firing_rate": 80,
-        "setup": { 
+        "setup": {
             "timestep": 1
         }
     },
@@ -73,7 +73,7 @@
         "prob_self": 0.8,
         "prob_inh": 0.8,
         "firing_rate": 80,
-        "setup": { 
+        "setup": {
             "timestep": 1
         }
     },

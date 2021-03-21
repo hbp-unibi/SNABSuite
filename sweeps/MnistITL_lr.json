@@ -2,21 +2,33 @@
     "snab_name": "MnistITL",
     "config": {
         "spikey": {
-            "learn_rate": [0.0001,0.1,25],
+            "learn_rate": [
+                0.0001,
+                0.1,
+                25
+            ],
             "train_data": true,
             "epochs": 5,
             "images": 100,
             "batchsize": 100
         },
         "nmpm1": {
-            "learn_rate": [0.0001,0.1,25],
+            "learn_rate": [
+                0.0001,
+                0.1,
+                25
+            ],
             "train_data": true,
             "epochs": 5,
             "images": 100,
             "batchsize": 100
         },
         "nest": {
-            "learn_rate": [0.0001,0.1,25],
+            "learn_rate": [
+                0.0001,
+                0.1,
+                25
+            ],
             "train_data": true,
             "epochs": 5,
             "images": 100,

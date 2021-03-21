@@ -74,7 +74,12 @@
         }
     },
     "spinnaker": {
-        "invalid": [false, true, false,false],
+        "invalid": [
+            false,
+            true,
+            false,
+            false
+        ],
         "neuron_type": "IF_cond_exp",
         "neuron_params": {
             "e_rev_E": 0,
