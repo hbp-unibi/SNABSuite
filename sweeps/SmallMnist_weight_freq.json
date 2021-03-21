@@ -1,24 +1,26 @@
 {
     "snab_name": "MnistSpikey",
-    "nest": {
-        "max_weight": [0.001,0.1,20],
-        "max_freq": [50,250,20],
-        "train_data": true,
-        "images": 1000,
-        "batchsize": 1000
-    },
-    "spikey": {
-        "max_weight": [0.005,0.015,10],
-        "max_freq": [50,150,10],
-        "train_data": true,
-        "images": 1000,
-        "batchsize": 1000
-    },
-    "nmpm1": {
-        "max_weight": [5,15,10],
-        "max_freq": [50,150,10],
-        "train_data": true,
-        "images": 1000,
-        "batchsize": 1000
+    "config": {
+        "nest": {
+            "max_weight": [0.001,0.1,20],
+            "max_freq": [50,250,20],
+            "train_data": true,
+            "images": 1000,
+            "batchsize": 1000
+        },
+        "spikey": {
+            "max_weight": [0.005,0.015,10],
+            "max_freq": [50,150,10],
+            "train_data": true,
+            "images": 1000,
+            "batchsize": 1000
+        },
+        "nmpm1": {
+            "max_weight": [5,15,10],
+            "max_freq": [50,150,10],
+            "train_data": true,
+            "images": 1000,
+            "batchsize": 1000
+        }
     }
 }

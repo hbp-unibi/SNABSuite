@@ -1,13 +1,15 @@
 {
     "snab_name": "MnistSpikey",
-    "nest": {
-        "train_data": true,
-        "images": 10000,
-        "batchsize": [100,10000,20]
-    },
-    "spinnaker": {
-        "train_data": true,
-        "images": 10000,
-        "batchsize": [100,10000,20]
+    "config": {
+        "nest": {
+            "train_data": true,
+            "images": 10000,
+            "batchsize": [100,10000,20]
+        },
+        "spinnaker": {
+            "train_data": true,
+            "images": 10000,
+            "batchsize": [100,10000,20]
+        }
     }
 }

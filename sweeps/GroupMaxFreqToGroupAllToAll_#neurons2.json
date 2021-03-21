@@ -1,15 +1,17 @@
 {
     "snab_name": "GroupMaxFreqToGroupAllToAll",
-    "spikey": {
-        "#neurons_max": [1,192,100]
-    },
-    "spinnaker": {
-        "#neurons_max": [1,4000,100]
-    },
-    "nest": {
-        "#neurons_max": [1,4000,100]
-    },
-    "nmpm1": {
-        "#neurons_max": [1,70,70]
+    "config": {
+        "spikey": {
+            "#neurons_max": [1,192,100]
+        },
+        "spinnaker": {
+            "#neurons_max": [1,4000,100]
+        },
+        "nest": {
+            "#neurons_max": [1,4000,100]
+        },
+        "nmpm1": {
+            "#neurons_max": [1,70,70]
+        }
     }
 }

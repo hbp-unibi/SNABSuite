@@ -50,8 +50,11 @@ cypress::Json read_config(const std::string &name, const std::string &backend)
 		std::string simulator =
 		    Utilities::split(Utilities::split(backend, '=')[0], '.').back();
 		if (config.find(simulator) == config.end()) {
-			if (backend == "genn_gpu") {
-				return read_config(name, "genn");
+			if (simulator == "genn_gpu") {
+				simulator = "genn";
+				if (config.find(simulator) != config.end()) {
+					return config[simulator];
+				}
 			}
 			global_logger().warn("SNABSuite",
 			                     "Could not find any config for " + simulator +
@@ -84,6 +87,12 @@ cypress::Json extract_backend(const cypress::Json &config,
 		std::string simulator =
 		    Utilities::split(Utilities::split(backend, '=')[0], '.').back();
 		if (config.find(simulator) == config.end()) {
+			if (simulator == "genn_gpu") {
+				simulator = "genn";
+				if (config.find(simulator) != config.end()) {
+					return config[simulator];
+				}
+			}
 			cypress::global_logger().warn(
 			    "SNABSuite", "Could not find any config for " + simulator +
 			                     " in the provided Json!");

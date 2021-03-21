@@ -72,6 +72,27 @@ private:
 	                                         "Single Chip", "Small System",
 	                                         "Large System"};
 
+	/**
+	 * Check if benchmark should be repeated + averaged
+	 */
+	size_t check_for_repeat(const cypress::Json &config)
+	{
+		if (config.count("repeat") > 0) {
+			size_t rep = config["repeat"].get<size_t>();
+			if (rep) {
+				// Zero = do not repeat = 1
+				return rep;
+			}
+		}
+		return 1;
+	}
+
+	/**
+	 * When repeating, merge results from several runs
+	 */
+	cypress::Json merge_repeat_results(
+	    const std::vector<cypress::Json> &results);
+
 public:
 	/**
 	 * Constructor which executes all registered benchmarks and gives the result
@@ -87,14 +108,33 @@ public:
 			    (benchmark == "all" || benchmark == i->snab_name())) {
 				global_logger().info("SNABSuite",
 				                     "Executing " + i->snab_name());
-				i->build();
-				i->run();
-				results.push_back({{"model", i->snab_name()},
-				                   {"timestamp", timestamp()},
-				                   {"task", bench_index_str[bench_index]},
-				                   {"results", i->evaluate_json()}});
-				// Clear memory
-				i.reset();
+
+				size_t repeat = check_for_repeat(i->get_config());
+				if (repeat == 1) {
+					i->build();
+					i->run();
+					results.push_back({{"model", i->snab_name()},
+					                   {"timestamp", timestamp()},
+					                   {"task", bench_index_str[bench_index]},
+					                   {"results", i->evaluate_json()}});
+					// Clear memory
+					i.reset();
+				}
+				else {
+					std::vector<cypress::Json> repeat_results;
+					i->build();
+					for (size_t j = 0; j < repeat; j++) {
+						i->run();
+						repeat_results.push_back(i->evaluate_json());
+					}
+					results.push_back(
+					    {{"model", i->snab_name()},
+					     {"timestamp", timestamp()},
+					     {"task", bench_index_str[bench_index]},
+					     {"results", merge_repeat_results(repeat_results)}});
+					// Clear memory
+					i.reset();
+				}
 			}
 		}
 		std::cout << results.dump(4) << std::endl;
