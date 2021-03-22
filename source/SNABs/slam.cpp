@@ -127,9 +127,8 @@ std::vector<std::vector<bool>> convert_map(
 Network &SpikingSlam::build_netw(cypress::Network &netw)
 {
 
-	m_slam =
-	    std::make_shared<SpikingNetwork>("", m_config_file, 8, 15, 15, 1, 1);
-	m_slam->createNetwork(netw, m_config_file["sim_path"].get<std::string>());
+	SpikingNetwork slam_netw("", m_config_file, 8, 15, 15, 1, 1);
+	slam_netw.createNetwork(netw, m_config_file["sim_path"].get<std::string>());
 	m_map = get_map(m_config_file["sim_path"].get<std::string>());
 	m_conn = netw.connection("stdp");
 	xsize = netw.populations("X")[0].size();
@@ -145,11 +144,22 @@ void SpikingSlam::run_netw(cypress::Network &netw)
 	netw.run(pwbackend);
 }
 
-/**
- * @brief ...
- *
- * @return std::vector< std::array< cypress::Real, 4 > >
- */
+#if SNAB_DEBUG
+namespace {
+void plotPopulation(Network &netw, std::string popname, std::string filename,
+                    std::string backend)
+{
+	std::vector<std::vector<Real>> spikes = {};
+	for (size_t j = 0; j < netw.populations(popname)[0].size(); j++) {
+		spikes.push_back(netw.populations(popname)[0][j].signals().data(0));
+	}
+
+	Utilities::write_vector2_to_csv(spikes, filename + "_" + popname + ".csv");
+	Utilities::plot_spikes(filename + "_" + popname + ".csv", backend);
+}
+}  // namespace
+#endif
+
 std::vector<std::array<cypress::Real, 4>> SpikingSlam::evaluate()
 {
 	const auto &weights_ = m_conn.connector().learned_weights();
@@ -226,22 +236,15 @@ std::vector<std::array<cypress::Real, 4>> SpikingSlam::evaluate()
 	Utilities::write_vector2_to_csv(map2, _debug_filename("TargetMap.csv"));
 	Utilities::write_vector_to_csv(weight, _debug_filename("LearntMap.csv"));
 	Utilities::write_vector_to_csv(data2, _debug_filename("LearntMapTh.csv"));
+	system(("../plot/plot_map.py " + _debug_filename("") + " -o " +
+	        _debug_filename("") + "map.pdf &")
+	           .c_str());
 
-	PyObject *imshow = nullptr;
-	pyplot::figure_size(600, 200);
-	pyplot::subplot(1, 3, 1);
-	pyplot::imshow(data.data(), ysize, xsize, 1, {}, &imshow);
-	pyplot::title("Learnt Map");
-	pyplot::subplot(1, 3, 2);
-	pyplot::imshow(data2.data(), ysize, xsize, 1);
-	pyplot::title("Learnt Map Threshhold");
-	pyplot::subplot(1, 3, 3);
-	pyplot::imshow(data3.data(), ysize, xsize, 1);
-	pyplot::title("Target Map");
-	pyplot::colorbar(imshow);
-	pyplot::tight_layout();
-	pyplot::save(_debug_filename("weights.pdf"));
-	m_slam->printResults(_debug_filename("results.pdf"));
+	plotPopulation(m_netw, "HD", _debug_filename("SLAM"), m_backend);
+	plotPopulation(m_netw, "X", _debug_filename("SLAM"), m_backend);
+	plotPopulation(m_netw, "Y", _debug_filename("SLAM"), m_backend);
+	plotPopulation(m_netw, "POS", _debug_filename("SLAM"), m_backend);
+	plotPopulation(m_netw, "CON", _debug_filename("SLAM"), m_backend);
 #endif
 	return {{double(fp), NaN(), NaN(), NaN()},
 	        {double(fn), NaN(), NaN(), NaN()}};
