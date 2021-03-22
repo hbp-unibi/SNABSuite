@@ -22,7 +22,6 @@
 #define SNABSUITE_SNABS_SLAM_HPP
 
 #include <cypress/cypress.hpp>
-#include "spikingnetwork.h"
 //#include <memory>
 
 #include "common/snab_base.hpp"
@@ -43,7 +42,6 @@ private:
 	size_t xsize = 0, ysize = 0;
 	std::vector<std::vector<bool>> m_map;  // The map itself
 	cypress::Real m_scale_th = 0.25;        // Scale for the threshold in [0:1]
-	std::shared_ptr<SpikingNetwork> m_slam;
 
 public:
 	SpikingSlam(const std::string backend, size_t bench_index);

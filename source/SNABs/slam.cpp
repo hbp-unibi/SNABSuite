@@ -127,14 +127,13 @@ std::vector<std::vector<bool>> convert_map(
 Network &SpikingSlam::build_netw(cypress::Network &netw)
 {
 
-	m_slam =
-	    std::make_shared<SpikingNetwork>("", m_config_file, 8, 15, 15, 1, 1);
-	m_slam->createNetwork(netw, m_config_file["sim_path"].get<std::string>());
+	SpikingNetwork slam_netw("", m_config_file, 8, 15, 15, 1, 1);
+	slam_netw.createNetwork(netw, m_config_file["sim_path"].get<std::string>());
 	m_map = get_map(m_config_file["sim_path"].get<std::string>());
 	m_conn = netw.connection("stdp");
 	xsize = netw.populations("X")[0].size();
 	ysize = netw.populations("Y")[0].size();
-	m_scale_th = m_config_file["scale_th"];
+    m_scale_th = m_config_file["scale_th"];
 	return netw;
 }
 
@@ -147,7 +146,7 @@ void SpikingSlam::run_netw(cypress::Network &netw)
 
 /**
  * @brief ...
- *
+ * 
  * @return std::vector< std::array< cypress::Real, 4 > >
  */
 std::vector<std::array<cypress::Real, 4>> SpikingSlam::evaluate()
@@ -172,9 +171,9 @@ std::vector<std::array<cypress::Real, 4>> SpikingSlam::evaluate()
 	}
 	Real max = *std::max_element(weight.begin(), weight.end());
 	Real min = *std::min_element(weight.begin(), weight.end());
-	Real thresh = min + (m_scale_th * (max - min));  // Threshhold for map
+	Real thresh = min + (m_scale_th * (max - min)); // Threshhold for map
 	auto map2 = convert_map(m_map);
-	size_t fp = 0, fn = 0;  // Convert the false set entries in learnt map
+	size_t fp = 0, fn = 0; //Convert the false set entries in learnt map
 
 	// m_map is shifted: it has dimension xsize + 2, ysize + 2 to include
 	// boarders!
@@ -241,7 +240,6 @@ std::vector<std::array<cypress::Real, 4>> SpikingSlam::evaluate()
 	pyplot::colorbar(imshow);
 	pyplot::tight_layout();
 	pyplot::save(_debug_filename("weights.pdf"));
-	m_slam->printResults(_debug_filename("results.pdf"));
 #endif
 	return {{double(fp), NaN(), NaN(), NaN()},
 	        {double(fn), NaN(), NaN(), NaN()}};
