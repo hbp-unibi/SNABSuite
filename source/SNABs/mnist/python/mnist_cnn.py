@@ -17,7 +17,7 @@ from keras import backend as K
 
 batch_size = 128
 num_classes = 10
-epochs = 20
+epochs = 100
 
 # input image dimensions
 img_rows, img_cols = 28, 28
@@ -46,16 +46,21 @@ print(x_test.shape[0], 'test samples')
 y_train = keras.utils.to_categorical(y_train, num_classes)
 y_test = keras.utils.to_categorical(y_test, num_classes)
 
+# kernel_init = 'glorot_uniform'
+kernel_init = 'he_uniform'
 model = Sequential()
 model.add(Conv2D(16, kernel_size=(3, 3),
                  activation='relu',
-                 input_shape=input_shape, use_bias=False))
-# model.add(Conv2D(16, (3, 3), activation='relu', use_bias=False))
+                 input_shape=input_shape, use_bias=False,
+                 kernel_initializer=kernel_init))
+# model.add(Conv2D(16, (3, 3), activation='relu', use_bias=False,
+#                  kernel_initializer=kernel_init))
 # model.add(Conv2D(64, (5, 5), activation='relu', use_bias=False))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 # model.add(Dropout(0.25))
 model.add(Flatten())
-model.add(Dense(128, activation='relu', use_bias=False))
+model.add(Dense(128, activation='relu', use_bias=False,
+                kernel_initializer=kernel_init))
 # model.add(Dropout(0.5))
 model.add(Dense(num_classes, activation='softmax', use_bias=False))
 # model.add(Dense(num_classes, activation='relu'))
@@ -77,7 +82,7 @@ print('Test loss:', score[0])
 print('Test accuracy:', score[1])
 
 
-model.save_weights('cnn_pool.h5')
+model.save_weights('pool/cnn_pool_he_100.h5')
 json_string = model.to_json()
-with open('cnn_pool.json', 'w') as file:
+with open('pool/cnn_pool_he_100.json', 'w') as file:
     file.write(json_string)

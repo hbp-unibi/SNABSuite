@@ -198,7 +198,7 @@ public:
 	virtual Real max_weight() const = 0;
 	virtual Real min_weight() const = 0;
 	virtual Real max_weight_abs() const = 0;
-	virtual Real conv_max_weight() const = 0;
+	virtual Real conv_max_weight(size_t layer_id = 0) const = 0;
 	virtual const size_t &epochs() const = 0;
 	virtual const size_t &batchsize() const = 0;
 	virtual const Real &learnrate() const = 0;
@@ -481,21 +481,20 @@ public:
 		return max;
 	}
 
-	Real conv_max_weight() const override
+	Real conv_max_weight(size_t layer_id) const override
 	{
 		Real max = 0.0;
-		for (auto &layer : m_filters) {
-			auto filter = layer.filter;
-			for (size_t f = 0; f < layer.output_sizes[2]; f++) {
-				for (size_t x = 0; x < filter.size(); x++) {
-					for (size_t y = 0; y < filter[0].size(); y++) {
-						for (size_t z = 0; z < filter[0][0].size(); z++) {
-							max = filter[x][y][z][f] > max ? filter[x][y][z][f] : max;
-						}
-					}
-				}
-			}
-		}
+		auto layer = m_filters[layer_id];
+        auto filter = layer.filter;
+        for (size_t f = 0; f < layer.output_sizes[2]; f++) {
+            for (size_t x = 0; x < filter.size(); x++) {
+                for (size_t y = 0; y < filter[0].size(); y++) {
+                    for (size_t z = 0; z < filter[0][0].size(); z++) {
+                        max = filter[x][y][z][f] > max ? filter[x][y][z][f] : max;
+                    }
+                }
+            }
+        }
 		return max;
 	}
 

@@ -58,7 +58,8 @@ std::vector<cypress::Json> ParameterSweep::generate_sweep_vector(
 		// Wrong entry or a sweep array was changed in entry/0, entry/1 and
 		// entry/2.
 		if (target_iter == tar.end()) {
-			if (i.key() == "repetitions" || i.key() == "snab_name") {
+			if (i.key() == "repetitions" || i.key() == "snab_name"
+			    || i.key() == "file_name") {
 				continue;
 			}
 			auto splitted = Utilities::split(i.key(), '/');
@@ -225,6 +226,7 @@ ParameterSweep::ParameterSweep(std::string backend, cypress::Json &config,
     : m_backend(backend)
 {
 	std::string snab_name = config["snab_name"];
+    m_file_name = config["out_file_name"].empty() ? "" : config["out_file_name"];
 	m_sweep_config = extract_backend(config, m_backend);
 	// Get the correct SNAB
 	auto snab_vec = snab_registry(m_backend, bench_index);
@@ -401,8 +403,12 @@ void ParameterSweep::write_csv()
 		std::cout << "Error creating directory!" << std::endl;
 		filename = "";
 	}
-	for (auto i : shortened_sweep_names) {
-		filename += i + "_";
+	if (m_file_name.empty()) {
+		for (auto i : shortened_sweep_names) {
+			filename += i + "_";
+		}
+	} else {
+		filename += m_file_name + "_";
 	}
 	filename += Utilities::split(m_backend, '=')[0] + ".csv";
 	std::ofstream ofs(filename, std::ofstream::out);

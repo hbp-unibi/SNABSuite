@@ -1,22 +1,13 @@
 {
   "snab_name" : "MnistNAStop",
+  "out_file_name": "pool_he_100ep_allim",
   "genn" : {
-    "pool_max_weight": [0.001, 0.5, 6],
-    "pool_inhib_weight": [-0.04, -0.0, 8],
-    "max_weight": [0.001, 0.00175, 8],
-    "conv_max_weight": [0.001, 0.0125, 8],
-    "images": 50,
-    "batchsize": 50,
-    "train_data": true,
-    "dnn_file": "source/SNABs/mnist/python/cnn_pool.out.msgpack"
-  },
-  "genn2" : {
-    "max_weight": [0.001, 0.005, 5],
-    "conv_max_weight": [0.001, 0.005, 5],
-    "pool_max_weight": [0.001, 0.3, 8],
-    "pool_inhib_weight": [-0.05, -0.005, 5],
-    "images": 10,
-    "batchsize": 10,
-    "dnn_file": "source/SNABs/mnist/python/cnn_pool.out.msgpack"
+    "pool_inhib_weight": [-0.0075, -0.0125, 3],
+    "max_weight": [0.0035, 0.005, 4],
+    "conv_max_weight": [[0.003, 0.045, 4]],
+    "images": 10000,
+    "batchsize": 10000,
+    "train_data": false,
+    "dnn_file": "source/SNABs/mnist/python/pool/cnn_pool_he_100.out.msgpack"
   }
 }

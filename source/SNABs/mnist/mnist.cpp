@@ -62,7 +62,7 @@ void MNIST_BASE::read_config()
 	m_pause = m_config_file["pause"].get<Real>();
 	m_poisson = m_config_file["poisson"].get<bool>();
 	m_max_weight = m_config_file["max_weight"].get<Real>();
-	m_conv_max_weight = m_config_file["conv_max_weight"].get<Real>();
+//	m_conv_max_weight = m_config_file["conv_max_weight"].get<std::vector<Real>>();
 	m_max_pool_weight = m_config_file["max_pool_weight"].empty() ? 0.1 : m_config_file["pool_max_weight"].get<Real>();
 	m_pool_inhib_weight = m_config_file["pool_inhib_weight"].empty() ? -0.1 : m_config_file["pool_inhib_weight"].get<Real>();
 	m_pool_delay = m_config_file["pool_delay"].empty() ? 0.3 : m_config_file["pool_delay"].get<Real>();
@@ -104,7 +104,8 @@ cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
 		m_all_pops.clear();
 		for (auto &i : m_batch_data) {
 			mnist_helper::create_spike_source(netw, i);
-			create_deep_network(netw, m_max_weight, m_conv_max_weight,
+			create_deep_network(netw, m_max_weight,
+//			                    m_conv_max_weight,
 			                    m_max_pool_weight, m_pool_inhib_weight);
 			m_label_pops.emplace_back(netw.populations().back());
 		}
@@ -121,7 +122,8 @@ cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
 		for (auto &i : m_batch_data) {
 			m_networks.push_back(cypress::Network());
 			mnist_helper::create_spike_source(m_networks.back(), i);
-			create_deep_network(m_networks.back(), m_max_weight, m_conv_max_weight,
+			create_deep_network(m_networks.back(), m_max_weight,
+//			                    m_conv_max_weight,
 			                    m_max_pool_weight, m_pool_inhib_weight);
 			m_label_pops.emplace_back(m_networks.back().populations().back());
 			if (m_count_spikes) {
@@ -252,7 +254,8 @@ std::vector<std::array<cypress::Real, 4>> MNIST_BASE::evaluate()
 	        std::array<cypress::Real, 4>({sim_time, NaN(), NaN(), NaN()})};
 }
 
-size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight, Real conv_max_weight,
+size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight,
+//                                       const std::vector<Real>& conv_max_weights,
                                        Real max_pool_weight, Real pool_inhib_weight)
 {
 	size_t layer_id = netw.populations().size();
@@ -264,10 +267,27 @@ size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight, Real conv
 		else {
 			m_weights_scale_factor = 1.0;
 		}
-		if (conv_max_weight > 0){
-            m_conv_weights_scale_factor = conv_max_weight / m_mlp->conv_max_weight();
-		} else {
-			m_conv_weights_scale_factor = 1.0;
+	}
+    if (m_conv_weights_scale_factors.empty()){
+		std::string default_conv_name = "conv_max_weight";
+		for (size_t i = 0; i < m_mlp->get_filter_weights().size(); i++){
+			std::string conv_name = default_conv_name + "_" + std::to_string(i);
+			Real layer_max_weight = 0;
+			if (!m_config_file[conv_name].empty()){
+				layer_max_weight = m_config_file[conv_name].get<Real>();
+			} else if (!m_config_file[default_conv_name].empty()){
+				layer_max_weight = m_config_file[default_conv_name].get<Real>();
+			} else {
+				global_logger().fatal_error("SNABSuite",
+			    "Please give at least one max_weight parameter for convolution layers! \n"
+			    "Number of convolution layers: " + std::to_string(m_mlp->get_filter_weights().size()));
+			}
+			if (layer_max_weight > 0){
+                m_conv_weights_scale_factors.push_back(
+                        layer_max_weight / m_mlp->conv_max_weight(i));
+			} else {
+			    m_conv_weights_scale_factors.push_back(1.0);
+            }
 		}
 	}
 
@@ -297,7 +317,7 @@ size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight, Real conv
 			auto pop = SpikingUtils::add_population(m_neuron_type_str, netw,
 			                                        m_neuro_params, size, "");
 			auto conns = mnist_helper::conv_weights_to_conn(
-			    layer_weights, m_conv_weights_scale_factor, 1.0);
+			    layer_weights, m_conv_weights_scale_factors[conv_counter], 1.0);
 			netw.add_connection(netw.populations()[layer_id - 1], pop,
 			                    Connector::from_list(conns),
                                 ("conv_" + std::to_string(conv_counter)).c_str());
@@ -416,7 +436,8 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 	    m_mlp->get_layer_sizes()[0], SpikeSourceArrayParameters(),
 	    SpikeSourceArraySignals(), "input_layer");
 
-	create_deep_network(netw, m_max_weight, m_conv_max_weight,
+	create_deep_network(netw, m_max_weight,
+//	                    m_conv_max_weight,
 	                    m_max_pool_weight, m_pool_inhib_weight);
 	m_label_pops = {netw.populations().back()};
 

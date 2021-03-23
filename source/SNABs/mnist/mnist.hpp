@@ -54,7 +54,7 @@ protected:
 	bool m_poisson,
 	    m_train_data;  // Use poisson or regular spiking, Use train or test data
 	cypress::Real m_max_weight;  // Max weight to be scaled to
-	cypress::Real m_conv_max_weight;
+	// std::vector<cypress::Real> m_conv_max_weight;
 	cypress::Real m_max_pool_weight;
 	cypress::Real m_pool_inhib_weight;
 	cypress::Real m_pool_delay;
@@ -75,7 +75,7 @@ protected:
 	std::shared_ptr<MNIST::MLPBase> m_mlp;
 
 	cypress::Real m_weights_scale_factor = 0.0;
-	cypress::Real m_conv_weights_scale_factor = 0.0;
+	std::vector<cypress::Real> m_conv_weights_scale_factors;
 
 	bool m_count_spikes = false;
 	std::vector<cypress::PopulationBase> m_all_pops;
@@ -89,7 +89,7 @@ protected:
 	 * @return number of layers
 	 */
 	size_t create_deep_network(cypress::Network &netw, Real max_weight = 0.0,
-	                           Real conv_max_weight = 0.0,
+//	                           const std::vector<cypress::Real>& conv_max_weights = std::vector<cypress::Real>(),
 	                           Real max_pool_weight = 0.0,
 	                           Real pool_inhib_weight = 0.0);
 
