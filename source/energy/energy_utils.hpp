@@ -20,8 +20,7 @@
 
 #include <cypress/cypress.hpp>
 
-
-namespace Energy{
+namespace Energy {
 using namespace cypress;
 
 /**
@@ -40,7 +39,6 @@ size_t get_number_of_spikes_pop(const PopulationBase &pop);
  * @return size_t number of spikes in the network
  */
 size_t get_number_of_spikes(Network &netw, bool sources = true);
-
 
 /**
  * @brief Calculate the number of neurons in a network
@@ -108,5 +106,18 @@ void calculate_coefficients(cypress::Json &energy_model);
  * @param bioruntime duration of the simulation in ms
  * @return the amount of energy used in Joule + its error estimated
  */
-std::pair<double, double> calculate_energy(const cypress::Network &netw, const Json &energy_model, double bioruntime);
-}
+std::pair<double, double> calculate_energy(const cypress::Network &netw,
+                                           const Json &energy_model);
+
+/**
+ * @brief Calculates the energy for simulating/emulating the given network on
+ * all available target systems. TODO: Calculate runtime of simulators/emulators
+ *
+ * @param netw Network object containing the simulated network
+ * @param path Folder containing energy configs. Defaults to "../config_energy".
+ * @return Energy calculations
+ */
+Json energy_all_backends(const cypress::Network &netw,
+                         std::string path = "../config_energy");
+
+}  // namespace Energy

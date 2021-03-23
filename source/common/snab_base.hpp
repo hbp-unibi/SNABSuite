@@ -170,6 +170,11 @@ public:
 	void reset_network() { m_netw = cypress::Network(); }
 
 	/**
+	 * Getting a pointer to the current network instance
+	 */
+	const cypress::Network get_network() const { return m_netw; }
+
+	/**
 	 * @brief Returns the state of the m_valid flag. Simulation should not be
 	 * executed
 	 * when valid() returns false

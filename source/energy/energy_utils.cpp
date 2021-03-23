@@ -1,8 +1,9 @@
 
-#include "energy_utils.hpp"
+#include <glob.h>
 
 #include <cypress/cypress.hpp>
 
+#include "energy_utils.hpp"
 #include "util/utilities.hpp"
 
 namespace Energy {
@@ -966,15 +967,16 @@ void calculate_coefficients(Json &energy_model)
 }
 
 std::pair<double, double> calculate_energy(const cypress::Network &netw,
-                                           const Json &energy_model,
-                                           double bioruntime)
+                                           const Json &energy_model)
 {
-	double runtime = netw.runtime().sim_pure * 1000.0;
+	double runtime = netw.runtime().sim_pure * 1000.0; // TODO runtime not cross platform!
+    
 	double energy = 0.0, error = 0.0;
 	energy += runtime * energy_model["power"]["idle"][0].get<double>();
 	error += runtime * energy_model["power"]["idle"][1].get<double>();
 	auto &conns = netw.connections();
 	bool runtime_normalized = false;
+	double bioruntime = netw.runtime().duration;
 	if (energy_model.count("runtime_normalized") > 0 &&
 	    energy_model["runtime_normalized"].get<bool>()) {
 		runtime_normalized = true;
@@ -982,6 +984,32 @@ std::pair<double, double> calculate_energy(const cypress::Network &netw,
 			bioruntime = netw.duration();
 			cypress::global_logger().warn(
 			    "EnergyModel", "Please provide simulation duration!");
+		}
+	}
+	bool fixed_neuron_costs = false;
+	if (energy_model.count("fixed_neuron_costs") > 0) {
+		fixed_neuron_costs = true;
+		size_t n_neurons_system =
+		    energy_model["fixed_neuron_costs"].get<size_t>();
+		if (!runtime_normalized) {
+			energy += double(n_neurons_system) *
+			          energy_model["power"]["idle_recorded_neurons"][0]
+			              .get<double>() *
+			          runtime;
+			error += double(n_neurons_system) *
+			         energy_model["power"]["idle_recorded_neurons"][1]
+			             .get<double>() *
+			         runtime;
+		}
+		else {
+			energy += double(n_neurons_system) *
+			          energy_model["energy"]["idle_recorded_neurons_ms"][0]
+			              .get<double>() *
+			          bioruntime;
+			error += double(n_neurons_system) *
+			         energy_model["energy"]["idle_recorded_neurons_ms"][1]
+			             .get<double>() *
+			         bioruntime;
 		}
 	}
 	for (const auto &pop : netw.populations()) {
@@ -1010,55 +1038,61 @@ std::pair<double, double> calculate_energy(const cypress::Network &netw,
 			    energy_model["energy"]["InputSpike_random"][1].get<double>();
 		}
 		else {
-			if (!pop.signals().is_recording(0)) {
+			if (!fixed_neuron_costs) {
+				if (!pop.signals().is_recording(0)) {
+					if (!runtime_normalized) {
+						energy += double(pop.size()) *
+						          energy_model["power"]["idle_neurons"][0]
+						              .get<double>() *
+						          runtime;
+						error += double(pop.size()) *
+						         energy_model["power"]["idle_neurons"][1]
+						             .get<double>() *
+						         runtime;
+						cypress::global_logger().warn(
+						    "EnergyModel",
+						    "Please activate spike recording for all "
+						    "populations!");
+						continue;
+					}
+					else {
+						energy += double(pop.size()) *
+						          energy_model["energy"]["idle_neurons_ms"][0]
+						              .get<double>() *
+						          bioruntime;
+						error += double(pop.size()) *
+						         energy_model["energy"]["idle_neurons_ms"][1]
+						             .get<double>() *
+						         bioruntime;
+						cypress::global_logger().warn(
+						    "EnergyModel",
+						    "Please activate spike recording for all "
+						    "populations!");
+						continue;
+					}
+				}
 				if (!runtime_normalized) {
-					energy +=
-					    double(pop.size()) *
-					    energy_model["power"]["idle_neurons"][0].get<double>() *
-					    runtime;
-					error +=
-					    double(pop.size()) *
-					    energy_model["power"]["idle_neurons"][1].get<double>() *
-					    runtime;
-					cypress::global_logger().warn(
-					    "EnergyModel",
-					    "Please activate spike recording for all populations!");
-					continue;
+					energy += double(pop.size()) *
+					          energy_model["power"]["idle_recorded_neurons"][0]
+					              .get<double>() *
+					          runtime;
+					error += double(pop.size()) *
+					         energy_model["power"]["idle_recorded_neurons"][1]
+					             .get<double>() *
+					         runtime;
 				}
 				else {
-					energy += double(pop.size()) *
-					          energy_model["energy"]["idle_neurons_ms"][0]
-					              .get<double>() *
-					          bioruntime;
-					error += double(pop.size()) *
-					         energy_model["energy"]["idle_neurons_ms"][1]
-					             .get<double>() *
-					         bioruntime;
-					cypress::global_logger().warn(
-					    "EnergyModel",
-					    "Please activate spike recording for all populations!");
-					continue;
+					energy +=
+					    double(pop.size()) *
+					    energy_model["energy"]["idle_recorded_neurons_ms"][0]
+					        .get<double>() *
+					    bioruntime;
+					error +=
+					    double(pop.size()) *
+					    energy_model["energy"]["idle_recorded_neurons_ms"][1]
+					        .get<double>() *
+					    bioruntime;
 				}
-			}
-			if (!runtime_normalized) {
-				energy += double(pop.size()) *
-				          energy_model["power"]["idle_recorded_neurons"][0]
-				              .get<double>() *
-				          bioruntime;
-				error += double(pop.size()) *
-				         energy_model["power"]["idle_recorded_neurons"][1]
-				             .get<double>() *
-				         bioruntime;
-			}
-			else {
-				energy += double(pop.size()) *
-				          energy_model["energy"]["idle_recorded_neurons_ms"][0]
-				              .get<double>() *
-				          bioruntime;
-				error += double(pop.size()) *
-				         energy_model["energy"]["idle_recorded_neurons_ms"][1]
-				             .get<double>() *
-				         bioruntime;
 			}
 
 			auto spikes = get_number_of_spikes_pop(pop);
@@ -1127,6 +1161,36 @@ std::pair<double, double> calculate_energy(const cypress::Network &netw,
 		}
 	}
 	return std::pair<double, double>{energy, error};
+}
+
+Json energy_all_backends(const cypress::Network &netw, std::string path)
+{
+	glob_t glob_result;
+	glob((path + "/*.json").c_str(), GLOB_TILDE, NULL, &glob_result);
+	std::vector<std::string> files;
+
+	for (unsigned int i = 0; i < glob_result.gl_pathc; ++i) {
+		files.push_back(std::string(glob_result.gl_pathv[i]));
+	}
+	globfree(&glob_result);
+	Json result;
+	for (auto &file : files) {
+		std::ifstream ifs(file);
+		Json config;
+		if (ifs.good()) {
+			ifs >> config;
+			auto res = calculate_energy(netw, config);
+			if (config.count("name") > 0) {
+				result[config["name"].get<std::string>()] = {
+				    {"val", std::get<0>(res)}, {"err", std::get<1>(res)}};
+			}
+			else {
+				result[file] = {{"val", std::get<0>(res)},
+				                {"err", std::get<1>(res)}};
+			}
+		}
+	}
+	return result;
 }
 
 }  // namespace Energy

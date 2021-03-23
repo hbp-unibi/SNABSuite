@@ -216,8 +216,7 @@ void test_energy_model(const std::string config_name,
 	rt.sim_pure = runtime * 1e-3;
 	net.runtime(rt);
 #endif
-	auto ener = Energy::calculate_energy(net, energy_model,
-	                                     config[config_name]["runtime"]);
+	auto ener = Energy::calculate_energy(net, energy_model);
 	std::cout
 	    << "Comparing Values for " << measure_name << ":\nMeasured:\t"
 	    << energy_model["measured"][measure_name + "_avg"][0].get<double>() *
@@ -431,6 +430,9 @@ int main(int argc, const char *argv[])
 	}
 	if (config.find("single_neuron_as_idle") != config.end()) {
 		single_neuron_as_idle = config["single_neuron_as_idle"].get<bool>();
+	}
+	if (config.find("fixed_neuron_costs") != config.end()) {
+		energy_model["fixed_neuron_costs"] = config["fixed_neuron_costs"];
 	}
 #endif
 	// sweep_neurons_runtime(config, setup, short_sim, multi, block,
@@ -1002,7 +1004,7 @@ int main(int argc, const char *argv[])
 	net.runtime(rt);
 #endif
 	auto ener =
-	    Energy::calculate_energy(net, energy_model, config["stdp"]["runtime"]);
+	    Energy::calculate_energy(net, energy_model);
 	std::cout << "Comparing Values for STDP:\nMeasured:\t"
 	          << energy_model["measured"]["stdp_spike_avg"][0].get<double>() *
 	                 runtime / 1000.0

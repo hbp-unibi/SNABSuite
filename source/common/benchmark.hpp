@@ -26,6 +26,7 @@
 #include <string>
 
 #include "common/snab_registry.hpp"
+#include "energy/energy_utils.hpp"
 
 namespace SNAB {
 
@@ -116,7 +117,9 @@ public:
 					results.push_back({{"model", i->snab_name()},
 					                   {"timestamp", timestamp()},
 					                   {"task", bench_index_str[bench_index]},
-					                   {"results", i->evaluate_json()}});
+					                   {"results", i->evaluate_json()},});
+					                   //{"energy", Energy::energy_all_backends(
+					                   //               i->get_network())}});
 					// Clear memory
 					i.reset();
 				}
