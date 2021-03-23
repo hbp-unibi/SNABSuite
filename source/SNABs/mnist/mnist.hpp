@@ -269,5 +269,48 @@ public:
 	}
 };
 
+/**
+ * A 4 layer network consisting of 2 convolutional and 2 densely connected layer.
+ * Layout:
+ * conv1: 28x28x16
+ * conv2: 26x26x16
+ * dense1: 128
+ * dense2: 10
+ */
+class MnistDoubleCNN : public MNIST_BASE {
+public:
+    MnistDoubleCNN(const std::string backend, size_t bench_index)
+        : MNIST_BASE(backend, bench_index, __func__)
+    {
+    }
+
+    std::shared_ptr<SNABBase> clone() override
+    {
+        return std::make_shared<MnistDoubleCNN>(m_backend, m_bench_index);
+    }
+};
+
+/**
+ * A 4 layer network consisting of 1 convolutional, 1 max pooling
+ * and 2 densely connected layer.
+ * Layout:
+ * conv1: 28x28x16
+ * pool1: 14x14x16
+ * dense1: 128
+ * dense2: 10
+ */
+class MnistCNNPool : public MNIST_BASE {
+public:
+    MnistCNNPool(const std::string backend, size_t bench_index)
+        : MNIST_BASE(backend, bench_index, __func__)
+    {
+    }
+
+    std::shared_ptr<SNABBase> clone() override
+    {
+        return std::make_shared<MnistCNNPool>(m_backend, m_bench_index);
+    }
+};
+
 }  // namespace SNAB
 #endif

@@ -1,0 +1,12 @@
+{
+  "snab_name" : "MnistDoubleCNN",
+  "out_file_name": "ExampleFileName",
+  "genn" : {
+    "max_weight": [0.002, 0.025, 6],
+    "conv_max_weight_0": [0.0025, 0.01, 6],
+    "conv_max_weight_1": [0.0005, 0.01, 6],
+    "images": 200,
+    "batchsize": 200,
+    "train_data": false
+  }
+}

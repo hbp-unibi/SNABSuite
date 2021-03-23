@@ -91,6 +91,10 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
 	        MnistITLLastLayer(backend, bench_index)),
 	    std::make_shared<MnistITL>(
 	        MnistITL(backend, bench_index)),
+	    std::make_shared<MnistDoubleCNN>(
+	        MnistDoubleCNN(backend, bench_index)),
+	    std::make_shared<MnistCNNPool>(
+	        MnistCNNPool(backend, bench_index)),
 	};
 	return vec;
 }
