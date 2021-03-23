@@ -126,7 +126,8 @@ private:
 	cypress::Real m_weight_inp = 0, m_delay = 1.0, m_weight_self = 0.0,
 	              m_weight_to_inh = 0.0, m_weight_from_inh = 0.0;
 	cypress::Real m_prob_inp = 0, m_prob_self = 0.0, m_prob_to_inh = 0.0;
-
+protected:
+	MirrorInhibWTA(std::string backend, size_t bench_index, std::string snab_name);
 public:
 	MirrorInhibWTA(std::string backend, size_t bench_index);
 	cypress::Network &build_netw(cypress::Network &network) override;
@@ -135,6 +136,16 @@ public:
 	std::shared_ptr<SNABBase> clone() override
 	{
 		return std::make_shared<MirrorInhibWTA>(m_backend, m_bench_index);
+	}
+};
+
+
+class MirrorInhibWTASmall : public MirrorInhibWTA {
+public:
+	MirrorInhibWTASmall(std::string backend, size_t bench_index): MirrorInhibWTA(backend, bench_index, __func__){};
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<MirrorInhibWTASmall>(m_backend, m_bench_index);
 	}
 };
 }  // namespace SNAB

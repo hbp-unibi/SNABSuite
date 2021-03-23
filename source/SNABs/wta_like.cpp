@@ -15,15 +15,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <cypress/cypress.hpp>  // Neural network frontend
+#include "wta_like.hpp"
 
 #include <cypress/backend/power/power.hpp>  // Control of power via netw
+#include <cypress/cypress.hpp>              // Neural network frontend
 #include <string>
 #include <vector>
 
 #include "util/read_json.hpp"
 #include "util/utilities.hpp"
-#include "wta_like.hpp"
 
 namespace SNAB {
 using cypress::global_logger;
@@ -52,9 +52,8 @@ cypress::Network &SimpleWTA::build_netw(cypress::Network &netw)
 	SpikingUtils::detect_type(neuron_type_str);
 
 	// Get neuron neuron_parameters
-	m_neuro_params =
-	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params"]);
+	m_neuro_params = NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
+	                                 m_config_file["neuron_params"]);
 
 	// Get network sizes
 	m_num_neurons_pop = m_config_file["num_neurons_pop"];
@@ -292,14 +291,13 @@ LateralInhibWTA::LateralInhibWTA(const std::string backend, size_t bench_index)
 
 Network &LateralInhibWTA::build_netw(cypress::Network &netw)
 {
-        RNG::instance().seed(1234);
+	RNG::instance().seed(1234);
 	std::string neuron_type_str = m_config_file["neuron_type"];
 	SpikingUtils::detect_type(neuron_type_str);
 
 	// Get neuron neuron_parameters
-	m_neuro_params =
-	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params"]);
+	m_neuro_params = NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
+	                                 m_config_file["neuron_params"]);
 
 	// Get network sizes
 	m_num_neurons_pop = m_config_file["num_neurons_pop"];
@@ -460,16 +458,30 @@ MirrorInhibWTA::MirrorInhibWTA(const std::string backend, size_t bench_index)
 {
 }
 
+MirrorInhibWTA::MirrorInhibWTA(const std::string backend, size_t bench_index,
+                               std::string snab_name)
+    : SNABBase(snab_name, backend,
+               {"Max Winning Streak", "Number of state changes",
+                "Time without winner"},
+               {"quality", "quality", "quality"},
+               {"time", "state changes", "time"}, {"ms", "", "ms"},
+               {"neuron_type", "neuron_params", "num_neurons_pop",
+                "num_source_neurons", "weight_inp", "weight_self",
+                "weight_to_inh", "weight_from_inh", "prob_inp", "prob_self",
+                "prob_to_inh", "firing_rate", "num_inhibitory_neurons"},
+               bench_index)
+{
+}
+
 Network &MirrorInhibWTA::build_netw(cypress::Network &netw)
 {
-        RNG::instance().seed(1234);
+	RNG::instance().seed(1234);
 	std::string neuron_type_str = m_config_file["neuron_type"];
 	SpikingUtils::detect_type(neuron_type_str);
 
 	// Get neuron neuron_parameters
-	m_neuro_params =
-	    NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
-	                     m_config_file["neuron_params"]);
+	m_neuro_params = NeuronParameter(SpikingUtils::detect_type(neuron_type_str),
+	                                 m_config_file["neuron_params"]);
 
 	// Get network sizes
 	m_num_neurons_pop = m_config_file["num_neurons_pop"];
@@ -522,16 +534,36 @@ Network &MirrorInhibWTA::build_netw(cypress::Network &netw)
 	m_prob_to_inh = m_config_file["prob_to_inh"];
 
 	// Connecting sources
-	netw.add_connection(m_pop_source[0], m_pop[0],
-	                    Connector::random(m_weight_inp, m_delay, m_prob_inp));
-	netw.add_connection(m_pop_source[1], m_pop[1],
-	                    Connector::random(m_weight_inp, m_delay, m_prob_inp));
+	if (m_prob_inp) {
+		netw.add_connection(
+		    m_pop_source[0], m_pop[0],
+		    Connector::random(m_weight_inp, m_delay, m_prob_inp));
+		netw.add_connection(
+		    m_pop_source[1], m_pop[1],
+		    Connector::random(m_weight_inp, m_delay, m_prob_inp));
+	}
+	else {
+		netw.add_connection(m_pop_source[0], m_pop[0],
+		                    Connector::one_to_one(m_weight_inp, m_delay));
+		netw.add_connection(m_pop_source[1], m_pop[1],
+		                    Connector::one_to_one(m_weight_inp, m_delay));
+	}
 
 	// Self connections
-	netw.add_connection(m_pop[0], m_pop[0],
-	                    Connector::random(m_weight_self, m_delay, m_prob_self));
-	netw.add_connection(m_pop[1], m_pop[1],
-	                    Connector::random(m_weight_self, m_delay, m_prob_self));
+	if (m_prob_self) {
+		netw.add_connection(
+		    m_pop[0], m_pop[0],
+		    Connector::random(m_weight_self, m_delay, m_prob_self));
+		netw.add_connection(
+		    m_pop[1], m_pop[1],
+		    Connector::random(m_weight_self, m_delay, m_prob_self));
+	}
+	else {
+		netw.add_connection(m_pop[0], m_pop[0],
+		                    Connector::one_to_one(m_weight_self, m_delay));
+		netw.add_connection(m_pop[1], m_pop[1],
+		                    Connector::one_to_one(m_weight_self, m_delay));
+	}
 
 	// Excite inhibitory populations
 	netw.add_connection(

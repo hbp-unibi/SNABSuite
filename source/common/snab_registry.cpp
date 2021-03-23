@@ -75,6 +75,7 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
 	    std::make_shared<LateralInhibWTA>(
 	        LateralInhibWTA(backend, bench_index)),
 	    std::make_shared<MirrorInhibWTA>(MirrorInhibWTA(backend, bench_index)),
+	    std::make_shared<MirrorInhibWTASmall>(MirrorInhibWTASmall(backend, bench_index)),
 	    std::make_shared<WeightDependentActivation>(
 	        WeightDependentActivation(backend, bench_index)),
 	    std::make_shared<RateBasedWeightDependentActivation>(
