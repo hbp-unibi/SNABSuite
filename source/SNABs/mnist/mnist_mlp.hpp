@@ -726,6 +726,12 @@ public:
 	virtual std::vector<std::vector<std::vector<Real>>> forward_path(
 	    const std::vector<size_t> &indices, const size_t start) const override
 	{
+		if(!m_filters.empty()){
+            throw std::runtime_error("Conv layer not supported in forward_path function!");
+        }
+		if(!m_pools.empty()){
+            throw std::runtime_error("Pooling layer layer not supported in forward_path function!");
+        }
 		auto &input = std::get<0>(m_mnist);
 		std::vector<std::vector<std::vector<Real>>> res;
 		std::vector<std::vector<Real>> activations;
@@ -755,6 +761,12 @@ public:
 	 */
 	virtual Real forward_path_test() const override
 	{
+		if(!m_filters.empty()){
+            throw std::runtime_error("Conv layer not supported in forward_path function!");
+        }
+		if(!m_pools.empty()){
+            throw std::runtime_error("Pooling layer layer not supported in forward_path function!");
+        }
 		auto &input = std::get<0>(m_mnist_test);
 		auto &labels = std::get<1>(m_mnist_test);
 		std::vector<std::vector<Real>> activations;
@@ -793,6 +805,12 @@ public:
 #ifndef NDEBUG
 		assert(m_batchsize == activations.size());
 #endif
+		if(!m_filters.empty()){
+            throw std::runtime_error("Conv layer not supported in forward_path function!");
+        }
+		if(!m_pools.empty()){
+            throw std::runtime_error("Pooling layer layer not supported in forward_path function!");
+        }
 		const auto &labels = std::get<1>(m_mnist);
 		const std::vector<cypress::Matrix<cypress::Real>> orig_weights =
 		    m_layers;
@@ -837,6 +855,12 @@ public:
 #ifndef NDEBUG
 		assert(m_batchsize == activations.back().size());
 #endif
+		if(!m_filters.empty()){
+            throw std::runtime_error("Conv layer not supported in forward_path function!");
+        }
+		if(!m_pools.empty()){
+            throw std::runtime_error("Pooling layer layer not supported in forward_path function!");
+        }
 		const auto orig_weights = m_layers;
 		for (size_t sample = 0; sample < m_batchsize; sample++) {
 
