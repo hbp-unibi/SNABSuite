@@ -1,15 +1,17 @@
 {
     "snab_name": "RefractoryPeriod",
-    "spikey": {
-        "neuron_params": {
-            "v_reset": [-80,-55,40],
-            "v_thresh": [-80,-55,40]
-        }
-    },
-    "nmpm1": {
-        "neuron_params": {
-            "v_reset": [-100,-70,40],
-            "v_thresh": [-60,-40,40]
+    "config": {
+        "spikey": {
+            "neuron_params": {
+                "v_reset": [-80,-55,40],
+                "v_thresh": [-80,-55,40]
+            }
+        },
+        "nmpm1": {
+            "neuron_params": {
+                "v_reset": [-100,-70,40],
+                "v_thresh": [-60,-40,40]
+            }
         }
     }
 }
