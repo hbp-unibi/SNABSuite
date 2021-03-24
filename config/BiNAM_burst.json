@@ -105,6 +105,7 @@
         }
     },
     "spikey": {
+        "repeat": 10,
         "data": {
             "n_bits_in": [
                 128,

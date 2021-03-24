@@ -30,6 +30,7 @@
         "tolerance": 0.5
     },
     "spikey": {
+        "repeat": 10,
         "neuron_type": "IfFacetsHardware1",
         "neuron_params": {
             "tau_m": 1,

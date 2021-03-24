@@ -86,6 +86,7 @@
         "invalid": true
     },
     "spikey": {
+        "repeat": 10,
         "neuron_params": {
             "tau_m": 8,
             "tau_refrac": 1,

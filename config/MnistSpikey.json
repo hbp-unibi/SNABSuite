@@ -104,6 +104,7 @@
         }
     },
     "spikey": {
+        "repeat": 10,
         "neuron_type": "IfFacetsHardware1",
         "neuron_params": {
             "tau_m": 10,
@@ -130,6 +131,7 @@
         "scaled_image": true
     },
     "nmpm1": {
+        "repeat": 10,
         "setup": {
             "calib_path": "/wang/data/calibration/brainscales/current",
             "neuron_size": 8,

@@ -1,5 +1,6 @@
 {
     "genn": {
+        "repeat": 10,
         "neuron_type": "IF_cond_exp",
         "neuron_params": {
             "e_rev_E": 0,
@@ -30,6 +31,7 @@
         }
     },
     "nest": {
+        "repeat": 10,
         "neuron_type": "IF_cond_exp",
         "neuron_params": {
             "e_rev_E": 0,
@@ -54,6 +56,7 @@
         "firing_rate": 80
     },
     "spinnaker": {
+        "repeat": 10,
         "neuron_type": "IF_cond_exp",
         "neuron_params": {
             "e_rev_E": 0,
@@ -84,6 +87,7 @@
         }
     },
     "spikey": {
+        "repeat": 10,
         "neuron_type": "IfFacetsHardware1",
         "neuron_params": {
             "tau_m": 6,
