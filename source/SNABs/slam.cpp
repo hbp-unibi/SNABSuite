@@ -30,7 +30,7 @@ using namespace cypress;
 SpikingSlam::SpikingSlam(const std::string backend, size_t bench_index)
     : SNABBase(
           __func__, backend, {"false positives", "false negatives"},
-          {"quality", "quality"}, {"time", "realtime"}, {"ms", "s"},
+          {"quality", "quality"}, {"FP", "FN"}, {"", ""},
           {"neuron_params", "neuron_params_2", "neuron_params_3", "wtaParams",
            "stParams", "common", "psParams", "others", "sim_path", "scale_th"},
           bench_index)
