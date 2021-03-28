@@ -140,7 +140,7 @@
     },
     "spinnaker": {
         "sim_path": "networks/slam_sim.json",
-        "scale_th": 0.1,
+        "scale_th": 0.05,
         "neuron_params": {
             "e_rev_E": 0.0,
             "e_rev_I": -100.0,
@@ -173,8 +173,8 @@
             "v_rest": -70.0,
             "v_reset": -80.0,
             "v_thresh": -63.0,
-            "tau_refrac": 3.0,
-            "tau_m": 10,
+            "tau_refrac": 2.5,
+            "tau_m": 2,
             "cm": 0.2
         },
         "wtaParams": {
@@ -196,13 +196,13 @@
             "A_minus": -0.015,
             "A_plus": 0.015,
             "tau_minus": 0.4,
-            "tau_plus": 3,
+            "tau_plus": 3.0,
             "w_max": 0.002,
             "w_min": 0.0
         },
         "others": {
-            "conSynEx": 0.025,
-            "conDelay": 11.0,
+            "conSynEx": 0.045,
+            "conDelay": 10.0,
             "posSynEx": 0.009
         }
     },
