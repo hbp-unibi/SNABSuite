@@ -103,8 +103,8 @@
             "v_rest": -70,
             "v_reset": -80,
             "v_thresh": -63,
-            "tau_refrac": 3,
-            "tau_m": 10,
+            "tau_refrac": 2.5,
+            "tau_m": 2,
             "cm": 0.2
         },
         "wtaParams": {
@@ -121,17 +121,17 @@
             "start": 1
         },
         "psParams": {
-            "weight": 0.001,
+            "weight": 0.0001,
             "delay": 1,
-            "A_minus": -0.015,
-            "A_plus": 0.015,
-            "tau_minus": 2,
-            "tau_plus": 2,
-            "w_max": 0.002,
+            "A_minus": -0.0015,
+            "A_plus": 0.0015,
+            "tau_minus": 1.7,
+            "tau_plus": 2.0,
+            "w_max": 0.0002,
             "w_min": 0
         },
         "others": {
-            "conSynEx": 0.025,
+            "conSynEx": 0.033,
             "conDelay": 11,
             "posSynEx": 0.009
         },
