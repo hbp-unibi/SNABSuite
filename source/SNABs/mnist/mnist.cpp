@@ -294,11 +294,11 @@ std::vector<std::array<cypress::Real, 4>> MNIST_BASE::evaluate()
 		    "Summ of all spikes: " + std::to_string(global_count) + " spikes");
 	}
 	Real acc = Real(global_correct) / Real(images);
-	Real sim_time = m_netw.runtime().sim;
+	Real sim_time = m_netw.runtime().sim_pure;
 	if (!m_batch_parallel) {
 		sim_time = 0.0;
 		for (auto &pop : m_label_pops) {
-			sim_time += pop.network().runtime().sim;
+			sim_time += pop.network().runtime().sim_pure;
 		}
 	}
 	if (m_ttfs) {
@@ -518,7 +518,7 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 			m_global_correct =
 			    mnist_helper::compare_labels(std::get<1>(i), labels);
 			m_num_images = std::get<1>(i).size();
-			m_sim_time = netw.runtime().sim;
+			m_sim_time = netw.runtime().sim_pure;
 			global_logger().debug(
 			    "SNABsuite",
 			    "Batch accuracy: " + std::to_string(Real(m_global_correct) /
@@ -560,7 +560,7 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 		auto correct = mnist_helper::compare_labels(orig_labels, labels);
 		m_global_correct += correct;
 		m_num_images += orig_labels.size();
-		m_sim_time += netw.runtime().sim;
+		m_sim_time += netw.runtime().sim_pure;
 		if (m_count_spikes) {
 			for (auto &pop : m_all_pops) {
 				size_t count = 0.0;
