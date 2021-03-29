@@ -967,10 +967,15 @@ void calculate_coefficients(Json &energy_model)
 }
 
 std::pair<double, double> calculate_energy(const cypress::Network &netw,
-                                           const Json &energy_model)
+                                           const Json &energy_model,
+                                           double runt)
 {
-	double runtime = netw.runtime().sim_pure * 1000.0; // TODO runtime not cross platform!
-    
+	double runtime =
+	    netw.runtime().sim_pure * 1000.0;  // TODO runtime not cross platform!
+	if (runt > 0) {
+		runtime = runt;
+	}
+
 	double energy = 0.0, error = 0.0;
 	energy += runtime * energy_model["power"]["idle"][0].get<double>();
 	error += runtime * energy_model["power"]["idle"][1].get<double>();
@@ -1179,7 +1184,19 @@ Json energy_all_backends(const cypress::Network &netw, std::string path)
 		Json config;
 		if (ifs.good()) {
 			ifs >> config;
-			auto res = calculate_energy(netw, config);
+			double runtime = 0;
+			if (config.count("name") > 0) {
+				if (config["name"] == "SpiNN3" || config["name"] == "SpiNN5") {
+					std::cout << "SpiNNaker: Assume time_scale_factor of 1"
+					          << std::endl;
+					runtime = netw.runtime().duration;
+				}
+				else if (config["name"] == "Spikey") {
+					runtime = netw.runtime().duration / 1.e4;
+				}
+			}
+
+			auto res = calculate_energy(netw, config, runtime);
 			if (config.count("name") > 0) {
 				result[config["name"].get<std::string>()] = {
 				    {"val", std::get<0>(res)}, {"err", std::get<1>(res)}};

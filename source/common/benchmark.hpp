@@ -94,6 +94,13 @@ private:
 	cypress::Json merge_repeat_results(
 	    const std::vector<cypress::Json> &results);
 
+	void record_spikes(const cypress::Network &netw)
+	{
+		for (auto pop : netw.populations()) {
+			pop.signals().record(0, true);
+		}
+	}
+
 public:
 	/**
 	 * Constructor which executes all registered benchmarks and gives the result
@@ -113,28 +120,35 @@ public:
 				size_t repeat = check_for_repeat(i->get_config());
 				if (repeat == 1) {
 					i->build();
+					// record_spikes(i->get_network());
 					i->run();
-					results.push_back({{"model", i->snab_name()},
-					                   {"timestamp", timestamp()},
-					                   {"task", bench_index_str[bench_index]},
-					                   {"results", i->evaluate_json()},});
-					                   //{"energy", Energy::energy_all_backends(
-					                   //               i->get_network())}});
+					results.push_back({
+					    {"model", i->snab_name()},
+					    {"timestamp", timestamp()},
+					    {"task", bench_index_str[bench_index]},
+					    {"results", i->evaluate_json()},
+					});
+					/*                   {"energy", Energy::energy_all_backends(
+					                                  i->get_network())}});*/
 					// Clear memory
 					i.reset();
 				}
 				else {
 					std::vector<cypress::Json> repeat_results;
 					i->build();
+					// record_spikes(i->get_network());
 					for (size_t j = 0; j < repeat; j++) {
 						i->run();
 						repeat_results.push_back(i->evaluate_json());
 					}
-					results.push_back(
-					    {{"model", i->snab_name()},
-					     {"timestamp", timestamp()},
-					     {"task", bench_index_str[bench_index]},
-					     {"results", merge_repeat_results(repeat_results)}});
+					results.push_back({
+					    {"model", i->snab_name()},
+					    {"timestamp", timestamp()},
+					    {"task", bench_index_str[bench_index]},
+					    {"results", merge_repeat_results(repeat_results)},
+					});
+					/*                   {"energy", Energy::energy_all_backends(
+					                                  i->get_network())}});*/
 					// Clear memory
 					i.reset();
 				}
