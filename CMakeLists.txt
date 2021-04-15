@@ -125,9 +125,14 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/plot/matplotlibrc ${CMAKE_CURRENT_BIN
 #
 # Download MNIST dataset
 #
+if(NOT EXISTS ${CMAKE_BINARY_DIR}/mnist.zip)
+    file(DOWNLOAD https://data.deepai.org/mnist.zip ${CMAKE_BINARY_DIR}/mnist.zip SHOW_PROGRESS)
+    execute_process(COMMAND unzip mnist.zip)
+endif()
+
 function(down_extract NAME)
     if(NOT EXISTS ${CMAKE_BINARY_DIR}/${NAME})
-    file(DOWNLOAD http://yann.lecun.com/exdb/mnist/${NAME}.gz ${CMAKE_BINARY_DIR}/${NAME}.gz SHOW_PROGRESS)
+    #file(DOWNLOAD http://yann.lecun.com/exdb/mnist/${NAME}.gz ${CMAKE_BINARY_DIR}/${NAME}.gz SHOW_PROGRESS)
     execute_process(COMMAND gunzip ${NAME}.gz)
     endif()
 endfunction()
