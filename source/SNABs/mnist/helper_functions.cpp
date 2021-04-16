@@ -361,22 +361,22 @@ std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,
 	return res;
 }
 
-void conv_spikes_per_kernel(const PopulationBase pop,
+void conv_spikes_per_kernel(const std::string& filename, const PopulationBase& pop,
                             Real duration, Real pause, size_t batch_size, Real norm)
 {
     auto res = spikes_to_rates(pop, duration, pause, batch_size, norm);
     std::ofstream file;
-	file.open("debug/conv_layer_results.csv");
+	file.open(filename);
 	file << "Neuron1,Neuron2,Neuron3,Neuron4,max,sum\n";
 	double neur1, neur2, neur3, neur4;
-	for (size_t sam = 0; sam < res.size(); sam++) {
+	for (size_t sample = 0; sample < res.size(); sample++) {
 		for (size_t x = 0; x < 25; x+=2) {
 			for (size_t y = 0; y < 25; y+=2) {
 				for (size_t fil = 0; fil < 32; fil++) {
-                    neur1 = res[sam][x*26*32 +y*32 +fil];
-                    neur2 = res[sam][x*26*32 +(y+1)*32 +fil];
-                    neur3 = res[sam][(x+1)*26*32 +y*32 +fil];
-                    neur4 = res[sam][(x+1)*26*32 +(y+1)*32 +fil];
+                    neur1 = res[sample][x*26*32 +y*32 +fil];
+                    neur2 = res[sample][x*26*32 +(y+1)*32 +fil];
+                    neur3 = res[sample][(x+1)*26*32 +y*32 +fil];
+                    neur4 = res[sample][(x+1)*26*32 +(y+1)*32 +fil];
 					if (neur1 != 0 || neur2 != 0 || neur3 != 0 || neur4 != 0) {
 						file << neur1 << "," << neur2 << "," << neur3 << ","
 						     << neur4 << ","

@@ -205,7 +205,7 @@ public:
 	virtual const mnist_helper::MNIST_DATA &mnist_train_set() = 0;
 	virtual const mnist_helper::MNIST_DATA &mnist_test_set() = 0;
 	virtual const std::vector<cypress::Matrix<Real>> &get_weights() = 0;
-	virtual const std::vector<mnist_helper::CONVOLUTION_LAYER> &get_filter_weights() = 0;
+	virtual const std::vector<mnist_helper::CONVOLUTION_LAYER> &get_conv_layers() = 0;
 	virtual const std::vector<mnist_helper::POOLING_LAYER> &get_pooling_layers() = 0;
 	virtual const std::vector<size_t> &get_layer_sizes() = 0;
 	virtual const std::vector<mnist_helper::LAYER_TYPE> &get_layer_types() = 0;
@@ -351,16 +351,13 @@ public:
 						}
 					}
 				}
-				//TODO: save input first mh
-				// saved input always first input?
-                m_layer_sizes.emplace_back(m_layers[0].rows());
+                m_layer_sizes.emplace_back(m_layers.back().rows());
                 m_layer_types.push_back(mnist_helper::LAYER_TYPE::Dense);
 				cypress::global_logger().debug(
 				    "MNIST", "Dense layer detected with size " +
 				                 std::to_string(weights.rows()) + " times " +
 				                 std::to_string(weights.cols()));
 			}
-            //TODO: padding? mh
 			else if (layer["class_name"].get<std::string>() == "Conv2D") {
                 auto &json = layer["weights"];
 				size_t kernel_x = json.size();
@@ -415,7 +412,7 @@ public:
 						}
 					}
 				}
-				m_layer_sizes.emplace_back(output_sizes[0] * output_sizes[1] * output);
+				m_layer_sizes.emplace_back(input_sizes[0] * input_sizes[1] * input_sizes[2]);
                 m_layer_types.push_back(mnist_helper::LAYER_TYPE::Conv);
 				cypress::global_logger().debug(
 				    "MNIST", "Conv layer detected with size ("+
@@ -445,7 +442,7 @@ public:
 				output_sizes.push_back(input_sizes[2]);
 				mnist_helper::POOLING_LAYER pool = {input_sizes, output_sizes, size, stride};
                 m_pools.emplace_back(pool);
-                m_layer_sizes.emplace_back(output_sizes[0]*output_sizes[1]*output_sizes[2]);
+                m_layer_sizes.emplace_back(input_sizes[0] * input_sizes[1] * input_sizes[2]);
 				m_layer_types.emplace_back(mnist_helper::LAYER_TYPE::Pooling);
 				cypress::global_logger().debug(
 				    "MNIST", "Pooling layer detected with size (" +
@@ -456,9 +453,10 @@ public:
 				throw std::runtime_error("Unknown layer type");
 			}
 		}
-		for (auto &layer : m_layers) {
-			m_layer_sizes.emplace_back(layer.cols());
-		}
+		m_layer_sizes.push_back(m_layers.back().cols());
+//		for (auto &layer : m_layers) {
+//			m_layer_sizes.emplace_back(layer.cols());
+//		}
 
 		m_mnist = mnist_helper::loadMnistData(60000, "train");
 		m_mnist_test = mnist_helper::loadMnistData(10000, "t10k");
@@ -569,7 +567,7 @@ public:
 	 * @return const mnist_helper::Conv_TYPE &
 	 */
 	 // TODO: return whole conv struct? mh
-	const std::vector<mnist_helper::CONVOLUTION_LAYER> &get_filter_weights() override
+	const std::vector<mnist_helper::CONVOLUTION_LAYER> &get_conv_layers() override
     {
 		return m_filters;
 	}

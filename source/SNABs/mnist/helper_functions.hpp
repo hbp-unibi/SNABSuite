@@ -316,8 +316,18 @@ std::vector<std::vector<LocalConnection>> pool_to_conn(
  */
 std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,
                                        Real pause, size_t batch_size);
-
-void conv_spikes_per_kernel(const PopulationBase pop,
+/**
+ * @brief Saves the spikes of a convolution layer in a file.
+ *
+ * @param filename the file to save to
+ * @param pop the neuron population to count spikes from
+ * @param duration presentation time of a sample
+ * @param pause pause time in between samples
+ * @param batch_size number of samples interpreted by these neurons (batch size)
+ * @param norm divide the number of spikes in bin by this value, ignore if it is
+ * set to zero
+ */
+void conv_spikes_per_kernel(const std::string& filename, const PopulationBase& pop,
                             Real duration, Real pause, size_t batch_size, Real norm = 0.0);
 
 /**
