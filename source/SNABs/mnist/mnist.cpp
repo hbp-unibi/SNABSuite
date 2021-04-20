@@ -104,7 +104,6 @@ cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
 		for (auto &i : m_batch_data) {
 			mnist_helper::create_spike_source(netw, i);
 			create_deep_network(netw, m_max_weight,
-//			                    m_conv_max_weight,
 			                    m_max_pool_weight, m_pool_inhib_weight);
 			m_label_pops.emplace_back(netw.populations().back());
 		}
@@ -122,7 +121,6 @@ cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
 			m_networks.push_back(cypress::Network());
 			mnist_helper::create_spike_source(m_networks.back(), i);
 			create_deep_network(m_networks.back(), m_max_weight,
-//			                    m_conv_max_weight,
 			                    m_max_pool_weight, m_pool_inhib_weight);
 			m_label_pops.emplace_back(m_networks.back().populations().back());
 			if (m_count_spikes) {
@@ -221,7 +219,9 @@ std::vector<std::array<cypress::Real, 4>> MNIST_BASE::evaluate()
                 m_backend);
         }
         auto pop2 = m_label_pops[0].network().populations()[1];
-        mnist_helper::conv_spikes_per_kernel(pop2, m_duration, m_pause, m_batchsize, 60);
+        mnist_helper::conv_spikes_per_kernel("testspikes.csv", pop2,
+		                                     m_duration, m_pause,
+		                                     m_batchsize, 60);
 #endif
 	}
 	if (m_count_spikes) {

@@ -89,7 +89,6 @@ protected:
 	 * @return number of layers
 	 */
 	size_t create_deep_network(cypress::Network &netw, Real max_weight = 0.0,
-//	                           const std::vector<cypress::Real>& conv_max_weights = std::vector<cypress::Real>(),
 	                           Real max_pool_weight = 0.0,
 	                           Real pool_inhib_weight = 0.0);
 
