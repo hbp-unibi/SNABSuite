@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "mnist.hpp"
+
 #include <cypress/backend/power/power.hpp>
 #include <cypress/cypress.hpp>  // Neural network frontend
 #include <memory>
@@ -23,7 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "mnist.hpp"
 #include "mnist_mlp.hpp"
 #include "util/utilities.hpp"
 
@@ -479,10 +480,16 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 			mnist_helper::update_spike_source(source_n, i);
 			netw.run(pwbackend, m_batchsize * (m_duration + m_pause));
 
-			std::vector<std::vector<std::vector<Real>>> output_rates;
-			for (auto &pop : netw.populations()) {
-				if (pop.signals().is_recording(0)) {
-					if (!m_ttfs) {
+			if (m_ttfs) {
+				// TODO
+				throw;
+			}
+			else {
+
+				std::vector<std::vector<std::vector<Real>>> output_rates;
+				for (auto &pop : netw.populations()) {
+					if (pop.signals().is_recording(0)) {
+						// if (!m_ttfs) {
 						if (pop.pid() != netw.populations().back().pid()) {
 							output_rates.emplace_back(
 							    mnist_helper::spikes_to_rates(
@@ -495,22 +502,24 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 							        pop, m_duration, m_pause, m_batchsize,
 							        m_norm_rate_last));
 						}
+						/*}
+						else {
+						    output_rates.emplace_back(
+						        mnist_helper::spikes_to_rates_ttfs(
+						            pop, m_duration, m_pause, m_batchsize));
+						}*/
 					}
 					else {
 						output_rates.emplace_back(
-						    mnist_helper::spikes_to_rates_ttfs(
-						        pop, m_duration, m_pause, m_batchsize));
+						    std::vector<std::vector<Real>>());
 					}
 				}
-				else {
-					output_rates.emplace_back(std::vector<std::vector<Real>>());
-				}
-			}
-			m_mlp->backward_path_2(std::get<1>(i), output_rates,
-			                       m_last_layer_only);
+				m_mlp->backward_path_2(std::get<1>(i), output_rates,
+				                       m_last_layer_only);
 
-			mnist_helper::update_conns_from_mat(m_mlp->get_weights(), netw, 1.0,
-			                                    m_weights_scale_factor);
+				mnist_helper::update_conns_from_mat(
+				    m_mlp->get_weights(), netw, 1.0, m_weights_scale_factor);
+			}
 
 			// Calculate batch accuracy
 			auto labels = mnist_helper::spikes_to_labels(
