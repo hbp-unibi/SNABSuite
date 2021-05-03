@@ -21,6 +21,19 @@ Epoch 25/25
 Test loss: 0.1122096147596836
 Test accuracy: 0.9795
 
+netw_double_cnn.msgpack: Trained with softmax in Output Layer, He initialization in non-Output Layer
+Trained with categorical crossentropy loss and AdaDelta Optimizer
+Epoch 100/100
+469/469 [==============================] - 13s 28ms/step - loss: 0.1357 - accuracy: 0.9627 - val_loss: 0.1351 - val_accuracy: 0.9617
+Test loss: 0.13510388135910034
+Test accuracy: 0.9617000222206116
+
+netw_cnn_pool.msgpack: Trained with softmax in Output Layer, He initialization in non-Output Layer
+Trained with categorical crossentropy loss and AdaDelta Optimizer
+Epoch 100/100
+469/469 [==============================] - 2s 3ms/step - loss: 0.2406 - accuracy: 0.9324 - val_loss: 0.2277 - val_accuracy: 0.9371
+Test loss: 0.22773444652557373
+Test accuracy: 0.9370999932289124
 
 From Larmarck_ML
 sequential_network_60.msgpack: 

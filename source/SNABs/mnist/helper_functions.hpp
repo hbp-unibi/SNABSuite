@@ -33,7 +33,24 @@ typedef std::pair<std::vector<std::vector<Real>>, std::vector<uint16_t>>
 typedef std::pair<std::vector<std::vector<std::vector<Real>>>,
                   std::vector<uint16_t>>
     SPIKING_MNIST;
-
+typedef std::vector<std::vector<std::vector<std::vector<Real>>>>
+    CONVOLUTION_FILTER;
+struct CONVOLUTION_LAYER {
+    CONVOLUTION_FILTER filter;
+	std::vector<size_t> input_sizes;
+	std::vector<size_t> output_sizes;
+	size_t stride;
+	size_t padding;
+};
+typedef struct CONVOLUTION_LAYER CONVOLUTION_LAYER;
+struct POOLING_LAYER {
+	std::vector<size_t> input_sizes;
+	std::vector<size_t> output_sizes;
+    std::vector<size_t> size;
+    size_t stride;
+};
+typedef struct POOLING_LAYER POOLING_LAYER;
+enum LAYER_TYPE {Dense, Conv, Pooling};
 /**
  * @brief Read in MNIST data from files
  *
@@ -262,6 +279,31 @@ std::vector<LocalConnection> dense_weights_to_conn(const Matrix<Real> &mat,
                                                    Real scale, Real delay);
 
 /**
+ * @brief Converts a conv layer to list of Local Connections.
+ *
+ * @param layer struct of convolution layer information
+ * @param scale scale factor for weights
+ * @param delay synaptic delay
+ * @return vector of connections
+ */
+std::vector<LocalConnection> conv_weights_to_conn(const mnist_helper::CONVOLUTION_LAYER &layer,
+                                                  Real scale, Real delay);
+
+/**
+ * @brief
+ *
+ * @param layer struct of pooling layer information
+ * @param max_pool_weight scale factor for pooling weights
+ * @param pool_inhib_weight scale factor for cross inhibitory weights
+ * @param delay synaptic delay
+ * @return vector of connections. First the inhibitory connections in the previous layer,
+ * then the connections to the pooling layer
+ */
+std::vector<std::vector<LocalConnection>> pool_to_conn(
+    const mnist_helper::POOLING_LAYER &layer,Real max_pool_weight,
+    Real pool_inhib_weight, Real delay, Real pool_delay);
+
+/**
  * @brief Converts the simulation results into label data
  *
  * @param pop the label population
@@ -274,6 +316,19 @@ std::vector<LocalConnection> dense_weights_to_conn(const Matrix<Real> &mat,
  */
 std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,
                                        Real pause, size_t batch_size);
+/**
+ * @brief Saves the spikes of a convolution layer in a file.
+ *
+ * @param filename the file to save to
+ * @param pop the neuron population to count spikes from
+ * @param duration presentation time of a sample
+ * @param pause pause time in between samples
+ * @param batch_size number of samples interpreted by these neurons (batch size)
+ * @param norm divide the number of spikes in bin by this value, ignore if it is
+ * set to zero
+ */
+void conv_spikes_per_kernel(const std::string& filename, const PopulationBase& pop,
+                            Real duration, Real pause, size_t batch_size, Real norm = 0.0);
 
 /**
  * @brief Converts the simulation results into values between 0 and 1

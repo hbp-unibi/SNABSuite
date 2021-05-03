@@ -1,0 +1,47 @@
+{
+    "nest": {
+        "invalid": true
+    },
+    "genn": {
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -130,
+            "tau_syn_E": 3,
+            "tau_syn_I": 3,
+            "v_rest": -65,
+            "v_reset": -75,
+            "v_thresh": -55,
+            "tau_refrac": 0,
+            "tau_m": 20,
+            "cm": 0.2
+        },
+        "images": 10000,
+        "batchsize": 10000,
+        "duration": 500,
+        "max_freq": 120,
+        "pause": 50,
+        "poisson": false,
+        "max_weight": 0.0158,
+        "conv_max_weight": 0.0045,
+        "conv_max_weight_0": 0.006,
+        "conv_max_weight_1": 0.0043,
+        "train_data": false,
+        "batch_parallel": true,
+        "count_spikes": false,
+        "dnn_file": "networks/netw_double_cnn.msgpack",
+        "scaled_image": false,
+        "setup": {
+            "timestep": 1
+        }
+    },
+    "spinnaker": {
+        "invalid": true
+    },
+    "spikey": {
+        "invalid": true
+    },
+    "nmpm1": {
+        "invalid": true
+    }
+}

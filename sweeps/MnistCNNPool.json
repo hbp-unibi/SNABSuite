@@ -1,0 +1,14 @@
+{
+    "snab_name" : "MnistCNNPool",
+    "out_file_name": "ExampleFileName",
+    "config": {
+        "genn" : {
+            "pool_inhib_weight": [-0.0075, -0.0125, 2],
+            "max_weight": [0.0035, 0.005, 2],
+            "conv_max_weight": [0.003, 0.045, 2],
+            "images": 100,
+            "batchsize": 100,
+            "train_data": true
+        }
+    }
+}

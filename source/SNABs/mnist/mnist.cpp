@@ -62,6 +62,9 @@ void MNIST_BASE::read_config()
 	m_pause = m_config_file["pause"].get<Real>();
 	m_poisson = m_config_file["poisson"].get<bool>();
 	m_max_weight = m_config_file["max_weight"].get<Real>();
+	m_max_pool_weight = m_config_file["max_pool_weight"].empty() ? 0.1 : m_config_file["pool_max_weight"].get<Real>();
+	m_pool_inhib_weight = m_config_file["pool_inhib_weight"].empty() ? -0.1 : m_config_file["pool_inhib_weight"].get<Real>();
+	m_pool_delay = m_config_file["pool_delay"].empty() ? 0.3 : m_config_file["pool_delay"].get<Real>();
 	m_train_data = m_config_file["train_data"].get<bool>();
 	m_batch_parallel = m_config_file["batch_parallel"].get<bool>();
 	m_dnn_file = m_config_file["dnn_file"].get<std::string>();
@@ -100,7 +103,8 @@ cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
 		m_all_pops.clear();
 		for (auto &i : m_batch_data) {
 			mnist_helper::create_spike_source(netw, i);
-			create_deep_network(netw, m_max_weight);
+			create_deep_network(netw, m_max_weight,
+			                    m_max_pool_weight, m_pool_inhib_weight);
 			m_label_pops.emplace_back(netw.populations().back());
 		}
 
@@ -116,7 +120,8 @@ cypress::Network &MNIST_BASE::build_netw_int(cypress::Network &netw)
 		for (auto &i : m_batch_data) {
 			m_networks.push_back(cypress::Network());
 			mnist_helper::create_spike_source(m_networks.back(), i);
-			create_deep_network(m_networks.back(), m_max_weight);
+			create_deep_network(m_networks.back(), m_max_weight,
+			                    m_max_pool_weight, m_pool_inhib_weight);
 			m_label_pops.emplace_back(m_networks.back().populations().back());
 			if (m_count_spikes) {
 				for (auto pop : m_networks.back().populations()) {
@@ -185,20 +190,38 @@ std::vector<std::array<cypress::Real, 4>> MNIST_BASE::evaluate()
 		images += orig_labels.size();
 
 #if SNAB_DEBUG
-		std::cout << "Target\t Infer" << std::endl;
-		for (size_t i = 0; i < orig_labels.size(); i++) {
-			std::cout << orig_labels[i] << "\t" << labels[i] << std::endl;
-		}
-		std::vector<std::vector<cypress::Real>> spikes;
-		for (size_t i = 0; i < pop.size(); i++) {
-			spikes.push_back(pop[i].signals().data(0));
-		}
-		Utilities::write_vector2_to_csv(
-		    spikes,
-		    _debug_filename("spikes_" + std::to_string(batch) + ".csv"));
-		Utilities::plot_spikes(
-		    _debug_filename("spikes_" + std::to_string(batch) + ".csv"),
-		    m_backend);
+        std::cout << "Target\t Infer" << std::endl;
+        for (size_t i = 0; i < orig_labels.size(); i++) {
+            std::cout << orig_labels[i] << "\t" << labels[i] << std::endl;
+        }
+        if (m_count_spikes) {
+            for (auto &pop : m_all_pops) {
+                std::vector<std::vector<cypress::Real>> spikes;
+                for (size_t i = 0; i < pop.size(); i++) {
+                    spikes.push_back(pop[i].signals().data(0));
+                }
+                std::string file = "spikes_pop" + std::to_string(pop.pid()) +
+                                   "_batch" + std::to_string(batch) + ".csv";
+                Utilities::write_vector2_to_csv(spikes, _debug_filename(file));
+                Utilities::plot_spikes(_debug_filename(file), m_backend);
+            }
+        }
+        else {
+            std::vector<std::vector<cypress::Real>> spikes;
+            for (size_t i = 0; i < pop.size(); i++) {
+                spikes.push_back(pop[i].signals().data(0));
+            }
+            Utilities::write_vector2_to_csv(
+                spikes,
+                _debug_filename("spikes_" + std::to_string(batch) + ".csv"));
+            Utilities::plot_spikes(
+                _debug_filename("spikes_" + std::to_string(batch) + ".csv"),
+                m_backend);
+        }
+        auto pop2 = m_label_pops[0].network().populations()[1];
+        mnist_helper::conv_spikes_per_kernel("testspikes.csv", pop2,
+		                                     m_duration, m_pause,
+		                                     m_batchsize, 60);
 #endif
 	}
 	if (m_count_spikes) {
@@ -230,10 +253,11 @@ std::vector<std::array<cypress::Real, 4>> MNIST_BASE::evaluate()
 	        std::array<cypress::Real, 4>({sim_time, NaN(), NaN(), NaN()})};
 }
 
-size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight)
+size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight,
+                                       Real max_pool_weight, Real pool_inhib_weight)
 {
 	size_t layer_id = netw.populations().size();
-	size_t counter = 0;
+	// size_t counter = 0;
 	if (m_weights_scale_factor == 0.0) {
 		if (max_weight > 0) {
 			m_weights_scale_factor = max_weight / m_mlp->max_weight();
@@ -242,25 +266,92 @@ size_t MNIST_BASE::create_deep_network(Network &netw, Real max_weight)
 			m_weights_scale_factor = 1.0;
 		}
 	}
-
-	for (const auto &layer : m_mlp->get_weights()) {
-
-		size_t size = layer.cols();
-		auto pop = SpikingUtils::add_population(m_neuron_type_str, netw,
-		                                        m_neuro_params, size, "");
-		auto conns = mnist_helper::dense_weights_to_conn(
-		    layer, m_weights_scale_factor, 1.0);
-		netw.add_connection(netw.populations()[layer_id - 1], pop,
-		                    Connector::from_list(conns),
-		                    ("dense_" + std::to_string(counter)).c_str());
-
-		global_logger().debug(
-		    "SNABSuite",
-		    "Dense layer constructed with size " + std::to_string(size));
-		counter++;
-		layer_id++;
+    if (m_conv_weights_scale_factors.empty()){
+		std::string default_conv_name = "conv_max_weight";
+		for (size_t i = 0; i < m_mlp->get_conv_layers().size(); i++){
+			std::string conv_name = default_conv_name + "_" + std::to_string(i);
+			Real layer_max_weight = 0;
+			if (!m_config_file[conv_name].empty()){
+				layer_max_weight = m_config_file[conv_name].get<Real>();
+			} else if (!m_config_file[default_conv_name].empty()){
+				layer_max_weight = m_config_file[default_conv_name].get<Real>();
+				global_logger().debug("SNABSuite",
+			    "Found no conv_max_weight parameter for layer "+std::to_string(i)+".\n"
+			    "Number of convolution layers: " + std::to_string(m_mlp->get_conv_layers().size())+
+				". Falling back on default conv_max_weight value.");
+			} else {
+				global_logger().debug("SNABSuite",
+			    "Found no conv_max_weight parameter for layer "+std::to_string(i)+
+				" and no default conv_max_weight parameter.\n"
+			    "Number of convolution layers: " + std::to_string(m_mlp->get_conv_layers().size())+".");
+			}
+			if (layer_max_weight > 0){
+                m_conv_weights_scale_factors.push_back(
+                        layer_max_weight / m_mlp->conv_max_weight(i));
+			} else {
+			    m_conv_weights_scale_factors.push_back(1.0);
+            }
+		}
 	}
-	return counter;
+
+	size_t dense_counter = 0;
+	size_t conv_counter = 0;
+	size_t pool_counter = 0;
+	for (const auto &layer : m_mlp->get_layer_types()){
+        if (layer == mnist_helper::Dense){
+			const auto &layer_weights = m_mlp->get_weights()[dense_counter];
+            size_t size = layer_weights.cols();
+            auto pop = SpikingUtils::add_population(m_neuron_type_str, netw,
+                                                    m_neuro_params, size, "");
+            auto conns = mnist_helper::dense_weights_to_conn(
+                layer_weights, m_weights_scale_factor, 1.0);
+            netw.add_connection(netw.populations()[layer_id - 1], pop,
+                                Connector::from_list(conns),
+                                ("dense_" + std::to_string(dense_counter)).c_str());
+
+            global_logger().debug(
+                "SNABSuite",
+                "Dense layer constructed with size " + std::to_string(size));
+
+			dense_counter++;
+		} else if (layer == mnist_helper::Conv){
+			const auto &layer_weights = m_mlp->get_conv_layers()[conv_counter];
+            size_t size = layer_weights.output_sizes[0] * layer_weights.output_sizes[1] * layer_weights.output_sizes[2];
+			auto pop = SpikingUtils::add_population(m_neuron_type_str, netw,
+			                                        m_neuro_params, size, "");
+			auto conns = mnist_helper::conv_weights_to_conn(
+			    layer_weights, m_conv_weights_scale_factors[conv_counter], 1.0);
+			netw.add_connection(netw.populations()[layer_id - 1], pop,
+			                    Connector::from_list(conns),
+                                ("conv_" + std::to_string(conv_counter)).c_str());
+            global_logger().debug(
+			    "SNABSuite",
+			    "Convolution layer constructed with size " + std::to_string(size));
+			conv_counter++;
+		} else if (layer == mnist_helper::Pooling){
+			auto &pool_layer = m_mlp->get_pooling_layers()[pool_counter];
+			size_t size = pool_layer.output_sizes[0] * pool_layer.output_sizes[1]
+			                * pool_layer.output_sizes[2];
+			auto pop = SpikingUtils::add_population(m_neuron_type_str, netw,
+			                                        m_neuro_params, size, "");
+			auto conns = mnist_helper::pool_to_conn(pool_layer, max_pool_weight,
+			                                        pool_inhib_weight, 1.0, m_pool_delay);
+			netw.add_connection(netw.populations()[layer_id - 1],
+			                    netw.populations()[layer_id - 1],
+			                    Connector::from_list(conns[0]),
+			                    "dummy_name");
+			netw.add_connection(netw.populations()[layer_id - 1], pop,
+			                    Connector::from_list(conns[1]),
+                                ("pool_" + std::to_string(pool_counter)).c_str());
+			global_logger().debug(
+			    "SNABSuite",
+			    "Pooling layer constructed with size " + std::to_string(size) +
+			    " and " + std::to_string(conns[0].size()) + " inhibitory connections");
+			pool_counter++;
+		}
+        layer_id++;
+	}
+	return dense_counter+conv_counter+pool_counter;
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -348,7 +439,8 @@ void MnistITLLastLayer::run_netw(cypress::Network &netw)
 	    m_mlp->get_layer_sizes()[0], SpikeSourceArrayParameters(),
 	    SpikeSourceArraySignals(), "input_layer");
 
-	create_deep_network(netw, m_max_weight);
+	create_deep_network(netw, m_max_weight,
+	                    m_max_pool_weight, m_pool_inhib_weight);
 	m_label_pops = {netw.populations().back()};
 
 	auto pre_last_pop = netw.populations()[netw.populations().size() - 2];

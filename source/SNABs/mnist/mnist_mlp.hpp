@@ -198,13 +198,17 @@ public:
 	virtual Real max_weight() const = 0;
 	virtual Real min_weight() const = 0;
 	virtual Real max_weight_abs() const = 0;
+	virtual Real conv_max_weight(size_t layer_id = 0) const = 0;
 	virtual const size_t &epochs() const = 0;
 	virtual const size_t &batchsize() const = 0;
 	virtual const Real &learnrate() const = 0;
 	virtual const mnist_helper::MNIST_DATA &mnist_train_set() = 0;
 	virtual const mnist_helper::MNIST_DATA &mnist_test_set() = 0;
 	virtual const std::vector<cypress::Matrix<Real>> &get_weights() = 0;
+	virtual const std::vector<mnist_helper::CONVOLUTION_LAYER> &get_conv_layers() = 0;
+	virtual const std::vector<mnist_helper::POOLING_LAYER> &get_pooling_layers() = 0;
 	virtual const std::vector<size_t> &get_layer_sizes() = 0;
+	virtual const std::vector<mnist_helper::LAYER_TYPE> &get_layer_types() = 0;
 	virtual void scale_down_images(size_t pooling_size = 3) = 0;
 	virtual inline bool correct(const uint16_t label,
 	                            const std::vector<Real> &output) const = 0;
@@ -237,7 +241,10 @@ template <typename Loss = MSE, typename ActivationFunction = ReLU,
 class MLP : public MLPBase {
 protected:
 	std::vector<cypress::Matrix<Real>> m_layers;
-	std::vector<size_t> m_layer_sizes;
+    std::vector<size_t> m_layer_sizes;
+	std::vector<mnist_helper::CONVOLUTION_LAYER> m_filters;
+	std::vector<mnist_helper::POOLING_LAYER> m_pools;
+	std::vector<mnist_helper::LAYER_TYPE> m_layer_types;
 	size_t m_epochs = 20;
 	size_t m_batchsize = 100;
 	Real learn_rate = 0.01;
@@ -344,19 +351,112 @@ public:
 						}
 					}
 				}
+                m_layer_sizes.emplace_back(m_layers.back().rows());
+                m_layer_types.push_back(mnist_helper::LAYER_TYPE::Dense);
 				cypress::global_logger().debug(
 				    "MNIST", "Dense layer detected with size " +
 				                 std::to_string(weights.rows()) + " times " +
 				                 std::to_string(weights.cols()));
 			}
+			else if (layer["class_name"].get<std::string>() == "Conv2D") {
+                auto &json = layer["weights"];
+				size_t kernel_x = json.size();
+				size_t kernel_y = json[0].size();
+				size_t kernel_z = json[0][0].size();
+				size_t output = json[0][0][0].size();
+				size_t stride = layer["stride"];
+                size_t padding = layer["padding"] == "valid" ? 0 : 1;
+				std::vector<size_t> input_sizes;
+				std::vector<size_t> output_sizes;
+                if (!layer["input_shape_x"].empty()){
+                    input_sizes.push_back(layer["input_shape_x"]);
+                    input_sizes.push_back(layer["input_shape_y"]);
+                    input_sizes.push_back(layer["input_shape_z"]);
+                } else {
+					if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Conv) {
+						input_sizes.push_back(m_filters.back().output_sizes[0]);
+						input_sizes.push_back(m_filters.back().output_sizes[1]);
+						input_sizes.push_back(m_filters.back().output_sizes[2]);
+					} else if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Pooling) {
+						input_sizes.push_back(m_pools.back().output_sizes[0]);
+						input_sizes.push_back(m_pools.back().output_sizes[1]);
+						input_sizes.push_back(m_pools.back().output_sizes[2]);
+					} else if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Dense) {
+						throw std::runtime_error("Conv after Dense layer not implemented!");
+					}
+				}
+				output_sizes.push_back((input_sizes[0] - kernel_x + 2*padding)/stride+1);
+				output_sizes.push_back((input_sizes[1] - kernel_x + 2*padding)/stride+1);
+				output_sizes.push_back(output);
+				mnist_helper::CONVOLUTION_FILTER conv_filter(
+				    kernel_x,
+				    std::vector<std::vector<std::vector<Real>>>(kernel_y,
+				    std::vector<std::vector<Real>>(kernel_z,
+				    std::vector<Real>(output)))
+				    );
+				mnist_helper::CONVOLUTION_LAYER conv = {
+				    conv_filter,
+				    input_sizes,
+				    output_sizes,
+				    stride,
+				    padding};
+				m_filters.emplace_back(conv);
+				auto &weights = m_filters.back().filter;
+				//auto scale = std::sqrt(2.0 / double(weights.rows()));
+				for (size_t i = 0; i < json.size(); i++){
+					for (size_t j = 0; j < json[i].size(); j++){
+						for (size_t k = 0; k < json[i][j].size(); k++){
+							for (size_t l = 0 ; l < json[i][j][k].size(); l++){
+								weights[i][j][k][l] = json[i][j][k][l].get<Real>();
+							}
+						}
+					}
+				}
+				m_layer_sizes.emplace_back(input_sizes[0] * input_sizes[1] * input_sizes[2]);
+                m_layer_types.push_back(mnist_helper::LAYER_TYPE::Conv);
+				cypress::global_logger().debug(
+				    "MNIST", "Conv layer detected with size ("+
+				        std::to_string(json.size())+","+std::to_string(json[0].size())+
+				        ","+std::to_string(json[0][0].size())+","+std::to_string(json[0][0][0].size())+")");
+			} else if(layer["class_name"].get<std::string>() == "MaxPooling2D"){
+				std::vector<size_t> size = layer["size"];
+				size_t stride = layer["stride"];
+				std::vector<size_t> input_sizes;
+				std::vector<size_t> output_sizes;
+				if (m_layer_types.empty()){
+					throw std::runtime_error("Pooling layer must not be the first layer!");
+				}
+                if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Conv){
+                    input_sizes.push_back(m_filters.back().output_sizes[0]);
+                    input_sizes.push_back(m_filters.back().output_sizes[1]);
+                    input_sizes.push_back(m_filters.back().output_sizes[2]);
+                } else if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Pooling){
+                    input_sizes.push_back(m_pools.back().output_sizes[0]);
+                    input_sizes.push_back(m_pools.back().output_sizes[1]);
+                    input_sizes.push_back(m_pools.back().output_sizes[2]);
+                } else if (m_layer_types.back() == mnist_helper::LAYER_TYPE::Dense){
+                    throw std::runtime_error("Pooling after Dense not implemented!");
+                }
+				output_sizes.push_back((input_sizes[0] - size[0] + 2*0)/stride+1);
+				output_sizes.push_back((input_sizes[1] - size[1] + 2*0)/stride+1);
+				output_sizes.push_back(input_sizes[2]);
+				mnist_helper::POOLING_LAYER pool = {input_sizes, output_sizes, size, stride};
+                m_pools.emplace_back(pool);
+                m_layer_sizes.emplace_back(input_sizes[0] * input_sizes[1] * input_sizes[2]);
+				m_layer_types.emplace_back(mnist_helper::LAYER_TYPE::Pooling);
+				cypress::global_logger().debug(
+				    "MNIST", "Pooling layer detected with size (" +
+				                 std::to_string(size[0]) + ", " + std::to_string(size[1]) +
+				                ") and stride " + std::to_string(stride));
+			}
 			else {
 				throw std::runtime_error("Unknown layer type");
 			}
 		}
-		m_layer_sizes.emplace_back(m_layers[0].rows());
-		for (auto &layer : m_layers) {
-			m_layer_sizes.emplace_back(layer.cols());
-		}
+		m_layer_sizes.push_back(m_layers.back().cols());
+//		for (auto &layer : m_layers) {
+//			m_layer_sizes.emplace_back(layer.cols());
+//		}
 
 		m_mnist = mnist_helper::loadMnistData(60000, "train");
 		m_mnist_test = mnist_helper::loadMnistData(10000, "t10k");
@@ -376,6 +476,23 @@ public:
 			if (w > max)
 				max = w;
 		}
+		return max;
+	}
+
+	Real conv_max_weight(size_t layer_id) const override
+	{
+		Real max = 0.0;
+		auto layer = m_filters[layer_id];
+        auto filter = layer.filter;
+        for (size_t f = 0; f < layer.output_sizes[2]; f++) {
+            for (size_t x = 0; x < filter.size(); x++) {
+                for (size_t y = 0; y < filter[0].size(); y++) {
+                    for (size_t z = 0; z < filter[0][0].size(); z++) {
+                        max = filter[x][y][z][f] > max ? filter[x][y][z][f] : max;
+                    }
+                }
+            }
+        }
 		return max;
 	}
 
@@ -445,6 +562,22 @@ public:
 	}
 
 	/**
+	 * @brief Return all filter weights in the form of weights[x][y][depth][filter]
+	 *
+	 * @return const mnist_helper::Conv_TYPE &
+	 */
+	 // TODO: return whole conv struct? mh
+	const std::vector<mnist_helper::CONVOLUTION_LAYER> &get_conv_layers() override
+    {
+		return m_filters;
+	}
+
+	const std::vector<mnist_helper::POOLING_LAYER> &get_pooling_layers() override
+	{
+		return m_pools;
+	}
+
+	/**
 	 * @brief Return the number of neurons per layer
 	 *
 	 * @return const std::vector< size_t >&
@@ -452,6 +585,11 @@ public:
 	const std::vector<size_t> &get_layer_sizes() override
 	{
 		return m_layer_sizes;
+	}
+
+	const std::vector<mnist_helper::LAYER_TYPE> &get_layer_types() override
+    {
+		return m_layer_types;
 	}
 
 	/**
@@ -586,6 +724,12 @@ public:
 	virtual std::vector<std::vector<std::vector<Real>>> forward_path(
 	    const std::vector<size_t> &indices, const size_t start) const override
 	{
+		if(!m_filters.empty()){
+            throw std::runtime_error("Conv layer not supported in forward_path function!");
+        }
+		if(!m_pools.empty()){
+            throw std::runtime_error("Pooling layer layer not supported in forward_path function!");
+        }
 		auto &input = std::get<0>(m_mnist);
 		std::vector<std::vector<std::vector<Real>>> res;
 		std::vector<std::vector<Real>> activations;
@@ -615,6 +759,12 @@ public:
 	 */
 	virtual Real forward_path_test() const override
 	{
+		if(!m_filters.empty()){
+            throw std::runtime_error("Conv layer not supported in forward_path function!");
+        }
+		if(!m_pools.empty()){
+            throw std::runtime_error("Pooling layer layer not supported in forward_path function!");
+        }
 		auto &input = std::get<0>(m_mnist_test);
 		auto &labels = std::get<1>(m_mnist_test);
 		std::vector<std::vector<Real>> activations;
@@ -653,6 +803,12 @@ public:
 #ifndef NDEBUG
 		assert(m_batchsize == activations.size());
 #endif
+		if(!m_filters.empty()){
+            throw std::runtime_error("Conv layer not supported in forward_path function!");
+        }
+		if(!m_pools.empty()){
+            throw std::runtime_error("Pooling layer layer not supported in forward_path function!");
+        }
 		const auto &labels = std::get<1>(m_mnist);
 		const std::vector<cypress::Matrix<cypress::Real>> orig_weights =
 		    m_layers;
@@ -697,6 +853,12 @@ public:
 #ifndef NDEBUG
 		assert(m_batchsize == activations.back().size());
 #endif
+		if(!m_filters.empty()){
+            throw std::runtime_error("Conv layer not supported in forward_path function!");
+        }
+		if(!m_pools.empty()){
+            throw std::runtime_error("Pooling layer layer not supported in forward_path function!");
+        }
 		const auto orig_weights = m_layers;
 		for (size_t sample = 0; sample < m_batchsize; sample++) {
 
