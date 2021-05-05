@@ -112,6 +112,10 @@ std::vector<std::shared_ptr<SNABBase>> snab_registry(std::string backend,
 	        SpikingSlam(backend, bench_index)),
 	    std::make_shared<FunctionApproximation>(
 	        FunctionApproximation(backend, bench_index)),
+	    std::make_shared<MnistDoubleCNN>(
+	        MnistDoubleCNN(backend, bench_index)),
+	    std::make_shared<MnistCNNPool>(
+	        MnistCNNPool(backend, bench_index)),
 	};
 	return vec;
 }

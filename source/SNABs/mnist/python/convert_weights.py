@@ -31,6 +31,7 @@ model.load_weights(args.w)
 netw = json.loads(json_file)
 
 data = {}
+input_shape = []
 if netw["keras_version"][0] != "2":
     print("Warning: script was written for Keras 2.3.0")
 
@@ -62,11 +63,30 @@ for ind, layer in enumerate(netw["config"]["layers"]):
             layer_dict["weights"] = model.layers[ind].get_weights()[0].tolist()
         # Weight[i][j]: i input, j output
     elif(layer["class_name"] == "Conv2D"):
-        print("Conv2D", layer)
-        continue #TODO
+        layer_dict["class_name"] = "Conv2D"
+        layer_dict["size"] = layer["config"]["filters"]
+        layer_dict["stride"] = layer["config"]["strides"][0]
+        layer_dict["padding"] = layer["config"]["padding"]
+        if "batch_input_shape" in layer["config"]:
+            layer_dict["input_shape_x"] = layer["config"]["batch_input_shape"][1]
+            layer_dict["input_shape_y"] = layer["config"]["batch_input_shape"][2]
+            layer_dict["input_shape_z"] = layer["config"]["batch_input_shape"][3]
+        else:
+            layer_dict["input_shape_x"] = None
+            layer_dict["input_shape_y"] = None
+            layer_dict["input_shape_z"] = None
+        try:
+            layer_name = layer["config"]["name"]
+            for layer_2 in model.layers:
+                if layer_2.name == layer_name:
+                    layer_dict["weights"] = layer_2.get_weights()[0].tolist()
+                    break
+        except:
+            layer_dict["weights"] = model.layers[ind].get_weights()[0].tolist()
     elif(layer["class_name"] == "MaxPooling2D"):
-        print("MaxPooling2D", layer)
-        continue
+        layer_dict["class_name"] = "MaxPooling2D"
+        layer_dict["size"] = layer["config"]["pool_size"]
+        layer_dict["stride"] = layer["config"]["strides"][0]
     else:
         raise RuntimeError("Unknown layer type " + layer["class_name"] + "!")
     data["netw"].append(layer_dict)
