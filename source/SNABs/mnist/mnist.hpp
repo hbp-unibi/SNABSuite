@@ -56,6 +56,10 @@ protected:
 	bool m_poisson,
 	    m_train_data;  // Use poisson or regular spiking, Use train or test data
 	cypress::Real m_max_weight;  // Max weight to be scaled to
+	// std::vector<cypress::Real> m_conv_max_weight;
+	cypress::Real m_max_pool_weight;
+	cypress::Real m_pool_inhib_weight;
+	cypress::Real m_pool_delay;
 
 	std::vector<mnist_helper::MNIST_DATA>
 	    m_batch_data;  // Spiking data for the network
@@ -75,6 +79,7 @@ protected:
 	std::vector<Real> m_layer_scale_factors;
 
 	cypress::Real m_weights_scale_factor = 0.0;
+	std::vector<cypress::Real> m_conv_weights_scale_factors;
 
 	bool m_count_spikes = false;
 	std::vector<cypress::PopulationBase> m_all_pops;
@@ -87,7 +92,9 @@ protected:
 	 * @param netw network object in which the deep network will be created
 	 * @return number of layers
 	 */
-	size_t create_deep_network(cypress::Network &netw, Real max_weight = 0.0);
+	size_t create_deep_network(cypress::Network &netw, Real max_weight = 0.0,
+	                           Real max_pool_weight = 0.0,
+	                           Real pool_inhib_weight = 0.0);
 
 	/**
 	 * @brief Constructor used by deriving classes
@@ -327,6 +334,49 @@ public:
 	{
 		return std::make_shared<MnistDiehlTTFS>(m_backend, m_bench_index);
 	}
+};
+
+/*
+ * A 4 layer network consisting of 2 convolutional and 2 densely connected layer.
+ * Layout:
+ * conv1: 28x28x16
+ * conv2: 26x26x16
+ * dense1: 128
+ * dense2: 10
+ */
+class MnistDoubleCNN : public MNIST_BASE {
+public:
+    MnistDoubleCNN(const std::string backend, size_t bench_index)
+        : MNIST_BASE(backend, bench_index, __func__)
+    {
+    }
+
+    std::shared_ptr<SNABBase> clone() override
+    {
+        return std::make_shared<MnistDoubleCNN>(m_backend, m_bench_index);
+    }
+};
+
+/**
+ * A 4 layer network consisting of 1 convolutional, 1 max pooling
+ * and 2 densely connected layer.
+ * Layout:
+ * conv1: 28x28x16
+ * pool1: 14x14x16
+ * dense1: 128
+ * dense2: 10
+ */
+class MnistCNNPool : public MNIST_BASE {
+public:
+    MnistCNNPool(const std::string backend, size_t bench_index)
+        : MNIST_BASE(backend, bench_index, __func__)
+    {
+    }
+
+    std::shared_ptr<SNABBase> clone() override
+    {
+        return std::make_shared<MnistCNNPool>(m_backend, m_bench_index);
+    }
 };
 
 }  // namespace SNAB

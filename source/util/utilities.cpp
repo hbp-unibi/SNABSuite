@@ -124,14 +124,15 @@ Json Utilities::manipulate_backend_string(std::string &backend, Json &json)
 
 void Utilities::plot_spikes(std::string filename, std::string simulator)
 {
-	std::string short_sim = split(split(simulator, '=')[0], '.').back();
-	try {
-		system(("../plot/spike_plot.py " + filename + " -s " + short_sim + "&")
-		           .c_str());
-	}
-	catch (...) {
-		std::cerr << "Calling spike_plot.py caused an error!" << std::endl;
-	}
+    std::string short_sim = split(split(simulator, '=')[0], '.').back();
+    if (fork() == 0) {
+        auto test =
+            execlp("python3", "python3", "../plot/spike_plot.py",
+                   filename.c_str(), "-s", short_sim.c_str(), "-p", (char *)NULL);
+        if (test < 0) {
+            std::cerr << "Calling spike_plot.py caused an error!" << std::endl;
+        }
+    }
 }
 
 void Utilities::plot_histogram(std::string filename, std::string simulator,

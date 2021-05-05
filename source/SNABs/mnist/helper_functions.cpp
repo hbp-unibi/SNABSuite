@@ -277,6 +277,87 @@ std::vector<LocalConnection> dense_weights_to_conn(const Matrix<Real> &mat,
 	return conns;
 }
 
+std::vector<LocalConnection> conv_weights_to_conn(
+    const mnist_helper::CONVOLUTION_LAYER &layer,
+    Real scale, Real delay)
+{
+    std::vector<LocalConnection> conns;
+	size_t stride = layer.stride;
+	size_t kernel_size_x = layer.filter.size();
+	size_t kernel_size_y = layer.filter[0].size();
+	size_t kernel_size_z = layer.filter[0][0].size();
+	size_t max_x = layer.input_sizes[0] - kernel_size_x + 1;
+    size_t max_y = layer.input_sizes[1] - kernel_size_y + 1;
+
+    for (size_t i = 0; i < max_x; i += stride) {
+        for (size_t j = 0; j < max_y; j += stride) {
+            for (size_t filter = 0; filter < layer.output_sizes[2]; filter++){
+                for (size_t x = 0; x < kernel_size_x; x++) {
+                    for (size_t y = 0; y < kernel_size_y; y++) {
+                        for (size_t z = 0; z < kernel_size_z; z++) {
+                            conns.emplace_back((LocalConnection(
+                                (i + x) * layer.input_sizes[1] * layer.input_sizes[2] +
+                                (j + y) * layer.input_sizes[2] +
+                                z,
+                                i * layer.output_sizes[2] * layer.output_sizes[1] +
+                                j * layer.output_sizes[2] +
+                                filter,
+                                scale * layer.filter[x][y][z][filter], delay)));
+						}
+                    }
+                }
+            }
+        }
+    }
+    return conns;
+}
+
+std::vector<std::vector<LocalConnection>> pool_to_conn(
+    const mnist_helper::POOLING_LAYER &layer, Real max_pool_weight,
+    Real pool_inhib_weight, Real delay, Real pool_delay)
+{
+    std::vector<LocalConnection> inhib_conns;
+	std::vector<LocalConnection> pool_cons;
+	std::vector<std::vector<LocalConnection>> conns;
+    size_t max_x = layer.input_sizes[0]-ceil(layer.size[0]/2);
+	size_t max_y = layer.input_sizes[1]-ceil(layer.size[1]/2);
+	for (size_t i = 0; i < max_x; i += layer.stride){
+		for (size_t j = 0; j < max_y; j += layer.stride){
+			for (size_t k = 0; k < layer.input_sizes[2]; k++){
+				for (size_t x = 0; x < layer.size[0]; x++){
+					for (size_t y = 0; y < layer.size[1]; y++){
+                        for (size_t u = 0; u < layer.size[0]; u++){
+                            for (size_t v = 0; v < layer.size[1]; v++){
+								if (u != x || v != y) {
+									inhib_conns.emplace_back(LocalConnection(
+                                        (i + x) * layer.input_sizes[1] * layer.input_sizes[2] +
+									    (j + y) * layer.input_sizes[2] +
+									    k,
+									    (i + u) * layer.input_sizes[1] * layer.input_sizes[2] +
+									    (j + v) * layer.input_sizes[2] +
+									    k,
+									    pool_inhib_weight, pool_delay));
+								}
+                            }
+                        }
+						pool_cons.emplace_back(LocalConnection(
+                            (i + x) * layer.input_sizes[1] * layer.input_sizes[2] +
+                            (j + y) * layer.input_sizes[2] +
+                            k,
+                            i/layer.stride * layer.output_sizes[1] * layer.output_sizes[2] +
+                            j/layer.stride * layer.output_sizes[2] +
+                            k,
+                            max_pool_weight, delay));
+					}
+				}
+			}
+		}
+	}
+    conns.push_back(inhib_conns);
+    conns.push_back(pool_cons);
+	return conns;
+}
+
 std::vector<uint16_t> spikes_to_labels(const PopulationBase &pop, Real duration,
                                        Real pause, size_t batch_size, bool ttfs)
 {
@@ -389,6 +470,34 @@ std::vector<std::vector<Real>> spikes_to_rates_ttfs(const PopulationBase pop,
 		}
 	}
 	return res;
+}
+
+void conv_spikes_per_kernel(const std::string& filename, const PopulationBase& pop,
+                            Real duration, Real pause, size_t batch_size, Real norm)
+{
+    auto res = spikes_to_rates(pop, duration, pause, batch_size, norm);
+    std::ofstream file;
+	file.open(filename);
+	file << "Neuron1,Neuron2,Neuron3,Neuron4,max,sum\n";
+	double neur1, neur2, neur3, neur4;
+	for (size_t sample = 0; sample < res.size(); sample++) {
+		for (size_t x = 0; x < 25; x+=2) {
+			for (size_t y = 0; y < 25; y+=2) {
+				for (size_t fil = 0; fil < 32; fil++) {
+                    neur1 = res[sample][x*26*32 +y*32 +fil];
+                    neur2 = res[sample][x*26*32 +(y+1)*32 +fil];
+                    neur3 = res[sample][(x+1)*26*32 +y*32 +fil];
+                    neur4 = res[sample][(x+1)*26*32 +(y+1)*32 +fil];
+					if (neur1 != 0 || neur2 != 0 || neur3 != 0 || neur4 != 0) {
+						file << neur1 << "," << neur2 << "," << neur3 << ","
+						     << neur4 << ","
+						     << std::max({neur1, neur2, neur3, neur4}) << ","
+						     << neur1 + neur2 + neur3 + neur4 << "\n";
+					}
+				}
+			}
+		}
+	}
 }
 
 std::vector<std::vector<Real>> spikes_to_rates(const PopulationBase pop,

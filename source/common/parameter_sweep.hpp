@@ -55,6 +55,8 @@ private:
 	// TODO: Number of repetitions for every simulation
 	size_t m_repetitions = 1;
 
+	std::string m_file_name;
+
 	// Number of threads for panellizing sweep
 	size_t m_n_threads = 1;
 
