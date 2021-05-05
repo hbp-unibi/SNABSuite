@@ -39,7 +39,10 @@
         "loss_function": "CatHinge",
         "num_test_images": 10000,
         "test_batchsize": 10000,
-        "random_init": false
+        "random_init": false,
+        "setup": {
+            "keep_compile" : true
+        }
     },
     "spikey": {
         "neuron_type": "IfFacetsHardware1",
