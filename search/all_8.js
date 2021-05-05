@@ -1,0 +1,16 @@
+var searchData=
+[
+  ['false',['False',['../de/dc5/namespacehistogram.html#a98380c3a995fd00acfc2e719c594ce6a',1,'histogram.False()'],['../d8/d5c/namespacespike__plot.html#a38252def569b65fd4f5a19609d75876c',1,'spike_plot.False()']]],
+  ['fig',['fig',['../d2/da3/namespace1dim__plot.html#ab0e27b04ae9ef8f58ebe14981414b24d',1,'1dim_plot.fig()'],['../d6/d01/namespace2dim__plot.html#ab0b1896ab295d77304c2433389909da2',1,'2dim_plot.fig()'],['../de/dc5/namespacehistogram.html#a70fb7eed40c32ebeb1bc6b1be9c257eb',1,'histogram.fig()'],['../df/da3/namespaceplot__membrane__pot.html#a3d3d7f580fa2ac281d91c46b73429a68',1,'plot_membrane_pot.fig()'],['../d8/d5c/namespacespike__plot.html#a9f21ff8f5e8c91a4ebb249d5fd8ba7d4',1,'spike_plot.fig()']]],
+  ['figsize',['figsize',['../d2/d62/namespaceshow__csv.html#aab0d1ce3b7a1a2031356070c9ad61eae',1,'show_csv']]],
+  ['file',['file',['../d8/dba/namespaceconvert__weights.html#ab5796d24e14cb43e94518474376a10dd',1,'convert_weights.file()'],['../d5/d9b/namespaceextract__from__diehl.html#ac244a5b9055faa7ae1f387c6fc72bd7e',1,'extract_from_diehl.file()'],['../d9/dd4/namespacegenerate__bench__json.html#a637db927a6c5b900de01e35d44c3fe2f',1,'generate_bench_json.file()']]],
+  ['filter',['filter',['../db/de8/namespacemnist__helper.html#ae46cb44826bfef069bc9fe868bf5b1fe',1,'mnist_helper::CONVOLUTION_LAYER']]],
+  ['filter_5fin',['filter_in',['../d2/d62/namespaceshow__csv.html#a4d5eafbcd2d7968e670a3d04e7fdfbc0',1,'show_csv']]],
+  ['first',['first',['../df/da3/namespaceplot__membrane__pot.html#a37d69911be652c32fed98748940aa2ec',1,'plot_membrane_pot']]],
+  ['float',['float',['../d2/da3/namespace1dim__plot.html#a7a52e1f7f8ab6a1e03c806ee128b6ff9',1,'1dim_plot.float()'],['../d6/d01/namespace2dim__plot.html#af0695260c098d2b460bb2e94214b0721',1,'2dim_plot.float()'],['../df/da3/namespaceplot__membrane__pot.html#a867febfb01544de735f3ff0d9e3dbbd4',1,'plot_membrane_pot.float()']]],
+  ['format',['format',['../d2/da3/namespace1dim__plot.html#aeed5b1a123e4a0dafc176b3e92128c9e',1,'1dim_plot.format()'],['../d6/d01/namespace2dim__plot.html#aa5318d0042d23cc05095e08e98b8ff8e',1,'2dim_plot.format()'],['../de/dc5/namespacehistogram.html#ade055a95f2859b9dcd55494dfaede1dd',1,'histogram.format()'],['../df/da3/namespaceplot__membrane__pot.html#a46eed3219c14e2c63d7cecef047504a1',1,'plot_membrane_pot.format()'],['../d8/d5c/namespacespike__plot.html#a3f3fa08e664dcd4fa64b4a24470e9c1f',1,'spike_plot.format()']]],
+  ['forward_5fpath',['forward_path',['../df/d5e/class_m_n_i_s_t_1_1_m_l_p_base.html#afb518340c7cc44b37d22583b732eb7f7',1,'MNIST::MLPBase::forward_path()'],['../d5/d71/class_m_n_i_s_t_1_1_m_l_p.html#a79ea6dc068fef2796ec6d00fd7fe8993',1,'MNIST::MLP::forward_path()']]],
+  ['forward_5fpath_5ftest',['forward_path_test',['../df/d5e/class_m_n_i_s_t_1_1_m_l_p_base.html#a02a5f618ffb01e48fcd78bd2d0fcb94a',1,'MNIST::MLPBase::forward_path_test()'],['../d5/d71/class_m_n_i_s_t_1_1_m_l_p.html#a89ac45271ac6380dee1c9f3461f15211',1,'MNIST::MLP::forward_path_test()']]],
+  ['fraction_5fpres_5ftime',['fraction_pres_time',['../df/d98/class_s_n_a_b_1_1_rate_based_weight_dependent_activation.html#a35c9211d4de6a936d6f7c0a247fb5897',1,'SNAB::RateBasedWeightDependentActivation']]],
+  ['function',['function',['../d1/dcc/class_m_n_i_s_t_1_1_re_l_u.html#aff7f26098d86652c863ee17ab94c09d8',1,'MNIST::ReLU']]]
+];
