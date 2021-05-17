@@ -55,7 +55,8 @@
     "nmpm1": {
         "neuron_type": "IF_cond_exp",
         "setup": {
-            "calib_path": "/wang/data/calibration/brainscales/current",
+            "calib_path": "/wang/data/commissioning/BSS-1/rackplace/33/calibration/current",
+            "defects_path": "/wang/data/commissioning/BSS-1/rackplace/33/derived_plus_calib_blacklisting/current",
             "neuron_size": 4,
             "wafer": 33,
             "hicann": 372
