@@ -117,28 +117,31 @@
     "nmpm1": {
         "neuron_type": "IF_cond_exp",
         "setup": {
-            "calib_path": "/wang/data/calibration/brainscales/current",
+            "calib_path": "/wang/data/commissioning/BSS-1/rackplace/33/calibration/current",
+            "defects_path": "/wang/data/commissioning/BSS-1/rackplace/33/derived_plus_calib_blacklisting/current",
             "digital_weight": true,
             "neuron_size": 4,
-            "bandwidth": 0.1,
+            "bandwidth": 0.6,
             "wafer": 33,
             "hicann": [
                 [
                     372
                 ],
                 [
-                    372,
-                    360
+                    [372],
+                    [360]
                 ],
                 [
-                    372,
-                    373,
-                    375,
-                    360,
+                    [372,
+                     373,
+                     375],
+                    [360,
                     361,
-                    362,
-                    363
-                ]
+                    363]
+                ],
+                [
+                [67,71,72,73,74,75,76,77,78,79,80,82,83,84,85,86,87,88],
+                [93,96,98,100,101,103,104,105,107,108,109,112,113,114,115]]
             ]
         },
         "neuron_params_max": {
@@ -147,7 +150,7 @@
             "v_reset": -67,
             "v_thresh": -60,
             "tau_syn_E": 2,
-            "tau_refrac": 8.1,
+            "tau_refrac": 7,
             "tau_m": 0.1,
             "cm": 0.2
         },
@@ -163,9 +166,10 @@
         },
         "weight": 15,
         "#neurons": [
-            50,
-            100,
-            350
+            60,
+            117,
+            360,
+            1698
         ]
     }
 }

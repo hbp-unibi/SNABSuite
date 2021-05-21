@@ -84,7 +84,7 @@ std::vector<std::array<cypress::Real, 4>> SingleMaxFreqToGroup::evaluate()
 	    m_pop_single[0].signals().data(0), m_start_time);
 	bool valid = true;
 	if (spike_ref < (m_simulation_length - m_start_time) /
-	                    10) {  // less than a spike every 10 ms
+	                    20.0) {  // less than a spike every 20 ms
 		global_logger().error(
 		    "SNABSuite",
 		    "SNAB SingleMaxFreqToGroup was probably not configured "
