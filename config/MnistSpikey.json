@@ -131,15 +131,22 @@
         "scaled_image": true
     },
     "nmpm1": {
-        "repeat": 10,
+        "repeat": 1,
         "setup": {
-            "calib_path": "/wang/data/calibration/brainscales/current",
+            "calib_path": "/wang/data/commissioning/BSS-1/rackplace/33/calibration/current",
+            "defects_path": "/wang/data/commissioning/BSS-1/rackplace/33/derived_plus_calib_blacklisting/current",
             "neuron_size": 8,
             "digital_weight": true,
             "bandwidth": 0.3,
             "synapse_loss": false,
             "wafer": 33,
             "hicann": [
+            [
+                [72,73,74,75,76,77,78],
+                [100,101,102,103],
+                [132,131]
+            ],
+            
                 [
                     [
                         320,
@@ -171,10 +178,10 @@
             "tau_syn_E": 5,
             "tau_syn_I": 5,
             "v_rest": -40,
-            "v_reset": -65,
-            "v_thresh": -25,
+            "v_reset": -50,
+            "v_thresh": -30,
             "tau_refrac": 0.1,
-            "tau_m": 20,
+            "tau_m": 22,
             "cm": 0.2
         },
         "images": 10000,

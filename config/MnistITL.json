@@ -79,7 +79,8 @@
     },
     "nmpm1": {
         "setup": {
-            "calib_path": "/wang/data/calibration/brainscales/current",
+            "calib_path": "/wang/data/commissioning/BSS-1/rackplace/33/calibration/current",
+            "defects_path": "/wang/data/commissioning/BSS-1/rackplace/33/derived_plus_calib_blacklisting/current",
             "neuron_size": 8,
             "digital_weight": true,
             "bandwidth": 0.3,
@@ -88,28 +89,11 @@
             "full_list_connect": false,
             "wafer": 33,
             "hicann": [
-                [
-                    [
-                        320,
-                        321,
-                        340,
-                        341,
-                        296,
-                        297,
-                        298,
-                        299
-                    ],
-                    [
-                        320,
-                        321,
-                        340,
-                        341
-                    ],
-                    [
-                        322,
-                        342
-                    ]
-                ]
+            [
+                [72,73,74,75,76,77,78],
+                [100,101,102,103],
+                [132,131]
+            ]
             ]
         },
         "neuron_type": "IF_cond_exp",
@@ -119,27 +103,27 @@
             "tau_syn_E": 5,
             "tau_syn_I": 5,
             "v_rest": -40,
-            "v_reset": -65,
-            "v_thresh": -25,
+            "v_reset": -50,
+            "v_thresh": -30,
             "tau_refrac": 0.1,
-            "tau_m": 20,
+            "tau_m": 22,
             "cm": 0.2
         },
         "images": 60000,
-        "batchsize": 500,
+        "batchsize": 4000,
         "duration": 900,
         "max_freq": 60,
         "pause": 50,
         "poisson": false,
         "max_weight": 15.4,
-        "learn_rate": 0.008,
+        "learn_rate": 0.015,
         "train_data": false,
         "batch_parallel": false,
         "dnn_file": "networks/netw_spikey.msgpack",
         "scaled_image": true,
-        "epochs": 5,
+        "epochs": 4,
         "positive": true,
-        "norm_rate_hidden": 5,
+        "norm_rate_hidden": 1,
         "norm_rate_last": 5,
         "loss_function": "CatHinge",
         "num_test_images": 10000,
