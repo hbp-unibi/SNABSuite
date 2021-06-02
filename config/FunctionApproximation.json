@@ -67,5 +67,42 @@
         "setup": {
             "calibIcb": false
         }
+    },
+    "nmpm1": {
+        "repeat": 10,
+        "setup": {
+            "calib_path": "/wang/data/commissioning/BSS-1/rackplace/33/calibration/current",
+            "defects_path": "/wang/data/commissioning/BSS-1/rackplace/33/derived_plus_calib_blacklisting/current",
+            "neuron_size": 8,
+            "digital_weight": true,
+            "bandwidth": 0.3,
+            "synapse_loss": false,
+            "wafer": 33,
+            "hicann": [[72,73]],
+            "keep_mapping":true
+        },
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "e_rev_I": -140,
+            "v_rest": -60,
+            "v_reset": -70,
+            "v_thresh": -55.0,
+            "tau_syn_E": 2,
+            "tau_syn_I": 2,
+            "tau_refrac": 2,
+            "tau_m": 20,
+            "cm": 0.2
+        },
+        "#neurons": 50,
+        "#repeat": 10,
+        "#samples_test": 100,
+        "#repeat_test": 1,
+        "weight": 6,
+        "bias_weight": 5,
+        "bias_weight_inh": -12,
+        "response_time": 300,
+        "min_spike_interval": 10,
+        "separate_inh": false
     }
 }

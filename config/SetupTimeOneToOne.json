@@ -25,34 +25,44 @@
     },
     "nmpm1": {
         "setup": {
-            "synapse_loss": true,
-            "calib_path": "/wang/data/calibration/brainscales/current",
+            "calib_path": "/wang/data/commissioning/BSS-1/rackplace/33/calibration/current",
+            "defects_path": "/wang/data/commissioning/BSS-1/rackplace/33/derived_plus_calib_blacklisting/current",
+            "neuron_size": 4,
             "digital_weight": true,
+            "bandwidth": 0.6,
             "wafer": 33,
+            "synapse_loss":true,
             "hicann": [
                 [
                     372
                 ],
                 [
-                    372,
-                    360
+                    375,
+                    363
                 ],
                 [
                     372,
                     373,
+                    374,
                     375,
                     360,
                     361,
                     362,
                     363
-                ]
+                ],
+                [12,13,
+                27,28,29,31,32,33,34,35,37,39,41,
+                46,47,48,51,52,53,54,56,57,58,59,60,
+                67,68,70,72,73,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,91,
+                93,95,98,100,101,103,104,105,106,107,108]
             ]
         },
         "neuron_type": "IF_cond_exp",
         "#neurons": [
-            51,
-            103,
-            357
+            60,
+            120,
+            480,
+            2000
         ]
     }
 }
