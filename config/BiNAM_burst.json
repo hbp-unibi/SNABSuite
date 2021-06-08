@@ -146,6 +146,89 @@
         }
     },
     "nmpm1": {
-        "invalid": true
+        "setup": {
+            "calib_path": "/wang/data/commissioning/BSS-1/rackplace/33/calibration/current",
+            "defects_path": "/wang/data/commissioning/BSS-1/rackplace/33/derived_plus_calib_blacklisting/current",
+            "neuron_size": 8,
+            "digital_weight": true,
+            "synapse_loss": false,
+            "bandwidth": 0.3,
+            "wafer": 33,
+            "hicann": [
+                [
+                    372
+                ],
+                [
+                    [372],
+                    [360]
+                ],
+                [
+                    [373],
+                    [372,
+                    375,
+                    360,
+                    361,
+                    362,
+                    363]
+                ],
+                [
+                [76,77,78,79,80,81,82,83,84,85,86,87,88],
+                [12,13,15,16,17,18,
+                27,28,29,31,32,33,34,35,37,39,41,
+                46,47,48,51,52,53,54,56,57,58,59,60,
+                67,68,70,72,73,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,91,
+                93,95,98,100,101,103,104,105,106,107,108
+                ]
+            ]]
+        },
+        "data": {
+            "n_bits_in": 50,
+            "n_bits_out": [
+                40,
+                56,
+                344,
+                3408
+            ],
+            "n_ones_in": 4,
+            "n_ones_out": 4
+        },
+        "network": {
+            "params": {
+                "e_rev_E": -14.0,
+                "e_rev_I": -80,
+                "v_rest": -70,
+                "v_reset": -80,
+                "v_thresh": -51,
+                "tau_syn_E": 8.0,
+                "tau_syn_I": 8.0,
+                "tau_refrac": 5.0,
+                "tau_m": 15,
+                "cm": 0.2
+            },
+            "neuron_type": "IF_cond_exp",
+            "weight": 5,
+            "input_burst_size": 4,
+            "time_window": 60,
+            "isi": 2,
+            "sigma_t": 2,
+            "sigma_offs": 0,
+            "p0": 0,
+            "p1": 0,
+            "output_burst_size": 1,
+            "general_offset": 10,
+            "multiplicity": 1,
+            "n_samples_recall": [
+                117,
+                158,
+                813,
+                7470
+            ]
+        },
+        "data_generator": {
+            "seed": 1234,
+            "random": 1,
+            "balanced": 0,
+            "unique": 0
+        }
     }
 }
