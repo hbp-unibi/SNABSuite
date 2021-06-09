@@ -43,7 +43,8 @@
         "activity_based_scaling": 97,
         "ttfs": true,
         "setup": {
-            "timestep": 1
+            "timestep": 1,
+            "keep_compile" : true
         }
     },
     "spikey": {

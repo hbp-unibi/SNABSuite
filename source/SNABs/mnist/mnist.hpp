@@ -255,6 +255,7 @@ protected:
 	bool m_last_layer_only = true;
 	size_t m_num_test_images = 10000;
 	size_t m_test_batchsize = 0;
+	std::vector<Real> m_time_to_sol;
 };
 
 /**
@@ -337,24 +338,20 @@ public:
 };
 
 /*
- * A 4 layer network consisting of 2 convolutional and 2 densely connected layer.
- * Layout:
- * conv1: 28x28x16
- * conv2: 26x26x16
- * dense1: 128
- * dense2: 10
+ * A 4 layer network consisting of 2 convolutional and 2 densely connected
+ * layer. Layout: conv1: 28x28x16 conv2: 26x26x16 dense1: 128 dense2: 10
  */
 class MnistDoubleCNN : public MNIST_BASE {
 public:
-    MnistDoubleCNN(const std::string backend, size_t bench_index)
-        : MNIST_BASE(backend, bench_index, __func__)
-    {
-    }
+	MnistDoubleCNN(const std::string backend, size_t bench_index)
+	    : MNIST_BASE(backend, bench_index, __func__)
+	{
+	}
 
-    std::shared_ptr<SNABBase> clone() override
-    {
-        return std::make_shared<MnistDoubleCNN>(m_backend, m_bench_index);
-    }
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<MnistDoubleCNN>(m_backend, m_bench_index);
+	}
 };
 
 /**
@@ -368,15 +365,15 @@ public:
  */
 class MnistCNNPool : public MNIST_BASE {
 public:
-    MnistCNNPool(const std::string backend, size_t bench_index)
-        : MNIST_BASE(backend, bench_index, __func__)
-    {
-    }
+	MnistCNNPool(const std::string backend, size_t bench_index)
+	    : MNIST_BASE(backend, bench_index, __func__)
+	{
+	}
 
-    std::shared_ptr<SNABBase> clone() override
-    {
-        return std::make_shared<MnistCNNPool>(m_backend, m_bench_index);
-    }
+	std::shared_ptr<SNABBase> clone() override
+	{
+		return std::make_shared<MnistCNNPool>(m_backend, m_bench_index);
+	}
 };
 
 }  // namespace SNAB

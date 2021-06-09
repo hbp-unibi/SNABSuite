@@ -31,10 +31,9 @@ using namespace cypress;
 WeightDependentActivation::WeightDependentActivation(const std::string backend,
                                                      size_t bench_index)
     : SNABBase(__func__, backend,
-               {"Average spike deviation", "Average standard deviation",
-                "Maximum deviation", "Minimum deviation"},
-               {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
-               {"", "", "", ""},
+               {"Average spike deviation"},
+               {"quality"}, {""},
+               {""},
                {"neuron_type", "neuron_params", "weight_min", "weight_max",
                 "step_size", "#neurons", "isi", "expected_output"},
                bench_index),
@@ -248,10 +247,9 @@ RateBasedWeightDependentActivation::RateBasedWeightDependentActivation(
     const std::string backend, size_t bench_index)
     : WeightDependentActivation(
           __func__, backend,
-          {"Average frequency deviation", "Average standard deviation",
-           "Maximum deviation", "Minimum deviation"},
-          {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
-          {"", "", "", ""},
+          {"Average frequency deviation"},
+          {"quality"}, {""},
+          {""},
           {"neuron_type", "neuron_params", "weight_min", "weight_max",
            "step_size", "#neurons", "presentation_time", "rate",
            "expected_output"},
@@ -395,10 +393,9 @@ void RateBasedWeightDependentActivation::run_netw(cypress::Network &netw)
 
 ReluSimilarity::ReluSimilarity(const std::string backend, size_t bench_index)
     : SNABBase(__func__, backend,
-               {"Average deviation", "Average standard deviation",
-                "Maximum deviation", "Minimum deviation"},
-               {"quality", "quality", "quality", "quality"}, {"", "", "", ""},
-               {"", "", "", ""},
+               {"Average deviation"},
+               {"quality"}, {""},
+               {""},
                {"neuron_type", "neuron_params", "weight", "rate_max", "steps",
                 "#neurons", "presentation_time", "#source_neurons"},  // TODO
                bench_index),
