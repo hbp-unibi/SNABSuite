@@ -111,7 +111,57 @@
         ]
     },
     "nmpm1": {
-        "invalid": true
+        "repeat":10,
+        "setup": {
+            "calib_path": "/wang/data/commissioning/BSS-1/rackplace/33/calibration/current",
+            "defects_path": "/wang/data/commissioning/BSS-1/rackplace/33/derived_plus_calib_blacklisting/current",
+            "neuron_size": 4,
+            "digital_weight": true,
+            "bandwidth": 0.8,
+            "synapse_loss": true,
+            "wafer": 33,
+            "hicann": [
+                   [12,13,15,16,17,18,27,28,29,31,32,33,34,35,37,39,46,47,48,51,52,53,54,56,57,58,59]
+            ],
+            "keep_mapping":true
+        },
+        "neuron_params": {
+            "e_rev_E": 40.0,
+            "e_rev_I": -120.0,
+            "tau_syn_E": 5.0,
+            "tau_syn_I": 10.0,
+            "v_rest": -30.0,
+            "v_reset": -40.0,
+            "v_thresh": -20.0,
+            "tau_refrac": 1.0,
+            "tau_m": 10.0,
+            "cm": 0.2
+        },
+        "population": {
+            "number": 2,
+            "weight_exh": 8,
+            "weight_inh": -9,
+            "fan_in_exh": 2,
+            "fan_in_inh": 2
+        },
+        "noise": {
+            "weight_rand": 15,
+            "noise_rate": 50
+        },
+        "trigger": {
+            "number": 2,
+            "weight": 15,
+            "trigger_rate": 60
+        },
+        "delay": 1,
+        "start": 0,
+        "duration": [
+            50000
+        ],
+        "bin_size": 60,
+        "sudoku": [
+            "_deps/sudoku_rep-src/sudokus/2x2/Sudoku_0.json"
+        ]
     },
     "spikey": {
         "invalid": true

@@ -1,0 +1,12 @@
+{
+    "snab_name": "ReluSimilarity",
+    "config": {
+        "nmpm1": {
+            "weight": [6,15,5],
+            "neuron_params": {
+                "v_thresh": [-30,-20,5],
+                "e_rev_E": [-10,50,5]
+            }
+        }
+    }
+}

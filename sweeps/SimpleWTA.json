@@ -1,0 +1,10 @@
+{
+    "snab_name": "SimpleWTA",
+    "config": {
+        "nmpm1": {
+            "weight_inp": [9,15,7],
+            "weight_self": [9,15,7],
+            "weight_inh": [-15,-5,11]
+        }
+    }
+}

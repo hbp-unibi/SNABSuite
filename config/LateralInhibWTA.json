@@ -110,13 +110,21 @@
         "firing_rate": 30
     },
     "nmpm1": {
-        "invalid": true,
+        "repeat": 1,
         "setup": {
-            "calib_path": "/wang/data/calibration/brainscales/default-2017-09-26-1",
-            "neuron_size": 4,
+            "calib_path": "/wang/data/commissioning/BSS-1/rackplace/33/calibration/current",
+            "defects_path": "/wang/data/commissioning/BSS-1/rackplace/33/derived_plus_calib_blacklisting/current",
+            "neuron_size": 8,
             "digital_weight": true,
-            "bandwidth": 0.8,
-            "synapse_loss": true
+            "bandwidth": 0.3,
+            "synapse_loss": false,
+            "wafer": 33,
+            "hicann": [
+                [
+                    360,372
+                ]
+            ],
+            "keep_mapping":true
         },
         "neuron_type": "IF_cond_exp",
         "neuron_params": {
@@ -133,14 +141,14 @@
         },
         "num_neurons_pop": 10,
         "num_source_neurons": 10,
-        "num_inhibitory_neurons": 10,
-        "weight_inp": 5,
-        "weight_self": 10,
+        "num_inhibitory_neurons": 4,
+        "weight_inp": 6,
+        "weight_self": 15,
         "weight_lat_inh": -2,
-        "weight_lat_exc": 2,
-        "prob_inp": 0.2,
-        "prob_self": 0.6,
-        "prob_lat_exc": 0.7,
-        "firing_rate": 60
+        "weight_lat_exc": 12,
+        "prob_inp": 1.0,
+        "prob_self": 1.0,
+        "prob_lat_exc": 1.0,
+        "firing_rate": 40
     }
 }

@@ -1,0 +1,10 @@
+ {
+    "snab_name": "FunctionApproximation",
+    "config": {
+        "nmpm1": {
+            "weight": [5,15,11],
+            "bias_weight": [5,15,11],
+            "bias_weight_inh": [-15,-5,11]
+        }
+    }
+}

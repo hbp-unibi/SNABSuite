@@ -1,0 +1,23 @@
+{
+    "snab_name": "SpikingSudoku",
+    "config": {
+	"nmpm1" : {
+        "population": {
+            "number": 2,
+            "weight_exh": [1,15,15],
+            "weight_inh": [-15,-1,15],
+            "fan_in_exh": 2,
+            "fan_in_inh": 2
+        },
+        "noise": {
+            "weight_rand": [1,15,15],
+            "noise_rate": 50
+        },
+        "trigger": {
+            "number": 2,
+            "weight": 15,
+            "trigger_rate": 60
+        },
+        "setup":{"keep_mapping":true}
+	}}
+}

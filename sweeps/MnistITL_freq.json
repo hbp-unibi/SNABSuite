@@ -14,14 +14,17 @@
         },
         "nmpm1": {
             "max_freq": [
-                10,
+                60,
                 150,
-                20
+                10
             ],
+            "neuron_params": {
+                "v_thresh": [-35,0,10]
+            },
             "train_data": true,
-            "epochs": 5,
-            "images": 100,
-            "batchsize": 100
+            "epochs": 2,
+            "images": 5000,
+            "batchsize": 500
         },
         "nest": {
             "max_freq": [

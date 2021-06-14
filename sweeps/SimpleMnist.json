@@ -1,0 +1,13 @@
+{
+	"snab_name" : "MnistSpikey",
+    "config": {
+	"nmpm1" : {
+		"neuron_params": {
+			"tau_m": [20,30,10],
+			"v_thresh":[-35,-25,5],
+			"v_reset" : [-60,-30,5]
+		},
+        "train_data": true
+	}
+	}
+}

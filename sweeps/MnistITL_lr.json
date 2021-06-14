@@ -20,8 +20,8 @@
             ],
             "train_data": true,
             "epochs": 5,
-            "images": 100,
-            "batchsize": 100
+            "images": 10000,
+            "batchsize": 500
         },
         "nest": {
             "learn_rate": [

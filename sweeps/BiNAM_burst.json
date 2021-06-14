@@ -1,5 +1,5 @@
 {
-    "snab_name": "BiNAM",
+    "snab_name": "BiNAM_burst",
     "config": {
         "spikey": {
         "network": {
@@ -28,11 +28,14 @@
             }
         },
         "nmpm1":{
-        "network": {
-            "params": {
-                "tau_syn_E": [1,10,5],
-                "e_rev_E": [-40,-15.0,10]
+            "network": {
+                "params": {
+                    "e_rev_E": [-40, 20.0,10],
+                    "tau_m" : [10,20,5],
+                    "v_thresh": [-65,-50,10]
+                },
+            "weight": [6,15,5]
             }
-        }}
+        }
     }
 }

@@ -1,5 +1,5 @@
 {
-    "snab_name": "LateralInhibWTA",
+    "snab_name": "MirrorInhibWTASmall",
     "config": {
         "spikey": {
             "weight_inp": [
@@ -12,7 +12,7 @@
                 0.01,
                 10
             ],
-            "weight_lat_inh": [
+            "weight_from_inh": [
                 -0.06,
                 -0.004,
                 15
@@ -20,21 +20,21 @@
         },
         "nmpm1": {
             "weight_inp": [
-                6,
+                1,
                 15,
-                10
+                15
             ],
             "weight_self": [
-                6,
+                1,
                 15,
-                10
+                15
             ],
-            "weight_lat_inh": [
+            "weight_from_inh": [
                 -15,
                 -1,
                 15
             ],
-            "weight_lat_exc": [
+            "weight_to_inh": [
                 1,
                 15,
                 15
