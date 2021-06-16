@@ -140,6 +140,10 @@ public:
 };
 
 
+/**
+ * Similar to MirrorInhibWTA, but focuses on using smaller populations.
+ * 
+ */
 class MirrorInhibWTASmall : public MirrorInhibWTA {
 public:
 	MirrorInhibWTASmall(std::string backend, size_t bench_index): MirrorInhibWTA(backend, bench_index, __func__){};

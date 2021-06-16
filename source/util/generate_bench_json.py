@@ -45,7 +45,7 @@ def get_key_arrays(dictionary):
     """
 
     temp_dict = dict()
-    length = 0
+    length = 1
     for i in dictionary:
         if type(dictionary[i]) == list:
             temp_dict[i] = dictionary[i]
@@ -77,16 +77,28 @@ def get_available_simulators(dictionary):
                 global_length = length
             avail_list.append(length)
         except:
-            avail_list.append(0)
+            try:
+                a, length = get_key_arrays(dictionary["default"])
+                if length > global_length:
+                    global_length = length
+                avail_list.append(length)
+            except:
+                avail_list.append(0)
 
     if global_length == 0:  # Not a scalable benchmark
         avail_list = [1 for i in avail_list]
 
     # Check for invalid flag
     for i, simulator in enumerate(simulators):
-        if "invalid" in dictionary[simulator]:
-            if dictionary[simulator]["invalid"]:
-                avail_list[i] = 0
+        if simulator in dictionary:
+            if "invalid" in dictionary[simulator]:
+                if dictionary[simulator]["invalid"]:
+                    avail_list[i] = 0
+        elif "default" in  dictionary:
+            if "invalid" in dictionary["default"]:
+                if dictionary[simulator]["invalid"]:
+                    avail_list[i] = 0
+            
 
     return avail_list
 
@@ -172,6 +184,9 @@ for headername in list_files:
         global_json.append(snab_dict)
         print('--------')
     print('========')
+
+for entry in global_json:
+    entry["model"]["description"] = entry["model"]["description"].replace("@brief ", "")
 
 # Dump the global list of benchmark description in pretty
 with open('benchmarks.json', 'w') as file:

@@ -87,6 +87,11 @@ public:
 	}
 };
 
+/**
+ * Measure the similarity between the rate-based activation curve of a spiking
+ * neuron and the ReLU function.
+ *
+ */
 class ReluSimilarity : public SNABBase {
 protected:
 	cypress::PopulationBase m_pop;
