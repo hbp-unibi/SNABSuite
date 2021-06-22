@@ -122,7 +122,7 @@ protected:
 
 /**
  * A simple feed-forward network with densely connected layers.
- * This network has 89x100x10 layout with images downscales by 3x3 average
+ * This network has 89 x 100 x 10 layout with images downscaled by 3x3 average
  * pooling and no inhibition
  */
 class MnistSpikey : public MNIST_BASE {
@@ -142,7 +142,7 @@ public:
 /**
  * A simple feed-forward network with densely connected layers.
  * This is a network optimized by Neural Architecture Search. Layout:
- * 784x43x10x10
+ * 784 x 43 x 10 x 10
  */
 class MnistNAS63 : public MNIST_BASE {
 public:
@@ -161,7 +161,7 @@ public:
 /**
  * A simple feed-forward network with densely connected layers.
  * This is a network optimized by Neural Architecture Search. Layout:
- * 784x52x35x32x10
+ * 784 x 52 x 35 x 32 x 10
  */
 class MnistNAS129 : public MNIST_BASE {
 public:
@@ -180,7 +180,7 @@ public:
 /**
  * A simple feed-forward network with densely connected layers.
  * This is a network optimized by Neural Architecture Search. Layout:
- * 784x866x52x35x32x10
+ * 784 x 866 x 52 x 35 x 32 x 10
  */
 class MnistNAStop : public MNIST_BASE {
 public:
@@ -199,9 +199,9 @@ public:
 /**
  * A simple feed-forward network with densely connected layers.
  * This is a network taken from
- * https://github.com/dannyneil/spiking_relu_conversion Corresponding paper:
+ * https://github.com/dannyneil/spiking_relu_conversion. Corresponding paper:
  * Diehl et al.: M. Fast-Classifying, High-Accuracy Spiking Deep Networks
- * Through Weight and Threshold Balancing. Layout: 784x1200x1200x10
+ * Through Weight and Threshold Balancing. Layout: 784 x 1200 x 1200 x 10
  */
 class MnistDiehl : public MNIST_BASE {
 public:
@@ -297,9 +297,9 @@ public:
 
 /**
  * A simple feed-forward network with densely connected layers.
- * This network has 89x100x10 layout with images downscales by 3x3 average
- * pooling and no inhibition
- * In contrast to MnistSpikey, use TTFS encoding
+ * This network has 89 x 100 x 10 layout with images downscaled by 3x3 average
+ * pooling and no inhibition.
+ * In contrast to MnistSpikey, this SNAB uses TTFS encoding.
  */
 class MnistSpikeyTTFS : public MNIST_BASE {
 public:
@@ -320,8 +320,8 @@ public:
  * This is a network taken from
  * https://github.com/dannyneil/spiking_relu_conversion Corresponding paper:
  * Diehl et al.: M. Fast-Classifying, High-Accuracy Spiking Deep Networks
- * Through Weight and Threshold Balancing. Layout: 784x1200x1200x10
- * In contrast to MnistDiehl, use TTFS encoding
+ * Through Weight and Threshold Balancing. Layout: 784 x 1200 x 1200 x 10.
+ * In contrast to MnistDiehl, this SNAB uses TTFS encoding.
  */
 class MnistDiehlTTFS : public MNIST_BASE {
 public:
@@ -337,9 +337,10 @@ public:
 	}
 };
 
-/*
- * A 4 layer network consisting of 2 convolutional and 2 densely connected
- * layer. Layout: conv1: 28x28x16 conv2: 26x26x16 dense1: 128 dense2: 10
+/**
+ * A four layer network consisting of two convolutional and two densely
+ * connected layer. Layout: conv1: 28x28x16, conv2: 26x26x16, dense1: 128,
+ * dense2: 10
  */
 class MnistDoubleCNN : public MNIST_BASE {
 public:
@@ -355,8 +356,8 @@ public:
 };
 
 /**
- * A 4 layer network consisting of 1 convolutional, 1 max pooling
- * and 2 densely connected layer.
+ * A four layer network consisting of one convolutional, one max pooling
+ * and two densely connected layer.
  * Layout:
  * conv1: 28x28x16
  * pool1: 14x14x16

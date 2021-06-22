@@ -55,8 +55,8 @@ public:
 
 /**
  * Similar to the benchmark before, this SNAB measures the bandwidth between
- * neuron populations. Now, the input population firing at maximal frequency
- * consist of the same number of neurons as the target population. The
+ * neuron populations. Here, the input population firing at maximal frequency
+ * consists of the same number of neurons as the target population. The
  * populations are connected via a OneToOne-Connector.
  */
 class GroupMaxFreqToGroup : public SNABBase {
@@ -92,7 +92,7 @@ public:
 
 /**
  * Identical to GroupMaxFreqToGroup, but using the AllToAll connector and
- * allowing different number of input neurons
+ * allowing different numbers for input and target populations
  */
 class GroupMaxFreqToGroupAllToAll : public GroupMaxFreqToGroup {
 public:
@@ -108,7 +108,7 @@ public:
 
 /**
  * Identical to GroupMaxFreqToGroup, but using the FixedProbability connector
- * and allowing different number of input neurons
+ * and allowing different number for input and target populations
  */
 class GroupMaxFreqToGroupProb : public GroupMaxFreqToGroup {
 public:

@@ -27,7 +27,7 @@
 
 namespace SNAB {
 /**
- * Check the input bandwidth by injecting spikes per one to one connection.
+ * Check the input bandwidth by injecting spikes per OneToOne connection.
  * Check if output neurons spike accordingly
  */
 class MaxInputOneToOne : public SNABBase {
@@ -50,7 +50,7 @@ public:
 };
 
 /**
- * Check the input bandwidth by injecting spikes per all to all connection.
+ * Check the input bandwidth by injecting spikes per AllToAll connection.
  * Check if output neurons spike accordingly
  */
 class MaxInputAllToAll : public SNABBase {
@@ -73,7 +73,7 @@ public:
 };
 
 /**
- * Check the input bandwidth by injecting spikes per fixed fan out connection.
+ * Check the input bandwidth by injecting spikes per FixedFanOut connection.
  * Check if output neurons spike accordingly
  */
 class MaxInputFixedOutConnector : public SNABBase {
@@ -105,7 +105,7 @@ public:
 };
 
 /**
- * Check the input bandwidth by injecting spikes per fixed fan out connection.
+ * Check the input bandwidth by injecting spikes per FixedFanIn connection.
  * Check if output neurons spike accordingly
  */
 class MaxInputFixedInConnector : public MaxInputFixedOutConnector {
