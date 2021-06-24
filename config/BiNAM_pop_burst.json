@@ -124,10 +124,10 @@
                 "v_reset": -80,
                 "v_thresh": -55,
                 "tau_refrac": 0,
-                "g_leak": 0.04
+                "g_leak": 0.040
             },
             "neuron_type": "IfFacetsHardware1",
-            "weight": 0.003,
+            "weight": 0.001,
             "input_burst_size": 4,
             "time_window": 100,
             "isi": 2,
