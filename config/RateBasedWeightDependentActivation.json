@@ -73,6 +73,54 @@
         }
     },
     "nmpm1": {
-        "invalid": true
+        "repeat": 10,
+        "neuron_type": "IF_cond_exp",
+        "neuron_params": {
+            "e_rev_E": 0,
+            "v_rest": -80,
+            "v_reset": -80,
+            "v_thresh": -70.7,
+            "tau_syn_E": 2,
+            "tau_refrac": 1,
+            "tau_m": 16.8,
+            "cm": 0.2
+        },
+        "weight_min": 0.001,
+        "weight_max": 0.015,
+        "step_size": 0.001,
+        "#neurons": 10,
+        "presentation_time": 300,
+        "rate": 100,
+        "expected_output": [
+            [
+                0,
+                0,
+                0,
+                0,
+                25,
+                50,
+                50,
+                72.3332,
+                100,
+                100,
+                100,
+                100,
+                100
+            ]
+        ],
+        "setup": {
+            "calib_path": "/wang/data/commissioning/BSS-1/rackplace/33/calibration/current",
+            "defects_path": "/wang/data/commissioning/BSS-1/rackplace/33/derived_plus_calib_blacklisting/current",
+            "neuron_size": 4,
+            "wafer": 33,
+            "hicann": [
+                [
+                    12,13,15,16,17,18,
+                27,28,29,31,32,33,34,35,37,39,41,
+                46,47,48,51,52,53,54,56,57,58,59,60,
+                67,68,70,72,73,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,91,
+                93,95,98,100,101,103,104,105,106,107,108
+                ]]
+        }
     }
 }
