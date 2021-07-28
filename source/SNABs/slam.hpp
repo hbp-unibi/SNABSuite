@@ -31,7 +31,7 @@ namespace SNAB {
  * Implements the mapping part of Simultaneous Localization and Mapping: a 2D
  * robot navigates in a virtual environment. A bumper sensor is triggered
  * whenever the robot touches a wall or obstacle. The internal map of the
- * surrounding is built using STDP.
+ * surroundings is built using STDP.
  */
 class SpikingSlam : public SNABBase {
 private:

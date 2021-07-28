@@ -31,7 +31,7 @@
 namespace SNAB {
 /**
  * Simplest, straight forward method to solve a Sudoku with SNNs. Solves a
- * single SNN using a WTA network.
+ * single Sudoku using a WTA network.
  */
 class SpikingSudoku : public SNABBase {
 protected:
@@ -64,7 +64,7 @@ public:
 /**
  * @brief Identical to SpikingSudoku. However, the network structure is defined
  * in a different way, using only a single population and two connectors. Meant
- * to improve speed on spinnaker + GeNN.
+ * to improve speed on SpiNNaker and GeNN.
  *
  */
 class SpikingSudokuSinglePop : public SpikingSudoku {

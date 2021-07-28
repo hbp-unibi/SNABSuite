@@ -28,7 +28,7 @@
 namespace SNAB {
 /**
  * This SNAB will test the maximal frequency of a single neuron by simply
- * setting the neuron membrane reset-potential above threshold.
+ * setting the neuron membrane reset-/resting-potential above threshold.
  */
 class OutputFrequencySingleNeuron : public SNABBase {
 private:
@@ -48,8 +48,9 @@ public:
 
 /**
  * This SNAB will test the maximal frequency of a single neuron by simply
- * setting the neuron membrane reset-potential above threshold. Although, spikes
- * are only recorded for a single neuron, multiple neurons are simulated
+ * setting the neuron membrane reset-/resting-potential above threshold.
+ * Although, spikes are only recorded for a single neuron, multiple neurons are
+ * simulated
  */
 class OutputFrequencySingleNeuron2 : public SNABBase {
 private:
@@ -72,14 +73,15 @@ public:
  * Here we do a similar test as in OutputFrequencySingleNeurons, but now we
  * increase the number of neurons used. We look at averages over neurons instead
  * of the average of a single neuron. This will show possible shortcuts in
- * communication infrastructure of neuron-nhips to the outer world
+ * communication infrastructure of neuron-chips to the outer world
  */
 class OutputFrequencyMultipleNeurons : public SNABBase {
 private:
 	cypress::PopulationBase m_pop;
 	size_t m_num_neurons = 0;
-    cypress::Real m_runtime = 150.0;
-    bool m_record_spikes = true;
+	cypress::Real m_runtime = 150.0;
+	bool m_record_spikes = true;
+
 public:
 	OutputFrequencyMultipleNeurons(const std::string backend,
 	                               size_t bench_index);

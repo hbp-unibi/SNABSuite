@@ -31,7 +31,7 @@ namespace SNAB {
 using namespace cypress;
 
 /**
- * SimpleWTA: A simple Winner-Takes-All network. Every population represents a
+ * Simple Winner-Takes-All: A simple WTA network. Every population represents a
  * winner, inhibition is directly between the populations.
  */
 class SimpleWTA : public SNABBase {

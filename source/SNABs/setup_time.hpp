@@ -28,7 +28,7 @@
 namespace SNAB {
 
 /**
- * This benchmark measures the setup time with a OneToOne Connector and compares
+ * This benchmark measures the setup time with a OneToOne connector and compares
  * the speedup to the same connection using a FromList connector
  */
 class SetupTimeOneToOne : public SNABBase {
@@ -64,7 +64,7 @@ public:
 };
 
 /**
- * This benchmark measures the setup time with a AllToAll Connector and compares
+ * This benchmark measures the setup time with a AllToAll connector and compares
  * the speedup to the same connection using a FromList connector
  */
 class SetupTimeAllToAll : public SetupTimeOneToOne {
@@ -78,7 +78,7 @@ public:
 };
 
 /**
- * This benchmark measures the setup time with a Random Connector and compares
+ * This benchmark measures the setup time with a Random connector and compares
  * the speedup to the same connection using a FromList connector
  */
 class SetupTimeRandom : public SetupTimeOneToOne {
