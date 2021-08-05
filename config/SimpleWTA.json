@@ -81,6 +81,7 @@
         "invalid": true
     },
     "nmpm1": {
+        "repeat": 10,
         "setup": {
             "calib_path": "/wang/data/commissioning/BSS-1/rackplace/33/calibration/current",
             "defects_path": "/wang/data/commissioning/BSS-1/rackplace/33/derived_plus_calib_blacklisting/current",

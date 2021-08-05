@@ -44,6 +44,7 @@
         "tolerance": 1
     },
     "nmpm1": {
+        "repeat": 10,
         "setup": {
             "calib_path": "/wang/data/calibration/brainscales/current",
             "neuron_size": 4,
