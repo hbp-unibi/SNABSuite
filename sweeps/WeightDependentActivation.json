@@ -1,5 +1,5 @@
 {
-    "snab_name": "RateBasedWeightDependentActivation",
+    "snab_name": "WeightDependentActivation",
     "config": {
         "spikey" : {
             "neuron_params": {
@@ -27,8 +27,10 @@
         },
         "nmpm1": {
             "neuron_params": {
-                "v_thresh": [-78,-55,20],
-                "tau_m": [5,20,20]
+                "v_thresh": [-70,-60,5],
+                "tau_m": [5,20,5],
+                "tau_syn_E":[2,5,3],
+                "e_rev_E": [-20,60,5]
             }
         }
     }

@@ -83,10 +83,68 @@
         "sudoku": "_deps/sudoku_rep-src/sudokus/2x2/Sudoku_0.json"
     },
     "nmpm1": {
-        "invalid": true
+        "invalid": true,
+        "repeat":10,
+        "setup": {
+            "calib_path": "/wang/data/commissioning/BSS-1/rackplace/33/calibration/current",
+            "defects_path": "/wang/data/commissioning/BSS-1/rackplace/33/derived_plus_calib_blacklisting/current",
+            "neuron_size": 4,
+            "digital_weight": true,
+            "bandwidth": 0.8,
+            "synapse_loss": true,
+            "wafer": 33,
+            "hicann": [
+                   [16,17,18,26,27,28,29,31,32,33,34,35,37,39,46,47,48,51,52,53,54,56,57,58,59,74,75,76]
+            ],
+            "keep_mapping":true
+        },
+        "neuron_params": {
+            "e_rev_I": -100,
+            "v_rest": -30,
+            "v_reset": -40,
+            "v_thresh": -20,
+            "tau_refrac": 1.0,
+            "tau_m": 10
+        },
+        "neuron_params_inhib": {
+            "e_rev_I": -100,
+            "v_rest": -30,
+            "v_reset": -40,
+            "v_thresh": -20,
+            "tau_refrac": 1.0,
+            "tau_m": 10
+        },
+        "population": {
+            "number": 2,
+            "weight_exh": 8,
+            "weight_inh": -9,
+            "weight_exh_self": 8,
+            "inhib_number": 2,
+            "self_exc_number": 2
+        },
+        "noise": {
+            "number": 2,
+            "probability": 1,
+            "weight_rand": 15,
+            "noise_rate": 50
+        },
+        "trigger": {
+            "number": 2,
+            "weight": 15,
+            "trigger_rate": 60
+        },
+        "delay": 1,
+        "start": 0,
+        "duration": [
+            50000
+        ],
+        "bin_size": 60,
+        "sudoku": [
+            "_deps/sudoku_rep-src/sudokus/2x2/Sudoku_0.json"
+        ]
     },
     "spikey": {
-        "repeat": 10,
+        "repeat": 1,
         "neuron_params": {
             "tau_m": 8,
             "tau_refrac": 1,
@@ -104,7 +162,7 @@
             "e_rev_I": -100
         },
         "population": {
-            "number": 3,
+            "number": 4,
             "weight_exh": 0.013,
             "weight_exh_self": 0.001,
             "weight_inh": -0.06,

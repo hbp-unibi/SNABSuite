@@ -16,14 +16,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 //#define EIGEN_DEFAULT_DENSE_INDEX_TYPE size_t
-#include "function.hpp"
-
 #include <Eigen/Dense>
 #include <algorithm>
 #include <cypress/backend/power/power.hpp>  // Control of power via netw
 #include <cypress/cypress.hpp>              // Neural network frontend
 #include <cypress/nef.hpp>
 
+#include "function.hpp"
 #include "mnist/mnist_mlp.hpp"
 #include "util/utilities.hpp"
 
@@ -351,19 +350,24 @@ void plot_spikes(const NetworkBase &netw, std::string filename,
  *
  * @param response result of get_responses
  */
-void print_response(const std::pair<std::vector<Real>, const EMatrix> &response)
+void print_response(const std::pair<std::vector<Real>, const EMatrix> &response,
+                    std::ostream &ofs = std::cout)
 {
 	auto &x = response.first;
 	auto &ys = response.second;
-	std::cout << "x\tys\n";
+	ofs << "x";
+    for (ptrdiff_t j = 0; j < ys.cols() ; j++) {
+        ofs<< ", ys" << j;
+    }
+    ofs<< "\n";
 	for (ptrdiff_t i = 0; i < ys.rows(); i++) {
-		std::cout << x[i] << "\t";
-		for (ptrdiff_t j = 0; j < ys.cols() - 1; j++) {
-			std::cout << ys(i, j) << ", ";
+		ofs << x[i] << ",";
+		for (ptrdiff_t j = 0; j < ys.cols()-1 ; j++) {
+			ofs << ys(i, j) << ", ";
 		}
-		std::cout << ys(i, ys.cols() - 1) << std::endl;
+		ofs << ys(i, ys.cols() - 1) << std::endl;
 	}
-	std::cout << std::endl;
+	ofs << std::endl;
 }
 
 void plot_response(const std::pair<std::vector<Real>, const EMatrix> &response,
@@ -465,6 +469,24 @@ void plot_function(std::vector<Real> x,
 	pyplot::tight_layout();
 	pyplot::save(filename);
 }
+
+void write_function(std::vector<Real> x,
+                    std::vector<std::pair<Real, Real>> &values,
+                    std::string filename)
+{
+
+	std::ofstream file;
+	file.open(filename);
+
+	if (file.good()) {
+		file << "#x, target, value\n";
+		for (size_t i = 0; i < values.size(); i++) {
+			file << x[i] << ", " << values[i].first << ", " << values[i].second
+			     << "\n";
+		}
+	}
+	file.close();
+}
 #endif
 }  // namespace
 
@@ -485,11 +507,19 @@ std::vector<std::array<Real, 4>> FunctionApproximation::evaluate()
 	plot_spikes(m_netw_test, _debug_filename("spikes_test.csv"), m_backend,
 	            m_evaluator_test.input_spike_train_len());
 
-	std::cout << "Pre Train\n";
-	print_response(pre_train);
+	std::ofstream file;
+	file.open(_debug_filename("activation_curve_train.csv"));
+	if (file.good()) {
+		print_response(pre_train, file);
+		file.close();
+	}
 	plot_response(pre_train, _debug_filename("activation_curve_train.png"));
-	std::cout << "Post Train\n";
-	print_response(post_train);
+
+	file.open(_debug_filename("activation_curve_test.csv"));
+	if (file.good()) {
+		print_response(post_train, file);
+		file.close();
+	}
 	plot_response(post_train, _debug_filename("activation_curve_test.png"));
 #endif
 
@@ -512,6 +542,8 @@ std::vector<std::array<Real, 4>> FunctionApproximation::evaluate()
 #if SNAB_DEBUG
 		plot_function(post_train.first, res,
 		              _debug_filename("function_" + function.first + ".png"));
+		write_function(post_train.first, res,
+		               _debug_filename("function_" + function.first + ".csv"));
 #endif
 		ret.emplace_back(calculate_statistics(res));
 	}

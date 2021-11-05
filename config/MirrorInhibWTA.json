@@ -95,19 +95,20 @@
             "v_reset": -70,
             "e_rev_I": -80
         },
-        "num_neurons_pop": 20,
+        "num_neurons_pop": 10,
         "num_source_neurons": 10,
         "num_inhibitory_neurons": 15,
         "weight_inp": 0.006,
-        "weight_self": 0.002,
-        "weight_from_inh": -0.02,
-        "weight_to_inh": 0.001,
+        "weight_self": 0.001,
+        "weight_from_inh": -0.060,
+        "weight_to_inh": 0.003,
         "prob_inp": 0.9,
-        "prob_self": 0.5,
+        "prob_self": 0.6,
         "prob_to_inh": 0.8,
         "firing_rate": 80
     },
     "nmpm1": {
+        "repeat": 10,
         "setup": {
             "calib_path": "/wang/data/commissioning/BSS-1/rackplace/33/calibration/current",
             "defects_path": "/wang/data/commissioning/BSS-1/rackplace/33/derived_plus_calib_blacklisting/current",
