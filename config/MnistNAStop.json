@@ -101,7 +101,7 @@
         "scaled_image": false,
         "setup": {
             "timestep": 1,
-            "neurons_per_core": 200
+            "neurons_per_core": [200,200,200,180]
         }
     },
     "spikey": {
